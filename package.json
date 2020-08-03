@@ -1,0 +1,55 @@
+{
+  "name": "fotrino-films",
+  "version": "0.0.1",
+  "productName": "fotrino-films",
+  "author": "Michael Molino <creative@michaelmolino.com>",
+  "private": true,
+  "scripts": {
+    "lint": "eslint --ext .js,.vue ./",
+    "test": "echo \"No test specified\" && exit 0"
+  },
+  "dependencies": {
+    "@quasar/extras": "^1.12.2",
+    "@videojs/themes": "^1.0.1",
+    "axios": "^0.21.2",
+    "core-js": "^3.6.5",
+    "postcss-preset-env": "^7.1.0",
+    "quasar": "2",
+    "underscore": "^1.13.2",
+    "video.js": "^7.17.0",
+    "vue": "^3.0.0",
+    "vue-router": "^4.0.0",
+    "vuex": "4",
+    "vuex-cache": "^3.4.0"
+  },
+  "devDependencies": {
+    "@babel/eslint-parser": "^7.0.0",
+    "@quasar/app": "3",
+    "eslint": "^7.14.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-loader": "^3.0.3",
+    "eslint-plugin-import": "^2.19.1",
+    "eslint-plugin-node": "^11.0.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "eslint-plugin-quasar": "^1.0.0",
+    "eslint-plugin-vue": "^7.0.0-beta.4",
+    "eslint-webpack-plugin": "^2.4.0",
+    "webpack": "^4.44.1"
+  },
+  "browserslist": [
+    "last 10 Chrome versions",
+    "last 10 Firefox versions",
+    "last 4 Edge versions",
+    "last 7 Safari versions",
+    "last 8 Android versions",
+    "last 8 ChromeAndroid versions",
+    "last 8 FirefoxAndroid versions",
+    "last 10 iOS versions",
+    "last 5 Opera versions"
+  ],
+  "engines": {
+    "node": ">= 10.18.1",
+    "npm": ">= 6.13.4",
+    "yarn": ">= 1.21.1"
+  }
+}
