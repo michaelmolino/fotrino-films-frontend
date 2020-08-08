@@ -3,7 +3,7 @@
     <q-toolbar-title>
       <q-btn
         to="/"
-        icon="camera"
+        icon="videocam"
         :label="!$q.platform.is.mobile ? 'Fotrino Films' : ''"
         flat
         no-caps

@@ -1,0 +1,14 @@
+FROM node:14-alpine
+WORKDIR /www/fotrino-films/
+COPY ./ ./
+RUN apk --update add --no-cache --virtual .build-deps git
+RUN yarn install
+RUN yarn global add @quasar/cli
+RUN quasar build -m ssr
+RUN apk del .build-deps
+RUN yarn cache clean
+RUN rm -rf node_modules
+WORKDIR /www/fotrino-films/dist/ssr/
+EXPOSE 3000
+RUN yarn install
+RUN yarn start

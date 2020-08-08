@@ -5,7 +5,7 @@ const routes = [
     children: [
       { path: '', component: () => import('pages/MovieIndex.vue') },
       {
-        path: 'movies/:movieId',
+        path: 'movies/:movieId/:chapterId?',
         component: () => import('pages/ChapterIndex.vue')
       }
     ]

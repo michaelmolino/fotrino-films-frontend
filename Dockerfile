@@ -1,5 +1,5 @@
-FROM node:14.5.0-alpine
-WORKDIR /www/filmino/
+FROM node:14-alpine
+WORKDIR /www/fotrino-films/
 COPY ./ ./
 RUN apk --update add --no-cache --virtual .build-deps git
 RUN yarn install

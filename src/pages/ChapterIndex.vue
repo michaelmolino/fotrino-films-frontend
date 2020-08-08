@@ -1,6 +1,7 @@
 <template>
   <div v-if="!loading">
     <span v-if="!playChapter">
+      <h6 class="q-ml-xl q-mt-lg q-mb-xs">{{ movie.title }}</h6>
       <div class="row">
         <div
           class="q-pa-md col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
@@ -11,8 +12,9 @@
             flat
             dense
             no-caps
-            @click="playChapter = movie.chapters.find(c => c.id === chapter.id)"
+            @click="playAChapter(chapter)"
             class="fit"
+            padding="8px"
           >
             <ChapterPreview
               class="cursor-pointer"
@@ -24,11 +26,10 @@
         </div>
       </div>
       <q-btn
-        fab
         square
-        label="Home"
+        size="lg"
+        color="secondary"
         icon="home"
-        color="accent"
         class="fixed-bottom-right q-mb-lg q-mr-lg"
         to="/"
       />
@@ -36,7 +37,6 @@
     <span v-else>
       <div class="row">
         <div class="q-pa-md col-xs-12 col-md-10">
-          <h6 class="q-my-xs">{{ playChapter.title }}</h6>
           <q-media-player
             dense
             autoplay
@@ -46,15 +46,16 @@
             big-play-button-color="black"
             :playback-rates="[{ label: 'Normal', value: 1 }]"
             style="max-width: 960px;"
+            :poster="playChapter.previewUrl"
           />
+          <h6 class="q-my-xs">{{ playChapter.title }}</h6>
           <q-btn
-            fab
             square
-            label="Back"
-            icon="arrow_back"
-            color="accent"
+            size="lg"
+            color="secondary"
+            icon="arrow_upward"
             class="fixed-bottom-right q-mb-lg q-mr-lg"
-            @click="playChapter = false"
+            @click="playAChapter(false)"
           />
         </div>
       </div>
@@ -80,11 +81,18 @@ export default {
   created: function () {
     this.$q.loading.show()
     this.$axios
-      .get(
-        'https://fotrino-movies.mocklab.io/movies/' + this.$route.params.movieId
-      )
+      .get('api/movies/' + this.$route.params.movieId)
       .then(response => {
         this.movie = response.data
+        if (this.$route.params.chapterId) {
+          this.playAChapter(
+            this.movie.chapters.find(
+              c => c.id === Number(this.$route.params.chapterId)
+            )
+          )
+        } else {
+          this.playAChapter(false)
+        }
         this.loading = false
         this.$q.loading.hide()
       })
@@ -98,6 +106,54 @@ export default {
           multiLine: true
         })
       })
+  },
+  methods: {
+    playAChapter (chapter) {
+      if (chapter) {
+        this.playChapter = this.movie.chapters.find(c => c.id === chapter.id)
+        this.$router
+          .push('/movies/' + this.movie.id + '/' + this.playChapter.id)
+          .catch(() => true)
+        document.title = this.playChapter.title + ' | fotrino-films'
+        document
+          .querySelector('meta[property="og:title"]')
+          .setAttribute('content', this.playChapter.title + ' | fotrino-films')
+        document
+          .querySelector('meta[property="og:image"]')
+          .setAttribute(
+            'content',
+            'https://films.fotrino.com/8851dec8-c991-4ebf-8a7c-eff8b6d1c94c/' +
+              this.playChapter.previewUrl
+          )
+      } else {
+        this.playChapter = false
+        this.$router.push('/movies/' + this.movie.id)
+        document.title = this.movie.title + ' | fotrino-films'
+        document
+          .querySelector('meta[property="og:title"]')
+          .setAttribute('content', this.movie.title + ' | fotrino-films')
+        document
+          .querySelector('meta[property="og:image"]')
+          .setAttribute(
+            'content',
+            'https://films.fotrino.com/8851dec8-c991-4ebf-8a7c-eff8b6d1c94c/' +
+              this.movie.coverUrl
+          )
+      }
+    }
+  },
+  watch: {
+    $route: function (value) {
+      if (value.params.chapterId) {
+        this.playAChapter(
+          this.movie.chapters.find(
+            c => c.id === Number(this.$route.params.chapterId)
+          )
+        )
+      } else {
+        this.playAChapter(false)
+      }
+    }
   }
 }
 </script>

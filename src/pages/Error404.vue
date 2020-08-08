@@ -1,6 +1,6 @@
 <template>
   <div
-    class="fullscreen bg-info text-black text-center q-pa-md flex flex-center"
+    class="fullscreen bg-warning text-black text-center q-pa-md flex flex-center"
   >
     <div>
       <div style="font-size: 30vh">
@@ -13,8 +13,8 @@
 
       <q-btn
         class="q-mt-xl"
-        color="white"
-        text-color="black"
+        color="secondary"
+        text-color="white"
         to="/"
         label="Go Home"
         no-caps

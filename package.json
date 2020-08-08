@@ -1,8 +1,7 @@
 {
-  "name": "filmino",
+  "name": "fotrino-films",
   "version": "0.0.1",
-  "description": "",
-  "productName": "The Molino Family Home Movies",
+  "productName": "fotrino-films",
   "author": "Michael Molino <creative@michaelmolino.com>",
   "private": true,
   "scripts": {

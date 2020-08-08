@@ -21,7 +21,7 @@ module.exports = function (/* ctx */) {
     boot: ['axios'],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
-    css: ['app.sass'],
+    css: ['app.sass', 'app.scss'],
 
     // https://github.com/quasarframework/quasar/tree/dev/extras
     extras: [
@@ -33,7 +33,7 @@ module.exports = function (/* ctx */) {
       // 'line-awesome',
       // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
 
-      'roboto-font', // optional, you are not bound to it
+      // 'roboto-font', // optional, you are not bound to it
       'material-icons' // optional, you are not bound to it
     ],
 
@@ -73,7 +73,16 @@ module.exports = function (/* ctx */) {
     devServer: {
       https: true,
       port: 8080,
-      open: true // opens browser window automatically
+      open: true, // opens browser window automatically
+
+      // backend
+      proxy: [
+        {
+          context: ['/api'],
+          target: 'https://127.0.0.1:65443/',
+          secure: false
+        }
+      ]
     },
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
@@ -112,9 +121,9 @@ module.exports = function (/* ctx */) {
       workboxPluginMode: 'GenerateSW', // 'GenerateSW' or 'InjectManifest'
       workboxOptions: {}, // only for GenerateSW
       manifest: {
-        name: 'The Molino Family Home Movies',
-        short_name: 'The Molino Family Home Movies',
-        description: '',
+        name: 'fotrino-films',
+        short_name: 'fotrino-films',
+        description: 'The transparent video host',
         display: 'standalone',
         orientation: 'portrait',
         background_color: '#ffffff',
@@ -177,7 +186,7 @@ module.exports = function (/* ctx */) {
       builder: {
         // https://www.electron.build/configuration/configuration
 
-        appId: 'filmino'
+        appId: 'fotrino-films'
       },
 
       // More info: https://quasar.dev/quasar-cli/developing-electron-apps/node-integration

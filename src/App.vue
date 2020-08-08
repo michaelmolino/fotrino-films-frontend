@@ -5,6 +5,9 @@
 </template>
 <script>
 export default {
-  name: 'App'
+  name: 'App',
+  created: function () {
+    this.$q.dark.set(false)
+  }
 }
 </script>
