@@ -2,6 +2,7 @@
 .thumbs.db
 node_modules
 *.tar
+*.sh
 
 # Quasar core related directories
 .quasar

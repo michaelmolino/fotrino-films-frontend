@@ -18,7 +18,7 @@ module.exports = function (/* ctx */) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://quasar.dev/quasar-cli/boot-files
-    boot: ['axios'],
+    boot: ['axios', 'vue-plyr'],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
     css: ['app.sass', 'app.scss'],
@@ -72,13 +72,13 @@ module.exports = function (/* ctx */) {
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
     devServer: {
       https: true,
-      port: 8080,
+      port: 8081,
       open: true, // opens browser window automatically
 
       // backend
       proxy: [
         {
-          context: ['/api'],
+          context: ['/8851dec8-c991-4ebf-8a7c-eff8b6d1c94c/api'],
           target: 'https://127.0.0.1:65443/',
           secure: false
         }

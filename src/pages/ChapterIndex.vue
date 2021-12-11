@@ -1,7 +1,6 @@
 <template>
   <div v-if="!loading">
     <span v-if="!playChapter">
-      <h6 class="q-ml-xl q-mt-lg q-mb-xs">{{ movie.title }}</h6>
       <div class="row">
         <div
           class="q-pa-md col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
@@ -29,26 +28,32 @@
         square
         size="lg"
         color="secondary"
-        icon="home"
+        icon="arrow_upward"
         class="fixed-bottom-right q-mb-lg q-mr-lg"
         to="/"
       />
     </span>
     <span v-else>
       <div class="row">
-        <div class="q-pa-md col-xs-12 col-md-10">
-          <q-media-player
-            dense
-            autoplay
-            :show-big-play-button="true"
-            type="video"
-            :sources="[{ src: playChapter.src, type: playChapter.type }]"
-            big-play-button-color="black"
-            :playback-rates="[{ label: 'Normal', value: 1 }]"
-            style="max-width: 960px;"
-            :poster="playChapter.previewUrl"
+        <div class="q-pa-md col-xs-12">
+          <video-player
+            style="max-width: 960px"
+            :options="{
+              autoplay: true,
+              controls: true,
+              fluid: true,
+              responsive: true,
+              sources: [
+                {
+                  src: playChapter.src,
+                  type: playChapter.type
+                }
+              ]
+            }"
           />
+
           <h6 class="q-my-xs">{{ playChapter.title }}</h6>
+
           <q-btn
             square
             size="lg"
@@ -65,11 +70,13 @@
 
 <script>
 import ChapterPreview from '../components/ChapterPreview.vue'
+import VideoPlayer from '../components/VideoPlayer.vue'
 
 export default {
   name: 'ChapterIndex',
   components: {
-    ChapterPreview
+    ChapterPreview,
+    VideoPlayer
   },
   data () {
     return {
@@ -80,14 +87,15 @@ export default {
   },
   created: function () {
     this.$q.loading.show()
+
     this.$axios
       .get('api/movies/' + this.$route.params.movieId)
-      .then(response => {
+      .then((response) => {
         this.movie = response.data
         if (this.$route.params.chapterId) {
           this.playAChapter(
             this.movie.chapters.find(
-              c => c.id === Number(this.$route.params.chapterId)
+              (c) => c.id === Number(this.$route.params.chapterId)
             )
           )
         } else {
@@ -96,7 +104,7 @@ export default {
         this.loading = false
         this.$q.loading.hide()
       })
-      .catch(error => {
+      .catch((error) => {
         this.loading = false
         this.$q.loading.hide()
         this.$q.notify({
@@ -110,7 +118,7 @@ export default {
   methods: {
     playAChapter (chapter) {
       if (chapter) {
-        this.playChapter = this.movie.chapters.find(c => c.id === chapter.id)
+        this.playChapter = this.movie.chapters.find((c) => c.id === chapter.id)
         this.$router
           .push('/movies/' + this.movie.id + '/' + this.playChapter.id)
           .catch(() => true)
@@ -147,7 +155,7 @@ export default {
       if (value.params.chapterId) {
         this.playAChapter(
           this.movie.chapters.find(
-            c => c.id === Number(this.$route.params.chapterId)
+            (c) => c.id === Number(this.$route.params.chapterId)
           )
         )
       } else {
