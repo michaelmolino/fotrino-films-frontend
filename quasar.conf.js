@@ -41,7 +41,7 @@ module.exports = function (/* ctx */) {
     build: {
       vueRouterMode: 'history', // available values: 'hash', 'history'
 
-      publicPath: '/8851dec8-c991-4ebf-8a7c-eff8b6d1c94c',
+      publicPath: '/',
       // transpile: false,
 
       // Add dependencies for transpiling with Babel (Array of string/regex)
@@ -78,7 +78,7 @@ module.exports = function (/* ctx */) {
       // backend
       proxy: [
         {
-          context: ['/8851dec8-c991-4ebf-8a7c-eff8b6d1c94c/api'],
+          context: ['/api'],
           target: 'https://127.0.0.1:65443/',
           secure: false
         }

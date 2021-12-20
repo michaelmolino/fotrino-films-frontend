@@ -1,7 +1,4 @@
 <template>
-  <!-- <div class="fit"> -->
-  <!-- <q-flashcard> -->
-  <!-- <q-flashcard-section transition="nudge-in" class="fit"> -->
   <q-img class="q-ma-xs" :src="coverUrl" :ratio="2 / 3">
     <div class="absolute-bottom text-subtitle1 text-center">
       {{ title }}<br />
@@ -13,9 +10,6 @@
       </div>
     </template>
   </q-img>
-  <!-- </q-flashcard-section> -->
-  <!-- </q-flashcard> -->
-  <!-- </div> -->
 </template>
 
 <script>

@@ -1,6 +1,6 @@
 <template>
   <span v-if="!loading">
-    <h6 class="q-ml-xl q-mt-lg q-mb-xs">{{ this.collection.title }}</h6>
+    <h6 class="q-ml-md q-mt-lg q-mb-xs">{{ this.collection.title }}</h6>
     <div class="row">
       <div
         class="q-pa-md col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
@@ -11,7 +11,14 @@
           flat
           dense
           no-caps
-          :to="'/' + movie.mediaType + '/' + movie.id"
+          :to="
+            '/' +
+            $route.params.userUuid +
+            '/' +
+            movie.mediaType +
+            '/' +
+            movie.id
+          "
           class="fit"
           padding="16px"
         >
@@ -44,8 +51,8 @@ export default {
   created: function () {
     this.$q.loading.show()
     this.$axios
-      .get('api/movies')
-      .then(response => {
+      .get('/api/' + this.$route.params.userUuid + '/movies')
+      .then((response) => {
         this.collection = response.data
         document.title = this.collection.title + ' | fotrino-films'
         document
@@ -57,7 +64,7 @@ export default {
         this.loading = false
         this.$q.loading.hide()
       })
-      .catch(error => {
+      .catch((error) => {
         this.loading = false
         this.$q.loading.hide()
         this.$q.notify({

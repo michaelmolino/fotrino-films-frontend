@@ -5,40 +5,39 @@
     </h6>
     <h6 v-if="$q.platform.is.mobile" class="q-ml-md q-mt-lg q-mb-xs">
       {{ movie.parentTitle }}<br />
-      {{ movie.title }}
+      {{ movie.title }}<br />
     </h6>
-    <MovieCover
-      class="q-ma-lg"
-      :id="movie.id"
-      :title="movie.title"
-      :subTitle="movie.subTitle"
-      :coverUrl="movie.coverUrl"
-      :style="
-        $q.screen.lt.sm ? 'max-width: 50%;' : 'max-width: 25%; float: left;'
-      "
-    />
     <div class="row">
-      <div
-        v-for="chapter in movie.chapters"
-        :key="chapter.id"
-        class="q-pa-md col-xs-12"
-      >
-        <span class="q-my-xs">{{ chapter.title }}</span>
-        <div style="max-width: 720px">
-          <vue-plyr :options="playerOptions">
-            <audio controls preload="auto" style="--plyr-color-main: #00635d">
-              <source :src="chapter.src" :type="chapter.type" />
-              Sorry, your browser doesn't support embedded audio.
-            </audio>
-          </vue-plyr>
-        </div>
+      <div class="q-pa-md col-xs-12">
+        <video-player
+          style="max-width: 720px"
+          :options="{
+            autoplay: false,
+            controls: true,
+            fluid: true,
+            responsive: true,
+            poster: playChapter.previewUrl,
+            sources: [
+              {
+                src: playChapter.src,
+                type: playChapter.type
+              }
+            ]
+          }"
+        />
+        <h4 class="q-ml-md q-mt-lg q-mb-xs">
+          {{ playChapter.title }}
+        </h4>
+
         <q-btn
           square
           size="lg"
           color="secondary"
           icon="arrow_upward"
           class="fixed-bottom-right q-mb-lg q-mr-lg"
-          :to="'/' + $route.params.userUuid"
+          :to="
+            '/' + $route.params.userUuid + '/movies/' + $route.params.movieId
+          "
         />
       </div>
     </div>
@@ -46,21 +45,18 @@
 </template>
 
 <script>
-import MovieCover from '../components/MovieCover.vue'
-import 'vue-plyr/dist/vue-plyr.css'
+import VideoPlayer from '../components/VideoPlayer.vue'
 
 export default {
-  name: 'AudioIndex',
+  name: 'Chapter',
   components: {
-    MovieCover
+    VideoPlayer
   },
   data () {
     return {
       loading: true,
       movie: null,
-      playerOptions: {
-        settings: []
-      }
+      playChapter: false
     }
   },
   created: function () {
@@ -71,19 +67,20 @@ export default {
         '/api/' +
           this.$route.params.userUuid +
           '/movies/' +
-          this.$route.params.audioId
+          this.$route.params.movieId
       )
       .then((response) => {
         this.movie = response.data
-
-        document.title = this.movie.title + ' | fotrino-films'
+        this.playChapter = this.movie.chapters.find(
+          (ch) => ch.id === Number(this.$route.params.chapterId)
+        )
+        document.title = this.playChapter.title + ' | fotrino-films'
         document
           .querySelector('meta[property="og:title"]')
-          .setAttribute('content', this.movie.title + ' | fotrino-films')
+          .setAttribute('content', this.playChapter.title + ' | fotrino-films')
         document
           .querySelector('meta[property="og:image"]')
-          .setAttribute('content', null)
-
+          .setAttribute('content', this.playChapter.previewUrl)
         this.loading = false
         this.$q.loading.hide()
       })

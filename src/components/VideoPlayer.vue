@@ -1,6 +1,6 @@
 <template>
   <div>
-    <video ref="videoPlayer" class="video-js vjs-theme-fantasy"></video>
+    <video ref="videoPlayer" class="video-js vjs-theme-city"></video>
   </div>
 </template>
 
@@ -23,13 +23,7 @@ export default {
     }
   },
   mounted () {
-    this.player = videojs(
-      this.$refs.videoPlayer,
-      this.options,
-      function onPlayerReady () {
-        console.log('onPlayerReady', this)
-      }
-    )
+    this.player = videojs(this.$refs.videoPlayer, this.options)
   },
   beforeDestroy () {
     if (this.player) {
@@ -39,7 +33,5 @@ export default {
 }
 </script>
 
-<style>
-@import 'https://unpkg.com/video.js@7/dist/video-js.min.css';
-@import 'https://unpkg.com/@videojs/themes@1/dist/fantasy/index.css';
-</style>
+<style src="video.js/dist/video-js.min.css"></style>
+<style src="@videojs/themes/dist/city/index.css"></style>
