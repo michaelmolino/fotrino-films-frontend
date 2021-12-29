@@ -1,25 +1,12 @@
 <template>
-  <div v-if="!loading">
-    <q-breadcrumbs class="q-ml-md q-mt-lg q-mb-xs text-h6">
-      <template v-slot:separator>
-        <q-icon size="1.5em" name="chevron_right" color="primary" />
-      </template>
-      <q-breadcrumbs-el
-        :label="collection.title"
-        :to="'/' + $route.params.userUuid"
-      />
-      <q-breadcrumbs-el
-        :label="movie.title"
-        :to="'/' + $route.params.userUuid + '/movies/' + $route.params.movieId"
-      />
-      <q-breadcrumbs-el :label="chapter.title" />
-    </q-breadcrumbs>
+  <div v-if="chapter">
+    <Breadcrumbs :breadcrumbs="this.breadcrumbs" />
     <div class="row">
       <div class="q-pa-md col-xs-12">
         <video-player
           style="max-width: 720px"
           :options="{
-            autoplay: false,
+            autoplay: !!$route.query.fbclid,
             controls: true,
             controlBar: {
               pictureInPictureToggle: false
@@ -45,57 +32,86 @@
 </template>
 
 <script>
+import Breadcrumbs from '../components/Breadcrumbs.vue'
 import VideoPlayer from '../components/VideoPlayer.vue'
 
 export default {
   name: 'Chapter',
   components: {
+    Breadcrumbs,
     VideoPlayer
   },
   data () {
     return {
-      loading: true,
-      collection: null,
-      movie: null,
-      chapter: null
+      metaData: null,
+      breadcrumbs: null
     }
   },
   created: function () {
     this.$q.loading.show()
 
-    this.$axios
-      .get('/api/' + this.$route.params.userUuid + '/movies')
-      .then((response) => {
-        this.collection = response.data
-        this.movie = response.data.movies.find(
-          (m) => m.id === Number(this.$route.params.movieId)
-        )
-        this.chapter = this.movie.chapters.find(
-          (ch) => ch.id === Number(this.$route.params.chapterId)
-        )
-
-        document.title = this.chapter.title + ' | fotrino-films'
-        document
-          .querySelector('meta[property="og:title"]')
-          .setAttribute('content', this.chapter.title + ' | fotrino-films')
-        document
-          .querySelector('meta[property="og:image"]')
-          .setAttribute('content', this.chapter.previewUrl)
-        this.loading = false
-        this.$q.loading.hide()
+    this.$store
+      .dispatch('collection/fetchCollection', {
+        userUuid: this.$route.params.userUuid,
+        movieId: this.$route.params.movieId,
+        chapterId: this.$route.params.chapterId
       })
-      .catch((error) => {
-        this.loading = false
+      .then(() => {
+        this.breadcrumbs = [
+          {
+            id: 0,
+            label: this.collection.title,
+            to: '/' + this.$route.params.userUuid
+          },
+          {
+            id: 1,
+            label: this.movie.title,
+            to:
+              '/' +
+              this.$route.params.userUuid +
+              '/movies/' +
+              this.$route.params.movieId
+          },
+          {
+            id: 2,
+            label: this.chapter.title,
+            to: null
+          }
+        ]
+
+        this.metaData = {
+          title: this.chapter.title + ' | fotrino-films',
+          meta: {
+            ogTitle: {
+              property: 'og:title',
+              content: this.chapter.title + ' | fotrino-films'
+            },
+            ogImage: { name: 'og:image', content: this.chapter.previewUrl }
+          }
+        }
+
         this.$q.loading.hide()
-        this.$q.notify({
-          type: 'negative',
-          message: error.response.data,
-          icon: 'warning',
-          multiLine: true
-        })
       })
   },
-  methods: {},
-  watch: {}
+  computed: {
+    collection: {
+      get () {
+        return this.$store.state.collection.collection
+      }
+    },
+    movie: {
+      get () {
+        return this.$store.state.collection.movie
+      }
+    },
+    chapter: {
+      get () {
+        return this.$store.state.collection.chapter
+      }
+    }
+  },
+  meta () {
+    return this.metaData
+  }
 }
 </script>

@@ -1,11 +1,6 @@
 <template>
-  <span v-if="!loading">
-    <q-breadcrumbs class="q-ml-md q-mt-lg q-mb-xs text-h6">
-      <template v-slot:separator>
-        <q-icon size="1.5em" name="chevron_right" color="primary" />
-      </template>
-      <q-breadcrumbs-el :label="this.collection.title" />
-    </q-breadcrumbs>
+  <span v-if="collection">
+    <Breadcrumbs :breadcrumbs="this.breadcrumbs" />
     <div class="row">
       <div
         class="q-pa-md col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
@@ -49,50 +44,56 @@
 </template>
 
 <script>
+import Breadcrumbs from '../components/Breadcrumbs.vue'
 import MovieCover from '../components/MovieCover.vue'
 
 export default {
   name: 'MovieIndex',
   components: {
+    Breadcrumbs,
     MovieCover
   },
   data () {
     return {
-      loading: true,
-      collection: null
+      metaData: null,
+      breadcrumbs: null
     }
   },
   created: function () {
     this.$q.loading.show()
-    this.$axios
-      .get('/api/' + this.$route.params.userUuid + '/movies')
-      .then((response) => {
-        const movieNode = response.data.movies.sort((a, b) => {
-          return a.sort - b.sort
-        })
-        this.movie = movieNode
-        this.collection = response.data
 
-        document.title = this.collection.title + ' | fotrino-films'
-        document
-          .querySelector('meta[property="og:title"]')
-          .setAttribute('content', this.collection.title + ' | fotrino-films')
-        document
-          .querySelector('meta[property="og:image"]')
-          .setAttribute('content', this.collection.coverUrl)
-        this.loading = false
+    this.$store
+      .dispatch('collection/fetchCollection', {
+        userUuid: this.$route.params.userUuid,
+        movieId: null,
+        chapterId: null
+      })
+      .then(() => {
+        this.breadcrumbs = [{ id: 0, label: this.collection.title, to: null }]
+
+        this.metaData = {
+          title: this.collection.title + ' | fotrino-films',
+          meta: {
+            ogTitle: {
+              property: 'og:title',
+              content: this.collection.title + ' | fotrino-films'
+            },
+            ogImage: { name: 'og:image', content: this.collection.coverUrl }
+          }
+        }
+
         this.$q.loading.hide()
       })
-      .catch((error) => {
-        this.loading = false
-        this.$q.loading.hide()
-        this.$q.notify({
-          type: 'negative',
-          message: error.response.data,
-          icon: 'warning',
-          multiLine: true
-        })
-      })
+  },
+  computed: {
+    collection: {
+      get () {
+        return this.$store.state.collection.collection
+      }
+    }
+  },
+  meta () {
+    return this.metaData
   }
 }
 </script>

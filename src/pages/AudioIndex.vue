@@ -1,15 +1,6 @@
 <template>
-  <div v-if="!loading">
-    <q-breadcrumbs class="q-ml-md q-mt-lg q-mb-xs text-h6">
-      <template v-slot:separator>
-        <q-icon size="1.5em" name="chevron_right" color="primary" />
-      </template>
-      <q-breadcrumbs-el
-        :label="collection.title"
-        :to="'/' + $route.params.userUuid"
-      />
-      <q-breadcrumbs-el :label="movie.title" />
-    </q-breadcrumbs>
+  <div v-if="movie">
+    <Breadcrumbs :breadcrumbs="this.breadcrumbs" />
     <MovieCover
       class="q-ma-lg"
       :id="movie.id"
@@ -41,19 +32,24 @@
 </template>
 
 <script>
+import Breadcrumbs from '../components/Breadcrumbs.vue'
 import MovieCover from '../components/MovieCover.vue'
+
+import Vue from 'vue'
+import VuePlyr from 'vue-plyr'
 import 'vue-plyr/dist/vue-plyr.css'
+Vue.use(VuePlyr)
 
 export default {
   name: 'AudioIndex',
   components: {
-    MovieCover
+    MovieCover,
+    Breadcrumbs
   },
   data () {
     return {
-      loading: true,
-      collection: null,
-      movie: null,
+      metaData: null,
+      breadcrumbs: null,
       playerOptions: {
         settings: []
       }
@@ -62,41 +58,49 @@ export default {
   created: function () {
     this.$q.loading.show()
 
-    this.$axios
-      .get('/api/' + this.$route.params.userUuid + '/movies')
-      .then((response) => {
-        const movieNode = response.data.movies.find(
-          (m) => m.id === Number(this.$route.params.audioId)
-        )
-        movieNode.chapters = movieNode.chapters.sort((a, b) => {
-          return a.sort - b.sort
-        })
-        this.movie = movieNode
-        this.collection = response.data
-
-        document.title = this.movie.title + ' | fotrino-films'
-        document
-          .querySelector('meta[property="og:title"]')
-          .setAttribute('content', this.movie.title + ' | fotrino-films')
-        document
-          .querySelector('meta[property="og:image"]')
-          .setAttribute('content', this.movie.coverUrl)
-
-        this.loading = false
-        this.$q.loading.hide()
+    this.$store
+      .dispatch('collection/fetchCollection', {
+        userUuid: this.$route.params.userUuid,
+        movieId: this.$route.params.audioId,
+        chapterId: null
       })
-      .catch((error) => {
-        this.loading = false
+      .then(() => {
+        this.breadcrumbs = [
+          {
+            id: 0,
+            label: this.collection.title,
+            to: '/' + this.$route.params.userUuid
+          },
+          { id: 1, label: this.movie.title, to: null }
+        ]
+
+        this.metaData = {
+          title: this.movie.title + ' | fotrino-films',
+          meta: {
+            ogTitle: {
+              property: 'og:title',
+              content: this.movie.title + ' | fotrino-films'
+            },
+            ogImage: { name: 'og:image', content: this.movie.coverUrl }
+          }
+        }
         this.$q.loading.hide()
-        this.$q.notify({
-          type: 'negative',
-          message: error.response.data,
-          icon: 'warning',
-          multiLine: true
-        })
       })
   },
-  methods: {},
-  watch: {}
+  computed: {
+    collection: {
+      get () {
+        return this.$store.state.collection.collection
+      }
+    },
+    movie: {
+      get () {
+        return this.$store.state.collection.movie
+      }
+    }
+  },
+  meta () {
+    return this.metaData
+  }
 }
 </script>

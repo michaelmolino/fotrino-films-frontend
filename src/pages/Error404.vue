@@ -11,6 +11,23 @@
 
 <script>
 export default {
-  name: 'Error404'
+  name: 'Error404',
+  data () {
+    return {
+      metaData: {
+        title: 'fotrino-films',
+        meta: {
+          ogTitle: {
+            property: 'og:title',
+            content: 'fotrino-films'
+          },
+          ogImage: { name: 'og:image', content: null }
+        }
+      }
+    }
+  },
+  meta () {
+    return this.metaData
+  }
 }
 </script>
