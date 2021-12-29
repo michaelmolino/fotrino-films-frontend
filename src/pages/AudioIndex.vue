@@ -1,12 +1,15 @@
 <template>
   <div v-if="!loading">
-    <h6 v-if="!$q.platform.is.mobile" class="q-ml-md q-mt-lg q-mb-xs">
-      {{ movie.parentTitle }} > {{ movie.title }}
-    </h6>
-    <h6 v-if="$q.platform.is.mobile" class="q-ml-md q-mt-lg q-mb-xs">
-      {{ movie.parentTitle }}<br />
-      {{ movie.title }}
-    </h6>
+    <q-breadcrumbs class="q-ml-md q-mt-lg q-mb-xs text-h6">
+      <template v-slot:separator>
+        <q-icon size="1.5em" name="chevron_right" color="primary" />
+      </template>
+      <q-breadcrumbs-el
+        :label="collection.title"
+        :to="'/' + $route.params.userUuid"
+      />
+      <q-breadcrumbs-el :label="movie.title" />
+    </q-breadcrumbs>
     <MovieCover
       class="q-ma-lg"
       :id="movie.id"
@@ -32,14 +35,6 @@
             </audio>
           </vue-plyr>
         </div>
-        <q-btn
-          square
-          size="lg"
-          color="secondary"
-          icon="arrow_upward"
-          class="fixed-bottom-right q-mb-lg q-mr-lg"
-          :to="'/' + $route.params.userUuid"
-        />
       </div>
     </div>
   </div>
@@ -57,6 +52,7 @@ export default {
   data () {
     return {
       loading: true,
+      collection: null,
       movie: null,
       playerOptions: {
         settings: []
@@ -67,14 +63,16 @@ export default {
     this.$q.loading.show()
 
     this.$axios
-      .get(
-        '/api/' +
-          this.$route.params.userUuid +
-          '/movies/' +
-          this.$route.params.audioId
-      )
+      .get('/api/' + this.$route.params.userUuid + '/movies')
       .then((response) => {
-        this.movie = response.data
+        const movieNode = response.data.movies.find(
+          (m) => m.id === Number(this.$route.params.audioId)
+        )
+        movieNode.chapters = movieNode.chapters.sort((a, b) => {
+          return a.sort - b.sort
+        })
+        this.movie = movieNode
+        this.collection = response.data
 
         document.title = this.movie.title + ' | fotrino-films'
         document
@@ -82,7 +80,7 @@ export default {
           .setAttribute('content', this.movie.title + ' | fotrino-films')
         document
           .querySelector('meta[property="og:image"]')
-          .setAttribute('content', null)
+          .setAttribute('content', this.movie.coverUrl)
 
         this.loading = false
         this.$q.loading.hide()

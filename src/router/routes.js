@@ -1,6 +1,11 @@
 const routes = [
   {
-    path: '/:userUuid/',
+    path: '/',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [{ path: '', component: () => import('pages/Home.vue') }]
+  },
+  {
+    path: '/:userUuid',
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('pages/MovieIndex.vue') },

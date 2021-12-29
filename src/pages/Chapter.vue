@@ -1,12 +1,19 @@
 <template>
   <div v-if="!loading">
-    <h6 v-if="!$q.platform.is.mobile" class="q-ml-md q-mt-lg q-mb-xs">
-      {{ movie.parentTitle }} > {{ movie.title }}
-    </h6>
-    <h6 v-if="$q.platform.is.mobile" class="q-ml-md q-mt-lg q-mb-xs">
-      {{ movie.parentTitle }}<br />
-      {{ movie.title }}<br />
-    </h6>
+    <q-breadcrumbs class="q-ml-md q-mt-lg q-mb-xs text-h6">
+      <template v-slot:separator>
+        <q-icon size="1.5em" name="chevron_right" color="primary" />
+      </template>
+      <q-breadcrumbs-el
+        :label="collection.title"
+        :to="'/' + $route.params.userUuid"
+      />
+      <q-breadcrumbs-el
+        :label="movie.title"
+        :to="'/' + $route.params.userUuid + '/movies/' + $route.params.movieId"
+      />
+      <q-breadcrumbs-el :label="chapter.title" />
+    </q-breadcrumbs>
     <div class="row">
       <div class="q-pa-md col-xs-12">
         <video-player
@@ -14,31 +21,24 @@
           :options="{
             autoplay: false,
             controls: true,
+            controlBar: {
+              pictureInPictureToggle: false
+            },
             fluid: true,
             responsive: true,
-            poster: playChapter.previewUrl,
+            poster: chapter.previewUrl,
             sources: [
               {
-                src: playChapter.src,
-                type: playChapter.type
+                src: chapter.src,
+                type: chapter.type
               }
             ]
           }"
         />
-        <h4 class="q-ml-md q-mt-lg q-mb-xs">
-          {{ playChapter.title }}
-        </h4>
-
-        <q-btn
-          square
-          size="lg"
-          color="secondary"
-          icon="arrow_upward"
-          class="fixed-bottom-right q-mb-lg q-mr-lg"
-          :to="
-            '/' + $route.params.userUuid + '/movies/' + $route.params.movieId
-          "
-        />
+        <div
+          class="q-pt-md q-pl-md text-body"
+          v-html="chapter.description"
+        ></div>
       </div>
     </div>
   </div>
@@ -55,32 +55,32 @@ export default {
   data () {
     return {
       loading: true,
+      collection: null,
       movie: null,
-      playChapter: false
+      chapter: null
     }
   },
   created: function () {
     this.$q.loading.show()
 
     this.$axios
-      .get(
-        '/api/' +
-          this.$route.params.userUuid +
-          '/movies/' +
-          this.$route.params.movieId
-      )
+      .get('/api/' + this.$route.params.userUuid + '/movies')
       .then((response) => {
-        this.movie = response.data
-        this.playChapter = this.movie.chapters.find(
+        this.collection = response.data
+        this.movie = response.data.movies.find(
+          (m) => m.id === Number(this.$route.params.movieId)
+        )
+        this.chapter = this.movie.chapters.find(
           (ch) => ch.id === Number(this.$route.params.chapterId)
         )
-        document.title = this.playChapter.title + ' | fotrino-films'
+
+        document.title = this.chapter.title + ' | fotrino-films'
         document
           .querySelector('meta[property="og:title"]')
-          .setAttribute('content', this.playChapter.title + ' | fotrino-films')
+          .setAttribute('content', this.chapter.title + ' | fotrino-films')
         document
           .querySelector('meta[property="og:image"]')
-          .setAttribute('content', this.playChapter.previewUrl)
+          .setAttribute('content', this.chapter.previewUrl)
         this.loading = false
         this.$q.loading.hide()
       })

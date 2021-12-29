@@ -5,7 +5,7 @@
     </div>
     <template v-slot:error>
       <div class="absolute-full flex flex-center bg-dark text-white">
-        <h6>{{ title }}</h6>
+        {{ title }}
       </div>
     </template>
   </q-img>
