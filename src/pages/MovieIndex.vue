@@ -62,8 +62,6 @@ export default {
     }
   },
   created: function () {
-    this.$q.loading.show()
-
     this.$store
       .dispatch('collection/fetchCollection', {
         userUuid: this.$route.params.userUuid,
@@ -82,8 +80,6 @@ export default {
           this.collection.title,
           this.collection.coverUrl
         )
-
-        this.$q.loading.hide()
       })
   },
   computed: {

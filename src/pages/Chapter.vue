@@ -50,8 +50,6 @@ export default {
     }
   },
   created: function () {
-    this.$q.loading.show()
-
     this.$store
       .dispatch('collection/fetchCollection', {
         userUuid: this.$route.params.userUuid,
@@ -67,8 +65,6 @@ export default {
         )
 
         this.metaData = setMetaData(this.chapter.title, this.chapter.previewUrl)
-
-        this.$q.loading.hide()
       })
   },
   computed: {

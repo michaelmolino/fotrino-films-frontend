@@ -27,7 +27,6 @@ export function setBreadcrumb (userUuid, collection, movie, chapter) {
   })
 
   if (movie !== null) {
-    console.log(movie)
     breadcrumbs.push({
       id: 1,
       label: movie.title,

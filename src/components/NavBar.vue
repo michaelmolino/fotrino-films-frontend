@@ -6,8 +6,8 @@
         label="Fotrino Films"
         flat
         no-caps
+        disabled
         size="lg"
-        :to="'/' + $route.params.userUuid"
       />
     </q-toolbar-title>
   </q-toolbar>
