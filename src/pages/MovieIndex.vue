@@ -47,6 +47,8 @@
 import Breadcrumbs from '../components/Breadcrumbs.vue'
 import MovieCover from '../components/MovieCover.vue'
 
+import { setMetaData, setBreadcrumb } from '../javascript/library.js'
+
 export default {
   name: 'MovieIndex',
   components: {
@@ -69,18 +71,17 @@ export default {
         chapterId: null
       })
       .then(() => {
-        this.breadcrumbs = [{ id: 0, label: this.collection.title, to: null }]
+        this.breadcrumbs = setBreadcrumb(
+          this.$route.params.userUuid,
+          this.collection,
+          null,
+          null
+        )
 
-        this.metaData = {
-          title: this.collection.title + ' | fotrino-films',
-          meta: {
-            ogTitle: {
-              property: 'og:title',
-              content: this.collection.title + ' | fotrino-films'
-            },
-            ogImage: { name: 'og:image', content: this.collection.coverUrl }
-          }
-        }
+        this.metaData = setMetaData(
+          this.collection.title,
+          this.collection.coverUrl
+        )
 
         this.$q.loading.hide()
       })

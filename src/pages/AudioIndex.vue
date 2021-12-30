@@ -35,6 +35,8 @@
 import Breadcrumbs from '../components/Breadcrumbs.vue'
 import MovieCover from '../components/MovieCover.vue'
 
+import { setMetaData, setBreadcrumb } from '../javascript/library.js'
+
 import Vue from 'vue'
 import VuePlyr from 'vue-plyr'
 import 'vue-plyr/dist/vue-plyr.css'
@@ -65,25 +67,15 @@ export default {
         chapterId: null
       })
       .then(() => {
-        this.breadcrumbs = [
-          {
-            id: 0,
-            label: this.collection.title,
-            to: '/' + this.$route.params.userUuid
-          },
-          { id: 1, label: this.movie.title, to: null }
-        ]
+        this.breadcrumbs = setBreadcrumb(
+          this.$route.params.userUuid,
+          this.collection,
+          this.movie,
+          null
+        )
 
-        this.metaData = {
-          title: this.movie.title + ' | fotrino-films',
-          meta: {
-            ogTitle: {
-              property: 'og:title',
-              content: this.movie.title + ' | fotrino-films'
-            },
-            ogImage: { name: 'og:image', content: this.movie.coverUrl }
-          }
-        }
+        this.metaData = setMetaData(this.movie.title, this.movie.coverUrl)
+
         this.$q.loading.hide()
       })
   },

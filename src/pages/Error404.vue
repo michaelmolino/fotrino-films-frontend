@@ -10,20 +10,13 @@
 </template>
 
 <script>
+import { setMetaData } from '../javascript/library.js'
+
 export default {
   name: 'Error404',
   data () {
     return {
-      metaData: {
-        title: 'fotrino-films',
-        meta: {
-          ogTitle: {
-            property: 'og:title',
-            content: 'fotrino-films'
-          },
-          ogImage: { name: 'og:image', content: null }
-        }
-      }
+      metaData: setMetaData(null, null)
     }
   },
   meta () {

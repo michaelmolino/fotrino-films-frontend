@@ -1,4 +1,4 @@
-import { Notify } from 'quasar'
+import { Notify, Loading } from 'quasar'
 import axios from 'axios'
 
 export function fetchCollection (context, payload) {
@@ -33,6 +33,8 @@ export function fetchCollection (context, payload) {
     })
     .catch((error) => {
       context.commit('SET_COLLECTION', null)
+      context.commit('SET_MOVIE', null)
+      context.commit('SET_CHAPTER', null)
       Notify.create({
         type: 'negative',
         timeout: 0,
@@ -40,5 +42,6 @@ export function fetchCollection (context, payload) {
         icon: 'warning',
         multiLine: true
       })
+      Loading.hide()
     })
 }

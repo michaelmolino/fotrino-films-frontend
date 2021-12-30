@@ -35,6 +35,8 @@
 import Breadcrumbs from '../components/Breadcrumbs.vue'
 import VideoPlayer from '../components/VideoPlayer.vue'
 
+import { setMetaData, setBreadcrumb } from '../javascript/library.js'
+
 export default {
   name: 'Chapter',
   components: {
@@ -57,38 +59,14 @@ export default {
         chapterId: this.$route.params.chapterId
       })
       .then(() => {
-        this.breadcrumbs = [
-          {
-            id: 0,
-            label: this.collection.title,
-            to: '/' + this.$route.params.userUuid
-          },
-          {
-            id: 1,
-            label: this.movie.title,
-            to:
-              '/' +
-              this.$route.params.userUuid +
-              '/movies/' +
-              this.$route.params.movieId
-          },
-          {
-            id: 2,
-            label: this.chapter.title,
-            to: null
-          }
-        ]
+        this.breadcrumbs = setBreadcrumb(
+          this.$route.params.userUuid,
+          this.collection,
+          this.movie,
+          this.chapter
+        )
 
-        this.metaData = {
-          title: this.chapter.title + ' | fotrino-films',
-          meta: {
-            ogTitle: {
-              property: 'og:title',
-              content: this.chapter.title + ' | fotrino-films'
-            },
-            ogImage: { name: 'og:image', content: this.chapter.previewUrl }
-          }
-        }
+        this.metaData = setMetaData(this.chapter.title, this.chapter.previewUrl)
 
         this.$q.loading.hide()
       })
