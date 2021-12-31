@@ -18,9 +18,9 @@
       <div
         v-for="chapter in movie.chapters"
         :key="chapter.id"
-        class="q-pa-md col-xs-12"
+        class="q-ml-xl q-pa-md col-xs-12"
       >
-        <span class="q-my-xs text-h6">{{ chapter.title }}</span>
+        <span class="q-my-xs text-body text-bold">{{ chapter.title }}</span>
         <div style="max-width: 720px">
           <audio
             class=".js-player"
