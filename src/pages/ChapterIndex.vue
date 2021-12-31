@@ -14,13 +14,13 @@
             no-caps
             :to="
               '/' +
-              $route.params.userUuid +
-              '/' +
-              'movies' +
-              '/' +
-              movie.id +
-              '/' +
-              chapter.id
+                $route.params.userUuid +
+                '/' +
+                'movies' +
+                '/' +
+                movie.id +
+                '/' +
+                chapter.id
             "
             class="fit"
             padding="8px"
@@ -39,6 +39,9 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar'
+import { ref } from 'vue'
+
 import Breadcrumbs from '../components/Breadcrumbs.vue'
 import ChapterPreview from '../components/ChapterPreview.vue'
 
@@ -52,7 +55,6 @@ export default {
   },
   data () {
     return {
-      metaData: null,
       breadcrumbs: null
     }
   },
@@ -86,8 +88,14 @@ export default {
       }
     }
   },
-  meta () {
-    return this.metaData
+  setup () {
+    const metaData = ref(setMetaData(null, null))
+    useMeta(() => {
+      return metaData.value
+    })
+    return {
+      metaData
+    }
   }
 }
 </script>

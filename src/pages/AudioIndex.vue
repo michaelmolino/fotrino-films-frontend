@@ -36,6 +36,9 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar'
+import { ref } from 'vue'
+
 import Plyr from 'plyr'
 import 'plyr/dist/plyr.css'
 
@@ -52,7 +55,6 @@ export default {
   },
   data () {
     return {
-      metaData: null,
       breadcrumbs: null
     }
   },
@@ -91,8 +93,14 @@ export default {
       }
     }
   },
-  meta () {
-    return this.metaData
+  setup () {
+    const metaData = ref(setMetaData(null, null))
+    useMeta(() => {
+      return metaData.value
+    })
+    return {
+      metaData
+    }
   }
 }
 </script>

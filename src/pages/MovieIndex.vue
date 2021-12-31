@@ -13,11 +13,11 @@
           no-caps
           :to="
             '/' +
-            $route.params.userUuid +
-            '/' +
-            movie.mediaType +
-            '/' +
-            movie.id
+              $route.params.userUuid +
+              '/' +
+              movie.mediaType +
+              '/' +
+              movie.id
           "
           class="fit"
           padding="16px"
@@ -44,6 +44,9 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar'
+import { ref } from 'vue'
+
 import Breadcrumbs from '../components/Breadcrumbs.vue'
 import MovieCover from '../components/MovieCover.vue'
 
@@ -57,7 +60,6 @@ export default {
   },
   data () {
     return {
-      metaData: null,
       breadcrumbs: null
     }
   },
@@ -89,8 +91,14 @@ export default {
       }
     }
   },
-  meta () {
-    return this.metaData
+  setup () {
+    const metaData = ref(setMetaData(null, null))
+    useMeta(() => {
+      return metaData.value
+    })
+    return {
+      metaData
+    }
   }
 }
 </script>

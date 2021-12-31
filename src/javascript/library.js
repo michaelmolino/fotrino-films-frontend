@@ -50,5 +50,7 @@ export function setBreadcrumb (userUuid, collection, movie, chapter) {
     })
   }
 
+  breadcrumbs[breadcrumbs.length - 1].to = null
+
   return breadcrumbs
 }
