@@ -19,12 +19,16 @@
       >
         <span class="q-my-xs">{{ chapter.title }}</span>
         <div style="max-width: 720px">
-          <vue-plyr :options="playerOptions">
-            <audio controls preload="auto" style="--plyr-color-main: #00635d">
-              <source :src="chapter.src" :type="chapter.type" />
-              Sorry, your browser doesn't support embedded audio.
-            </audio>
-          </vue-plyr>
+          <audio
+            class=".js-player"
+            controls
+            data-plyr-config='{ "settings":  [] }'
+            preload="auto"
+            style="--plyr-color-main: #00635d"
+          >
+            <source :src="chapter.src" :type="chapter.type" />
+            Sorry, your browser doesn't support embedded audio.
+          </audio>
         </div>
       </div>
     </div>
@@ -32,15 +36,13 @@
 </template>
 
 <script>
+import Plyr from 'plyr'
+import 'plyr/dist/plyr.css'
+
 import Breadcrumbs from '../components/Breadcrumbs.vue'
 import MovieCover from '../components/MovieCover.vue'
 
 import { setMetaData, setBreadcrumb } from '../javascript/library.js'
-
-import Vue from 'vue'
-import VuePlyr from 'vue-plyr'
-import 'vue-plyr/dist/vue-plyr.css'
-Vue.use(VuePlyr)
 
 export default {
   name: 'AudioIndex',
@@ -51,10 +53,7 @@ export default {
   data () {
     return {
       metaData: null,
-      breadcrumbs: null,
-      playerOptions: {
-        settings: []
-      }
+      breadcrumbs: null
     }
   },
   created: function () {
@@ -74,6 +73,11 @@ export default {
 
         this.metaData = setMetaData(this.movie.title, this.movie.coverUrl)
       })
+  },
+  updated: function () {
+    Array.from(document.getElementsByClassName('.js-player')).map(
+      p => new Plyr(p)
+    )
   },
   computed: {
     collection: {
