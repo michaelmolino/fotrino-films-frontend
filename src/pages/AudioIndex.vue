@@ -1,23 +1,26 @@
 <template>
   <div v-if="movie">
-    <Breadcrumbs :breadcrumbs="this.breadcrumbs" />
-    <MovieCover
-      class="q-ma-lg"
-      :id="movie.id"
-      :title="movie.title"
-      :subTitle="movie.subTitle"
-      :coverUrl="movie.coverUrl"
+    <Breadcrumbs
+      :userUuid="$route.params.userUuid"
+      :collection="collection"
+      :movie="movie"
+      :chapter="null"
+    />
+    <!-- <MovieCover
+      :badge="false"
+      :movie="movie"
+      :userUuid="$route.params.userUuid"
       :style="
         $q.screen.lt.sm ? 'max-width: 50%;' : 'max-width: 25%; float: left;'
       "
-    />
+    /> -->
     <div class="row">
       <div
         v-for="chapter in movie.chapters"
         :key="chapter.id"
         class="q-pa-md col-xs-12"
       >
-        <span class="q-my-xs">{{ chapter.title }}</span>
+        <span class="q-my-xs text-h6">{{ chapter.title }}</span>
         <div style="max-width: 720px">
           <audio
             class=".js-player"
@@ -37,26 +40,19 @@
 
 <script>
 import { useMeta } from 'quasar'
-import { ref } from 'vue'
+import { ref, defineAsyncComponent } from 'vue'
 
 import Plyr from 'plyr'
 import 'plyr/dist/plyr.css'
 
-import Breadcrumbs from '../components/Breadcrumbs.vue'
-import MovieCover from '../components/MovieCover.vue'
-
-import { setMetaData, setBreadcrumb } from '../javascript/library.js'
+import { setMetaData } from '../javascript/library.js'
 
 export default {
   name: 'AudioIndex',
   components: {
-    MovieCover,
-    Breadcrumbs
-  },
-  data () {
-    return {
-      breadcrumbs: null
-    }
+    Breadcrumbs: defineAsyncComponent(() =>
+      import('../components/Breadcrumbs.vue')
+    )
   },
   created: function () {
     this.$store
@@ -66,13 +62,6 @@ export default {
         chapterId: null
       })
       .then(() => {
-        this.breadcrumbs = setBreadcrumb(
-          this.$route.params.userUuid,
-          this.collection,
-          this.movie,
-          null
-        )
-
         this.metaData = setMetaData(this.movie.title, this.movie.coverUrl)
       })
   },
