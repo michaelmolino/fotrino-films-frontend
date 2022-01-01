@@ -12,7 +12,7 @@ export function setMetaData (title, image) {
         property: 'og:title',
         content: title
       },
-      ogImage: { name: 'og:image', content: image }
+      ogImage: { property: 'og:image', content: image }
     }
   }
 }
