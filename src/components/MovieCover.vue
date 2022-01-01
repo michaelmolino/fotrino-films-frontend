@@ -8,7 +8,6 @@
     padding="16px"
   >
     <q-badge
-      v-if="badge"
       style="z-index: 999 !important"
       class="bg-accent q-pa-md"
       align="middle"
@@ -37,8 +36,7 @@ export default {
   name: 'MovieCover',
   props: {
     movie: Object,
-    userUuid: String,
-    badge: Boolean
+    userUuid: String
   }
 }
 </script>

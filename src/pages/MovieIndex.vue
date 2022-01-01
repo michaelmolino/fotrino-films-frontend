@@ -12,11 +12,7 @@
         v-for="movie in collection.movies"
         :key="movie.id"
       >
-        <MovieCover
-          :badge="true"
-          :movie="movie"
-          :userUuid="$route.params.userUuid"
-        />
+        <MovieCover :movie="movie" :userUuid="$route.params.userUuid" />
       </div>
     </div>
   </span>

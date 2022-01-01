@@ -6,14 +6,6 @@
       :movie="movie"
       :chapter="null"
     />
-    <!-- <MovieCover
-      :badge="false"
-      :movie="movie"
-      :userUuid="$route.params.userUuid"
-      :style="
-        $q.screen.lt.sm ? 'max-width: 50%;' : 'max-width: 25%; float: left;'
-      "
-    /> -->
     <div class="row">
       <div
         v-for="chapter in movie.chapters"
@@ -27,7 +19,7 @@
             controls
             data-plyr-config='{ "settings":  [] }'
             preload="auto"
-            style="--plyr-color-main: #00635d"
+            style="--plyr-color-main: #8D6A9F"
           >
             <source :src="chapter.src" :type="chapter.type" />
             Sorry, your browser doesn't support embedded audio.
@@ -93,3 +85,10 @@ export default {
   }
 }
 </script>
+
+<style lang="sass">
+:root
+  --plyr-audio-controls-background: $dark
+  --plyr-audio-control-color: $dark
+  // --plyr-color-main: $accent
+</style>
