@@ -25,7 +25,7 @@ export default {
   mounted () {
     this.player = videojs(this.$refs.videoPlayer, this.options)
   },
-  beforeDestroy () {
+  beforeUnmount () {
     if (this.player) {
       this.player.dispose()
     }

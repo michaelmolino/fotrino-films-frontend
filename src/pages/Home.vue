@@ -13,17 +13,16 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar'
 import { setMetaData } from '../javascript/library.js'
 
 export default {
   name: 'Home',
-  data () {
-    return {
-      metaData: setMetaData(null, null)
-    }
-  },
-  meta () {
-    return this.metaData
+  setup () {
+    const metaData = setMetaData(null, null)
+    useMeta(() => {
+      return metaData
+    })
   }
 }
 </script>

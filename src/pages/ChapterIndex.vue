@@ -1,60 +1,46 @@
 <template>
   <div v-if="movie">
-    <Breadcrumbs :breadcrumbs="this.breadcrumbs" />
+    <Breadcrumbs
+      :userUuid="$route.params.userUuid"
+      :collection="collection"
+      :movie="movie"
+      :chapter="null"
+    />
     <div class="row">
       <div
         class="q-pa-md col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
         v-for="chapter in movie.chapters"
         :key="chapter.id"
       >
-        <div :class="chapter.primary ? 'bg-accent' : ''">
-          <q-btn
-            flat
-            dense
-            no-caps
-            :to="
-              '/' +
-              $route.params.userUuid +
-              '/' +
-              'movies' +
-              '/' +
-              movie.id +
-              '/' +
-              chapter.id
-            "
-            class="fit"
-            padding="8px"
-          >
-            <ChapterPreview
-              class="cursor-pointer"
-              :id="chapter.id"
-              :title="chapter.title"
-              :previewUrl="chapter.previewUrl"
-            />
-          </q-btn>
-        </div>
+        <ChapterPreview
+          class="cursor-pointer"
+          :chapterId="chapter.id"
+          :movieId="movie.id"
+          :title="chapter.title"
+          :previewUrl="chapter.previewUrl"
+          :primary="chapter.primary"
+          :userUuid="$route.params.userUuid"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import Breadcrumbs from '../components/Breadcrumbs.vue'
-import ChapterPreview from '../components/ChapterPreview.vue'
+import { useMeta } from 'quasar'
+import { defineAsyncComponent, ref } from 'vue'
 
-import { setMetaData, setBreadcrumb } from '../javascript/library.js'
+import { setMetaData } from '../javascript/library.js'
 
 export default {
   name: 'ChapterIndex',
   components: {
-    Breadcrumbs,
-    ChapterPreview
-  },
-  data () {
-    return {
-      metaData: null,
-      breadcrumbs: null
-    }
+    Breadcrumbs: defineAsyncComponent(() =>
+      import('../components/Breadcrumbs.vue')
+    ),
+    ChapterPreview: defineAsyncComponent(() =>
+      import('../components/ChapterPreview.vue')
+    )
   },
   created: function () {
     this.$store
@@ -64,13 +50,6 @@ export default {
         chapterId: null
       })
       .then(() => {
-        this.breadcrumbs = setBreadcrumb(
-          this.$route.params.userUuid,
-          this.collection,
-          this.movie,
-          null
-        )
-
         this.metaData = setMetaData(this.movie.title, this.movie.coverUrl)
       })
   },
@@ -86,8 +65,14 @@ export default {
       }
     }
   },
-  meta () {
-    return this.metaData
+  setup () {
+    const metaData = ref(setMetaData(null, null))
+    useMeta(() => {
+      return metaData.value
+    })
+    return {
+      metaData
+    }
   }
 }
 </script>

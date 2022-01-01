@@ -1,6 +1,11 @@
 <template>
   <div v-if="chapter">
-    <Breadcrumbs :breadcrumbs="this.breadcrumbs" />
+    <Breadcrumbs
+      :userUuid="$route.params.userUuid"
+      :collection="collection"
+      :movie="movie"
+      :chapter="chapter"
+    />
     <div class="row">
       <div class="q-pa-md col-xs-12">
         <video-player
@@ -9,7 +14,8 @@
             autoplay: !!$route.query.fbclid,
             controls: true,
             controlBar: {
-              pictureInPictureToggle: false
+              pictureInPictureToggle: false,
+              captionsButton: false
             },
             fluid: true,
             responsive: true,
@@ -32,22 +38,20 @@
 </template>
 
 <script>
-import Breadcrumbs from '../components/Breadcrumbs.vue'
-import VideoPlayer from '../components/VideoPlayer.vue'
+import { useMeta } from 'quasar'
+import { ref, defineAsyncComponent } from 'vue'
 
-import { setMetaData, setBreadcrumb } from '../javascript/library.js'
+import { setMetaData } from '../javascript/library.js'
 
 export default {
   name: 'Chapter',
   components: {
-    Breadcrumbs,
-    VideoPlayer
-  },
-  data () {
-    return {
-      metaData: null,
-      breadcrumbs: null
-    }
+    Breadcrumbs: defineAsyncComponent(() =>
+      import('../components/Breadcrumbs.vue')
+    ),
+    VideoPlayer: defineAsyncComponent(() =>
+      import('../components/VideoPlayer.vue')
+    )
   },
   created: function () {
     this.$store
@@ -57,13 +61,6 @@ export default {
         chapterId: this.$route.params.chapterId
       })
       .then(() => {
-        this.breadcrumbs = setBreadcrumb(
-          this.$route.params.userUuid,
-          this.collection,
-          this.movie,
-          this.chapter
-        )
-
         this.metaData = setMetaData(this.chapter.title, this.chapter.previewUrl)
       })
   },
@@ -84,8 +81,14 @@ export default {
       }
     }
   },
-  meta () {
-    return this.metaData
+  setup () {
+    const metaData = ref(setMetaData(null, null))
+    useMeta(() => {
+      return metaData.value
+    })
+    return {
+      metaData
+    }
   }
 }
 </script>

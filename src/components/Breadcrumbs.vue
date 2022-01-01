@@ -16,7 +16,53 @@
 export default {
   name: 'BreadCrumbs',
   props: {
-    breadcrumbs: Array
+    userUuid: String,
+    collection: Object,
+    movie: Object,
+    chapter: Object
+  },
+  data () {
+    return {
+      breadcrumbs: null
+    }
+  },
+  created: function () {
+    const breadcrumbs = []
+
+    breadcrumbs.push({
+      id: 0,
+      label: this.collection.title,
+      to: '/' + this.userUuid
+    })
+
+    if (this.movie !== null) {
+      breadcrumbs.push({
+        id: 1,
+        label: this.movie.title,
+        to:
+          '/' + this.userUuid + '/' + this.movie.mediaType + '/' + this.movie.id
+      })
+    }
+
+    if (this.movie !== null && this.chapter !== null) {
+      breadcrumbs.push({
+        id: 2,
+        label: this.chapter.title,
+        to:
+          '/' +
+          this.userUuid +
+          '/' +
+          this.movie.mediaType +
+          '/' +
+          this.movie.id +
+          '/' +
+          this.chapter.id
+      })
+    }
+
+    breadcrumbs[breadcrumbs.length - 1].to = null
+
+    this.breadcrumbs = breadcrumbs
   }
 }
 </script>

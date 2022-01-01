@@ -1,65 +1,42 @@
 <template>
   <span v-if="collection">
-    <Breadcrumbs :breadcrumbs="this.breadcrumbs" />
+    <Breadcrumbs
+      :userUuid="$route.params.userUuid"
+      :collection="collection"
+      :movie="null"
+      :chapter="null"
+    />
     <div class="row">
       <div
         class="q-pa-md col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
         v-for="movie in collection.movies"
         :key="movie.id"
       >
-        <q-btn
-          flat
-          dense
-          no-caps
-          :to="
-            '/' +
-            $route.params.userUuid +
-            '/' +
-            movie.mediaType +
-            '/' +
-            movie.id
-          "
-          class="fit"
-          padding="16px"
-        >
-          <q-badge
-            style="z-index: 999 !important"
-            class="bg-accent q-pa-md"
-            align="middle"
-            floating
-            transparent
-          >
-            <span class="text-bold">{{ movie.chapters.length }}</span>
-          </q-badge>
-          <MovieCover
-            :id="movie.id"
-            :title="movie.title"
-            :subTitle="movie.subTitle"
-            :coverUrl="movie.coverUrl"
-          />
-        </q-btn>
+        <MovieCover
+          :badge="true"
+          :movie="movie"
+          :userUuid="$route.params.userUuid"
+        />
       </div>
     </div>
   </span>
 </template>
 
 <script>
-import Breadcrumbs from '../components/Breadcrumbs.vue'
-import MovieCover from '../components/MovieCover.vue'
+import { useMeta } from 'quasar'
+import { defineAsyncComponent, ref } from 'vue'
 
-import { setMetaData, setBreadcrumb } from '../javascript/library.js'
+import { setMetaData } from '../javascript/library.js'
 
 export default {
   name: 'MovieIndex',
   components: {
-    Breadcrumbs,
-    MovieCover
-  },
-  data () {
-    return {
-      metaData: null,
-      breadcrumbs: null
-    }
+    Breadcrumbs: defineAsyncComponent(() =>
+      import('../components/Breadcrumbs.vue')
+    ),
+    MovieCover: defineAsyncComponent(() =>
+      import('../components/MovieCover.vue')
+    )
   },
   created: function () {
     this.$store
@@ -69,13 +46,6 @@ export default {
         chapterId: null
       })
       .then(() => {
-        this.breadcrumbs = setBreadcrumb(
-          this.$route.params.userUuid,
-          this.collection,
-          null,
-          null
-        )
-
         this.metaData = setMetaData(
           this.collection.title,
           this.collection.coverUrl
@@ -89,8 +59,14 @@ export default {
       }
     }
   },
-  meta () {
-    return this.metaData
+  setup () {
+    const metaData = ref(setMetaData(null, null))
+    useMeta(() => {
+      return metaData.value
+    })
+    return {
+      metaData
+    }
   }
 }
 </script>
