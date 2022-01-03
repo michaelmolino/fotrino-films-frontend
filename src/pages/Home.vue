@@ -2,18 +2,18 @@
   <div style="max-width: 720px">
     <div class="q-pa-xl text-h6 text-center text-uppercase">Hello, World!</div>
     <div class="q-pl-xl text-body1 text-left">
-      <span v-if="!lastCollection.collectionId">
-        This website is private and by invitation only. You probably got here by
-        accident. If you're looking for something specific, then make sure you
-        followed the correct link.
-      </span>
-      <span v-else>
+      <span v-if="lastCollection">
         Not much here... You probably meant to visit
         <q-btn
           flat
           :label="lastCollection.title"
           :to="'/' + lastCollection.collectionId"
         />
+      </span>
+      <span v-else>
+        This website is private and by invitation only. You probably got here by
+        accident. If you're looking for something specific, then make sure you
+        followed the correct link.
       </span>
       <p />
       Problems?
@@ -36,7 +36,7 @@ export default {
   name: 'Home',
   data () {
     return {
-      lastCollection: null
+      lastCollection: false
     }
   },
   setup () {
