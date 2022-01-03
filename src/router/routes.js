@@ -2,7 +2,10 @@ const routes = [
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/Home.vue') }]
+    children: [
+      { path: '', component: () => import('pages/Home.vue') },
+      { path: 'terms', component: () => import('pages/Terms.vue') }
+    ]
   },
   {
     path: '/:userUuid',

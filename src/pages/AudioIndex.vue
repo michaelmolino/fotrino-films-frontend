@@ -6,25 +6,26 @@
       :movie="movie"
       :chapter="null"
     />
-    <div class="row">
-      <div
-        v-for="chapter in movie.chapters"
-        :key="chapter.id"
-        class="q-ml-xl q-pa-md col-xs-12"
-      >
-        <span class="q-my-xs text-body text-bold">{{ chapter.title }}</span>
-        <div style="max-width: 720px">
-          <audio
-            class=".js-player"
-            controls
-            data-plyr-config='{ "settings":  [] }'
-            preload="auto"
-            style="--plyr-color-main: #8D6A9F"
-          >
-            <source :src="chapter.src" :type="chapter.type" />
-            Sorry, your browser doesn't support embedded audio.
-          </audio>
-        </div>
+    <div
+      v-for="chapter in movie.chapters"
+      :key="chapter.id"
+      class="row q-ml-lg q-pa-md"
+      style="max-width: 720px"
+    >
+      <div class="q-my-xs col-xs-12">
+        <span class="q-my-xs text-body text-bold ellipsis">{{
+          chapter.title
+        }}</span>
+        <audio
+          class=".js-player"
+          controls
+          data-plyr-config='{ "settings":  [] }'
+          preload="auto"
+          style="--plyr-color-main: #8D6A9F"
+        >
+          <source :src="chapter.src" :type="chapter.type" />
+          Sorry, your browser doesn't support embedded audio.
+        </audio>
       </div>
     </div>
   </div>

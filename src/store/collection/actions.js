@@ -10,20 +10,21 @@ export function fetchCollection (context, payload) {
 
   return axios
     .get('/api/' + userUuid + '/movies')
-    .then((response) => {
+    .then(response => {
       let chapter = null
       let movie = null
       const collection = response.data
+      collection.uuid = userUuid
 
       if (movieId !== null) {
-        movie = collection.movies.find((m) => m.id === movieId)
+        movie = collection.movies.find(m => m.id === movieId)
         movie.chapters = movie.chapters.sort((a, b) => {
           return a.sort - b.sort
         })
       }
 
       if (movieId !== null && chapterId !== null) {
-        chapter = movie.chapters.find((ch) => ch.id === chapterId)
+        chapter = movie.chapters.find(ch => ch.id === chapterId)
       }
 
       collection.movies = collection.movies.sort((a, b) => {
@@ -36,7 +37,7 @@ export function fetchCollection (context, payload) {
 
       Loading.hide()
     })
-    .catch((error) => {
+    .catch(error => {
       context.commit('SET_COLLECTION', null)
       context.commit('SET_MOVIE', null)
       context.commit('SET_CHAPTER', null)

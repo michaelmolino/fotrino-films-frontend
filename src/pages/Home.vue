@@ -1,28 +1,58 @@
 <template>
   <div style="max-width: 720px">
-    <div class="q-pa-xl text-h3 text-center text-uppercase">Hello, World!</div>
-
+    <div class="q-pa-xl text-h6 text-center text-uppercase">Hello, World!</div>
     <div class="q-pl-xl text-body1 text-left">
-      This website is private and by invitation only. You probably got here by
-      accident. If you're looking for something specific, then make sure you
-      followed the correct link.
+      <span v-if="!lastCollection.collectionId">
+        This website is private and by invitation only. You probably got here by
+        accident. If you're looking for something specific, then make sure you
+        followed the correct link.
+      </span>
+      <span v-else>
+        Not much here... You probably meant to visit
+        <q-btn
+          flat
+          :label="lastCollection.title"
+          :to="'/' + lastCollection.collectionId"
+        />
+      </span>
       <p />
-      Problems? creative@michaelmolino.com
+      Problems?
+      <p />
+      <q-btn
+        flat
+        icon="email"
+        label="creative@michaelmolino.com"
+        href="mailto:creative@michaelmolino.com"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import { useMeta } from 'quasar'
+import { useMeta, useQuasar } from 'quasar'
 import { setMetaData } from '../javascript/library.js'
 
 export default {
   name: 'Home',
+  data () {
+    return {
+      lastCollection: null
+    }
+  },
   setup () {
     const metaData = setMetaData(null, null)
     useMeta(() => {
       return metaData
     })
+  },
+  created () {
+    const $q = useQuasar()
+
+    try {
+      this.lastCollection = $q.localStorage.getItem('fotrino-films-last')
+    } catch (e) {
+      console.log(e)
+    }
   }
 }
 </script>

@@ -8,26 +8,7 @@
     />
     <div class="row">
       <div class="q-pa-md col-xs-12">
-        <video-player
-          style="max-width: 720px"
-          :options="{
-            autoplay: !!$route.query.fbclid,
-            controls: true,
-            controlBar: {
-              pictureInPictureToggle: false,
-              captionsButton: false
-            },
-            fluid: true,
-            responsive: true,
-            poster: chapter.previewUrl,
-            sources: [
-              {
-                src: chapter.src,
-                type: chapter.type
-              }
-            ]
-          }"
-        />
+        <video-player style="max-width: 720px" :options="options" />
         <div
           class="q-pt-md q-pl-md text-body"
           v-html="chapter.description"
@@ -53,6 +34,11 @@ export default {
       import('../components/VideoPlayer.vue')
     )
   },
+  data () {
+    return {
+      options: null
+    }
+  },
   created: function () {
     this.$store
       .dispatch('collection/fetchCollection', {
@@ -61,6 +47,23 @@ export default {
         chapterId: this.$route.params.chapterId
       })
       .then(() => {
+        this.options = {
+          autoplay: !!this.$route.query.fbclid,
+          controls: true,
+          controlBar: {
+            pictureInPictureToggle: false,
+            captionsButton: false
+          },
+          fluid: true,
+          responsive: true,
+          poster: this.chapter.previewUrl,
+          sources: [
+            {
+              src: this.chapter.src,
+              type: this.chapter.type
+            }
+          ]
+        }
         this.metaData = setMetaData(this.chapter.title, this.chapter.previewUrl)
       })
   },

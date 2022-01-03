@@ -1,21 +1,22 @@
 <template>
-  <q-toolbar class="bg-primary text-white">
+  <q-toolbar>
     <q-toolbar-title>
       <q-btn
         icon="videocam"
         label="Fotrino Films"
         flat
         no-caps
-        disabled
         size="lg"
+        to="/"
       />
     </q-toolbar-title>
     <q-toggle
+      class="text-uppercase"
       v-model="darkMode"
       unchecked-icon="wb_sunny"
       checked-icon="nights_stay"
       :label="$q.screen.gt.xs ? 'Dark Mode' : ''"
-      color="info"
+      color="secondary"
       keep-color
     />
   </q-toolbar>

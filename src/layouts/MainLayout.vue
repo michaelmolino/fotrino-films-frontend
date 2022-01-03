@@ -1,19 +1,27 @@
 <template>
   <q-layout view="hHh lpR fFf">
-    <NavBar />
+    <q-header elevated class="bg-primary text-white">
+      <NavBar />
+    </q-header>
+
     <q-page-container>
       <router-view />
     </q-page-container>
+
+    <q-footer reveal elevated class="bg-secondary text-white">
+      <Footer />
+    </q-footer>
   </q-layout>
 </template>
 
 <script>
-import NavBar from '../components/NavBar.vue'
+import { defineAsyncComponent } from 'vue'
 
 export default {
   name: 'MainLayout',
   components: {
-    NavBar
+    NavBar: defineAsyncComponent(() => import('../components/NavBar.vue')),
+    Footer: defineAsyncComponent(() => import('../components/Footer.vue'))
   }
 }
 </script>
