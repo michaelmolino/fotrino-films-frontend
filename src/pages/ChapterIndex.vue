@@ -42,14 +42,18 @@ export default {
       import('../components/ChapterPreview.vue')
     )
   },
+  data () {
+    return {
+      movie: null
+    }
+  },
   created: function () {
-    this.$store
-      .dispatch('collection/fetchCollection', {
-        userUuid: this.$route.params.userUuid,
-        movieId: this.$route.params.movieId,
-        chapterId: null
-      })
+    this.$store.cache
+      .dispatch('collection/fetchCollection', this.$route.params.userUuid)
       .then(() => {
+        this.movie = this.collection.movies.find(
+          m => m.id === Number(this.$route.params.movieId)
+        )
         this.metaData = setMetaData(this.movie.title, this.movie.coverUrl)
       })
   },
@@ -57,11 +61,6 @@ export default {
     collection: {
       get () {
         return this.$store.state.collection.collection
-      }
-    },
-    movie: {
-      get () {
-        return this.$store.state.collection.movie
       }
     }
   },

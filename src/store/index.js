@@ -1,4 +1,5 @@
 import { createStore } from 'vuex'
+import createCache from 'vuex-cache'
 import collection from './collection'
 
 export default function (/* { ssrContext } */) {
@@ -6,6 +7,7 @@ export default function (/* { ssrContext } */) {
     modules: {
       collection
     },
+    plugins: [createCache()],
 
     // enable strict mode (adds overhead!)
     // for dev mode and --debug builds only

@@ -9,15 +9,5 @@ export function SET_COLLECTION (state, collection) {
   }
   try {
     LocalStorage.set('fotrino-films-last', lastCollection)
-  } catch (e) {
-    console.log(e)
-  }
-}
-
-export function SET_MOVIE (state, movie) {
-  state.movie = movie
-}
-
-export function SET_CHAPTER (state, chapter) {
-  state.chapter = chapter
+  } catch (e) {}
 }

@@ -47,14 +47,18 @@ export default {
       import('../components/Breadcrumbs.vue')
     )
   },
+  data () {
+    return {
+      movie: null
+    }
+  },
   created: function () {
-    this.$store
-      .dispatch('collection/fetchCollection', {
-        userUuid: this.$route.params.userUuid,
-        movieId: this.$route.params.audioId,
-        chapterId: null
-      })
+    this.$store.cache
+      .dispatch('collection/fetchCollection', this.$route.params.userUuid)
       .then(() => {
+        this.movie = this.collection.movies.find(
+          m => m.id === Number(this.$route.params.audioId)
+        )
         this.metaData = setMetaData(this.movie.title, this.movie.coverUrl)
       })
   },
@@ -67,11 +71,6 @@ export default {
     collection: {
       get () {
         return this.$store.state.collection.collection
-      }
-    },
-    movie: {
-      get () {
-        return this.$store.state.collection.movie
       }
     }
   },

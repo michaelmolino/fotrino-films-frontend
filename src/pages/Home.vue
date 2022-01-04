@@ -6,9 +6,10 @@
         Not much here... You probably meant to visit
         <q-btn
           flat
+          dense
           :label="lastCollection.title"
           :to="'/' + lastCollection.collectionId"
-        />
+        />.
       </span>
       <span v-else>
         This website is private and by invitation only. You probably got here by

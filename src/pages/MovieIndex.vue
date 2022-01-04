@@ -35,12 +35,8 @@ export default {
     )
   },
   created: function () {
-    this.$store
-      .dispatch('collection/fetchCollection', {
-        userUuid: this.$route.params.userUuid,
-        movieId: null,
-        chapterId: null
-      })
+    this.$store.cache
+      .dispatch('collection/fetchCollection', this.$route.params.userUuid)
       .then(() => {
         this.metaData = setMetaData(
           this.collection.title,

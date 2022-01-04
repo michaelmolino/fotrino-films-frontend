@@ -10,7 +10,7 @@
       />
     </span>
     <q-space />
-    <span class="q-pl-xl text-center">
+    <span class="text-center">
       <q-btn
         flat
         icon="policy"
@@ -18,7 +18,7 @@
         to="/terms"
       />
     </span>
-    <span class="q-pl-xl text-center">
+    <span class="q-pr-lg text-center">
       <q-btn
         flat
         :icon="'img:' + imageSrc"
