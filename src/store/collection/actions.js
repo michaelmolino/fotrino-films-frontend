@@ -31,7 +31,13 @@ export function fetchCollection (context, userUuid) {
         timeout: 0,
         message: 'Something went wrong!',
         icon: 'warning',
-        multiLine: true
+        multiLine: false,
+        actions: [
+          {
+            label: 'Dismiss',
+            color: 'white'
+          }
+        ]
       })
 
       Loading.hide()
