@@ -41,16 +41,16 @@
 import { useMeta } from 'quasar'
 import { ref, defineAsyncComponent } from 'vue'
 
-import { setMetaData } from '../javascript/library.js'
+import { setMetaData } from '../../javascript/library.js'
 
 export default {
   name: 'Chapter',
   components: {
     Breadcrumbs: defineAsyncComponent(() =>
-      import('../components/Breadcrumbs.vue')
+      import('../../components/Breadcrumbs.vue')
     ),
     VideoPlayer: defineAsyncComponent(() =>
-      import('../components/VideoPlayer.vue')
+      import('../../components/VideoPlayer.vue')
     )
   },
   data () {

@@ -1,21 +1,14 @@
 <template>
   <div style="max-width: 720px">
-    <div class="q-pa-xl text-h6 text-center text-uppercase">Hello, World!</div>
-    <div class="q-pl-xl text-body1 text-left">
-      <span v-if="lastCollection">
-        Not much here... You probably meant to visit
-        <q-btn
-          flat
-          dense
-          :label="lastCollection.title"
-          :to="'/' + lastCollection.collectionId"
-        />.
-      </span>
-      <span v-else>
+    <div class="q-pa-md text-h6 text-center">Hello, World!</div>
+    <div class="q-pl-md text-body1 text-left">
+      <span>
         This website is private and by invitation only. You probably got here by
         accident. If you're looking for something specific, then make sure you
         followed the correct link.
       </span>
+      <p />
+      <LastCollection />
       <p />
       Problems?
       <p />
@@ -31,10 +24,16 @@
 
 <script>
 import { useMeta, useQuasar } from 'quasar'
+import { defineAsyncComponent } from 'vue'
 import { setMetaData } from '../javascript/library.js'
 
 export default {
   name: 'Home',
+  components: {
+    LastCollection: defineAsyncComponent(() =>
+      import('../components/LastCollection.vue')
+    )
+  },
   data () {
     return {
       lastCollection: false

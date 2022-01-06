@@ -30,16 +30,16 @@
 import { useMeta } from 'quasar'
 import { defineAsyncComponent, ref } from 'vue'
 
-import { setMetaData } from '../javascript/library.js'
+import { setMetaData } from '../../javascript/library.js'
 
 export default {
   name: 'ChapterIndex',
   components: {
     Breadcrumbs: defineAsyncComponent(() =>
-      import('../components/Breadcrumbs.vue')
+      import('../../components/Breadcrumbs.vue')
     ),
     ChapterPreview: defineAsyncComponent(() =>
-      import('../components/ChapterPreview.vue')
+      import('../../components/ChapterPreview.vue')
     )
   },
   data () {

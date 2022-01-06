@@ -38,13 +38,13 @@ import { ref, defineAsyncComponent } from 'vue'
 import Plyr from 'plyr'
 import 'plyr/dist/plyr.css'
 
-import { setMetaData } from '../javascript/library.js'
+import { setMetaData } from '../../javascript/library.js'
 
 export default {
   name: 'AudioIndex',
   components: {
     Breadcrumbs: defineAsyncComponent(() =>
-      import('../components/Breadcrumbs.vue')
+      import('../../components/Breadcrumbs.vue')
     )
   },
   data () {

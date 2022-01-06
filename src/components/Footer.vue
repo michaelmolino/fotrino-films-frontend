@@ -21,7 +21,7 @@
     <span class="q-pr-lg text-center">
       <q-btn
         flat
-        :icon="'img:' + imageSrc"
+        icon="fab fa-github"
         :label="$q.screen.gt.xs ? 'GitHub' : ''"
         href="https://github.com/michaelmolino/fotrino-films-frontend"
       />
@@ -39,11 +39,6 @@ export default {
   },
   mounted () {
     this.year = new Date().getFullYear()
-  },
-  setup () {
-    return {
-      imageSrc: 'images/GitHub-Mark-Light-32px.png'
-    }
   }
 }
 </script>

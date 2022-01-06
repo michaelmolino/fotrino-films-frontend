@@ -4,25 +4,28 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('pages/Home.vue') },
-      { path: 'terms', component: () => import('pages/Terms.vue') }
+      { path: '/dashboard', component: () => import('pages/account/Dashboard.vue') },
+      { path: 'terms', component: () => import('pages/legal/Terms.vue') },
+      { path: '/403', component: () => import('pages/errors/403.vue') },
+      { path: '/409', component: () => import('pages/errors/409.vue') }
     ]
   },
   {
     path: '/:userUuid',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/MovieIndex.vue') },
+      { path: '', component: () => import('pages/collection/MovieIndex.vue') },
       {
         path: 'movies/:movieId',
-        component: () => import('pages/ChapterIndex.vue')
+        component: () => import('pages/collection/ChapterIndex.vue')
       },
       {
         path: 'audio/:audioId',
-        component: () => import('pages/AudioIndex.vue')
+        component: () => import('pages/collection/AudioIndex.vue')
       },
       {
         path: 'movies/:movieId/:chapterId',
-        component: () => import('pages/Chapter.vue')
+        component: () => import('pages/collection/Chapter.vue')
       }
     ]
   },
@@ -31,7 +34,7 @@ const routes = [
   // but you can also remove it
   {
     path: '/:catchAll(.*)',
-    component: () => import('pages/Error404.vue')
+    component: () => import('pages/errors/404.vue')
   }
 ]
 
