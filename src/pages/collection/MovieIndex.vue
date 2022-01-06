@@ -22,16 +22,16 @@
 import { useMeta } from 'quasar'
 import { defineAsyncComponent, ref } from 'vue'
 
-import { setMetaData } from '../javascript/library.js'
+import { setMetaData } from '../../javascript/library.js'
 
 export default {
   name: 'MovieIndex',
   components: {
     Breadcrumbs: defineAsyncComponent(() =>
-      import('../components/Breadcrumbs.vue')
+      import('../../components/Breadcrumbs.vue')
     ),
     MovieCover: defineAsyncComponent(() =>
-      import('../components/MovieCover.vue')
+      import('../../components/MovieCover.vue')
     )
   },
   created: function () {

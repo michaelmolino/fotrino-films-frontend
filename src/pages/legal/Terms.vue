@@ -56,7 +56,7 @@
 
 <script>
 import { useMeta } from 'quasar'
-import { setMetaData } from '../javascript/library.js'
+import { setMetaData } from '../../javascript/library.js'
 
 export default {
   name: 'Home',
