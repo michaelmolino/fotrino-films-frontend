@@ -23,17 +23,68 @@
       <q-tooltip>Dark Mode</q-tooltip>
     </q-toggle>
 
-    <q-btn-dropdown v-if="!profile" icon="account_box" :label="$q.screen.gt.xs ? 'Login' : ''" flat no-caps size="md">
+    <q-btn
+      icon="help"
+      :label="$q.screen.gt.xs ? 'Help' : ''"
+      flat
+      no-caps
+      size="md"
+      to="/about"
+    />
+
+    <q-btn-dropdown
+      v-if="!profile"
+      icon="account_box"
+      :label="$q.screen.gt.xs ? 'Login' : ''"
+      flat
+      no-caps
+      size="md"
+    >
       <span v-for="provider in oauthProviders" :key="provider.name">
         <q-separator />
-        <q-btn :href="'/api/account/login/' + provider.name.toLowerCase()" align="left" flat no-caps :icon="provider.icon" :label="provider.name" size="md" class="q-px-sm fit" />
+        <q-btn
+          :href="'/api/account/login/' + provider.name.toLowerCase()"
+          align="left"
+          flat
+          no-caps
+          :icon="provider.icon"
+          :label="provider.name"
+          size="md"
+          class="q-px-sm fit"
+        />
       </span>
     </q-btn-dropdown>
-    <q-btn-dropdown v-if="profile" :icon="'img:' + profile.profile_pic" :label="$q.screen.gt.xs ? 'Account' : ''" flat no-caps size="md" class="q-px-sm">
+    <q-btn-dropdown
+      v-if="profile"
+      :icon="'img:' + profile.profile_pic"
+      :label="$q.screen.gt.xs ? 'Account' : ''"
+      flat
+      no-caps
+      size="md"
+      class="q-px-sm"
+    >
       <q-separator />
-      <q-btn to="/dashboard" align="left" flat no-caps icon="dashboard" label="Collections Dashboard" size="md" class="fit" />
+      <q-btn
+        to="/dashboard"
+        align="left"
+        flat
+        no-caps
+        icon="dashboard"
+        label="Collections Dashboard"
+        size="md"
+        class="fit"
+      />
       <q-separator />
-      <q-btn :href="'/api/account/logout?route=' + $route.fullPath" align="left" flat no-caps icon="logout" label="Logout" size="md" class="fit" />
+      <q-btn
+        :href="'/api/account/logout?route=' + $route.fullPath"
+        align="left"
+        flat
+        no-caps
+        icon="logout"
+        label="Logout"
+        size="md"
+        class="fit"
+      />
     </q-btn-dropdown>
   </q-toolbar>
 </template>
