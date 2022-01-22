@@ -20,6 +20,7 @@
           :previewUrl="chapter.previewUrl"
           :primary="chapter.primary"
           :userUuid="$route.params.userUuid"
+          :type="chapter.type"
         />
       </div>
     </div>

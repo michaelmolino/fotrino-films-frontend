@@ -3,7 +3,7 @@
     flat
     dense
     no-caps
-    :to="'/' + userUuid + '/' + movie.mediaType + '/' + movie.id"
+    :to="'/' + userUuid + '/movies/' + movie.id"
     class="fit"
     padding="16px"
   >

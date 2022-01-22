@@ -10,6 +10,7 @@
       <div class="q-pa-md col-xs-12">
         <video-player
           style="max-width: 720px"
+          :type="chapter.type"
           :options="{
             autoplay: !!$route.query.fbclid,
             controls: true,
@@ -19,7 +20,7 @@
             },
             fluid: true,
             responsive: true,
-            poster: chapter.previewUrl,
+            poster: chapter.previewUrl || defaultPreview,
             sources: [
               {
                 src: chapter.src,
@@ -56,7 +57,8 @@ export default {
   data () {
     return {
       movie: null,
-      chapter: null
+      chapter: null,
+      defaultPreview: 'https://media-us.fotrino.com/placeholder-image.png'
     }
   },
   created: function () {

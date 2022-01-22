@@ -21,10 +21,6 @@ const routes = [
         component: () => import('pages/collection/ChapterIndex.vue')
       },
       {
-        path: 'audio/:audioId',
-        component: () => import('pages/collection/AudioIndex.vue')
-      },
-      {
         path: 'movies/:movieId/:chapterId',
         component: () => import('pages/collection/Chapter.vue')
       }

@@ -1,6 +1,9 @@
 <template>
-  <div>
+  <div v-if="!type.startsWith('audio/')">
     <video ref="videoPlayer" class="video-js vjs-theme-city"></video>
+  </div>
+  <div v-else>
+    <audio id="audioPlayer" ref="videoPlayer" class="video-js vjs-theme-city"></audio>
   </div>
 </template>
 
@@ -10,12 +13,8 @@ import videojs from 'video.js'
 export default {
   name: 'VideoPlayer',
   props: {
-    options: {
-      type: Object,
-      default () {
-        return {}
-      }
-    }
+    type: String,
+    options: Object
   },
   data () {
     return {

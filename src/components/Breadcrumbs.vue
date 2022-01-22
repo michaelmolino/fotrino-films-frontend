@@ -40,7 +40,7 @@ export default {
         id: 1,
         label: this.movie.title,
         to:
-          '/' + this.userUuid + '/' + this.movie.mediaType + '/' + this.movie.id
+          '/' + this.userUuid + '/movies/' + this.movie.id
       })
     }
 
@@ -51,9 +51,7 @@ export default {
         to:
           '/' +
           this.userUuid +
-          '/' +
-          this.movie.mediaType +
-          '/' +
+          '/movies/' +
           this.movie.id +
           '/' +
           this.chapter.id
