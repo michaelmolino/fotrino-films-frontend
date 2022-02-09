@@ -32,7 +32,7 @@
 import { defineAsyncComponent } from 'vue'
 
 export default {
-  name: 'Chapter',
+  name: 'Chapter-Player',
 
   components: {
     Breadcrumbs: defineAsyncComponent(() =>

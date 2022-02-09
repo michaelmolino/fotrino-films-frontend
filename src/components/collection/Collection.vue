@@ -23,7 +23,7 @@
 import { defineAsyncComponent } from 'vue'
 
 export default {
-  name: 'Collection',
+  name: 'Collection-Root',
 
   components: {
     Breadcrumbs: defineAsyncComponent(() =>

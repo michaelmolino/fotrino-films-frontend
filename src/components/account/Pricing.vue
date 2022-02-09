@@ -94,7 +94,7 @@
 import { ref } from 'vue'
 
 export default {
-  name: 'Pricing',
+  name: 'Pricing-Page',
   data () {
     return {
       slide: ref('free')

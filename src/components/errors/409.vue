@@ -13,6 +13,6 @@
 
 <script>
 export default {
-  name: 'Error409'
+  name: 'Error-409'
 }
 </script>

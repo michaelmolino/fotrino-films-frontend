@@ -26,7 +26,7 @@
 
 <script>
 export default {
-  name: 'Footer',
+  name: 'Footer-Bar',
 
   data () {
     return {

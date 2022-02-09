@@ -210,6 +210,6 @@
 
 <script>
 export default {
-  name: 'Help'
+  name: 'Help-Page'
 }
 </script>
