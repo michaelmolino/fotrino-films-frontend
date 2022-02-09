@@ -168,7 +168,7 @@ export default {
 
   components: {
     CollectionCover: defineAsyncComponent(() =>
-      import('@components/collection/CollectionCover.vue')
+      import('@components/account/CollectionCover.vue')
     )
   },
 

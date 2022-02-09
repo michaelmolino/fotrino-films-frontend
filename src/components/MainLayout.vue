@@ -1,16 +1,10 @@
 <template>
   <q-layout view="hHh lpR fFf">
-    <q-header elevated class="bg-primary">
-      <Header />
-    </q-header>
-
+    <Header />
     <q-page-container>
       <router-view class="q-pa-md" />
     </q-page-container>
-
-    <q-footer reveal elevated class="bg-secondary">
-      <Footer />
-    </q-footer>
+    <Footer />
   </q-layout>
 </template>
 
@@ -21,8 +15,8 @@ export default {
   name: 'MainLayout',
 
   components: {
-    Header: defineAsyncComponent(() => import('@components/Header.vue')),
-    Footer: defineAsyncComponent(() => import('@components/Footer.vue'))
+    Header: defineAsyncComponent(() => import('@components/shared/Header.vue')),
+    Footer: defineAsyncComponent(() => import('@components/shared/Footer.vue'))
   }
 }
 </script>
