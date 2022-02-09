@@ -54,7 +54,7 @@ export default {
     },
     collection () {
       if (
-        this.collection.uuid &&
+        this.collection.uuid && this.$route.params.collectionSlug &&
         this.collection.slug !== this.$route.params.collectionSlug
       ) {
         this.$router.replace({
