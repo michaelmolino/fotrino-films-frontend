@@ -4,8 +4,10 @@ export function getMetaData (route, collection) {
   let title = null
   let image = null
 
-  title = collection?.title
-  image = collection?.coverUrl
+  if (route?.params.uuid) {
+    title = collection?.title
+    image = collection?.coverUrl
+  }
 
   if (route?.params.movieSlug) {
     movie = collection.movies.find(
