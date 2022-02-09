@@ -140,7 +140,7 @@
 
 <script>
 export default {
-  name: 'Header',
+  name: 'Header-Bar',
 
   data () {
     return {

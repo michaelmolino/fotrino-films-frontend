@@ -65,6 +65,6 @@
 
 <script>
 export default {
-  name: 'Terms'
+  name: 'Terms-Page'
 }
 </script>

@@ -31,7 +31,7 @@
 import { defineAsyncComponent } from 'vue'
 
 export default {
-  name: 'Movie Dashboard',
+  name: 'Movie-Dashboard',
 
   components: {
     MovieCover: defineAsyncComponent(() =>

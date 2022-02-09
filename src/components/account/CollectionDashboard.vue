@@ -164,7 +164,7 @@
 import { defineAsyncComponent, ref } from 'vue'
 
 export default {
-  name: 'Collection Dashboard',
+  name: 'Collection-Dashboard',
 
   components: {
     CollectionCover: defineAsyncComponent(() =>
