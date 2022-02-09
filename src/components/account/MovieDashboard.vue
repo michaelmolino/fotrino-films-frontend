@@ -1,6 +1,6 @@
 <template>
   <div v-if="collection">
-    <div v-if="profile">
+    <div v-if="profile.id">
       <div class="text-h6 text-center">
         <q-btn flat dense icon="arrow_back" to="/dashboard" />
         Dashboard:
