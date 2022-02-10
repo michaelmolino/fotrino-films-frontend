@@ -59,10 +59,7 @@
             your specific collection of movies. Your movies should not appear in
             search engines and the URL to your videos is impossible for someone
             to guess or discover via brute force. The only way to discover your
-            videos is for someone to be given the link. If you want to revoke
-            access, you have the ability to change the link, however this
-            revokes access for everyone - there is no way to selectively
-            allow/disallow access (yet!).
+            videos is for someone to be given the link.
           </q-card-section>
         </q-card>
       </q-expansion-item>
@@ -162,7 +159,7 @@
             content or usage of Fotrino Films is shared with third parties other
             than what is required to negotiate the login session. More identity
             providers will be supported in the future including Github,
-            Instagram, Microsoft Live, and Reddit.
+            Instagram, and Microsoft Live.
           </q-card-section>
         </q-card>
       </q-expansion-item>
@@ -176,7 +173,7 @@
           <q-card-section>
             There is no need to login to view content - login is only required
             to upload and manage your content. These features are currently in
-            development and not yet available to the public.
+            development and not yet available.
           </q-card-section>
         </q-card>
       </q-expansion-item>

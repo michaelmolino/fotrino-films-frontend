@@ -1,27 +1,28 @@
 <template>
-  <div v-if="collection">
+  <div>
     <div v-if="profile.id">
       <div class="text-h6 text-center">
         <q-btn flat dense icon="arrow_back" to="/dashboard" />
-        Dashboard:
-        {{ collection.title }}
+        Dashboard: {{ collection.title }}
       </div>
-      <div>
-        <q-btn color="positive" icon="add" label="New Movie" disabled />
-      </div>
-
+      <q-btn color="positive" icon="add" label="New Movie" disabled />
       <div class="row">
         <div
           v-for="movie in collection.movies"
           :key="movie.id"
           class="q-pa-md col-xs-6 col-sm-4 col-md-3 col-lg-2"
-          style="max-width: 320px"
         >
-          <MovieCover :movie="movie" disabled />
+          <div>
+            <MovieCover :collection="collection" :movie="movie" disabled />
+          </div>
+          <ActionBarMovie :collection="collection" :movie="movie" />
         </div>
       </div>
+      <div v-if="collection.movies.length === 0" class="q-py-md">
+        No movies yet.
+      </div>
     </div>
-    <div v-if="!profile">
+    <div v-if="!profile.id" class="q-py-md">
       Not logged in!
     </div>
   </div>
@@ -36,6 +37,9 @@ export default {
   components: {
     MovieCover: defineAsyncComponent(() =>
       import('@components/collection/MovieCover.vue')
+    ),
+    ActionBarMovie: defineAsyncComponent(() =>
+      import('@components/account/ActionBar-Movie.vue')
     )
   },
 
@@ -53,7 +57,8 @@ export default {
   },
 
   created: function () {
-    this.$store.dispatch('collection/fetchCollection', this.$route.query.uuid)
+    this.$store
+      .dispatch('collection/fetchCollection', this.$route.query.uuid)
       .catch(() => {})
   }
 }
