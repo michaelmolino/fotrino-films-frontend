@@ -70,9 +70,9 @@
         <div class="text-center">
           <div class="q-py-md">
             Best for most people! Organise your photos across unlimited
-            collections and movies and upload up to <b>100 hours</b> of video (or
-            audio). You can also invite up to 3 people for a free Friends &amp;
-            Family account.
+            collections and movies and upload up to
+            <strong>100 hours</strong> of video (or audio). You can also invite
+            up to 3 people for a free Friends &amp; Family account.
           </div>
           <div class="q-pb-md">
             28 day free trial

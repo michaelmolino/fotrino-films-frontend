@@ -31,7 +31,7 @@ export function fetchCollection (context, uuid) {
           slug: collection.slug
         }
       )
-      const uniq = _.uniq(history, collection => collection.uuid)
+      const uniq = _.uniq(history, c => c.uuid)
       context.commit('SET_HISTORY', uniq)
       LocalStorage.set('fotrino-films-history', uniq)
 
@@ -63,8 +63,7 @@ export function fetchHistory (context) {
 }
 
 export function rmHistory (context, uuid) {
-  let history = LocalStorage.getItem('fotrino-films-history') || []
-  history = context.state.history.filter(
+  const history = context.state.history.filter(
     function (o) {
       return o.uuid !== uuid
     }

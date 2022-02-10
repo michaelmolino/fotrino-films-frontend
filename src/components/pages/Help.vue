@@ -185,18 +185,21 @@
       >
         <q-card>
           <q-card-section>
-            <li>
-              The top level of Fotrino Films is a <b>collection</b>. A
-              <b>collection</b> contains <b>movies</b>.
-            </li>
-            <li>
-              A <b>movie</b> contains <b>chapters</b>. A <b>movie</b> has a
-              poster (portrait), a title, and a sub-title.
-            </li>
-            <li>
-              A <b>chapter</b> is a playable video or audio file. It has a
-              preview (landscape), a title, and a description.
-            </li>
+            <ul>
+              <li>
+                The top level of Fotrino Films is a <strong>collection</strong>.
+                A <strong>collection</strong> contains <strong>movies</strong>.
+              </li>
+              <li>
+                A <strong>movie</strong> contains <strong>chapters</strong>. A
+                <strong>movie</strong> has a poster (portrait), a title, and a
+                sub-title.
+              </li>
+              <li>
+                A <strong>chapter</strong> is a playable video or audio file. It
+                has a preview (landscape), a title, and a description.
+              </li>
+            </ul>
           </q-card-section>
         </q-card>
       </q-expansion-item>
