@@ -5657,9 +5657,9 @@ qs@6.9.6:
   integrity sha512-TIRk4aqYLNoJUbd+g2lEdz5kLWIuTMRagAXxl78Q0RiVjAOugHmeKNGdd3cwo/ktpf9aL9epCfFqWDEKysUlLQ==
 
 quasar@2:
-  version "2.5.4"
-  resolved "https://registry.yarnpkg.com/quasar/-/quasar-2.5.4.tgz#8cc7ad626ca582b3ee1dad6919ed02f3ced6a575"
-  integrity sha512-eGsy2xaWbZ49ksY4lB4Yx+djQjlrlQ6wWwtJPkQWk/4pQY3iY9AdyJ76KOvrNITgIr4YKHkjZTUqzrjS6V/v1A==
+  version "2.5.5"
+  resolved "https://registry.yarnpkg.com/quasar/-/quasar-2.5.5.tgz#942996e10a548c5f8a368b51d3432da21043d25a"
+  integrity sha512-7UntzqIBih+xZLCB/f9pxuvNP3EBgexfQDbf8r9p58DHWAiSQwamLjcRHKqmujjp0uX1QChtp6oUxEkK+sFKtA==
 
 queue-microtask@^1.2.2:
   version "1.2.3"
