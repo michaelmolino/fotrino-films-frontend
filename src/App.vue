@@ -25,6 +25,9 @@ export default {
     collection: {
       get () {
         return this.$store.state.collection.collection
+      },
+      set (_collection) {
+        this.$store.commit('collection/SET_COLLECTION', _collection)
       }
     }
   },
@@ -43,12 +46,12 @@ export default {
     $route (to, from) {
       this.$store.cache
         .dispatch('collection/fetchCollection', to.params.uuid)
-        .then(collection => {
-          this.$store.commit('collection/SET_COLLECTION', collection)
+        .then(_collection => {
+          this.collection = _collection
           this.updatePageProperties()
         })
         .catch(() => {
-          this.$store.commit('collection/SET_COLLECTION', this.$nullCollection)
+          this.collection = this.$nullCollection
           this.updatePageProperties()
         })
     },
