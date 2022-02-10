@@ -63,7 +63,9 @@ export default {
 
   created: function () {
     this.$store.dispatch('collection/fetchCollections')
-      .catch(() => {})
+      .catch(error => {
+        console.log(error)
+      })
   },
 
   setup () {
@@ -73,9 +75,15 @@ export default {
       $q.dialog({
         component: NewCollection
       })
-        .onOk(data => {})
-        .onCancel(() => {})
-        .onDismiss(() => {})
+        .onOk(data => {
+          // Do nothing.
+        })
+        .onCancel(() => {
+          // Do nothing.
+        })
+        .onDismiss(() => {
+          // Do nothing.
+        })
     }
 
     return { newCollectionDialog }

@@ -59,7 +59,9 @@ export default {
   created: function () {
     this.$store
       .dispatch('collection/fetchCollection', this.$route.query.uuid)
-      .catch(() => {})
+      .catch(error => {
+        console.log(error)
+      })
   }
 }
 </script>

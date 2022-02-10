@@ -50,7 +50,9 @@ export default {
           this.$store
             .dispatch('collection/fetchCollections')
         })
-        .catch(() => {})
+        .catch(error => {
+          console.log(error)
+        })
       this.onOKClick(data)
     }
   },

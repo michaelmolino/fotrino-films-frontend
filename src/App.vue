@@ -12,7 +12,9 @@ export default {
 
   created () {
     this.$store.dispatch('account/fetchProfile')
-      .catch(() => {})
+      .catch(() => {
+        // Do nothing.  It's normal for users not to be logged in.
+      })
   },
 
   methods: {
