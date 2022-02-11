@@ -74,7 +74,7 @@ export function rmHistory (context, uuid) {
 
 export function createCollection (context, collection) {
   return axios
-    .post('/api/collections', { title: collection.title })
+    .post('/api/collections', { title: collection.title, cover: collection.cover })
     .catch(error => {
       return Promise.reject(error)
     })

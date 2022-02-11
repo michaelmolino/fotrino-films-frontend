@@ -83,7 +83,7 @@
         <span v-for="provider in oauthProviders" :key="provider.name">
           <q-separator />
           <q-btn
-            :href="'/api/account/login/' + provider.name.toLowerCase()"
+            :href="provider.login"
             align="left"
             flat
             no-caps
@@ -126,7 +126,7 @@
         />
         <q-separator />
         <q-btn
-          :href="'/api/account/logout?route=' + $route.fullPath"
+          href="/api/account/logout"
           align="left"
           flat
           no-caps
@@ -156,8 +156,8 @@ export default {
       //   { name: 'Twitter', icon: 'fab fa-twitter' }
       // ]
       oauthProviders: [
-        { name: 'Facebook', icon: 'fab fa-facebook' },
-        { name: 'Google', icon: 'fab fa-google' }
+        { name: 'Facebook', icon: 'fab fa-facebook', login: '/api/account/login/facebook' },
+        { name: 'Google', icon: 'fab fa-google', login: '/api/account/login/google' }
       ]
     }
   },

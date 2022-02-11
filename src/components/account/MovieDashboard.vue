@@ -5,7 +5,7 @@
         <q-btn flat dense icon="arrow_back" to="/dashboard" />
         Dashboard: {{ collection.title }}
       </div>
-      <q-btn color="positive" icon="add" label="New Movie" disabled />
+      <q-btn color="positive" icon="add" label="New Movie" @click="newMovieDialog()" />
       <div class="row">
         <div
           v-for="movie in collection.movies"
@@ -29,7 +29,10 @@
 </template>
 
 <script>
+import { useQuasar } from 'quasar'
 import { defineAsyncComponent } from 'vue'
+
+import NewMovie from '@components/account/dialogs/NewMovie.vue'
 
 export default {
   name: 'Movie-Dashboard',
@@ -62,6 +65,40 @@ export default {
       .catch(error => {
         console.log(error)
       })
+  },
+
+  setup () {
+    const $q = useQuasar()
+
+    function newMovieDialog () {
+      $q.dialog({
+        component: NewMovie
+      })
+        .onOk(data => {
+          console.log(data)
+          $q.notify({
+            type: 'warning',
+            timeout: 0,
+            message: 'Not implemented.',
+            icon: 'warning',
+            multiLine: false,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'black'
+              }
+            ]
+          })
+        })
+        .onCancel(() => {
+          // TODO: Cleanup uploaded file
+        })
+        .onDismiss(() => {
+          // Do nothing.
+        })
+    }
+
+    return { newMovieDialog }
   }
 }
 </script>

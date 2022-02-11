@@ -66,6 +66,21 @@ export default {
           params: { collectionSlug: this.collection.slug }
         })
       }
+      if (this.collection.deleted === true && this.$route.params.collectionSlug) {
+        this.$q.notify({
+          type: 'info',
+          timeout: 0,
+          message: 'This collection has been deleted. Only you can see it.',
+          icon: 'info',
+          multiLine: false,
+          actions: [
+            {
+              label: 'Dismiss',
+              color: 'white'
+            }
+          ]
+        })
+      }
       this.updatePageProperties()
     }
   }
