@@ -76,10 +76,10 @@ export default {
         component: NewCollection
       })
         .onOk(data => {
-          console.log(data)
+          // Do nothing.
         })
         .onCancel(() => {
-          // TODO: Cleanup uploaded file
+          // Do nothing.
         })
         .onDismiss(() => {
           // Do nothing.

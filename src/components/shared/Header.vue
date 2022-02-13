@@ -32,7 +32,7 @@
               :to="'/' + collection.uuid + '/' + collection.slug"
             />
             <q-btn
-              icon="clear"
+              icon="remove_circle"
               flat
               no-caps
               no-wrap

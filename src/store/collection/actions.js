@@ -39,6 +39,7 @@ export function fetchCollection (context, uuid) {
     })
     .catch(error => {
       context.commit('SET_COLLECTION', nullCollection)
+      rmHistory(context, uuid)
       return Promise.reject(error)
     })
 }
@@ -74,7 +75,12 @@ export function rmHistory (context, uuid) {
 
 export function createCollection (context, collection) {
   return axios
-    .post('/api/collections', { title: collection.title, cover: collection.cover })
+    .post('/api/collections',
+      {
+        title: collection.title,
+        filename: collection.filename
+      }
+    )
     .catch(error => {
       return Promise.reject(error)
     })
