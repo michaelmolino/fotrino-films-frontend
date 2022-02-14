@@ -4,7 +4,7 @@
       dense
       no-caps
       padding="8px"
-      :class="chapter.primary ? 'fit bg-accent' : 'fit'"
+      :class="chapter.main ? 'fit bg-accent' : 'fit'"
     >
       <q-badge
         v-if="chapter.type.startsWith('audio/')"
@@ -14,7 +14,7 @@
       >
         <span class="text-bold">Audio</span>
       </q-badge>
-      <q-img :src="chapter.previewUrl" :ratio="16 / 9" loading="lazy">
+      <q-img :src="chapter.preview" :ratio="16 / 9" loading="lazy">
         <div class="absolute-bottom text-center">
           <div class="ellipsis">{{ chapter.title }}</div>
         </div>

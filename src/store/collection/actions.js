@@ -86,6 +86,21 @@ export function createCollection (context, collection) {
     })
 }
 
+export function createMovie (context, movie) {
+  return axios
+    .post('/api/movies',
+      {
+        collection: movie.collection,
+        title: movie.title,
+        subTitle: movie.subTitle,
+        filename: movie.filename
+      }
+    )
+    .catch(error => {
+      return Promise.reject(error)
+    })
+}
+
 export function editCollection (context, collection) {
   return axios
     .put('/api/collections/' + collection.uuid,

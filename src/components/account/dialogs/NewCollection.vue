@@ -1,5 +1,5 @@
 <template>
-  <q-dialog ref="dialogRef" @hide="onDialogHide">
+  <q-dialog ref="dialogRef" @hide="onDialogHide" persistent>
     <q-card class="q-dialog-plugin">
       <q-card-section>
         <div class="text-h6">New Collection</div>
@@ -11,7 +11,7 @@
           label="Title"
           dense
           autofocus
-          v-model="title"
+          v-model="newCollection.title"
         />
         <q-input
           :color="$q.dark.isActive ? 'white' : 'secondary'"
@@ -21,28 +21,29 @@
           autofocus
           v-model="slug"
         />
-        <q-card-section>
+        <q-card-section class="q-py-sm">
           <q-checkbox
             color="secondary"
-            v-model="useProfilePhoto"
+            v-model="newCollection.useProfilePhoto"
+            size="md"
+            @click="tick"
           />
           Use profile photo for collection cover
-          <q-uploader
-            v-if="!useProfilePhoto"
-            :class="$q.dark.isActive ? 'fit bg-dark' : 'fit bg-white'"
-            flat
-            label="Cover"
-            color="secondary"
-            hide-upload-btn
-            accept=".jpg, image/*"
-            @added="added"
-            @removed="cover = null"
-          />
-          <div class="q-pt-md" v-if="!useProfilePhoto">
+          <div v-if="!newCollection.useProfilePhoto">
+            <q-uploader
+              :class="$q.dark.isActive ? 'fit bg-dark' : 'fit bg-white'"
+              flat
+              label="Cover"
+              color="secondary"
+              hide-upload-btn
+              accept=".jpg, image/*"
+              @added="added"
+              @removed="newCollection.cover = null"
+            />
             <q-icon
               name="lightbulb"
               :class="$q.dark.isActive ? 'text-white' : 'text-secondary'"
-              size="md"
+              size="sm"
             />
             Cover photos should be square!
           </div>
@@ -53,9 +54,9 @@
         <q-btn
           color="secondary"
           label="OK"
-          @click="createCollection({ title: title, cover: cover })"
-          :disabled="title.length <= 2 || (!cover && !useProfilePhoto)"
-          :loading="uploading"
+          @click="createCollection"
+          :disabled="!(newCollection.title.length > 2 && (newCollection.cover || newCollection.useProfilePhoto))"
+          :loading="working"
         />
         <q-btn color="secondary" label="Cancel" @click="onCancelClick" />
       </q-card-actions>
@@ -74,10 +75,12 @@ export default {
 
   data () {
     return {
-      title: '',
-      useProfilePhoto: true,
-      cover: null,
-      uploading: false
+      newCollection: {
+        title: '',
+        useProfilePhoto: true,
+        cover: null
+      },
+      working: false
     }
   },
 
@@ -89,38 +92,27 @@ export default {
     },
     slug: {
       get () {
-        return this.title.replace(/[^0-9a-zA-Z]+/g, '-').substring(0, 32)
+        return this.newCollection.title?.replace(/[^0-9a-zA-Z]+/g, '-').substring(0, 32)
       }
     }
   },
 
   methods: {
-    createCollection (data) {
-      let p2
-      if (!this.useProfilePhoto) {
-        this.uploading = true
-
-        const from = new Image()
-        from.src = URL.createObjectURL(data.cover)
-
-        const _cover = document.createElement('canvas')
-        _cover.height = 320
-        _cover.width = 320
-
-        p2 = reducer.toBlob(this.cover, { max: 320 })
-      } else {
-        this.cover = null
-        p2 = Promise.resolve()
-      }
+    createCollection () {
+      this.newCollection.working = true
 
       const p1 = this.$store.dispatch('collection/createCollection', {
-        title: data.title,
-        filename: this.cover?.name
+        title: this.newCollection.title,
+        filename: this.newCollection.cover?.name
       })
+
+      const p2 = !this.newCollection.useProfilePhoto
+        ? reducer.toBlob(this.newCollection.cover, { max: 360 })
+        : Promise.resolve(null)
 
       Promise.all([p1, p2])
         .then(results => {
-          if (!this.useProfilePhoto) {
+          if (!this.newCollection.useProfilePhoto) {
             return this.$axios.put(
               results[0].data.presignedCoverPutUrl,
               results[1]
@@ -129,18 +121,20 @@ export default {
           return Promise.resolve()
         })
         .then(() => {
-          return this.$store.dispatch('collection/fetchCollections')
-        })
-        .then(() => {
-          this.onOKClick()
+          this.onOKClick(this.newCollection)
         })
         .catch(error => {
           console.log(error)
-          this.onOKClick()
+          this.onOKClick(false)
         })
     },
     added (files) {
-      this.cover = files[0]
+      this.newCollection.cover = files[0]
+    },
+    tick () {
+      if (this.newCollection.useProfilePhoto === false) {
+        this.newCollection.cover = null
+      }
     }
   },
 

@@ -15,7 +15,7 @@
         },
         fluid: true,
         responsive: true,
-        poster: chapter.previewUrl,
+        poster: chapter.preview,
         sources: [
           {
             src: chapter.src,

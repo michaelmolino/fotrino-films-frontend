@@ -33,6 +33,7 @@
 <script>
 import { useQuasar } from 'quasar'
 import { defineAsyncComponent } from 'vue'
+import { useStore } from 'vuex'
 
 import NewCollection from '@components/account/dialogs/NewCollection.vue'
 
@@ -70,13 +71,17 @@ export default {
 
   setup () {
     const $q = useQuasar()
+    const store = useStore()
 
     function newCollectionDialog () {
       $q.dialog({
         component: NewCollection
       })
         .onOk(data => {
-          // Do nothing.
+          store.dispatch('collection/fetchCollections')
+            .catch(error => {
+              console.log(error)
+            })
         })
         .onCancel(() => {
           // Do nothing.

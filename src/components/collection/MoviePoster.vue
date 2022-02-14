@@ -13,15 +13,15 @@
     >
       <span class="text-bold">{{ movie.chapters.length }}</span>
     </q-badge>
-    <q-img :src="movie.coverUrl" :ratio="2 / 3" loading="lazy">
+    <q-img :src="movie.poster" :ratio="2 / 3" loading="lazy">
       <div class="absolute-bottom text-center">
         <div class="ellipsis">{{ movie.title }}</div>
-        <div class="ellipsis">{{ movie.subTitle }}</div>
+        <div class="ellipsis">{{ movie.subtitle }}</div>
       </div>
       <template v-slot:error>
         <div class="absolute-full text-center bg-dark">
           <div class="ellipsis">{{ movie.title }}</div>
-          <div class="ellipsis">{{ movie.subTitle }}</div>
+          <div class="ellipsis">{{ movie.subtitle }}</div>
         </div>
       </template>
     </q-img>
@@ -30,7 +30,7 @@
 
 <script>
 export default {
-  name: 'MovieCover',
+  name: 'MoviePoster',
 
   props: {
     movie: Object
