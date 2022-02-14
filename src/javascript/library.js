@@ -6,7 +6,7 @@ export function getMetaData (route, collection) {
 
   if (route?.params.uuid) {
     title = collection?.title
-    image = collection?.coverUrl
+    image = collection?.cover
   }
 
   if (route?.params.movieSlug) {
@@ -14,7 +14,7 @@ export function getMetaData (route, collection) {
       m => m.slug === route.params.movieSlug
     )
     title = movie?.title
-    image = movie?.coverUrl
+    image = movie?.poster
   }
 
   if (route?.params.chapterSlug) {
@@ -22,7 +22,7 @@ export function getMetaData (route, collection) {
       ch => ch.slug === route.params.chapterSlug
     )
     title = chapter?.title
-    image = chapter?.previewUrl
+    image = chapter?.preview
   }
 
   if (title !== null) {

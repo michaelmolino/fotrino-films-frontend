@@ -4,8 +4,14 @@
       <div class="text-h6 text-center">
         <q-btn flat dense icon="arrow_back" to="/dashboard" />
         Dashboard: {{ collection.title }}
+        <ActionButtonOpen :collection="collection" />
       </div>
-      <q-btn color="positive" icon="add" label="New Movie" disabled />
+      <q-btn
+        color="positive"
+        icon="add"
+        label="New Movie"
+        @click="newMovieDialog()"
+      />
       <div class="row">
         <div
           v-for="movie in collection.movies"
@@ -13,7 +19,7 @@
           class="q-pa-md col-xs-6 col-sm-4 col-md-3 col-lg-2"
         >
           <div>
-            <MovieCover :collection="collection" :movie="movie" disabled />
+            <MoviePoster :collection="collection" :movie="movie" disabled />
           </div>
           <ActionBarMovie :collection="collection" :movie="movie" />
         </div>
@@ -29,14 +35,21 @@
 </template>
 
 <script>
+import { useQuasar } from 'quasar'
 import { defineAsyncComponent } from 'vue'
+import { useStore } from 'vuex'
+
+import NewMovie from '@components/account/dialogs/NewMovie.vue'
 
 export default {
   name: 'Movie-Dashboard',
 
   components: {
-    MovieCover: defineAsyncComponent(() =>
-      import('@components/collection/MovieCover.vue')
+    ActionButtonOpen: defineAsyncComponent(() =>
+      import('@components/account/ActionButtonOpen-Collection.vue')
+    ),
+    MoviePoster: defineAsyncComponent(() =>
+      import('@components/collection/MoviePoster.vue')
     ),
     ActionBarMovie: defineAsyncComponent(() =>
       import('@components/account/ActionBar-Movie.vue')
@@ -58,10 +71,38 @@ export default {
 
   created: function () {
     this.$store
-      .dispatch('collection/fetchCollection', this.$route.query.uuid)
+      .dispatch('collection/fetchCollection',
+        this.$route.query.uuid)
       .catch(error => {
         console.log(error)
       })
+  },
+
+  setup () {
+    const $q = useQuasar()
+    const store = useStore()
+
+    function newMovieDialog () {
+      $q.dialog({
+        component: NewMovie
+      })
+        .onOk(data => {
+          store
+            .dispatch('collection/fetchCollection',
+              this.$route.query.uuid)
+            .catch(error => {
+              console.log(error)
+            })
+        })
+        .onCancel(() => {
+          // Do nothing.
+        })
+        .onDismiss(() => {
+          // Do nothing.
+        })
+    }
+
+    return { newMovieDialog }
   }
 }
 </script>

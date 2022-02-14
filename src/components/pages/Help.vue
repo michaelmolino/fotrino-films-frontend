@@ -23,11 +23,18 @@
       >
         <q-card>
           <q-card-section>
-            Fotrino Films is not designed for monetisation of videos or
-            commercial purposes. There are no ads, no algorithms, and no content
-            discovery. We also don't segment your users, track users, or harvest
-            or sell personal data. You simply upload the content you want to
-            share and give the link to people you know.
+            <div>
+              Fotrino Films is not designed for monetisation of videos or
+              commercial purposes. There are no ads, no algorithms, and no
+              content discovery. We also don't segment your users, track users,
+              or harvest or sell personal data. You simply upload the content
+              you want to share and give the link to people you know.
+            </div>
+            <div>
+              Another way to think of it is most video platforms are designed
+              for people who want to get paid to upload content. Fotrino Films
+              is for people that want to pay to host their content without ads.
+            </div>
           </q-card-section>
         </q-card>
       </q-expansion-item>
@@ -192,12 +199,11 @@
               </li>
               <li>
                 A <strong>movie</strong> contains <strong>chapters</strong>. A
-                <strong>movie</strong> has a poster (portrait), a title, and a
-                sub-title.
+                <strong>movie</strong> has a poster, a title, and a sub-title.
               </li>
               <li>
                 A <strong>chapter</strong> is a playable video or audio file. It
-                has a preview (landscape), a title, and a description.
+                has a preview, a title, and a description.
               </li>
             </ul>
           </q-card-section>

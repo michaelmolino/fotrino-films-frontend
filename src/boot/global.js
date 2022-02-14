@@ -16,7 +16,7 @@ const nullCollection = {
   owner: null,
   title: null,
   slug: null,
-  coverUrl: null,
+  cover: null,
   uuid: null,
   movies: []
 }
@@ -27,8 +27,8 @@ const nullMovie = {
   sort: null,
   title: null,
   slug: null,
-  subTitle: null,
-  coverUrl: null,
+  subtitle: null,
+  poster: null,
   chapters: []
 }
 
@@ -39,10 +39,10 @@ const nullChapter = {
   title: null,
   slug: null,
   description: null,
-  previewUrl: null,
+  preview: null,
   src: null,
   type: null,
-  primary: null
+  main: null
 }
 
 export default boot(({ app }) => {

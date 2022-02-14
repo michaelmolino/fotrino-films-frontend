@@ -1,14 +1,6 @@
 <template>
   <div class="q-mt-sm text-center">
-    <q-btn
-      round
-      dense
-      color="info"
-      icon="link"
-      :to="'/' + collection.uuid + '/' + collection.slug"
-    >
-      <q-tooltip>Open Collection</q-tooltip>
-    </q-btn>
+    <ActionButtonOpen :collection="collection" />
     &nbsp;
     <q-btn round dense color="positive" icon="edit" disabled>
       <q-tooltip>Edit Collection</q-tooltip>
@@ -49,8 +41,16 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue'
+
 export default {
   name: 'ActionBar-Collection',
+
+  components: {
+    ActionButtonOpen: defineAsyncComponent(() =>
+      import('@components/account/ActionButtonOpen-Collection.vue')
+    )
+  },
 
   props: {
     collection: Object

@@ -7,7 +7,7 @@
         v-for="movie in collection.movies"
         :key="movie.id"
       >
-        <MovieCover
+        <MoviePoster
           :movie="movie"
           :to="'/' + collection.uuid + '/' + collection.slug + '/' + movie.slug"
         />
@@ -29,8 +29,8 @@ export default {
     Breadcrumbs: defineAsyncComponent(() =>
       import('@components/collection/Breadcrumbs.vue')
     ),
-    MovieCover: defineAsyncComponent(() =>
-      import('@components/collection/MovieCover.vue')
+    MoviePoster: defineAsyncComponent(() =>
+      import('@components/collection/MoviePoster.vue')
     )
   },
 
