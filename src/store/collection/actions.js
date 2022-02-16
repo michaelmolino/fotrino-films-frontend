@@ -1,6 +1,7 @@
 import { LocalStorage } from 'quasar'
 import _ from 'underscore'
 import axios from 'axios'
+import DOMPurify from 'dompurify'
 import { nullCollection } from 'boot/global'
 
 export function fetchCollection (context, uuid) {
@@ -19,6 +20,9 @@ export function fetchCollection (context, uuid) {
       collection.movies.forEach(m => {
         m.chapters = m.chapters.sort((a, b) => {
           return a.sort - b.sort
+        })
+        m.chapters.forEach(ch => {
+          ch.description_sanitised = DOMPurify.sanitize(ch.description_unsafe, { ALLOWED_TAGS: ['br', 'i', 'p', 'strong'] })
         })
       })
       context.commit('SET_COLLECTION', collection)

@@ -24,7 +24,7 @@
         ]
       }"
     />
-    <div class="q-py-md" v-html="chapter.description"></div>
+    <div class="q-py-md" v-html="chapter.description_sanitised"></div>
   </div>
 </template>
 
