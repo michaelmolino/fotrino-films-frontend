@@ -1,7 +1,16 @@
 <template>
   <div>
     <div v-if="profile.id">
-      <div class="text-h6 text-center">Dashboard: {{ profile.name + '\'s' }} Collections</div>
+      <div class="text-h6 text-center" style="max-width: 1023px;">
+        Dashboard: {{ profile.name + "'s" }} Collections
+      </div>
+      <div class="q-py-md text-justify" style="max-width: 1023px;">
+        <q-icon color="warning" name="warning" size="md" />
+        Fotrino Films is under active development and is not ready for use. The
+        database, all accounts, and any images, video, etc. are regularly
+        deleted. You should have no expectation that this site is fit for any
+        purpose.
+      </div>
       <q-btn
         color="positive"
         icon="add"
@@ -14,10 +23,13 @@
           :key="collection.id"
           class="q-pa-md col-xs-6 col-sm-4 col-md-3 col-lg-2"
         >
-            <div>
-              <CollectionCover :collection="collection" :to="'/dashboard/movies?uuid=' + collection.uuid" />
-            </div>
-            <ActionBarCollection :collection="collection" />
+          <div>
+            <CollectionCover
+              :collection="collection"
+              :to="'/dashboard/movies?uuid=' + collection.uuid"
+            />
+          </div>
+          <ActionBarCollection :collection="collection" />
         </div>
       </div>
       <div v-if="collections.length === 0" class="q-py-md">
@@ -63,10 +75,9 @@ export default {
   },
 
   created: function () {
-    this.$store.dispatch('collection/fetchCollections')
-      .catch(error => {
-        console.log(error)
-      })
+    this.$store.dispatch('collection/fetchCollections').catch(error => {
+      console.log(error)
+    })
   },
 
   setup () {
@@ -78,10 +89,9 @@ export default {
         component: NewCollection
       })
         .onOk(data => {
-          store.dispatch('collection/fetchCollections')
-            .catch(error => {
-              console.log(error)
-            })
+          store.dispatch('collection/fetchCollections').catch(error => {
+            console.log(error)
+          })
         })
         .onCancel(() => {
           // Do nothing.

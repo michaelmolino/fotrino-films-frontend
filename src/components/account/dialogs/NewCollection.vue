@@ -26,27 +26,26 @@
             color="secondary"
             v-model="newCollection.useProfilePhoto"
             size="md"
-            @click="tick"
           />
           Use profile photo for collection cover
-          <div v-if="!newCollection.useProfilePhoto">
-            <q-uploader
-              :class="$q.dark.isActive ? 'fit bg-dark' : 'fit bg-white'"
-              flat
-              label="Cover"
-              color="secondary"
-              hide-upload-btn
-              accept=".jpg, image/*"
-              @added="added"
-              @removed="newCollection.cover = null"
-            />
-            <q-icon
-              name="lightbulb"
-              :class="$q.dark.isActive ? 'text-white' : 'text-secondary'"
-              size="sm"
-            />
-            Cover photos should be square!
-          </div>
+          <q-uploader
+            :disable="newCollection.useProfilePhoto"
+            :class="$q.dark.isActive ? 'fit bg-dark' : 'fit bg-white'"
+            no-thumbnails
+            flat
+            label="Cover"
+            color="secondary"
+            hide-upload-btn
+            accept=".jpg, image/*"
+            @added="added"
+            @removed="newCollection.cover = null"
+          />
+          <q-icon
+            name="lightbulb"
+            :class="$q.dark.isActive ? 'text-white' : 'text-secondary'"
+            size="sm"
+          />
+          Cover photos should be square!
         </q-card-section>
       </q-card-section>
 
@@ -130,11 +129,6 @@ export default {
     },
     added (files) {
       this.newCollection.cover = files[0]
-    },
-    tick () {
-      if (this.newCollection.useProfilePhoto === false) {
-        this.newCollection.cover = null
-      }
     }
   },
 

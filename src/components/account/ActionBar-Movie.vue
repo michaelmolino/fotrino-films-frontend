@@ -60,7 +60,7 @@ export default {
 
   methods: {
     editMovie (collectionUuid, movieId, deleted) {
-      // TODO
+      console.log('Not yet supported.')
     },
     deleteMovie (collectionUuid, movieId) {
       this.editMovie(collectionUuid, movieId, true)

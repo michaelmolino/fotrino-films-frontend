@@ -88,11 +88,11 @@ export function createCollection (context, collection) {
 
 export function createMovie (context, movie) {
   return axios
-    .post('/api/movies',
+    .post('/api/collections/movies',
       {
         collection: movie.collection,
         title: movie.title,
-        subTitle: movie.subTitle,
+        subtitle: movie.subtitle,
         filename: movie.filename
       }
     )

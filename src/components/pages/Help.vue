@@ -78,10 +78,7 @@
       >
         <q-card>
           <q-card-section>
-            As a viewer, if you were invited to view a video, you can trust that
-            it will be availble for you. It is not ready for arbitrary users to
-            upload content. At the moment, it's mostly a personal project for me
-            and my family.
+            At the moment, it's mostly a personal project for me and my family.
           </q-card-section>
         </q-card>
       </q-expansion-item>

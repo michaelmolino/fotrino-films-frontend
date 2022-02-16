@@ -3,8 +3,18 @@
     <div class="text-h6">Terms, Conditions, &amp; Privacy Policy</div>
     <ol>
       <li>
+        Fotrino Films is under active development and is not ready for use. The
+        database, all accounts, and any images, video, etc. are regularly
+        deleted. You should have no expectation that this site is fit for any
+        purpose.
+      </li>
+      <li>
         We respect your privacy regarding any information we may collect from
-        you.
+        you. In addition to your content (and all metadata/exifdata) we may also
+        store your name, profile picture, email address, and country. Country
+        informtion may be used in the future to provide a better experience.
+        Your name and email address are used for important communications and
+        marketing. No information is shared with third parties.
       </li>
       <li>
         You own and are responsible for your own content; you must only upload
@@ -43,8 +53,9 @@
         applicable laws.
       </li>
       <li>
-        In addition to your content (and all metadata/exifdata) we may also
-        store your name, profile picture, and email address.
+        The servers used to operate this website are located in several
+        different countries. Your data may be stored in the European Union, the
+        United States of America, or any other country.
       </li>
       <li>
         If you want us to remove all content and close your account please email

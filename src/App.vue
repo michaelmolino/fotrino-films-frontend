@@ -12,8 +12,8 @@ export default {
 
   created () {
     this.$store.dispatch('account/fetchProfile')
-      .catch(() => {
-        // Do nothing.  It's normal for users not to be logged in.
+      .catch(error => {
+        console.log(error)
       })
   },
 

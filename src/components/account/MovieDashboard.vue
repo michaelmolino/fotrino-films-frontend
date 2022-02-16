@@ -38,6 +38,7 @@
 import { useQuasar } from 'quasar'
 import { defineAsyncComponent } from 'vue'
 import { useStore } from 'vuex'
+import { useRoute } from 'vue-router'
 
 import NewMovie from '@components/account/dialogs/NewMovie.vue'
 
@@ -81,6 +82,7 @@ export default {
   setup () {
     const $q = useQuasar()
     const store = useStore()
+    const route = useRoute()
 
     function newMovieDialog () {
       $q.dialog({
@@ -89,7 +91,7 @@ export default {
         .onOk(data => {
           store
             .dispatch('collection/fetchCollection',
-              this.$route.query.uuid)
+              route.query.uuid)
             .catch(error => {
               console.log(error)
             })

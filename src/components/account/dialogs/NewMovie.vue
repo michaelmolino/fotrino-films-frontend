@@ -18,7 +18,7 @@
           label="Sub Title"
           dense
           autofocus
-          v-model="newMovie.subTitle"
+          v-model="newMovie.subtitle"
         />
         <q-input
           :color="$q.dark.isActive ? 'white' : 'secondary'"
@@ -31,6 +31,7 @@
         <q-card-section class="q-py-sm">
           <q-uploader
             :class="$q.dark.isActive ? 'fit bg-dark' : 'fit bg-white'"
+            no-thumbnails
             flat
             label="Poster"
             color="secondary"
@@ -56,19 +57,18 @@
       </q-card-section>
 
       <q-card-actions align="right">
-        <!-- <q-btn
+        <q-btn
           color="secondary"
           label="OK"
           @click="createMovie"
-          :disabled="newMovie.title.length < 3 || newMovie.subTitle.length < 3 || !newMovie.poster"
+          :disabled="newMovie.title.length < 3 || newMovie.subtitle.length < 3 || !newMovie.poster"
           :loading="working"
-        /> -->
-        <q-btn
+        />
+        <!-- <q-btn
           color="secondary"
           label="Not Yet Implemented"
           :disabled="true"
-          :loading="working"
-        />
+        /> -->
         <q-btn color="secondary" label="Cancel" @click="onCancelClick" />
       </q-card-actions>
     </q-card>
@@ -88,7 +88,7 @@ export default {
     return {
       newMovie: {
         title: '',
-        subTitle: '',
+        subtitle: '',
         poster: null
       },
       working: false
@@ -115,7 +115,7 @@ export default {
       const p1 = this.$store.dispatch('collection/createMovie', {
         collection: this.$route.query.uuid,
         title: this.newMovie.title,
-        subTitle: this.newMovie.subTitle,
+        subtitle: this.newMovie.subtitle,
         filename: this.newMovie.poster?.name
       })
 
@@ -124,7 +124,7 @@ export default {
       Promise.all([p1, p2])
         .then(results => {
           return this.$axios.put(
-            results[0].data.presignedCoverPutUrl,
+            results[0].data.presignedPosterPutUrl,
             results[1]
           )
         })

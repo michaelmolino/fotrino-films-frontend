@@ -19,6 +19,9 @@
           :to="'/' + collection.uuid + '/' + collection.slug + '/' + movie.slug + '/' + chapter.slug"
         />
       </div>
+      <div v-if="movie.chapters.length === 0">
+        This movie is empty!
+      </div>
     </div>
   </div>
 </template>

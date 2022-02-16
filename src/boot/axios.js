@@ -24,12 +24,19 @@ export default boot(({ app, router, store }) => {
       let msg = 'Something went wrong!'
       switch (error.response.status) {
         case 401:
-          return Promise.reject(error)
+          msg = 'Unauthorised.  Please login.'
+          break
         case 402:
           msg = 'You have exceeded a limit for your account type.'
           break
+        case 403:
+          msg = 'Forbidden.'
+          break
         case 404:
           router.replace('/404')
+          return Promise.reject(error)
+        case 409:
+          router.replace('/409')
           return Promise.reject(error)
       }
 
