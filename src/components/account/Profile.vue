@@ -1,7 +1,7 @@
 <template>
   <div>
     <q-card v-if="profile.id" flat style="max-width: 250px">
-      <img :src="profile.profile_pic" />
+      <img :src="profile.profile_pic" :alt="profile.name" />
       <q-card-section>
         <div class="text-h6">
           <q-icon :name="'fab fa-' + profile.identity_provider" />

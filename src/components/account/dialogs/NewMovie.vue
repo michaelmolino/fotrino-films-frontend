@@ -64,11 +64,6 @@
           :disabled="newMovie.title.length < 3 || newMovie.subtitle.length < 3 || !newMovie.poster"
           :loading="working"
         />
-        <!-- <q-btn
-          color="secondary"
-          label="Not Yet Implemented"
-          :disabled="true"
-        /> -->
         <q-btn color="secondary" label="Cancel" @click="onCancelClick" />
       </q-card-actions>
     </q-card>
