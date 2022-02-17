@@ -14,7 +14,7 @@
       >
         <span class="text-bold">Audio</span>
       </q-badge>
-      <q-img :src="chapter.preview" :ratio="16 / 9" loading="lazy">
+      <q-img :src="chapter.preview" :ratio="16 / 9">
         <div class="absolute-bottom text-center">
           <div class="ellipsis">{{ chapter.title }}</div>
         </div>

@@ -1,6 +1,6 @@
 <template>
   <q-btn flat dense no-caps class="fit" padding="16px">
-    <q-img :src="collection.cover" :ratio="1 / 1" loading="lazy">
+    <q-img :src="collection.cover" :ratio="1 / 1">
       <div class="absolute-bottom text-center">
         <div class="ellipsis">{{ collection.title }}</div>
       </div>
