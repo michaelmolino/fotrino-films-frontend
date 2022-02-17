@@ -17,7 +17,7 @@
         <div
           v-for="chapter in movie.chapters"
           :key="chapter.id"
-          class="q-pa-md col-xs-6 col-sm-4 col-md-3 col-lg-2"
+          class="q-pa-md col-xs-12 col-sm-4 col-md-3"
         >
           <div>
             <ChapterPreview :collection="collection" :movie="movie" :chapter="chapter" disable />

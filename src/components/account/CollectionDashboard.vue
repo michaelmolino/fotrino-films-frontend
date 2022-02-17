@@ -75,7 +75,7 @@ export default {
   },
 
   created: function () {
-    this.$store.dispatch('collection/fetchCollections').catch(error => {
+    this.$store.cache.dispatch('collection/fetchCollections').catch(error => {
       console.log(error)
     })
   },
