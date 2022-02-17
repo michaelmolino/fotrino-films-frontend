@@ -61,7 +61,7 @@
           color="secondary"
           label="OK"
           @click="createMovie"
-          :disabled="newMovie.title.length < 3 || newMovie.subtitle.length < 3 || !newMovie.poster"
+          :disable="newMovie.title.length < 3 || newMovie.subtitle.length < 3 || !newMovie.poster"
           :loading="working"
         />
         <q-btn color="secondary" label="Cancel" @click="onCancelClick" />
@@ -108,7 +108,7 @@ export default {
       this.newMovie.working = true
 
       const p1 = this.$store.dispatch('collection/createMovie', {
-        collection: this.$route.query.uuid,
+        collection: this.$route.params.uuid,
         title: this.newMovie.title,
         subtitle: this.newMovie.subtitle,
         filename: this.newMovie.poster?.name

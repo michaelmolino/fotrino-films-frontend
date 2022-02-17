@@ -5,7 +5,7 @@ const routes = [
     children: [
       { path: '', component: () => import('@components/pages/Home.vue') },
       {
-        path: '/profile',
+        path: 'profile',
         component: () => import('@components/account/Profile.vue')
       },
       { path: 'help', component: () => import('@components/pages/Help.vue') },
@@ -22,7 +22,7 @@ const routes = [
     ]
   },
   {
-    path: '/:uuid/:collectionSlug',
+    path: '/:uuid([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})/:collectionSlug([0-9a-zA-Z-]+)',
     component: () => import('@components/MainLayout.vue'),
     children: [
       {
@@ -30,11 +30,11 @@ const routes = [
         component: () => import('@components/collection/Collection.vue')
       },
       {
-        path: ':movieSlug',
+        path: ':movieSlug([0-9a-zA-Z-]+)',
         component: () => import('@components/collection/Movie.vue')
       },
       {
-        path: ':movieSlug/:chapterSlug',
+        path: ':movieSlug([0-9a-zA-Z-]+)/:chapterSlug([0-9a-zA-Z-]+)',
         component: () => import('@components/collection/Chapter.vue')
       }
     ]
@@ -48,9 +48,12 @@ const routes = [
         component: () => import('@components/account/CollectionDashboard.vue')
       },
       {
-        path: 'movies',
-        query: { name: 'uuid' },
+        path: ':uuid([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})/:collectionSlug([0-9a-zA-Z-]+)',
         component: () => import('@components/account/MovieDashboard.vue')
+      },
+      {
+        path: ':uuid([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})/:collectionSlug([0-9a-zA-Z-]+)/:movieSlug([0-9a-zA-Z-]+)',
+        component: () => import('@components/account/ChapterDashboard.vue')
       }
     ]
   },

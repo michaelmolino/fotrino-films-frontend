@@ -4,7 +4,7 @@
       <div class="text-h6 text-center">
         <q-btn flat dense icon="arrow_back" to="/dashboard" />
         Dashboard: {{ collection.title }}
-        <ActionButtonOpen :collection="collection" />
+        <ActionButtonOpenCollection :collection="collection" />
       </div>
       <q-btn
         color="positive"
@@ -19,7 +19,7 @@
           class="q-pa-md col-xs-6 col-sm-4 col-md-3 col-lg-2"
         >
           <div>
-            <MoviePoster :collection="collection" :movie="movie" disabled />
+            <MoviePoster :collection="collection" :movie="movie" :to="'/dashboard/' + collection.uuid + '/' + collection.slug + '/' + movie.slug" />
           </div>
           <ActionBarMovie :collection="collection" :movie="movie" />
         </div>
@@ -46,7 +46,7 @@ export default {
   name: 'Movie-Dashboard',
 
   components: {
-    ActionButtonOpen: defineAsyncComponent(() =>
+    ActionButtonOpenCollection: defineAsyncComponent(() =>
       import('@components/account/ActionButtonOpen-Collection.vue')
     ),
     MoviePoster: defineAsyncComponent(() =>
@@ -70,15 +70,6 @@ export default {
     }
   },
 
-  created: function () {
-    this.$store
-      .dispatch('collection/fetchCollection',
-        this.$route.query.uuid)
-      .catch(error => {
-        console.log(error)
-      })
-  },
-
   setup () {
     const $q = useQuasar()
     const store = useStore()
@@ -91,7 +82,7 @@ export default {
         .onOk(data => {
           store
             .dispatch('collection/fetchCollection',
-              route.query.uuid)
+              route.params.uuid)
             .catch(error => {
               console.log(error)
             })
