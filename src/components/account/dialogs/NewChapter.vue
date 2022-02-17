@@ -2,7 +2,7 @@
   <q-dialog ref="dialogRef" @hide="onDialogHide" persistent>
     <q-card class="q-dialog-plugin">
       <q-card-section>
-        <div class="text-h6">New Collection</div>
+        <div class="text-h6">New Chapter</div>
       </q-card-section>
 
       <q-card-section>
@@ -11,7 +11,7 @@
           label="Title"
           dense
           autofocus
-          v-model="newCollection.title"
+          v-model="newChapter.title"
         />
         <q-input
           :color="$q.dark.isActive ? 'white' : 'secondary'"
@@ -22,39 +22,50 @@
           v-model="slug"
         />
         <q-card-section class="q-py-sm">
-          <q-checkbox
-            color="secondary"
-            v-model="newCollection.useProfilePhoto"
-            size="md"
-          />
-          Use profile photo for collection cover
           <q-uploader
-            :disable="newCollection.useProfilePhoto"
             :class="$q.dark.isActive ? 'fit bg-dark' : 'fit bg-white'"
             no-thumbnails
             flat
-            label="Cover"
+            label="Media"
+            color="secondary"
+            hide-upload-btn
+            accept=".mp4, .mov, .mkv, .mp3, audio/*, video/*"
+            @added="addedMedia"
+            @removed="newChapter.media = null"
+          />
+          <q-uploader
+            :class="$q.dark.isActive ? 'fit bg-dark' : 'fit bg-white'"
+            no-thumbnails
+            flat
+            label="Preview"
             color="secondary"
             hide-upload-btn
             accept=".jpg, image/*"
-            @added="added"
-            @removed="newCollection.cover = null"
+            @added="addedPreview"
+            @removed="newChapter.preview = null"
           />
           <q-icon
             name="lightbulb"
             :class="$q.dark.isActive ? 'text-white' : 'text-secondary'"
             size="sm"
           />
-          Cover photos should be square!
+          Previews should be landscape
+          <br>
+          <q-icon
+            name="lightbulb"
+            :class="$q.dark.isActive ? 'text-white' : 'text-secondary'"
+            size="sm"
+          />
+          Previews should have an aspect ratio of 16:9
         </q-card-section>
       </q-card-section>
 
       <q-card-actions align="right">
         <q-btn
           color="secondary"
-          label="OK"
-          @click="createCollection"
-          :disable="!(newCollection.title.length > 2 && (newCollection.cover || newCollection.useProfilePhoto))"
+          label="Not Yet Supported"
+          @click="createChapter"
+          :disable="newChapter.title.length < 3 || !newChapter.preview || true"
           :loading="working"
         />
         <q-btn color="secondary" label="Cancel" @click="onCancelClick" />
@@ -68,16 +79,16 @@ import { useDialogPluginComponent } from 'quasar'
 const reducer = require('image-blob-reduce')()
 
 export default {
-  name: 'NewCollection',
+  name: 'newChapter',
 
   emits: [...useDialogPluginComponent.emits],
 
   data () {
     return {
-      newCollection: {
+      newChapter: {
         title: '',
-        useProfilePhoto: true,
-        cover: null
+        media: null,
+        preview: null
       },
       working: false
     }
@@ -91,44 +102,43 @@ export default {
     },
     slug: {
       get () {
-        return this.newCollection.title?.replace(/[^0-9a-zA-Z]+/g, '-').substring(0, 32)
+        return this.newChapter.title?.replace(/[^0-9a-zA-Z]+/g, '-').substring(0, 32)
       }
     }
   },
 
   methods: {
-    createCollection () {
-      this.newCollection.working = true
+    createChapter () {
+      this.newChapter.working = true
 
-      const p1 = this.$store.dispatch('collection/createCollection', {
-        title: this.newCollection.title,
-        filename: this.newCollection.cover?.name
+      const p1 = this.$store.dispatch('collection/createChapter', {
+        collection: this.$route.params.uuid,
+        title: this.newChapter.title,
+        filename: this.newChapter.Preview?.name
       })
 
-      const p2 = !this.newCollection.useProfilePhoto
-        ? reducer.toBlob(this.newCollection.cover, { max: 360 })
-        : Promise.resolve(null)
+      const p2 = reducer.toBlob(this.newChapter.preview, { max: 720 })
 
       Promise.all([p1, p2])
         .then(results => {
-          if (!this.newCollection.useProfilePhoto) {
-            return this.$axios.put(
-              results[0].data.presignedCoverPutUrl,
-              results[1]
-            )
-          }
-          return Promise.resolve()
+          return this.$axios.put(
+            results[0].data.presignedPreviewPutUrl,
+            results[1]
+          )
         })
         .then(() => {
-          this.onOKClick(this.newCollection)
+          this.onOKClick(this.newChapter)
         })
         .catch(error => {
           console.log(error)
           this.onOKClick(false)
         })
     },
-    added (files) {
-      this.newCollection.cover = files[0]
+    addedMedia (files) {
+      this.newChapter.preview = files[0]
+    },
+    addedPreview (files) {
+      this.newChapter.media = files[0]
     }
   },
 

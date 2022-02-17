@@ -1,16 +1,8 @@
 <template>
   <div class="q-mt-sm text-center">
-    <q-btn
-      round
-      dense
-      color="info"
-      icon="link"
-      :to="'/' + collection.uuid + '/' + collection.slug + '/' + movie.slug"
-    >
-      <q-tooltip>Open Movie</q-tooltip>
-    </q-btn>
+    <ActionButtonOpenMovie :collection="collection" :movie="movie" />
     &nbsp;
-    <q-btn round dense color="positive" icon="edit" disabled>
+    <q-btn round dense color="positive" icon="edit" disable>
       <q-tooltip>Edit Movie</q-tooltip>
     </q-btn>
     &nbsp;
@@ -21,7 +13,7 @@
       color="warning"
       icon="delete"
       @click="deleteMovie(collection.uuid, movie.id)"
-      disabled
+      disable
     >
       <q-tooltip>Delete Movie</q-tooltip>
     </q-btn>
@@ -42,7 +34,7 @@
       dense
       color="negative"
       icon="delete_forever"
-      disabled
+      disable
     >
       <q-tooltip>Delete Forever</q-tooltip>
     </q-btn>
@@ -50,8 +42,16 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue'
+
 export default {
   name: 'ActionBar-Movie',
+
+  components: {
+    ActionButtonOpenMovie: defineAsyncComponent(() =>
+      import('@components/account/ActionButtonOpen-Movie.vue')
+    )
+  },
 
   props: {
     collection: Object,

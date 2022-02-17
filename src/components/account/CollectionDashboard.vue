@@ -26,7 +26,7 @@
           <div>
             <CollectionCover
               :collection="collection"
-              :to="'/dashboard/movies?uuid=' + collection.uuid"
+              :to="'/dashboard/' + collection.uuid + '/' + collection.slug"
             />
           </div>
           <ActionBarCollection :collection="collection" />

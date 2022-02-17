@@ -1,8 +1,8 @@
 <template>
   <div class="q-mt-sm text-center">
-    <ActionButtonOpen :collection="collection" />
+    <ActionButtonOpenCollection :collection="collection" />
     &nbsp;
-    <q-btn round dense color="positive" icon="edit" disabled>
+    <q-btn round dense color="positive" icon="edit" disable>
       <q-tooltip>Edit Collection</q-tooltip>
     </q-btn>
     &nbsp;
@@ -33,7 +33,7 @@
       dense
       color="negative"
       icon="delete_forever"
-      disabled
+      disable
     >
       <q-tooltip>Delete Forever</q-tooltip>
     </q-btn>
@@ -47,7 +47,7 @@ export default {
   name: 'ActionBar-Collection',
 
   components: {
-    ActionButtonOpen: defineAsyncComponent(() =>
+    ActionButtonOpenCollection: defineAsyncComponent(() =>
       import('@components/account/ActionButtonOpen-Collection.vue')
     )
   },

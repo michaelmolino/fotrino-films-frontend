@@ -3,9 +3,9 @@ import axios from 'axios'
 import { Notify, Loading } from 'quasar'
 
 export default boot(({ app, router, store }) => {
-  Loading.show()
-
   axios.interceptors.request.use(config => {
+    Loading.show()
+    // TODO: I only want this for local API calls, not calls to third parties like S3
     if (['post', 'put', 'delete'].includes(config.method)) {
       config.headers['X-CSRFToken'] = store.state.account.profile.csrf_token
     }
