@@ -1,6 +1,6 @@
 import { LocalStorage } from 'quasar'
 import _ from 'underscore'
-import axios from 'axios'
+import { api } from 'boot/axios'
 import DOMPurify from 'dompurify'
 import { nullCollection } from 'boot/global'
 
@@ -10,8 +10,8 @@ export function fetchCollection (context, uuid) {
     return Promise.resolve(nullCollection)
   }
 
-  return axios
-    .get('/api/collections/' + uuid)
+  return api
+    .get('/collections/' + uuid)
     .then(response => {
       const collection = response.data
       collection.movies = collection.movies.sort((a, b) => {
@@ -49,8 +49,8 @@ export function fetchCollection (context, uuid) {
 }
 
 export function fetchCollections (context) {
-  return axios
-    .get('/api/collections')
+  return api
+    .get('/collections')
     .then(response => {
       context.commit('SET_COLLECTIONS', response.data)
       return Promise.resolve(response.data)
@@ -78,8 +78,8 @@ export function rmHistory (context, uuid) {
 }
 
 export function createCollection (context, collection) {
-  return axios
-    .post('/api/collections',
+  return api
+    .post('/collections',
       {
         title: collection.title,
         filename: collection.filename
@@ -91,8 +91,8 @@ export function createCollection (context, collection) {
 }
 
 export function createMovie (context, movie) {
-  return axios
-    .post('/api/collections/movies',
+  return api
+    .post('/collections/movies',
       {
         collection: movie.collection,
         title: movie.title,
@@ -106,8 +106,8 @@ export function createMovie (context, movie) {
 }
 
 export function editCollection (context, collection) {
-  return axios
-    .put('/api/collections/' + collection.uuid,
+  return api
+    .put('/collections/' + collection.uuid,
       {
         title: collection.title,
         deleted: collection.deleted

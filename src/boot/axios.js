@@ -2,17 +2,23 @@ import { boot } from 'quasar/wrappers'
 import axios from 'axios'
 import { Notify, Loading } from 'quasar'
 
+const api = axios.create({ baseURL: process.env.API })
+
 export default boot(({ app, router, store }) => {
-  axios.interceptors.request.use(config => {
+  api.interceptors.request.use(req => {
     Loading.show()
-    // TODO: I only want this for local API calls, not calls to third parties like S3
-    if (['post', 'put', 'delete'].includes(config.method)) {
-      config.headers['X-CSRFToken'] = store.state.account.profile.csrf_token
+    if (['post', 'put', 'delete'].includes(req.method)) {
+      req.headers['X-CSRFToken'] = store.state.account.profile.csrf_token
     }
-    return config
+    return req
   })
 
-  axios.interceptors.response.use(
+  axios.interceptors.request.use(req => {
+    Loading.show()
+    return req
+  })
+
+  api.interceptors.response.use(
     function (response) {
       Loading.hide()
       return response
@@ -58,7 +64,20 @@ export default boot(({ app, router, store }) => {
     }
   )
 
+  axios.interceptors.response.use(
+    function (response) {
+      Loading.hide()
+      return response
+    },
+
+    function (error) {
+      Loading.hide()
+      return Promise.reject(error)
+    }
+  )
+
   app.config.globalProperties.$axios = axios
+  app.config.globalProperties.$api = api
 })
 
-export { axios }
+export { axios, api }

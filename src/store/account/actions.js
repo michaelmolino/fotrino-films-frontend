@@ -1,9 +1,9 @@
-import axios from 'axios'
+import { api } from 'boot/axios'
 import { nullProfile } from 'boot/global'
 
 export function fetchProfile (context) {
-  return axios
-    .get('/api/account/profile')
+  return api
+    .get('/account/profile')
     .then(response => {
       context.commit('SET_PROFILE', response.data)
     })

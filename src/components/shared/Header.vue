@@ -137,7 +137,7 @@
         />
         <q-separator />
         <q-btn
-          href="/api/account/logout"
+          :href="logout"
           align="left"
           flat
           no-caps
@@ -157,6 +157,7 @@ export default {
 
   data () {
     return {
+      logout: process.env.API + '/account/logout',
       // oauthProviders: [
       //   { name: 'Facebook', icon: 'fab fa-facebook' },
       //   { name: 'GitHub', icon: 'fab fa-github' },
@@ -167,8 +168,8 @@ export default {
       //   { name: 'Twitter', icon: 'fab fa-twitter' }
       // ]
       oauthProviders: [
-        { name: 'Facebook', icon: 'fab fa-facebook', login: '/api/account/login/facebook' },
-        { name: 'Google', icon: 'fab fa-google', login: '/api/account/login/google' }
+        { name: 'Facebook', icon: 'fab fa-facebook', login: process.env.API + '/account/login/facebook' },
+        { name: 'Google', icon: 'fab fa-google', login: process.env.API + '/account/login/google' }
       ]
     }
   },
