@@ -51,7 +51,6 @@ module.exports = {
     // allow paren-less arrow functions
     'arrow-parens': 'off',
     'one-var': 'off',
-
     'import/first': 'off',
     'import/named': 'error',
     'import/namespace': 'error',
@@ -61,6 +60,7 @@ module.exports = {
     'import/no-unresolved': 'off',
     'import/no-extraneous-dependencies': 'off',
     'prefer-promise-reject-errors': 'off',
+    'space-before-function-paren': 'off',
     // hack
     'vue/script-setup-uses-vars': 'off',
 

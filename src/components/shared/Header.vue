@@ -158,15 +158,6 @@ export default {
   data () {
     return {
       logout: process.env.API + '/account/logout',
-      // oauthProviders: [
-      //   { name: 'Facebook', icon: 'fab fa-facebook' },
-      //   { name: 'GitHub', icon: 'fab fa-github' },
-      //   { name: 'Google', icon: 'fab fa-google' },
-      //   { name: 'Instagram', icon: 'fab fa-instagram' },
-      //   { name: 'Live', icon: 'fab fa-microsoft' },
-      //   { name: 'Reddit', icon: 'fab fa-reddit' },
-      //   { name: 'Twitter', icon: 'fab fa-twitter' }
-      // ]
       oauthProviders: [
         { name: 'Facebook', icon: 'fab fa-facebook', login: process.env.API + '/account/login/facebook' },
         { name: 'Google', icon: 'fab fa-google', login: process.env.API + '/account/login/google' }
@@ -176,7 +167,7 @@ export default {
 
   created: function () {
     this.$store
-      .dispatch('collection/fetchHistory')
+      .dispatch('collection/getHistory')
   },
 
   computed: {

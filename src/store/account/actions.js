@@ -1,7 +1,7 @@
 import { api } from 'boot/axios'
 import { nullProfile } from 'boot/global'
 
-export function fetchProfile (context) {
+export function getProfile (context) {
   return api
     .get('/account/profile')
     .then(response => {

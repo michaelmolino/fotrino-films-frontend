@@ -20,7 +20,7 @@
           class="q-pa-md col-xs-12 col-sm-4 col-md-3"
         >
           <div>
-            <ChapterPreview :collection="collection" :movie="movie" :chapter="chapter" disable />
+            <ChapterPreview :collection="collection" :movie="movie" :chapter="chapter" :ripple="false" class="no-pointer-events" />
           </div>
           <ActionBarChapter :collection="collection" :movie="movie" :chapter="chapter" />
         </div>
@@ -94,7 +94,7 @@ export default {
       })
         .onOk(data => {
           store
-            .dispatch('collection/fetchCollection',
+            .dispatch('collection/getCollection',
               route.params.uuid)
             .catch(error => {
               console.log(error)

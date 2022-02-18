@@ -57,22 +57,22 @@ export default {
   },
 
   methods: {
-    editCollection (collectionUuid, deleted) {
+    editCollection(modifiedCollection) {
       this.$store
-        .dispatch('collection/editCollection', {
-          uuid: collectionUuid,
-          deleted: deleted
-        })
+        .dispatch('collection/editCollection', modifiedCollection)
         .then(() => {
-          this.$store.dispatch('collection/fetchCollections')
-          this.$store.cache.delete('collection/fetchCollection', collectionUuid)
+          this.$store.dispatch('collection/getCollections')
+          this.$store.cache.delete(
+            'collection/getCollection',
+            modifiedCollection.uuid
+          )
         })
     },
-    deleteCollection (collectionUuid) {
-      this.editCollection(collectionUuid, true)
+    deleteCollection(collectionUuid) {
+      this.editCollection({ uuid: collectionUuid, deleted: true })
     },
-    unDeleteCollection (collectionUuid) {
-      this.editCollection(collectionUuid, false)
+    unDeleteCollection(collectionUuid) {
+      this.editCollection({ uuid: collectionUuid, deleted: false })
     }
   }
 }

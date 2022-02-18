@@ -11,7 +11,7 @@ export default {
   name: 'App',
 
   created () {
-    this.$store.dispatch('account/fetchProfile')
+    this.$store.dispatch('account/getProfile')
       .catch(error => {
         console.log(error)
       })
@@ -47,7 +47,7 @@ export default {
   watch: {
     $route (to, from) {
       this.$store.cache
-        .dispatch('collection/fetchCollection', to.params.uuid)
+        .dispatch('collection/getCollection', to.params.uuid)
         .then(_collection => {
           this.collection = _collection
           this.updatePageProperties()

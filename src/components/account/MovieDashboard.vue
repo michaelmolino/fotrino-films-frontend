@@ -81,7 +81,7 @@ export default {
       })
         .onOk(data => {
           store
-            .dispatch('collection/fetchCollection',
+            .dispatch('collection/getCollection',
               route.params.uuid)
             .catch(error => {
               console.log(error)

@@ -75,7 +75,7 @@ export default {
   },
 
   created: function () {
-    this.$store.cache.dispatch('collection/fetchCollections').catch(error => {
+    this.$store.cache.dispatch('collection/getCollections').catch(error => {
       console.log(error)
     })
   },
@@ -89,7 +89,7 @@ export default {
         component: NewCollection
       })
         .onOk(data => {
-          store.dispatch('collection/fetchCollections').catch(error => {
+          store.dispatch('collection/getCollections').catch(error => {
             console.log(error)
           })
         })
