@@ -28,8 +28,7 @@
           "
           size="sm"
         />
-        Descriptions can have &lt;br&gt;, &lt;i&gt;, &lt;p&gt;, and
-        &lt;strong&gt; tags.
+        Tags &lt;br&gt;, &lt;i&gt;, &lt;p&gt;, and &lt;strong&gt; are allowed.
         <br />
         <q-input
           :color="$q.dark.isActive ? 'white' : 'secondary'"
