@@ -16,7 +16,16 @@
           :collection="collection"
           :movie="movie"
           :chapter="chapter"
-          :to="'/' + collection.uuid + '/' + collection.slug + '/' + movie.slug + '/' + chapter.slug"
+          :to="
+            '/' +
+              collection.uuid +
+              '/' +
+              collection.slug +
+              '/' +
+              movie.slug +
+              '/' +
+              chapter.slug
+          "
         />
       </div>
       <div v-if="movie.chapters.length === 0">
@@ -43,12 +52,12 @@ export default {
 
   computed: {
     collection: {
-      get () {
+      get() {
         return this.$store.state.collection.collection
       }
     },
     movie: {
-      get () {
+      get() {
         let _movie = null
         _movie = this.collection.movies.find(
           m => m.slug === this.$route.params.movieSlug

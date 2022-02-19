@@ -1,6 +1,10 @@
 <template>
   <div v-if="collection.uuid">
-    <Breadcrumbs :collection="collection" :movie="this.$nullMovie" :chapter="this.$nullChapter" />
+    <Breadcrumbs
+      :collection="collection"
+      :movie="this.$nullMovie"
+      :chapter="this.$nullChapter"
+    />
     <div class="row">
       <div
         class="q-pa-md col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
@@ -9,7 +13,18 @@
       >
         <MoviePoster
           :movie="movie"
-          :to="'/' + collection.uuid + '/' + collection.slug + '/' + movie.slug"
+          :to="
+            movie.chapters.length === 1
+              ? '/' +
+                collection.uuid +
+                '/' +
+                collection.slug +
+                '/' +
+                movie.slug +
+                '/' +
+                movie.chapters[0].slug
+              : '/' + collection.uuid + '/' + collection.slug + '/' + movie.slug
+          "
         />
       </div>
       <div v-if="collection.movies.length === 0">
@@ -36,7 +51,7 @@ export default {
 
   computed: {
     collection: {
-      get () {
+      get() {
         return this.$store.state.collection.collection
       }
     }
