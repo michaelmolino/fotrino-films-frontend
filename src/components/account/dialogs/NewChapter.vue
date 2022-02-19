@@ -15,6 +15,24 @@
         />
         <q-input
           :color="$q.dark.isActive ? 'white' : 'secondary'"
+          label="Description"
+          dense
+          autofocus
+          v-model="newChapter.description"
+          type="textarea"
+        />
+        <q-icon
+          name="lightbulb"
+          :class="
+            $q.dark.isActive ? 'q-py-sm text-white' : 'q-py-sm text-secondary'
+          "
+          size="sm"
+        />
+        Descriptions can have &lt;br&gt;, &lt;i&gt;, &lt;p&gt;, and
+        &lt;strong&gt; tags.
+        <br />
+        <q-input
+          :color="$q.dark.isActive ? 'white' : 'secondary'"
           readonly
           label="Slug"
           dense
@@ -50,7 +68,7 @@
             size="sm"
           />
           Previews should be landscape
-          <br>
+          <br />
           <q-icon
             name="lightbulb"
             :class="$q.dark.isActive ? 'text-white' : 'text-secondary'"
@@ -83,10 +101,11 @@ export default {
 
   emits: [...useDialogPluginComponent.emits],
 
-  data () {
+  data() {
     return {
       newChapter: {
         title: '',
+        description: '',
         media: null,
         preview: null
       },
@@ -96,19 +115,21 @@ export default {
 
   computed: {
     profile: {
-      get () {
+      get() {
         return this.$store.state.account.profile
       }
     },
     slug: {
-      get () {
-        return this.newChapter.title?.replace(/[^0-9a-zA-Z]+/g, '-').substring(0, 32)
+      get() {
+        return this.newChapter.title
+          ?.replace(/[^0-9a-zA-Z]+/g, '-')
+          .substring(0, 32)
       }
     }
   },
 
   methods: {
-    createChapter () {
+    createChapter() {
       this.newChapter.working = true
 
       const p1 = this.$store.dispatch('collection/createChapter', {
@@ -134,15 +155,15 @@ export default {
           this.onOKClick(false)
         })
     },
-    addedMedia (files) {
+    addedMedia(files) {
       this.newChapter.preview = files[0]
     },
-    addedPreview (files) {
+    addedPreview(files) {
       this.newChapter.media = files[0]
     }
   },
 
-  setup () {
+  setup() {
     const {
       dialogRef,
       onDialogHide,
@@ -153,7 +174,7 @@ export default {
     return {
       dialogRef,
       onDialogHide,
-      onOKClick (data) {
+      onOKClick(data) {
         onDialogOK()
       },
       onCancelClick: onDialogCancel
