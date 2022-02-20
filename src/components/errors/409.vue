@@ -10,14 +10,7 @@
         now trying to log in with Google. Please try logging in again using the
         same identity provider you used when you created your account.
       </div>
-      <q-btn
-        icon="videocam"
-        label="Home"
-        flat
-        no-caps
-        size="lg"
-        to="/"
-      />
+      <q-btn icon="videocam" label="Home" flat no-caps size="lg" to="/" />
     </div>
   </div>
 </template>

@@ -30,13 +30,13 @@
 export default {
   name: 'Footer-Bar',
 
-  data () {
+  data() {
     return {
       year: 2021
     }
   },
 
-  created () {
+  created() {
     this.year = new Date().getFullYear()
   }
 }

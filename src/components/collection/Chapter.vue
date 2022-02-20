@@ -45,12 +45,12 @@ export default {
 
   computed: {
     collection: {
-      get () {
+      get() {
         return this.$store.state.collection.collection
       }
     },
     movie: {
-      get () {
+      get() {
         let _movie = null
         _movie = this.collection.movies.find(
           m => m.slug === this.$route.params.movieSlug
@@ -62,7 +62,7 @@ export default {
       }
     },
     chapter: {
-      get () {
+      get() {
         let _chapter = null
         _chapter = this.movie?.chapters.find(
           ch => ch.slug === this.$route.params.chapterSlug

@@ -155,37 +155,44 @@
 export default {
   name: 'Header-Bar',
 
-  data () {
+  data() {
     return {
       logout: process.env.API + '/account/logout',
       oauthProviders: [
-        { name: 'Facebook', icon: 'fab fa-facebook', login: process.env.API + '/account/login/facebook' },
-        { name: 'Google', icon: 'fab fa-google', login: process.env.API + '/account/login/google' }
+        {
+          name: 'Facebook',
+          icon: 'fab fa-facebook',
+          login: process.env.API + '/account/login/facebook'
+        },
+        {
+          name: 'Google',
+          icon: 'fab fa-google',
+          login: process.env.API + '/account/login/google'
+        }
       ]
     }
   },
 
-  created: function () {
-    this.$store
-      .dispatch('collection/getHistory')
+  created: function() {
+    this.$store.dispatch('collection/getHistory')
   },
 
   computed: {
     history: {
-      get () {
+      get() {
         return this.$store.state.collection.history
       }
     },
     darkMode: {
-      get () {
+      get() {
         return this.$q.dark.isActive
       },
-      set (value) {
+      set(value) {
         this.$q.dark.set(value)
       }
     },
     profile: {
-      get () {
+      get() {
         return this.$store.state.account.profile
       }
     }

@@ -1,6 +1,10 @@
 <template>
   <div class="q-mt-sm text-center">
-    <ActionButtonOpenChapter :collection="collection" :movie="movie" :chapter="chapter" />
+    <ActionButtonOpenChapter
+      :collection="collection"
+      :movie="movie"
+      :chapter="chapter"
+    />
     &nbsp;
     <q-btn round dense color="positive" icon="edit" disable>
       <q-tooltip>Edit Chapter</q-tooltip>
@@ -60,13 +64,13 @@ export default {
   },
 
   methods: {
-    editChapter (collectionUuid, movieId, chapterId, deleted) {
+    editChapter(collectionUuid, movieId, chapterId, deleted) {
       console.log('Not yet supported.')
     },
-    deleteMovie (collectionUuid, movieId, chapterId) {
+    deleteMovie(collectionUuid, movieId, chapterId) {
       this.editChapter(collectionUuid, movieId, chapterId, true)
     },
-    unDeleteMovie (collectionUuid, movieId, chapterId) {
+    unDeleteMovie(collectionUuid, movieId, chapterId) {
       this.editChapter(collectionUuid, movieId, chapterId, false)
     }
   }

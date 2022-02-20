@@ -24,7 +24,7 @@ export default {
 
   computed: {
     breadcrumbs: {
-      get () {
+      get() {
         const _breadcrumbs = []
 
         _breadcrumbs.push({
@@ -37,7 +37,13 @@ export default {
           _breadcrumbs.push({
             id: 1,
             label: this.movie.title,
-            to: '/' + this.collection.uuid + '/' + this.collection.slug + '/' + this.movie.slug
+            to:
+              '/' +
+              this.collection.uuid +
+              '/' +
+              this.collection.slug +
+              '/' +
+              this.movie.slug
           })
         }
 
@@ -45,7 +51,15 @@ export default {
           _breadcrumbs.push({
             id: 2,
             label: this.chapter.title,
-            to: '/' + this.collection.uuid + '/' + this.collection.slug + '/' + this.movie.slug + '/' + this.chapter.slug
+            to:
+              '/' +
+              this.collection.uuid +
+              '/' +
+              this.collection.slug +
+              '/' +
+              this.movie.slug +
+              '/' +
+              this.chapter.slug
           })
         }
 

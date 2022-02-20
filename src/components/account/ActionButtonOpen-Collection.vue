@@ -1,13 +1,13 @@
 <template>
-    <q-btn
-      round
-      dense
-      color="info"
-      icon="link"
-      :to="'/' + collection.uuid + '/' + collection.slug"
-    >
-      <q-tooltip>Open Collection</q-tooltip>
-    </q-btn>
+  <q-btn
+    round
+    dense
+    color="info"
+    icon="link"
+    :to="'/' + collection.uuid + '/' + collection.slug"
+  >
+    <q-tooltip>Open Collection</q-tooltip>
+  </q-btn>
 </template>
 
 <script>

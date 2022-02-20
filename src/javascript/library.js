@@ -1,4 +1,4 @@
-export function getMetaData (route, collection) {
+export function getMetaData(route, collection) {
   let movie = null
   let chapter = null
   let title = null
@@ -10,17 +10,13 @@ export function getMetaData (route, collection) {
   }
 
   if (route?.params.movieSlug) {
-    movie = collection.movies.find(
-      m => m.slug === route.params.movieSlug
-    )
+    movie = collection.movies.find(m => m.slug === route.params.movieSlug)
     title = movie?.title
     image = movie?.poster
   }
 
   if (route?.params.chapterSlug) {
-    chapter = movie?.chapters?.find(
-      ch => ch.slug === route.params.chapterSlug
-    )
+    chapter = movie?.chapters?.find(ch => ch.slug === route.params.chapterSlug)
     title = chapter?.title
     image = chapter?.preview
   }

@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://ogp.me/ns/fb#" lang="en">
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:fb="http://ogp.me/ns/fb#"
+  lang="en"
+>
   <head>
     <meta charset="utf-8" />
 
@@ -97,23 +101,18 @@
     <script type="text/javascript">
       if (window.location.hash && window.location.hash == '#_=_') {
         if (window.history && history.pushState) {
-          window.history.pushState(
-            '',
-            document.title,
-            window.location.pathname
-          );
+          window.history.pushState('', document.title, window.location.pathname)
         } else {
           var scroll = {
             top: document.body.scrollTop,
             left: document.body.scrollLeft
-          };
-          window.location.hash = '';
-          document.body.scrollTop = scroll.top;
-          document.body.scrollLeft = scroll.left;
+          }
+          window.location.hash = ''
+          document.body.scrollTop = scroll.top
+          document.body.scrollLeft = scroll.left
         }
       }
     </script>
-
   </head>
   <body>
     <!-- DO NOT touch the following DIV -->

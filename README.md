@@ -18,18 +18,22 @@ Feel free to use this live demo as a playground. It is always the most up to dat
 
 ## Backend
 
-The backend is written in Python.  I may make the source code available in the future, but currently it is private.
+The backend is written in Python. I may make the source code available in the future, but currently it is private.
 
 ## Build
+
 ```bash
 yarn install
 yarn global add @quasar/cli
 quasar build -m spa
 ```
+
 ## Development
+
 ```bash
 yarn install
 yarn global add @quasar/cli
 quasar dev
 ```
+
 Note: You'll need to proxy the backend somewhere in `quasar.conf.js`.

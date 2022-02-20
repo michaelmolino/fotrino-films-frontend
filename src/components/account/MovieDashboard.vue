@@ -19,7 +19,18 @@
           class="q-pa-md col-xs-6 col-sm-4 col-md-3 col-lg-2"
         >
           <div>
-            <MoviePoster :collection="collection" :movie="movie" :to="'/dashboard/' + collection.uuid + '/' + collection.slug + '/' + movie.slug" />
+            <MoviePoster
+              :collection="collection"
+              :movie="movie"
+              :to="
+                '/dashboard/' +
+                  collection.uuid +
+                  '/' +
+                  collection.slug +
+                  '/' +
+                  movie.slug
+              "
+            />
           </div>
           <ActionBarMovie :collection="collection" :movie="movie" />
         </div>
@@ -59,30 +70,29 @@ export default {
 
   computed: {
     profile: {
-      get () {
+      get() {
         return this.$store.state.account.profile
       }
     },
     collection: {
-      get () {
+      get() {
         return this.$store.state.collection.collection
       }
     }
   },
 
-  setup () {
+  setup() {
     const $q = useQuasar()
     const store = useStore()
     const route = useRoute()
 
-    function newMovieDialog () {
+    function newMovieDialog() {
       $q.dialog({
         component: NewMovie
       })
         .onOk(data => {
           store
-            .dispatch('collection/getCollection',
-              route.params.uuid)
+            .dispatch('collection/getCollection', route.params.uuid)
             .catch(error => {
               console.log(error)
             })

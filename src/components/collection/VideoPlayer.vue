@@ -16,15 +16,15 @@ export default {
     type: String,
     options: Object
   },
-  data () {
+  data() {
     return {
       player: null
     }
   },
-  mounted () {
+  mounted() {
     this.player = videojs(this.$refs.videoPlayer, this.options)
   },
-  beforeUnmount () {
+  beforeUnmount() {
     this.player?.dispose()
   }
 }

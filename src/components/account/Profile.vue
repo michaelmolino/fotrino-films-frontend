@@ -22,7 +22,7 @@ export default {
 
   computed: {
     profile: {
-      get () {
+      get() {
         return this.$store.state.account.profile
       }
     }

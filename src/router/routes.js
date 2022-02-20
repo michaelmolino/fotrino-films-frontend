@@ -22,7 +22,8 @@ const routes = [
     ]
   },
   {
-    path: '/:uuid([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})/:collectionSlug([0-9a-zA-Z-]+)',
+    path:
+      '/:uuid([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})/:collectionSlug([0-9a-zA-Z-]+)',
     component: () => import('@components/MainLayout.vue'),
     children: [
       {
@@ -48,11 +49,13 @@ const routes = [
         component: () => import('@components/account/CollectionDashboard.vue')
       },
       {
-        path: ':uuid([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})/:collectionSlug([0-9a-zA-Z-]+)',
+        path:
+          ':uuid([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})/:collectionSlug([0-9a-zA-Z-]+)',
         component: () => import('@components/account/MovieDashboard.vue')
       },
       {
-        path: ':uuid([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})/:collectionSlug([0-9a-zA-Z-]+)/:movieSlug([0-9a-zA-Z-]+)',
+        path:
+          ':uuid([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})/:collectionSlug([0-9a-zA-Z-]+)/:movieSlug([0-9a-zA-Z-]+)',
         component: () => import('@components/account/ChapterDashboard.vue')
       }
     ]

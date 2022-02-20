@@ -59,13 +59,13 @@ export default {
   },
 
   methods: {
-    editMovie (collectionUuid, movieId, deleted) {
+    editMovie(collectionUuid, movieId, deleted) {
       console.log('Not yet supported.')
     },
-    deleteMovie (collectionUuid, movieId) {
+    deleteMovie(collectionUuid, movieId) {
       this.editMovie(collectionUuid, movieId, true)
     },
-    unDeleteMovie (collectionUuid, movieId) {
+    unDeleteMovie(collectionUuid, movieId) {
       this.editMovie(collectionUuid, movieId, false)
     }
   }

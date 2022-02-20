@@ -19,12 +19,12 @@ export default boot(({ app, router, store }) => {
   })
 
   api.interceptors.response.use(
-    function (response) {
+    function(response) {
       Loading.hide()
       return response
     },
 
-    function (error) {
+    function(error) {
       Loading.hide()
 
       let msg = 'Something went wrong!'
@@ -65,12 +65,12 @@ export default boot(({ app, router, store }) => {
   )
 
   axios.interceptors.response.use(
-    function (response) {
+    function(response) {
       Loading.hide()
       return response
     },
 
-    function (error) {
+    function(error) {
       Loading.hide()
       return Promise.reject(error)
     }

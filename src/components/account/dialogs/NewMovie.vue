@@ -46,7 +46,7 @@
             size="sm"
           />
           Posters should be portrait
-          <br>
+          <br />
           <q-icon
             name="lightbulb"
             :class="$q.dark.isActive ? 'text-white' : 'text-secondary'"
@@ -61,7 +61,11 @@
           color="secondary"
           label="OK"
           @click="createMovie"
-          :disable="newMovie.title.length < 3 || newMovie.subtitle.length < 3 || !newMovie.poster"
+          :disable="
+            newMovie.title.length < 3 ||
+              newMovie.subtitle.length < 3 ||
+              !newMovie.poster
+          "
           :loading="working"
         />
         <q-btn color="secondary" label="Cancel" @click="onCancelClick" />
@@ -79,7 +83,7 @@ export default {
 
   emits: [...useDialogPluginComponent.emits],
 
-  data () {
+  data() {
     return {
       newMovie: {
         title: '',
@@ -92,19 +96,21 @@ export default {
 
   computed: {
     profile: {
-      get () {
+      get() {
         return this.$store.state.account.profile
       }
     },
     slug: {
-      get () {
-        return this.newMovie.title?.replace(/[^0-9a-zA-Z]+/g, '-').substring(0, 32)
+      get() {
+        return this.newMovie.title
+          ?.replace(/[^0-9a-zA-Z]+/g, '-')
+          .substring(0, 32)
       }
     }
   },
 
   methods: {
-    createMovie () {
+    createMovie() {
       this.newMovie.working = true
 
       const p1 = this.$store.dispatch('collection/createMovie', {
@@ -131,12 +137,12 @@ export default {
           this.onOKClick(false)
         })
     },
-    added (files) {
+    added(files) {
       this.newMovie.poster = files[0]
     }
   },
 
-  setup () {
+  setup() {
     const {
       dialogRef,
       onDialogHide,
@@ -147,7 +153,7 @@ export default {
     return {
       dialogRef,
       onDialogHide,
-      onOKClick (data) {
+      onOKClick(data) {
         onDialogOK()
       },
       onCancelClick: onDialogCancel

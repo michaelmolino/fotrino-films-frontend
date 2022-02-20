@@ -1,6 +1,6 @@
 import { nullCollection } from 'boot/global'
 
-export default function () {
+export default function() {
   return {
     collection: nullCollection,
     collections: [],

@@ -1,6 +1,6 @@
 import { nullProfile } from 'boot/global'
 
-export default function () {
+export default function() {
   return {
     profile: nullProfile
   }

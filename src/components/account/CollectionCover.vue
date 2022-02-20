@@ -5,7 +5,12 @@
         <div class="ellipsis">{{ collection.title }}</div>
       </div>
       <template v-slot:error>
-        <div class="absolute-bottom text-center bg-dark">
+        <div class="absolute-full bg-black text-center text-h6">
+          <div class="absolute-center">
+            <q-spinner-gears color="accent" size="xl" />
+          </div>
+        </div>
+        <div class="absolute-bottom text-center">
           <div class="ellipsis">{{ collection.title }}</div>
         </div>
       </template>

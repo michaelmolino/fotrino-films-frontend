@@ -1,13 +1,22 @@
 <template>
-    <q-btn
-      round
-      dense
-      color="info"
-      icon="link"
-      :to="'/' + collection.uuid + '/' + collection.slug + '/' + movie.slug + '/' + chapter.slug"
-    >
-      <q-tooltip>Open Chapter</q-tooltip>
-    </q-btn>
+  <q-btn
+    round
+    dense
+    color="info"
+    icon="link"
+    :to="
+      '/' +
+        collection.uuid +
+        '/' +
+        collection.slug +
+        '/' +
+        movie.slug +
+        '/' +
+        chapter.slug
+    "
+  >
+    <q-tooltip>Open Chapter</q-tooltip>
+  </q-btn>
 </template>
 
 <script>

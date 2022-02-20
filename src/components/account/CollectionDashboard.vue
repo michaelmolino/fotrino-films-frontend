@@ -63,28 +63,28 @@ export default {
 
   computed: {
     profile: {
-      get () {
+      get() {
         return this.$store.state.account.profile
       }
     },
     collections: {
-      get () {
+      get() {
         return this.$store.state.collection.collections
       }
     }
   },
 
-  created: function () {
+  created: function() {
     this.$store.cache.dispatch('collection/getCollections').catch(error => {
       console.log(error)
     })
   },
 
-  setup () {
+  setup() {
     const $q = useQuasar()
     const store = useStore()
 
-    function newCollectionDialog () {
+    function newCollectionDialog() {
       $q.dialog({
         component: NewCollection
       })

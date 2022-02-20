@@ -54,7 +54,12 @@
           color="secondary"
           label="OK"
           @click="createCollection"
-          :disable="!(newCollection.title.length > 2 && (newCollection.cover || newCollection.useProfilePhoto))"
+          :disable="
+            !(
+              newCollection.title.length > 2 &&
+              (newCollection.cover || newCollection.useProfilePhoto)
+            )
+          "
           :loading="working"
         />
         <q-btn color="secondary" label="Cancel" @click="onCancelClick" />
@@ -72,7 +77,7 @@ export default {
 
   emits: [...useDialogPluginComponent.emits],
 
-  data () {
+  data() {
     return {
       newCollection: {
         title: '',
@@ -85,19 +90,21 @@ export default {
 
   computed: {
     profile: {
-      get () {
+      get() {
         return this.$store.state.account.profile
       }
     },
     slug: {
-      get () {
-        return this.newCollection.title?.replace(/[^0-9a-zA-Z]+/g, '-').substring(0, 32)
+      get() {
+        return this.newCollection.title
+          ?.replace(/[^0-9a-zA-Z]+/g, '-')
+          .substring(0, 32)
       }
     }
   },
 
   methods: {
-    createCollection () {
+    createCollection() {
       this.newCollection.working = true
 
       const p1 = this.$store.dispatch('collection/createCollection', {
@@ -127,12 +134,12 @@ export default {
           this.onOKClick(false)
         })
     },
-    added (files) {
+    added(files) {
       this.newCollection.cover = files[0]
     }
   },
 
-  setup () {
+  setup() {
     const {
       dialogRef,
       onDialogHide,
@@ -143,7 +150,7 @@ export default {
     return {
       dialogRef,
       onDialogHide,
-      onOKClick (data) {
+      onOKClick(data) {
         onDialogOK()
       },
       onCancelClick: onDialogCancel

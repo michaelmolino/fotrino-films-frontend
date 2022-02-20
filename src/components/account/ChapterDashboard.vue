@@ -3,7 +3,12 @@
     <div v-if="profile.id && collection.id && movie.id">
       <div class="text-h6 text-center">
         <q-btn flat dense icon="arrow_upward" to="/dashboard" />
-        <q-btn flat dense icon="arrow_back" :to="'/dashboard/' + collection.uuid + '/' + collection.slug" />
+        <q-btn
+          flat
+          dense
+          icon="arrow_back"
+          :to="'/dashboard/' + collection.uuid + '/' + collection.slug"
+        />
         Dashboard: {{ movie.title }}
         <ActionButtonOpenMovie :collection="collection" :movie="movie" />
       </div>
@@ -20,9 +25,19 @@
           class="q-pa-md col-xs-12 col-sm-4 col-md-3"
         >
           <div>
-            <ChapterPreview :collection="collection" :movie="movie" :chapter="chapter" :ripple="false" class="no-pointer-events" />
+            <ChapterPreview
+              :collection="collection"
+              :movie="movie"
+              :chapter="chapter"
+              :ripple="false"
+              class="no-pointer-events"
+            />
           </div>
-          <ActionBarChapter :collection="collection" :movie="movie" :chapter="chapter" />
+          <ActionBarChapter
+            :collection="collection"
+            :movie="movie"
+            :chapter="chapter"
+          />
         </div>
       </div>
       <div v-if="movie.chapters.length === 0" class="q-py-md">
@@ -60,17 +75,17 @@ export default {
 
   computed: {
     profile: {
-      get () {
+      get() {
         return this.$store.state.account.profile
       }
     },
     collection: {
-      get () {
+      get() {
         return this.$store.state.collection.collection
       }
     },
     movie: {
-      get () {
+      get() {
         let _movie = null
         _movie = this.collection.movies.find(
           m => m.slug === this.$route.params.movieSlug
@@ -83,19 +98,18 @@ export default {
     }
   },
 
-  setup () {
+  setup() {
     const $q = useQuasar()
     const store = useStore()
     const route = useRoute()
 
-    function newChapterDialog () {
+    function newChapterDialog() {
       $q.dialog({
         component: NewChapter
       })
         .onOk(data => {
           store
-            .dispatch('collection/getCollection',
-              route.params.uuid)
+            .dispatch('collection/getCollection', route.params.uuid)
             .catch(error => {
               console.log(error)
             })
