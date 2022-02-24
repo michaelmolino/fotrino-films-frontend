@@ -36,6 +36,17 @@ export function getCollection(context, uuid) {
           ch.description_sanitised = DOMPurify.sanitize(ch.description_unsafe, {
             ALLOWED_TAGS: ['br', 'i', 'p', 'strong']
           })
+          ch.description_text = ch.description_sanitised.replace(
+            /<br[^>]*>/gi,
+            '\n'
+          )
+          ch.description_text = ch.description_text.replace(
+            /<\/?p[^>]*>/gi,
+            '\n'
+          )
+          ch.description_text = DOMPurify.sanitize(ch.description_text, {
+            ALLOWED_TAGS: []
+          })
         })
       })
       context.commit('SET_COLLECTION', collection)
