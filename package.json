@@ -20,7 +20,7 @@
     "core-js": "^3.6.5",
     "dompurify": "^2.3.6",
     "image-blob-reduce": "^4.1.0",
-    "postcss-preset-env": "^7.3.3",
+    "postcss-preset-env": "^7.4.2",
     "quasar": "2",
     "underscore": "^1.13.2",
     "video.js": "^7.17.0",
