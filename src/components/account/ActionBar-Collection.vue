@@ -7,6 +7,7 @@
     </q-btn>
     &nbsp;
     <q-btn
+      disable
       v-if="!collection.deleted"
       round
       dense
@@ -17,6 +18,7 @@
       <q-tooltip>Delete Collection</q-tooltip>
     </q-btn>
     <q-btn
+      disable
       v-if="collection.deleted"
       round
       dense

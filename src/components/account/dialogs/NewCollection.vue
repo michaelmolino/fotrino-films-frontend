@@ -52,13 +52,13 @@
       <q-card-actions align="right">
         <q-btn
           color="secondary"
-          label="OK"
+          label="Not Yet Suppported"
           @click="createCollection"
           :disable="
             !(
               newCollection.title.length > 2 &&
               (newCollection.cover || newCollection.useProfilePhoto)
-            )
+            ) || true
           "
           :loading="working"
         />
@@ -107,25 +107,17 @@ export default {
     createCollection() {
       this.newCollection.working = true
 
-      const p1 = this.$store.dispatch('collection/createCollection', {
-        title: this.newCollection.title,
-        filename: this.newCollection.cover?.name
-      })
-
-      const p2 = !this.newCollection.useProfilePhoto
+      const p = !this.newCollection.useProfilePhoto
         ? reducer.toBlob(this.newCollection.cover, { max: 360 })
         : Promise.resolve(null)
 
-      Promise.all([p1, p2])
-        .then(results => {
-          if (!this.newCollection.useProfilePhoto) {
-            return this.$axios.put(
-              results[0].data.presignedCoverPutUrl,
-              results[1]
-            )
-          }
-          return Promise.resolve()
+      p.then(results => {
+        this.$store.dispatch('collection/createCollection', {
+          title: this.newCollection.title,
+          useProfilePhoto: this.newCollection.useProfilePhoto,
+          cover: this.newCollection.cover
         })
+      })
         .then(() => {
           this.onOKClick(this.newCollection)
         })

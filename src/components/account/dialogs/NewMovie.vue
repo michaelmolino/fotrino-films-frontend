@@ -59,12 +59,13 @@
       <q-card-actions align="right">
         <q-btn
           color="secondary"
-          label="OK"
+          label="Not Yet Supported"
           @click="createMovie"
           :disable="
             newMovie.title.length < 3 ||
               newMovie.subtitle.length < 3 ||
-              !newMovie.poster
+              !newMovie.poster ||
+              true
           "
           :loading="working"
         />

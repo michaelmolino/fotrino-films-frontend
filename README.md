@@ -6,7 +6,11 @@
 
 Fotrino Films is a video content hosting platform. It is designed for users to be able to upload content and share it easily with family and friends.
 
-This project is actively being developed and is not yet ready for use. Until I reach version 1.0, updates might break existing installs (eg. I won't provide DB migrations).
+This project is actively being developed and is not yet ready for use.
+
+### Tests?!
+
+This project only has one developer, is not used in production, and the behaviour changes at my whim! When it is more stable I will add tests.
 
 ## [Demo Site](https://films.fotrino.com/)
 
@@ -20,19 +24,18 @@ Feel free to use this live demo as a playground. It is always the most up to dat
 
 The backend is written in Python. I may make the source code available in the future, but currently it is private.
 
-## Build
-
-```bash
-yarn install
-yarn global add @quasar/cli
-quasar build -m spa
-```
-
 ## Development
 
+### Dependencies
+
 ```bash
 yarn install
 yarn global add @quasar/cli
+```
+
+### Run
+
+```bash
 quasar dev
 ```
 

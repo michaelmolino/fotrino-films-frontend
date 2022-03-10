@@ -5,14 +5,9 @@ import DOMPurify from 'dompurify'
 import { nullCollection } from 'boot/global'
 
 export function createCollection(context, collection) {
-  return api
-    .post('/collections', {
-      title: collection.title,
-      filename: collection.filename
-    })
-    .catch(error => {
-      return Promise.reject(error)
-    })
+  return api.post('/collections', collection).catch(error => {
+    return Promise.reject(error)
+  })
 }
 
 export function getCollection(context, uuid) {
@@ -80,39 +75,6 @@ export function getCollections(context) {
     })
     .catch(error => {
       context.commit('SET_COLLECTIONS', [])
-      return Promise.reject(error)
-    })
-}
-
-export function editCollection(context, collection) {
-  return api.put('/collections/' + collection.uuid, collection).catch(error => {
-    return Promise.reject(error)
-  })
-}
-
-export function createMovie(context, movie) {
-  return api
-    .post('/collections/movies', {
-      collection: movie.collection,
-      title: movie.title,
-      subtitle: movie.subtitle,
-      filename: movie.filename
-    })
-    .catch(error => {
-      return Promise.reject(error)
-    })
-}
-
-export function editMovie(context, movie) {
-  return api
-    .put('/collections/movies/' + movie.id, {
-      collection: movie.collection,
-      title: movie.title,
-      subtitle: movie.subtitle,
-      filename: movie.filename,
-      deleted: movie.deleted
-    })
-    .catch(error => {
       return Promise.reject(error)
     })
 }
