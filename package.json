@@ -23,7 +23,7 @@
     "postcss-preset-env": "^7.3.3",
     "quasar": "2",
     "underscore": "^1.13.2",
-    "video.js": "^7.17.0",
+    "video.js": "^7.18.1",
     "vue": "^3.2.31",
     "vue-router": "^4.0.0",
     "vuex": "4",
