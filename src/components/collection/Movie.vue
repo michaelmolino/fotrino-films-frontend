@@ -12,7 +12,7 @@
         :key="chapter.id"
       >
         <ChapterPreview
-          class="cursor-pointer"
+          :style="chapter.deleted ? 'filter: brightness(37.5%);' : ''"
           :collection="collection"
           :movie="movie"
           :chapter="chapter"

@@ -12,6 +12,7 @@
         :key="movie.id"
       >
         <MoviePoster
+          :style="movie.deleted ? 'filter: brightness(37.5%);' : ''"
           :movie="movie"
           :to="
             movie.chapters.length === 1
