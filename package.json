@@ -21,7 +21,7 @@
     "dompurify": "^2.3.6",
     "image-blob-reduce": "^4.1.0",
     "postcss": "^8.2.13",
-    "postcss-preset-env": "^7.3.3",
+    "postcss-preset-env": "^7.4.3",
     "quasar": "2",
     "underscore": "^1.13.2",
     "video.js": "^7.17.0",
