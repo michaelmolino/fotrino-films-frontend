@@ -14,7 +14,7 @@
     "nth-check": "^2.0.1"
   },
   "dependencies": {
-    "@quasar/extras": "^1.12.2",
+    "@quasar/extras": "^1.13.6",
     "@videojs/themes": "^1.0.1",
     "axios": "^0.26.0",
     "core-js": "^3.6.5",
