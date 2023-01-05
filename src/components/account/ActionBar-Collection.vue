@@ -2,7 +2,13 @@
   <div class="q-mt-sm text-center">
     <ActionButtonOpenCollection :collection="collection" />
     &nbsp;
-    <q-btn round dense color="positive" icon="edit" disable>
+    <q-btn
+      round
+      dense
+      color="positive"
+      icon="edit"
+      @click="editCollection(collection)"
+    >
       <q-tooltip>Edit Collection</q-tooltip>
     </q-btn>
     &nbsp;
@@ -59,16 +65,8 @@ export default {
   },
 
   methods: {
-    editCollection(modifiedCollection) {
-      this.$store
-        .dispatch('collection/editCollection', modifiedCollection)
-        .then(() => {
-          this.$store.dispatch('collection/getCollections')
-          this.$store.cache.delete(
-            'collection/getCollection',
-            modifiedCollection.uuid
-          )
-        })
+    editCollection(_collection) {
+      this.$global.$emit('editCollection', _collection)
     },
     deleteCollection(collectionUuid) {
       this.editCollection({ uuid: collectionUuid, deleted: true })

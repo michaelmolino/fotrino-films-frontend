@@ -67,6 +67,21 @@ export default {
         _chapter = this.movie?.chapters.find(
           ch => ch.slug === this.$route.params.chapterSlug
         )
+        if (_chapter.deleted) {
+          this.$q.notify({
+            type: 'info',
+            timeout: 0,
+            message: 'This chapter has been deleted. Only you can see it.',
+            icon: 'info',
+            multiLine: false,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white'
+              }
+            ]
+          })
+        }
         if (this.collection.uuid && !_chapter) {
           this.$router.replace('/404')
         }

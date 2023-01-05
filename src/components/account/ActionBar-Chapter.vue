@@ -28,6 +28,7 @@
       color="positive"
       icon="restore_from_trash"
       @click="unDeleteChapter(collection.uuid, movie.id, chapter.id)"
+      disable
     >
       <q-tooltip>Restore Chapter</q-tooltip>
     </q-btn>
@@ -72,6 +73,10 @@ export default {
     },
     unDeleteMovie(collectionUuid, movieId, chapterId) {
       this.editChapter(collectionUuid, movieId, chapterId, false)
+    },
+    deleteChapter(uuid, movie, chapter) {
+    },
+    unDeleteChapter(uuid, movie, chapter) {
     }
   }
 }

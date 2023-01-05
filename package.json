@@ -20,6 +20,8 @@
     "core-js": "^3.6.5",
     "dompurify": "^2.3.6",
     "image-blob-reduce": "^4.1.0",
+    "mitt": "^3.0.0",
+    "nth-check": "^2.0.1",
     "postcss": "^8.2.13",
     "postcss-preset-env": "^7.3.3",
     "quasar": "2",

@@ -24,6 +24,7 @@
       color="positive"
       icon="restore_from_trash"
       @click="unDeleteMovie(collection.uuid, movie.id)"
+      disable
     >
       <q-tooltip>Restore Movie</q-tooltip>
     </q-btn>

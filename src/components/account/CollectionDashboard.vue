@@ -25,6 +25,7 @@
         >
           <div>
             <CollectionCover
+              :style="collection.deleted ? 'filter: brightness(37.5%);' : ''"
               :collection="collection"
               :to="'/dashboard/' + collection.uuid + '/' + collection.slug"
             />
@@ -80,13 +81,20 @@ export default {
     })
   },
 
+  mounted: function() {
+    this.$global.$on('editCollection', c => this.newCollectionDialog(c))
+  },
+
   setup() {
     const $q = useQuasar()
     const store = useStore()
 
-    function newCollectionDialog() {
+    function newCollectionDialog(c) {
       $q.dialog({
-        component: NewCollection
+        component: NewCollection,
+        componentProps: {
+          collection: c
+        }
       })
         .onOk(data => {
           store.dispatch('collection/getCollections').catch(error => {

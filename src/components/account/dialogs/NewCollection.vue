@@ -80,12 +80,16 @@ export default {
   data() {
     return {
       newCollection: {
-        title: '',
-        useProfilePhoto: true,
+        title: this.collection?.title || '',
+        useProfilePhoto: !this.collection?.cover,
         cover: null
       },
       working: false
     }
+  },
+
+  props: {
+    collection: Object
   },
 
   computed: {
