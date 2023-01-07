@@ -10,7 +10,7 @@
   },
   "resolutions": {
     "glob-parent": "^6.0.1",
-    "postcss": "^8.2.13",
+    "postcss": "^8.4.21",
     "nth-check": "^2.0.1"
   },
   "dependencies": {
@@ -22,7 +22,7 @@
     "image-blob-reduce": "^4.1.0",
     "mitt": "^3.0.0",
     "nth-check": "^2.0.1",
-    "postcss": "^8.2.13",
+    "postcss": "^8.4.21",
     "postcss-preset-env": "^7.3.3",
     "quasar": "2",
     "underscore": "^1.13.2",
