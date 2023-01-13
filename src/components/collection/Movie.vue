@@ -6,21 +6,19 @@
       :chapter="chapter.main ? this.$nullChapter : chapter"
     />
     <div class="q-pa-md">
-      <div style="max-width: 640px">
-        <Vime :chapter="chapter" />
-        <div class="q-py-md" v-html="chapter.description_sanitised"></div>
-      </div>
+      <Vime :chapter="chapter" />
+      <div class="q-py-md" v-html="chapter.description_sanitised"></div>
     </div>
 
     <div>
-      <div class="row" v-if="movie.chapters.filter(ch => ch.id !== chapter.id).length > 0">
+      <div class="row" v-if="movie.chapters?.filter(ch => ch.id !== chapter.id)?.length > 0">
         <div class="text-h6" v-if="chapter.main">Bonus Content</div>
         <div class="text-h6" v-else>Related Content</div>
       </div>
       <div class="row">
       <div
         class="q-pa-md col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
-        v-for="chapter in movie.chapters.filter(ch => ch.id !== chapter.id)"
+        v-for="chapter in movie.chapters?.filter(ch => ch.id !== chapter.id)"
         :key="chapter.id"
       >
         <ChapterPreview
@@ -44,7 +42,7 @@
     </div>
 
     <div class="row">
-    <div v-if="movie.chapters.length === 0">
+    <div v-if="movie.chapters?.length === 0" class="q-pa-md">
         This movie is empty!
       </div>
     </div>
@@ -99,6 +97,11 @@ export default {
         }
         if (this.collection.uuid && !_chapter) {
           this.$router.replace('/404')
+        }
+        if (_chapter.main) {
+          this.$router.replace({
+            params: { chapterSlug: null }
+          })
         }
         return _chapter
       }

@@ -151,7 +151,7 @@
         </q-card>
       </q-expansion-item>
       <q-separator />
-      <q-expansion-item
+      <!-- <q-expansion-item
         group="faq"
         label="Why can I only login with Google or Facebook?"
         header-class="text-bold"
@@ -166,11 +166,11 @@
             Instagram, and Microsoft Live.
           </q-card-section>
         </q-card>
-      </q-expansion-item>
+      </q-expansion-item> -->
       <q-separator />
       <q-expansion-item
         group="faq"
-        label="What's the point of logging in?"
+        label="Why can't I log in?"
         header-class="text-bold"
       >
         <q-card>

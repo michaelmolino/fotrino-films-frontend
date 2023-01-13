@@ -19,6 +19,16 @@
           no-caps
           size="lg"
         >
+          <q-btn
+              icon="history"
+              align="left"
+              flat
+              no-caps
+              no-wrap
+              class="col-xs-10 no-pointer-events fit"
+              label="History"
+              size="md"
+            />
           <div v-for="collection in history" :key="collection.uuid" class="row">
             <q-btn
               icon="movie"

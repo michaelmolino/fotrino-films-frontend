@@ -5,6 +5,7 @@
     no-caps
     padding="8px"
     :class="chapter.main ? 'fit bg-accent' : 'fit'"
+    style="max-width: 640px"
   >
     <q-badge
       v-if="chapter.type.startsWith('audio/')"
