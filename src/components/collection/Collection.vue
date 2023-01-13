@@ -14,18 +14,7 @@
         <MoviePoster
           :style="movie.deleted ? 'filter: brightness(37.5%);' : ''"
           :movie="movie"
-          :to="
-            movie.chapters.length === 1
-              ? '/' +
-                collection.uuid +
-                '/' +
-                collection.slug +
-                '/' +
-                movie.slug +
-                '/' +
-                movie.chapters[0].slug
-              : '/' + collection.uuid + '/' + collection.slug + '/' + movie.slug
-          "
+          :to="'/' + collection.uuid + '/' + collection.slug + '/' + movie.slug"
         />
       </div>
       <div v-if="collection.movies.length === 0">

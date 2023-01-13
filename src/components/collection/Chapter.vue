@@ -1,29 +1,9 @@
 <template>
   <div v-if="chapter">
     <Breadcrumbs :collection="collection" :movie="movie" :chapter="chapter" />
-    <video-player
-      style="max-width: 720px"
-      class="q-mt-md"
-      :type="chapter.type"
-      :options="{
-        autoplay: !!$route.query.fbclid,
-        controls: true,
-        controlBar: {
-          pictureInPictureToggle: false,
-          captionsButton: false,
-          fullscreenToggle: chapter.type.startsWith('audio/') ? false : true
-        },
-        fluid: true,
-        responsive: true,
-        poster: chapter.preview,
-        sources: [
-          {
-            src: chapter.src,
-            type: chapter.type
-          }
-        ]
-      }"
-    />
+    <div style="max-width: 640px" class="q-pa-md">
+      <Vime :chapter="chapter" :options="options={}" />
+    </div>
     <div class="q-py-md" v-html="chapter.description_sanitised"></div>
   </div>
 </template>
@@ -38,8 +18,8 @@ export default {
     Breadcrumbs: defineAsyncComponent(() =>
       import('@components/collection/Breadcrumbs.vue')
     ),
-    VideoPlayer: defineAsyncComponent(() =>
-      import('@components/collection/VideoPlayer.vue')
+    Vime: defineAsyncComponent(() =>
+      import('@components/collection/Vime.vue')
     )
   },
 
@@ -67,7 +47,10 @@ export default {
         _chapter = this.movie?.chapters.find(
           ch => ch.slug === this.$route.params.chapterSlug
         )
-        if (_chapter.deleted) {
+        if (_chapter?.main) {
+          this.$router.replace('/' + this.collection.uuid + '/' + this.collection.slug + '/' + this.movie.slug)
+        }
+        if (_chapter?.deleted) {
           this.$q.notify({
             type: 'info',
             timeout: 0,

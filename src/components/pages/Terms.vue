@@ -10,15 +10,20 @@
       </li>
       <li>
         We respect your privacy regarding any information we may collect from
-        you. In addition to your content (and all metadata/exifdata) we may also
-        store your name, profile picture, email address, and country. Country
-        informtion may be used in the future to provide a better experience.
-        Your name and email address are used for important communications and
-        marketing. No information is shared with third parties.
+        you.
+        <ul>
+          <li>
+            During registration we will store your name, email address, your profile photo, and country (based on IP address).  This information is used to identify your account, display your profile page, and contact you if necessary (eg. in the event of a copyright claim on one of your videos).  This information is retained until you choose to close your account (see paragraph 11).
+          </li>
+          <li>Everytime you make a request to Fotrino Films, basic information about the request is logged along with the time, date, and your IP address.  This information may remain in our system for up to 30 days.  It is only used for troubleshooting potential bugs that we may find.</li>
+          <li>
+            If you choose to share a collection of videos, your profile photo may be used when generating previews of the content.
+          </li>
+        </ul>
       </li>
       <li>
         You own and are responsible for your own content; you must only upload
-        legal content that you own the rights to.
+        legal content that you own the rights to.  All content you choose to upload will be stored on servers operated by Fotrino Films.
       </li>
       <li>
         You are not allowed to use this service to host content that depicts or
@@ -60,10 +65,10 @@
       <li>
         If you want us to remove all content and close your account please email
         creative@michaelmolino.com. Some information may remain in logs for up
-        to 30 days.
+        to 30 days.  Once your account is closed, no information about you is retained.  Please include the email address you used when signing up in the request if it is different than the email address you are sending the request from.  If you are sending from a different email address, additional verification will be needed before we can close the account.
       </li>
       <li>
-        If you'd like to export all of the data held by Fotrino Films into a
+        If you'd like to export all of the data held by Fotrino Films about you into a
         downloadable file, please email creative@michaelmolino.com.
       </li>
       <li>
