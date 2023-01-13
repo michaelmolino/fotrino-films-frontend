@@ -1,60 +1,31 @@
 <template>
-    <div v-if="!chapter.type.startsWith('audio/')">
-        <Player playsinline ref="player">
-        <Hls :poster="chapter.preview">
-          <source
-            :src="chapter.src"
-            :type="chapter.type"
-          />
-        </Hls>
-
-        <DefaultUi>
-          <!-- <TapSidesToSeek /> -->
-        </DefaultUi>
-      </Player>
+    <div v-if="!chapter.type.startsWith('audio/')" style="max-width: 640px">
+        <vds-media>
+            <vds-hls controls :poster="chapter.preview" :key="chapter.id">
+                <video controls :src="chapter.src" preload="none"></video>
+            </vds-hls>
+        </vds-media>
     </div>
     <div v-else style="max-width: 640px">
-        <Player playsinline ref="player">
-        <q-img :src="chapter.preview" :ratio="16 / 9" />
-        <Audio>
-          <source
-            :data-src="chapter.src"
-            :type="chapter.type"
-          />
-        </Audio>
-
-        <DefaultUi>
-          <!-- <TapSidesToSeek /> -->
-        </DefaultUi>
-      </Player>
+        <vds-media style="width: 100%">
+            <vds-poster></vds-poster>
+            <vds-audio controls :poster="chapter.preview" style="width: 100%" class="q-pt-sm">
+                <audio controls :src="chapter.src" preload="none" style="width: 100%"></audio>
+            </vds-audio>
+        </vds-media>
     </div>
   </template>
 
 <script>
-import { Player, Hls, Audio, DefaultUi } from '@vime/vue-next'
+import '@vidstack/player/define/vds-media.js'
+import '@vidstack/player/define/vds-hls.js'
+import '@vidstack/player/define/vds-audio.js'
+import '@vidstack/player/define/vds-poster.js'
 
 export default {
   name: 'VimePlayer',
-  components: {
-    Player,
-    Hls,
-    Audio,
-    DefaultUi
-  },
   props: {
-    chapter: Object,
-    options: Object
-  },
-  data() {
-    return {
-      player: null
-    }
-  },
-  mounted() {
-    // this.player = this.$refs.player
-  },
-  beforeUnmount() {
-    // this.player?.dispose()
+    chapter: Object
   }
 }
 </script>

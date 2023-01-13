@@ -3,31 +3,27 @@
     <Breadcrumbs
       :collection="collection"
       :movie="movie"
-      :chapter="this.$nullChapter"
+      :chapter="chapter.main ? this.$nullChapter : chapter"
     />
     <div class="q-pa-md">
-      <div
-        style="max-width: 640px"
-        v-for="chapter in movie.chapters.filter(chapter => chapter.main).slice(0)"
-        :key="chapter.id"
-      >
-
-      <Vime :chapter="chapter" :options="options={}" />
-      <div class="q-py-md" v-html="chapter.description_sanitised"></div>
-        </div>
+      <div style="max-width: 640px">
+        <Vime :chapter="chapter" />
+        <div class="q-py-md" v-html="chapter.description_sanitised"></div>
       </div>
+    </div>
 
     <div>
-      <div class="row" v-if="movie.chapters.filter(chapter => !chapter.main).length > 0">
-        <div class="text-h6">Bonus Features</div>
+      <div class="row" v-if="movie.chapters.filter(ch => ch.id !== chapter.id).length > 0">
+        <div class="text-h6" v-if="chapter.main">Bonus Content</div>
+        <div class="text-h6" v-else>Related Content</div>
       </div>
       <div class="row">
       <div
         class="q-pa-md col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
-        v-for="chapter in movie.chapters.filter(chapter => !chapter.main)"
+        v-for="chapter in movie.chapters.filter(ch => ch.id !== chapter.id)"
         :key="chapter.id"
       >
-        <ChapterPreview v-if="!chapter.main"
+        <ChapterPreview
           :style="chapter.deleted ? 'filter: brightness(37.5%);' : ''"
           :collection="collection"
           :movie="movie"
@@ -90,6 +86,21 @@ export default {
           this.$router.replace('/404')
         }
         return _movie
+      }
+    },
+    chapter: {
+      get() {
+        let _chapter = null
+        _chapter = this.movie?.chapters.find(
+          ch => ch.slug === this.$route.params.chapterSlug
+        )
+        if (!_chapter) {
+          _chapter = this.movie?.chapters.find(ch => ch.main)
+        }
+        if (this.collection.uuid && !_chapter) {
+          this.$router.replace('/404')
+        }
+        return _chapter
       }
     }
   }

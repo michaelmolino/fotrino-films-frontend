@@ -67,6 +67,14 @@ module.exports = function(/* ctx */) {
             : '/api'
       },
 
+      vueLoaderOptions: {
+        compilerOptions: {
+          isCustomElement: (tag) => {
+            return tag.startsWith('vds-')
+          }
+        }
+      },
+
       // https://quasar.dev/quasar-cli/handling-webpack
       extendWebpack(cfg) {
         cfg.module.rules.push({

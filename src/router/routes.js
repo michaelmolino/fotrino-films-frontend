@@ -31,12 +31,8 @@ const routes = [
         component: () => import('@components/collection/Collection.vue')
       },
       {
-        path: ':movieSlug([0-9a-zA-Z-]+)',
+        path: ':movieSlug([0-9a-zA-Z-]+)/:chapterSlug([0-9a-zA-Z-]+)?',
         component: () => import('@components/collection/Movie.vue')
-      },
-      {
-        path: ':movieSlug([0-9a-zA-Z-]+)/:chapterSlug([0-9a-zA-Z-]+)',
-        component: () => import('@components/collection/Chapter.vue')
       }
     ]
   },

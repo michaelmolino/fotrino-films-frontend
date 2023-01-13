@@ -71,6 +71,7 @@
         flat
         no-caps
         size="md"
+        disabled
       >
         <q-btn
           v-if="!$q.screen.gt.sm"
