@@ -1,5 +1,5 @@
 <template>
-  <q-btn flat dense no-caps class="fit" padding="16px" style="max-width: 480px">
+  <q-btn flat dense no-caps class="fit" padding="16px">
     <q-badge class="bg-accent q-pa-md z-top" floating transparent>
       <span class="text-bold">{{ movie.chapters.length }}</span>
     </q-badge>

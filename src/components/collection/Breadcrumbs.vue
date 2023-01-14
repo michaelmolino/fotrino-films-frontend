@@ -1,5 +1,5 @@
 <template>
-  <q-breadcrumbs class="text-h6">
+  <q-breadcrumbs class="text-h6 q-pb-md">
     <template v-slot:separator>
       <q-icon size="1.5em" name="chevron_right" color="primary" />
     </template>

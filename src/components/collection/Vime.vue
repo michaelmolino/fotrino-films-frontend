@@ -1,5 +1,5 @@
 <template>
-    <div v-if="!chapter.type.startsWith('audio/')" style="max-width: 720px">
+    <div v-if="!chapter.type.startsWith('audio/')">
         <vds-media style="width: 100%">
             <vds-aspect-ratio ratio="16/9">
                 <vds-hls controls loading="idle" :poster="chapter.preview" :key="chapter.id">
@@ -8,8 +8,8 @@
             </vds-aspect-ratio>
         </vds-media>
     </div>
-    <div v-else style="max-width: 640px">
-        <vds-media style="width: 100%">
+    <div v-else>
+        <vds-media>
             <vds-poster></vds-poster>
             <vds-audio controls :poster="chapter.preview" style="width: 100%" class="q-pt-sm">
                 <audio controls :src="chapter.src" preload="none" style="width: 100%"></audio>

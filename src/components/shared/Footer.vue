@@ -1,5 +1,5 @@
 <template>
-  <q-footer reveal elevated class="bg-secondary">
+  <q-footer reveal class="bg-secondary">
     <div class="row no-wrap">
       <q-btn
         flat
