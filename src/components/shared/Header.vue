@@ -13,22 +13,14 @@
         />
         <q-btn-dropdown
           v-if="history.length > 0"
-          icon="videocam"
+          :icon="showHistory ? 'history' : 'videocam'"
+          @before-show="showHistory = true"
+          @before-hide="showHistory = false"
           :label="$q.screen.gt.xs ? 'Fotrino Films' : ''"
           flat
           no-caps
           size="lg"
         >
-          <q-btn
-              icon="history"
-              align="left"
-              flat
-              no-caps
-              no-wrap
-              class="col-xs-10 no-pointer-events fit"
-              label="History"
-              size="md"
-            />
           <div v-for="collection in history" :key="collection.uuid" class="row">
             <q-btn
               icon="movie"
@@ -168,6 +160,7 @@ export default {
 
   data() {
     return {
+      showHistory: false,
       logout: process.env.API + '/account/logout',
       oauthProviders: [
         {
