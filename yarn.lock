@@ -2993,10 +2993,10 @@ domhandler@^4.0.0, domhandler@^4.2.0, domhandler@^4.3.1:
   dependencies:
     domelementtype "^2.2.0"
 
-dompurify@^2.3.6:
-  version "2.4.2"
-  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-2.4.2.tgz#c3409b49357804c9b00e1fbebea81f26514c5bc3"
-  integrity sha512-ckbbxcGpfTJ7SNHC2yT2pHSCYxo2oQgSfdoDHQANzMzQyGzVmalF9W/B+X97Cdik5xFwWtwJP232gIP2+1kNEA==
+dompurify@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.0.0.tgz#6adc6f918376d93419ed1ee35811850680027cba"
+  integrity sha512-0g/yr2IJn4nTbxwL785YxS7/AvvgGFJw6LLWP+BzWzB1+BYOqPUT9Hy0rXrZh5HLdHnxH72aDdzvC9SdTjsuaA==
 
 domutils@^1.5.1, domutils@^1.7.0:
   version "1.7.0"
