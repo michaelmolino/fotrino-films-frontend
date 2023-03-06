@@ -16,7 +16,7 @@
   "dependencies": {
     "@quasar/extras": "^1.12.2",
     "axios": "^0.26.0",
-    "dompurify": "^2.3.6",
+    "dompurify": "^3.0.1",
     "image-blob-reduce": "^4.1.0",
     "lit": "^2.6.1",
     "mitt": "^3.0.0",
