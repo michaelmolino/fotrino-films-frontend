@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.12.2",
-    "axios": "^0.26.0",
+    "axios": "^1.3.4",
     "dompurify": "^2.3.6",
     "image-blob-reduce": "^4.1.0",
     "lit": "^2.6.1",
