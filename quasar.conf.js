@@ -70,7 +70,7 @@ module.exports = function(/* ctx */) {
       vueLoaderOptions: {
         compilerOptions: {
           isCustomElement: (tag) => {
-            return tag.startsWith('vds-')
+            return tag.startsWith('media-')
           }
         }
       },

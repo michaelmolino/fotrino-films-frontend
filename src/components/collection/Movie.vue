@@ -7,21 +7,16 @@
       :chapter="chapter.main ? this.$nullChapter : chapter"
     />
 
-    <q-card flat style="max-width: 720px; width: 100%;">
-      <Vime :chapter="chapter" />
-        <q-card-section>
-          <div class="text-h6" v-html="chapter.title"></div>
-          <div class="text-subtitle2 q-pl-xl" v-html="chapter.description_sanitised"></div>
-        </q-card-section>
-    </q-card>
+    <Vime :chapter="chapter" style="width: 100%; max-width: 720px; position: relative; display: flex;" />
 
-    <div>
+    <div class="text-h6" v-html="chapter.title"></div>
+    <div class="text-subtitle2 q-pl-xl" v-html="chapter.description_sanitised"></div>
 
-      <div class="row q-pt-md" v-if="movie.chapters?.filter(ch => ch.id !== chapter.id)?.length > 0">
-        <div class="text-h6">Related Content</div>
-      </div>
+    <div class="q-pt-md text-h6" v-if="movie.chapters?.filter(ch => ch.id !== chapter.id)?.length > 0">
+      Related Content
+    </div>
 
-      <div class="row">
+    <div class="row">
       <div
         class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
         v-for="chapter in movie.chapters?.filter(ch => ch.id !== chapter.id)"
@@ -35,14 +30,10 @@
           :to="'/' + collection.uuid + '/' + collection.slug + '/' + movie.slug + '/' + chapter.slug"
         />
       </div>
-      </div>
-
     </div>
 
-    <div class="row">
-      <div v-if="movie.chapters?.length === 0" class="q-pa-md">
-        This movie is empty!
-      </div>
+    <div v-if="movie.chapters?.length === 0" class="q-pa-md">
+      This movie is empty!
     </div>
 
   </div>

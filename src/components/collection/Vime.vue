@@ -1,34 +1,31 @@
 <template>
     <div v-if="!chapter.type.startsWith('audio/')">
-        <vds-media style="width: 100%">
-            <vds-aspect-ratio ratio="16/9">
-                <vds-hls controls loading="idle" :poster="chapter.preview" :key="chapter.id">
-                    <video controls :src="chapter.src" preload="none"></video>
-                </vds-hls>
-            </vds-aspect-ratio>
-        </vds-media>
+        <media-player aspect-ratio="16/9" controls :src="chapter.src" :poster="chapter.preview" view="video" :key="chapter.id" style="width: 100%; height: 100%">
+          <media-outlet></media-outlet>
+        </media-player>
     </div>
     <div v-else>
-        <vds-media>
-            <vds-poster></vds-poster>
-            <vds-audio controls :poster="chapter.preview" style="width: 100%" class="q-pt-sm">
-                <audio controls :src="chapter.src" preload="none" style="width: 100%"></audio>
-            </vds-audio>
-        </vds-media>
+        <media-player aspect-ratio="16/9" controls :src="chapter.src" :poster="chapter.preview" view="audio" :key="chapter.id" style="width: 100%; height: 100%">
+          <media-poster></media-poster>
+          <media-outlet class="q-pt-sm"></media-outlet>
+        </media-player>
     </div>
   </template>
 
 <script>
-import '@vidstack/player/define/vds-media.js'
-import '@vidstack/player/define/vds-hls.js'
-import '@vidstack/player/define/vds-audio.js'
-import '@vidstack/player/define/vds-poster.js'
-import '@vidstack/player/define/vds-aspect-ratio.js'
+import { defineCustomElements } from 'vidstack/elements'
+
+import 'vidstack/styles/base.css'
+import 'vidstack/styles/ui/buttons.css'
+import 'vidstack/styles/ui/sliders.css'
 
 export default {
   name: 'VimePlayer',
   props: {
     chapter: Object
+  },
+  setup() {
+    defineCustomElements()
   }
 }
 </script>
