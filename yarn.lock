@@ -4662,7 +4662,12 @@ mdn-data@2.0.14:
   resolved "https://registry.yarnpkg.com/mdn-data/-/mdn-data-2.0.14.tgz#7113fc4281917d63ce29b43446f701e68c25ba50"
   integrity sha512-dn6wd0uw5GsdswPFfsgMp5NSB0/aDe6fK94YJV/AJDYXL6HVLWBsxeq7js7Ad+mU2K9LAlwpk6kN2D5mwCPVow==
 
-media-icons@0.4.2:
+media-captions@^0.0.7:
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/media-captions/-/media-captions-0.0.7.tgz#8a609cc9875eba86d161d0c77d35ebe6eb596def"
+  integrity sha512-FUz0sVnMrhNHL3AmmDMKs3SUYnjxQ5Yg4N7ijJUTojAOqd4KYjPqSj2+dGBwAuU7gJsU5TgKziggsXU17EGPOw==
+
+media-icons@^0.4.2:
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/media-icons/-/media-icons-0.4.2.tgz#b257f563c18552c4f990df0a393b125989d06fc2"
   integrity sha512-jrxoQzxsZFyzt6P3CoGZWa6FVKoR/Ii1plbVjtyTSyQGpeVWkJ++0oBAwGOv/F9mWRxmGkaQ04uEIKTFouRG1w==
@@ -6596,13 +6601,14 @@ vary@~1.1.2:
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==
 
-vidstack@^0.4.2:
-  version "0.4.2"
-  resolved "https://registry.yarnpkg.com/vidstack/-/vidstack-0.4.2.tgz#51dc11d1f9e145fd92657a08a8a9401ca89d64c8"
-  integrity sha512-ZFTKUj1BqLdvS0/YS12mfrzHQtpaVTeqFDWwPQivPeczZIOhHBDDqs8+YZCLF/C/LY74ARP8TfEu1+HfwMy0Gg==
+vidstack@^0.4.4:
+  version "0.4.4"
+  resolved "https://registry.yarnpkg.com/vidstack/-/vidstack-0.4.4.tgz#4329203c8d78ca2a8fac40064c6e83a83f3da541"
+  integrity sha512-kj+RJAqYfLd4ACMaPpU6QXwKmp/Oy84H1xeBgW3XSwMF2EYv1YVf0+FanqwaHl56pmZaUzzuhZlviqeqaU7duA==
   dependencies:
     maverick.js "^0.32.3"
-    media-icons "0.4.2"
+    media-captions "^0.0.7"
+    media-icons "^0.4.2"
     type-fest "^3.5.0"
 
 vue-eslint-parser@^8.0.1:

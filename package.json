@@ -22,7 +22,7 @@
     "mitt": "^3.0.0",
     "quasar": "2",
     "underscore": "^1.13.2",
-    "vidstack": "^0.4.2",
+    "vidstack": "^0.4.4",
     "vue": "^3.2.31",
     "vue-router": "^4.0.0",
     "vuex": "4",

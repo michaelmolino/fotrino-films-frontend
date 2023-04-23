@@ -7,7 +7,7 @@
       :chapter="chapter.main ? this.$nullChapter : chapter"
     />
 
-    <Vime :chapter="chapter" style="width: 100%; max-width: 720px; position: relative; display: flex;" />
+    <Vime :chapter="chapter" style="max-width: 720px;" />
 
     <div class="text-h6" v-html="chapter.title"></div>
     <div class="text-subtitle2 q-pl-xl" v-html="chapter.description_sanitised"></div>
