@@ -7,7 +7,7 @@
       :chapter="chapter.main ? this.$nullChapter : chapter"
     />
 
-    <Vime :chapter="chapter" style="max-width: 720px;" />
+    <VidstackPlayer :chapter="chapter" style="max-width: 720px;" />
 
     <div class="text-h6" v-html="chapter.title"></div>
     <div class="text-subtitle2 q-pl-xl" v-html="chapter.description_sanitised"></div>
@@ -52,8 +52,8 @@ export default {
     ChapterPreview: defineAsyncComponent(() =>
       import('@components/collection/ChapterPreview.vue')
     ),
-    Vime: defineAsyncComponent(() =>
-      import('@components/collection/Vime.vue')
+    VidstackPlayer: defineAsyncComponent(() =>
+      import('@components/collection/VidstackPlayer.vue')
     )
   },
 

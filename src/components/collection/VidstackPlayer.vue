@@ -8,12 +8,10 @@
 <script>
 import { defineCustomElements } from 'vidstack/elements'
 
-import 'vidstack/styles/base.css'
-import 'vidstack/styles/ui/buttons.css'
-import 'vidstack/styles/ui/sliders.css'
+import 'vidstack/styles/defaults.css'
 
 export default {
-  name: 'VimePlayer',
+  name: 'VidstackPlayer',
   props: {
     chapter: Object
   },
