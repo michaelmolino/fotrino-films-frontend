@@ -98,7 +98,7 @@ module.exports = function(/* ctx */) {
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
     devServer: {
       https: true,
-      host: '127.0.0.1',
+      host: 'localhost',
       port: 8081,
       open: true, // opens browser window automatically
 
@@ -106,7 +106,7 @@ module.exports = function(/* ctx */) {
       proxy: [
         {
           context: ['/api'],
-          target: 'https://127.0.0.1:65443/',
+          target: 'https://localhost:65443/',
           secure: false
         }
       ]

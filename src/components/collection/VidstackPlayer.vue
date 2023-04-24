@@ -1,13 +1,14 @@
 <template>
-  <media-player aspect-ratio="16/9" controls :src="chapter.src" :poster="chapter.preview" :view="view" :key="chapter.id" style="width: 100%; height: 100%">
-    <media-poster v-if="view === 'audio'"></media-poster>
-    <media-outlet class="q-pt-sm"></media-outlet>
-  </media-player>
+  <div>
+    <media-player controls :src="chapter.src" :poster="chapter.preview" :view="view" :key="chapter.id">
+      <media-poster v-if="view === 'audio'"></media-poster>
+      <media-outlet class="q-pt-sm"></media-outlet>
+    </media-player>
+  </div>
 </template>
 
 <script>
 import { defineCustomElements } from 'vidstack/elements'
-
 import 'vidstack/styles/defaults.css'
 
 export default {
@@ -27,3 +28,9 @@ export default {
   }
 }
 </script>
+
+<style>
+:root {
+  --plyr-color-main: #8D6A9F;
+}
+</style>
