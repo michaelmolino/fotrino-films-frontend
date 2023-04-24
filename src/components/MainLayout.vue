@@ -1,10 +1,10 @@
 <template>
   <q-layout view="hHh lpR fFf">
-    <Header />
+    <FotrinoHeader />
     <q-page-container>
       <router-view class="q-pa-md" />
     </q-page-container>
-    <Footer />
+    <FotrinoFooter />
   </q-layout>
 </template>
 
@@ -15,8 +15,8 @@ export default {
   name: 'MainLayout',
 
   components: {
-    Header: defineAsyncComponent(() => import('@components/shared/Header.vue')),
-    Footer: defineAsyncComponent(() => import('@components/shared/Footer.vue'))
+    FotrinoHeader: defineAsyncComponent(() => import('@components/shared/FotrinoHeader.vue')),
+    FotrinoFooter: defineAsyncComponent(() => import('@components/shared/FotrinoFooter.vue'))
   }
 }
 </script>

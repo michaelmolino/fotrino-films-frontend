@@ -156,7 +156,7 @@
 
 <script>
 export default {
-  name: 'Header-Bar',
+  name: 'FotrinoHeader',
 
   data() {
     return {

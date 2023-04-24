@@ -28,7 +28,7 @@
 
 <script>
 export default {
-  name: 'Footer-Bar',
+  name: 'FotrinoFooter',
 
   data() {
     return {
