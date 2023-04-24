@@ -7,10 +7,10 @@
       :chapter="chapter.main ? this.$nullChapter : chapter"
     />
 
-    <VidstackPlayer :chapter="chapter" style="width: 100%; max-width: 720px;" />
-    <!-- <PlyrPlayer :chapter="chapter" style="max-width: 720px;" /> -->
+    <VidstackPlayer :chapter="chapter" style="width: 100%; max-width: 720px; min-width: 240px;" />
+    <!-- <PlyrPlayer :chapter="chapter" style="width: 100%; max-width: 720px;" /> -->
 
-    <div class="text-h6" v-html="chapter.title"></div>
+    <div class="text-h6" v-text="chapter.title"></div>
     <div class="text-subtitle2 q-pl-xl" v-html="chapter.description_sanitised"></div>
 
     <div class="q-pt-md text-h6" v-if="movie.chapters?.filter(ch => ch.id !== chapter.id)?.length > 0">
