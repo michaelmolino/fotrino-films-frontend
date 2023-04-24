@@ -23,7 +23,7 @@
     "quasar": "2",
     "underscore": "^1.13.2",
     "vue": "^3.2.47",
-    "vidstack": "^0.4.4",
+    "vidstack": "^0.4.5",
     "vue-router": "^4.0.0",
     "vuex": "4",
     "vuex-cache": "^3.4.0"
