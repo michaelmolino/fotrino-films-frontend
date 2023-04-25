@@ -1,14 +1,15 @@
 <template>
     <div>
       <div v-if="view == 'video'">
-        <video id="player" controls :data-poster="chapter.preview" :key="chapter.id" />
+        <video id="player" controls :data-poster="chapter.preview" :key="chapter.id" style="width: 100%; height: 100%; aspect-ratio: 16 / 9" />
       </div>
       <div v-else>
         <q-img
           :src="chapter.preview"
-          style="width: 100%; max-width: 720px; min-width: 240px;"
+          style="width: 100%; height: 100%;"
+          :ratio="16/9"
         />
-        <audio id="player" controls :key="chapter.id" style="width: 100%; max-width: 720px; min-width: 240px;">
+        <audio id="player" controls :key="chapter.id" style="width: 100%; height: 100%;">
           <source :src="chapter.src" :type="chapter.type" />
         </audio>
       </div>

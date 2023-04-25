@@ -7,7 +7,7 @@
       :chapter="chapter.main ? this.$nullChapter : chapter"
     />
 
-    <PlyrPlayer v-if="(this.$route.query?.fallback ?? false) || $q.platform.is.mobile" :chapter="chapter" style="width: 100%; max-width: 720px; min-width: 240px;" />
+    <PlyrPlayer v-if="!(this.$route.query?.fallback ?? false)" :chapter="chapter" style="width: 100%; max-width: 720px; min-width: 240px;" />
     <VidstackPlayer v-else :chapter="chapter" style="width: 100%; max-width: 720px; min-width: 240px;" />
 
     <div class="text-h6" v-text="chapter.title"></div>
