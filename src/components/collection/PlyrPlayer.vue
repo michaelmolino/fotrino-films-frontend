@@ -56,13 +56,14 @@ export default {
         })
 
       const video = document.querySelector('video')
+      const source = this.chapter.src
       if (Hls.isSupported()) {
         this.hls = new Hls()
-        this.hls.loadSource(this.chapter.src)
+        this.hls.loadSource(source)
         this.hls.attachMedia(video)
         window.hls = this.hls
       } else {
-        video.src = this.chapter.src
+        video.src = source
       }
       this.player.poster = this.chapter.preview
     }
@@ -72,12 +73,13 @@ export default {
   },
   beforeUnmount() {
     this.player?.destroy()
-    this.hls?.destroy()
   },
   updated() {
-    this.player?.destroy()
-    this.hls?.destroy()
-    this.setSourceHack(this.player, this.hls)
+    if (Hls.isSupported()) {
+      this.hls.destroy()
+    }
+    this.player.destroy()
+    this.setSourceHack()
   }
 }
 </script>
