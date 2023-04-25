@@ -9,4 +9,4 @@ RUN rm -rf node_modules
 EXPOSE 4000
 RUN addgroup -S fotrino && adduser -S fotrino -G fotrino
 USER fotrino
-CMD quasar serve -p 4000 -H 0.0.0.0 dist/spa/ --history
+CMD quasar serve -p 4000 -H 0.0.0.0 /www/fotrino-films/dist/spa/ --history

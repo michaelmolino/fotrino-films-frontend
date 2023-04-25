@@ -34,7 +34,6 @@ export default {
     setProviderStlyingHack(player) {
       player.addEventListener('provider-setup', (event) => {
         const provider = event.detail
-        console.log('provider')
         if (provider?.type === 'hls') {
           provider.video.setAttribute('style', 'width: 100%; max-width: 720px; min-width: 240px;')
         }

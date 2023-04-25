@@ -7,8 +7,8 @@
       :chapter="chapter.main ? this.$nullChapter : chapter"
     />
 
-    <VidstackPlayer :chapter="chapter" style="width: 100%; max-width: 720px; min-width: 240px;" />
-    <!-- <PlyrPlayer :chapter="chapter" style="width: 100%; max-width: 720px;" /> -->
+    <PlyrPlayer v-if="(this.$route.query?.fallback ?? false) || $q.platform.is.mobile" :chapter="chapter" style="width: 100%; max-width: 720px; min-width: 240px;" />
+    <VidstackPlayer v-else :chapter="chapter" style="width: 100%; max-width: 720px; min-width: 240px;" />
 
     <div class="text-h6" v-text="chapter.title"></div>
     <div class="text-subtitle2 q-pl-xl" v-html="chapter.description_sanitised"></div>
@@ -55,12 +55,11 @@ export default {
     ),
     VidstackPlayer: defineAsyncComponent(() =>
       import('@components/collection/VidstackPlayer.vue')
+    ),
+    PlyrPlayer: defineAsyncComponent(() =>
+      import('@components/collection/PlyrPlayer.vue')
     )
-    // PlyrPlayer: defineAsyncComponent(() =>
-    //   import('@components/collection/PlyrPlayer.vue')
-    // )
   },
-
   computed: {
     collection: {
       get() {
