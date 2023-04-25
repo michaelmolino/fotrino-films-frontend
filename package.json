@@ -16,7 +16,8 @@
     "minimist": "^1.2.6",
     "webpack": "^5.76.0",
     "json5": "^1.0.2",
-    "qs": "^6.9.7"
+    "qs": "^6.9.7",
+    "yaml": "^2.2.2"
   },
   "dependencies": {
     "@quasar/extras": "^1.16.2",

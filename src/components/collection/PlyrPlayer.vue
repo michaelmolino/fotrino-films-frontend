@@ -1,9 +1,17 @@
 <template>
     <div>
-      <video v-if="view == 'video'" id="player" controls :data-poster="chapter.preview" :key="chapter.id" />
-      <audio v-if="view == 'audio'" id="player" controls :key="chapter.id">
+      <div v-if="view == 'video'">
+        <video id="player" controls :data-poster="chapter.preview" :key="chapter.id" />
+      </div>
+      <div v-else>
+        <q-img
+          :src="chapter.preview"
+          style="width: 100%; max-width: 720px; min-width: 240px;"
+        />
+        <audio id="player" controls :key="chapter.id" style="width: 100%; max-width: 720px; min-width: 240px;">
           <source :src="chapter.src" :type="chapter.type" />
-      </audio>
+        </audio>
+      </div>
     </div>
 </template>
 
@@ -55,30 +63,47 @@ export default {
           ]
         })
 
-      const video = document.querySelector('video')
-      const source = this.chapter.src
-      if (Hls.isSupported()) {
-        this.hls = new Hls()
-        this.hls.loadSource(source)
-        this.hls.attachMedia(video)
-        window.hls = this.hls
+      if (this.view === 'video') {
+        const video = document.querySelector('video')
+        const source = this.chapter.src
+        if (Hls.isSupported()) {
+          this.hls = new Hls()
+          this.hls.loadSource(source)
+          this.hls.attachMedia(video)
+          window.hls = this.hls
+        } else {
+          video.src = source
+        }
+        this.player.poster = this.chapter.preview
       } else {
-        video.src = source
+        const audio = document.querySelector('audio')
+        audio.src = this.chapter.src
       }
-      this.player.poster = this.chapter.preview
     }
   },
   mounted() {
     this.setSourceHack()
   },
   beforeUnmount() {
-    this.player?.destroy()
+    try {
+      this.player.destroy()
+    } catch (e) {
+      //
+    }
   },
   updated() {
     if (Hls.isSupported()) {
-      this.hls.destroy()
+      try {
+        this.hls.destroy()
+      } catch (e) {
+        //
+      }
     }
-    this.player.destroy()
+    try {
+      this.player.destroy()
+    } catch (e) {
+      //
+    }
     this.setSourceHack()
   }
 }
