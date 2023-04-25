@@ -54,12 +54,16 @@ export default {
             'fullscreen'
           ]
         })
-      this.hls = new Hls()
 
-      this.hls.loadSource(this.chapter.src)
-      this.hls.attachMedia(document.querySelector('video'))
-      window.hls = this.hls
-
+      const video = document.querySelector('video')
+      if (Hls.isSupported()) {
+        this.hls = new Hls()
+        this.hls.loadSource(this.chapter.src)
+        this.hls.attachMedia(video)
+        window.hls = this.hls
+      } else {
+        video.src = this.chapter.src
+      }
       this.player.poster = this.chapter.preview
     }
   },

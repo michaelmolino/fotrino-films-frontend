@@ -32,6 +32,12 @@ export default {
   },
   methods: {
     setProviderStlyingHack(player) {
+      player.addEventListener('provider-change', (event) => {
+        const provider = event.detail
+        if (provider?.type === 'hls') {
+          provider.library = Hls
+        }
+      })
       player.addEventListener('provider-setup', (event) => {
         const provider = event.detail
         if (provider?.type === 'hls') {
@@ -45,12 +51,6 @@ export default {
   },
   mounted() {
     const player = document.querySelector('media-player')
-    player.addEventListener('provider-change', (event) => {
-      const provider = event.detail
-      if (provider?.type === 'hls') {
-        provider.library = Hls
-      }
-    })
     this.setProviderStlyingHack(player)
     defineCustomElements()
   },
