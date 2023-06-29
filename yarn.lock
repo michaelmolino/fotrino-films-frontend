@@ -4062,10 +4062,10 @@ he@^1.2.0:
   resolved "https://registry.yarnpkg.com/he/-/he-1.2.0.tgz#84ae65fa7eafb165fddb61566ae14baf05664f0f"
   integrity sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==
 
-hls.js@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/hls.js/-/hls.js-1.4.0.tgz#e73af3e7c8d4310a2bcc92d5ade362dfb781fef7"
-  integrity sha512-VEjg7Rx5FlE9TB3MIn0HPgq3J+vR7EoQnjaqMCk/ISEaCOSZlAFh4g867f1QkSxZiq9kHeUZo+iH16X7VS3jKA==
+hls.js@^1.4.7:
+  version "1.4.7"
+  resolved "https://registry.yarnpkg.com/hls.js/-/hls.js-1.4.7.tgz#a739d93ad74944eaa52493b6e37d08f042c31041"
+  integrity sha512-dvwJXLlYES6wb7DR42uuTrio5sUTsIoWbuNeQS4xHMqfVBZ0KAlJlBmjFAo4s20/0XRhsMjWf5bx0kq5Lgvv1w==
 
 hpack.js@^2.1.6:
   version "2.1.6"
