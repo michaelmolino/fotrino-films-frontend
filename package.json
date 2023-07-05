@@ -37,7 +37,7 @@
     "vuex-cache": "^3.4.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.21.4",
+    "@babel/core": "^7.22.6",
     "@babel/eslint-parser": "^7.21.3",
     "@quasar/app": "3",
     "autoprefixer": "^10.4.14",
