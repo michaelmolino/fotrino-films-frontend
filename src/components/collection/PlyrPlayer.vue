@@ -1,17 +1,15 @@
 <template>
     <div>
       <div v-if="view == 'video'">
-        <video id="player" controls :data-poster="chapter.preview" :key="chapter.id" style="width: 100%; height: 100%; aspect-ratio: 16 / 9" />
+        <video id="player" controls :key="chapter.id" style="width: 100%; aspect-ratio: 16 / 9" />
       </div>
       <div v-else>
         <q-img
           :src="chapter.preview"
-          style="width: 100%; height: 100%;"
+          style="width: 100%;"
           :ratio="16/9"
         />
-        <audio id="player" controls :key="chapter.id" style="width: 100%; height: 100%;">
-          <source :src="chapter.src" :type="chapter.type" />
-        </audio>
+        <audio id="player" controls :key="chapter.id" style="width: 100%;"></audio>
       </div>
     </div>
 </template>
@@ -79,6 +77,7 @@ export default {
       } else {
         const audio = document.querySelector('audio')
         audio.src = this.chapter.src
+        audio.type = this.chapter.type
       }
     }
   },

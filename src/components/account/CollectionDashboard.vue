@@ -4,18 +4,12 @@
       <div class="text-h6 text-center" style="max-width: 1023px;">
         Dashboard: {{ profile.name + "'s" }} Collections
       </div>
-      <div class="q-py-md text-justify" style="max-width: 1023px;">
-        <q-icon color="warning" name="warning" size="md" />
-        Fotrino Films is under active development and is not ready for use. The
-        database, all accounts, and any images, video, etc. are regularly
-        deleted. You should have no expectation that this site is fit for any
-        purpose.
-      </div>
       <q-btn
         color="positive"
         icon="add"
         label="New Collection"
         @click="newCollectionDialog()"
+        disabled
       />
       <div class="row">
         <div

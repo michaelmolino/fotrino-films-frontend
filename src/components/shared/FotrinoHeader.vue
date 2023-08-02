@@ -137,6 +137,7 @@
           label="Upgrade Account"
           size="md"
           class="fit"
+          disable
         />
         <q-separator />
         <q-btn
@@ -163,11 +164,6 @@ export default {
       showHistory: false,
       logout: process.env.API + '/account/logout',
       oauthProviders: [
-        {
-          name: 'Facebook',
-          icon: 'fab fa-facebook',
-          login: process.env.API + '/account/login/facebook'
-        },
         {
           name: 'Google',
           icon: 'fab fa-google',

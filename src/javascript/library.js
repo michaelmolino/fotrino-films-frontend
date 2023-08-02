@@ -14,13 +14,11 @@ export function getMetaData(route, collection) {
 
   if (route?.params.movieSlug) {
     movie = collection.movies.find(m => m.slug === route.params.movieSlug)
-    title = movie?.title
-    description += ' | ' + title
-    image = movie?.poster
-  }
-
-  if (route?.params.chapterSlug) {
-    chapter = movie?.chapters?.find(ch => ch.slug === route.params.chapterSlug)
+    if (route?.params.chapterSlug) {
+      chapter = movie?.chapters?.find(ch => ch.slug === route.params.chapterSlug)
+    } else {
+      chapter = movie?.chapters.find(ch => ch.main)
+    }
     title = chapter?.title
     description = chapter?.description_text
     image = chapter?.preview
