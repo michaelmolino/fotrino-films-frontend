@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:lts-alpine
 WORKDIR /www/fotrino-films/
 COPY ./ ./
 RUN yarn install
