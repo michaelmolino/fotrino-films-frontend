@@ -41,7 +41,7 @@
     "yaml": "^2.2.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.9",
+    "@babel/core": "^7.22.10",
     "@babel/eslint-parser": "^7.22.9",
     "@quasar/app": "3",
     "autoprefixer": "^10.4.14",
