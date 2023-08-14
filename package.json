@@ -44,7 +44,7 @@
     "@babel/core": "^7.22.9",
     "@babel/eslint-parser": "^7.22.9",
     "@quasar/app": "3",
-    "autoprefixer": "^10.4.14",
+    "autoprefixer": "^10.4.15",
     "babel-loader": "^9.1.2",
     "eslint": "^7.14.0",
     "eslint-config-standard": "^16.0.2",
