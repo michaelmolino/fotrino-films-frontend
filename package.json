@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.16.5",
-    "axios": "^1.4.0",
+    "axios": "^1.5.1",
     "dompurify": "^3.0.2",
     "hls.js": "^1.4.10",
     "image-blob-reduce": "^4.1.0",
