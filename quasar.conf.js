@@ -106,7 +106,7 @@ module.exports = function(/* ctx */) {
       proxy: [
         {
           context: ['/api'],
-          target: 'https://localhost:65443/',
+          target: 'https://127.0.0.1:65443/',
           secure: false
         }
       ]
