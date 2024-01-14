@@ -2,7 +2,6 @@
 
 ![GitHub](https://img.shields.io/github/license/michaelmolino/fotrino-films-frontend?style=for-the-badge)
 [![Sonar Violations (short format)](https://img.shields.io/sonar/violations/michaelmolino_fotrino-films-frontend?label=sonar%20violations&server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge)](https://sonarcloud.io/dashboard?id=michaelmolino_fotrino-films-frontend)
-[![Depfu](https://img.shields.io/depfu/michaelmolino/fotrino-films-frontend?style=for-the-badge)](https://depfu.com/github/michaelmolino/fotrino-films-frontend)
 
 Fotrino Films is a video content hosting platform. It is designed for users to be able to upload content and share it easily with family and friends.
 
