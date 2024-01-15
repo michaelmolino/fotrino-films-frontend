@@ -6989,10 +6989,10 @@ vary@~1.1.2:
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==
 
-vidstack@^0.6.13:
-  version "0.6.13"
-  resolved "https://registry.yarnpkg.com/vidstack/-/vidstack-0.6.13.tgz#026e8876db454c7a2f9e610a6bf02eebcc6e999c"
-  integrity sha512-g5wH6Hfc4EQqOI0Mm7qW4D1DWPZfQnlATLZuqpuVAKI8HOz4UGfd1v48MLK9cR+ZfPjVL4/iZLu7YOIdSX3L2g==
+vidstack@^0.6.14:
+  version "0.6.14"
+  resolved "https://registry.yarnpkg.com/vidstack/-/vidstack-0.6.14.tgz#0f8670ba543edd328e0b18a51953044184daee58"
+  integrity sha512-JxM11ya75T9KefRqUXw4Tm1cNGMdtvebSK/mqjT9vBMwtfVesgSdT4oeW8kVuhQDixXOEb/OOldB1qOBycLHag==
   dependencies:
     maverick.js "0.37.0"
     media-captions "0.0.18"
