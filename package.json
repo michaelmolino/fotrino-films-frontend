@@ -21,7 +21,7 @@
     "yaml": "^2.2.2"
   },
   "dependencies": {
-    "@quasar/extras": "^1.16.5",
+    "@quasar/extras": "^1.16.10",
     "axios": "^1.6.0",
     "dompurify": "^3.0.2",
     "hls.js": "^1.4.10",
