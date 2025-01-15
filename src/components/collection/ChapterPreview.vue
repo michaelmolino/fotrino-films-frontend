@@ -17,7 +17,7 @@
     </q-badge>
     <q-img :src="chapter.preview" :ratio="16 / 9">
       <div class="absolute-bottom text-center">
-        <div class="ellipsis">{{ chapter.title }}</div>
+        <div class="ellipsis">{{ chapter.title }}<span v-if="detail"><br>{{ movie.title }}</span></div>
       </div>
       <template v-slot:error>
         <div class="absolute-full bg-black text-center text-h6">
@@ -26,7 +26,7 @@
           </div>
         </div>
         <div class="absolute-bottom text-center">
-          <div class="ellipsis">{{ chapter.title }}</div>
+          <div class="ellipsis">{{ chapter.title }}<br>{{ movie.title }}</div>
         </div>
       </template>
     </q-img>
@@ -38,7 +38,9 @@ export default {
   name: 'ChapterPreview',
 
   props: {
-    chapter: Object
+    chapter: Object,
+    movie: Object,
+    detail: Boolean
   }
 }
 </script>
