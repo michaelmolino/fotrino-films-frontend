@@ -22,6 +22,7 @@
           {label: 'Collections', value: 'collections'},
           {label: 'All Media', value: 'all'}
         ]"
+        @update:model-value="changeViewMode"
       />
   </div>
 
@@ -43,23 +44,6 @@
       </div>
     </div>
 
-    <div class="row" v-if="selectedView=='all'">
-      <div
-        class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm"
-        v-for="item in collection.movies.flatMap(movie => movie.chapters.map(chapter => ({ chapter: chapter, movie: movie })))"
-        :key="item.chapter.id"
-      >
-      <ChapterPreview
-          :style="item.chapter.deleted ? 'filter: brightness(37.5%); max-width: 360px;' : 'max-width: 360px;'"
-          :collection="collection"
-          :movie="item.movie"
-          :chapter="item.chapter"
-          :to="'/' + collection.uuid + '/' + collection.slug + '/' + item.movie.slug + '/' + item.chapter.slug"
-          :detail=true
-        />
-      </div>
-    </div>
-
   </div>
 </template>
 
@@ -75,9 +59,6 @@ export default {
     ),
     MoviePoster: defineAsyncComponent(() =>
       import('@components/collection/MoviePoster.vue')
-    ),
-    ChapterPreview: defineAsyncComponent(() =>
-      import('@components/collection/ChapterPreview.vue')
     )
   },
 
@@ -91,6 +72,17 @@ export default {
     collection: {
       get() {
         return this.$store.state.collection.collection
+      }
+    }
+  },
+
+  methods: {
+    changeViewMode() {
+      if (this.selectedView === 'collections') {
+        this.$router.push({ path: '/' + this.collection.uuid + '/' + this.collection.slug })
+      }
+      if (this.selectedView === 'all') {
+        this.$router.push({ path: '/' + this.collection.uuid + '/' + this.collection.slug + '/all' })
       }
     }
   }
