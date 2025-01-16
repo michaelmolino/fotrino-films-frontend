@@ -1,15 +1,25 @@
 <template>
-  <q-breadcrumbs class="text-h5 q-pb-md">
-    <template v-slot:separator>
-      <q-icon size="1.5em" name="chevron_right" color="primary" />
-    </template>
-    <q-breadcrumbs-el
-      v-for="location in breadcrumbs"
-      :key="location.id"
-      :label="location.label"
-      :to="location.to"
-    />
-  </q-breadcrumbs>
+  <q-item dense>
+    <q-item-section side>
+      <q-avatar>
+        <img :src=this.collection.cover>
+      </q-avatar>
+    </q-item-section>
+    <q-item-section>
+      <q-breadcrumbs class="text-h5">
+      <template v-slot:separator>
+        <q-icon size="1.5em" name="chevron_right" color="primary" />
+      </template>
+      <q-breadcrumbs-el
+        v-for="location in breadcrumbs"
+        :key="location.id"
+        :label="location.label"
+        :to="location.to"
+      />
+      </q-breadcrumbs>
+    <q-item-label caption>By {{ collection.ownername }}</q-item-label>
+    </q-item-section>
+  </q-item>
 </template>
 
 <script>

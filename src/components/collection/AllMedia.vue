@@ -1,7 +1,7 @@
 <template>
     <div v-if="collection.uuid">
 
-      <div class="row q-py-md">
+      <div class="row">
         <Breadcrumbs
           :collection="collection"
           :movie="this.$nullMovie"
@@ -26,10 +26,10 @@
         />
       </div>
 
-      <div class="row" v-if="selectedView=='all'">
+      <div class="row q-pt-md" v-if="selectedView=='all'">
         <div
           class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm"
-          v-for="item in collection.movies.flatMap(movie => movie.chapters.map(chapter => ({ chapter: chapter, movie: movie })))"
+          v-for="item in collection.movies.flatMap(movie => movie.chapters.map(chapter => ({ chapter: chapter, movie: movie }))).sort((b, a) => a.chapter.created.localeCompare(b.chapter.created))"
           :key="item.chapter.id"
         >
         <ChapterPreview

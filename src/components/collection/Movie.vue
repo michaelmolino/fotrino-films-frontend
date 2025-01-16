@@ -2,6 +2,7 @@
   <div v-if="movie">
 
     <Breadcrumbs
+      class="q-pb-md"
       :collection="collection"
       :movie="movie"
       :chapter="chapter.main ? this.$nullChapter : chapter"
@@ -10,7 +11,34 @@
     <PlyrPlayer v-if="!(this.$route.query?.fallback ?? false)" :chapter="chapter" style="width: 100%; max-width: 720px; min-width: 240px;" />
     <VidstackPlayer v-else :chapter="chapter" style="width: 100%; max-width: 720px; min-width: 240px;" />
 
-    <div class="text-h6" v-text="chapter.title"></div>
+    <q-btn-dropdown dropdown-icon="share" class="q-pa-md" flat color="accent">
+      <q-list>
+        <q-item clickable v-close-popup @click="copyLink('public')">
+          <q-item-section avatar>
+            <q-avatar icon="public" color="accent" text-color="white" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>Share within this collection</q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-icon name="content_copy" color="accent" />
+          </q-item-section>
+        </q-item>
+
+        <q-item clickable v-close-popup @click="copyLink('private')" disabled>
+          <q-item-section avatar>
+            <q-avatar icon="public_off" color="accent" text-color="white" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>Share only this video</q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <q-icon name="content_copy" color="accent" />
+          </q-item-section>
+        </q-item>
+      </q-list>
+    </q-btn-dropdown>
+    <span class="text-h6" v-text="chapter.title"></span>
     <div class="text-subtitle2 q-pl-xl" v-html="chapter.description_sanitised"></div>
 
     <div class="q-pt-md text-h6" v-if="movie.chapters?.filter(ch => ch.id !== chapter.id)?.length > 0">
@@ -42,6 +70,7 @@
 
 <script>
 import { defineAsyncComponent } from 'vue'
+import { Notify, copyToClipboard } from 'quasar'
 
 export default {
   name: 'ChapterIndex',
@@ -96,6 +125,29 @@ export default {
           })
         }
         return _chapter
+      }
+    }
+  },
+
+  methods: {
+    copyLink(val) {
+      if (val === 'public') {
+        copyToClipboard(window.location.href)
+          .then(() => {
+            Notify.create({
+              message: 'URL copied to clipboard',
+              color: 'accent',
+              icon: 'content_paste',
+              timeout: 1000
+            })
+          })
+          .catch(() => {
+            // fail
+          })
+      }
+      if (val === 'private') {
+        console.log(window.location.origin)
+        console.log(this.$route.path)
       }
     }
   }

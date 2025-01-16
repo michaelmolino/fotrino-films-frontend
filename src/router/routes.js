@@ -40,6 +40,15 @@ const routes = [
       }
     ]
   },
+  // {
+  //   component: () => import('@components/MainLayout.vue'),
+  //   children: [
+  //     {
+  //       path: '/private/:privateSlug([0-9a-zA-Z]+)',
+  //       component: () => import('@components/collection/PrivateMovie.vue')
+  //     }
+  //   ]
+  // },
   {
     path: '/dashboard',
     component: () => import('@components/MainLayout.vue'),
