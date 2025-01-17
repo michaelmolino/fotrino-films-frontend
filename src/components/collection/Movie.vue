@@ -11,35 +11,38 @@
     <PlyrPlayer v-if="!(this.$route.query?.fallback ?? false)" :chapter="chapter" style="width: 100%; max-width: 720px; min-width: 240px;" />
     <VidstackPlayer v-else :chapter="chapter" style="width: 100%; max-width: 720px; min-width: 240px;" />
 
-    <q-btn-dropdown dropdown-icon="share" class="q-pa-md" flat color="accent">
-      <q-list>
-        <q-item clickable v-close-popup @click="copyLink('public')">
-          <q-item-section avatar>
-            <q-avatar icon="public" color="accent" text-color="white" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Share within this collection</q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            <q-icon name="content_copy" color="accent" />
-          </q-item-section>
-        </q-item>
+    <div style="width: 100%; max-width: 720px; min-width: 240px;">
+      <span class="text-h6" v-text="chapter.title"></span>
+      <q-btn-dropdown dropdown-icon="share" class="q-pa-md float-right" flat color="accent">
+        <q-list>
+          <q-item clickable v-close-popup @click="copyLink('public')">
+            <q-item-section avatar>
+              <q-avatar icon="public" color="accent" text-color="white" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Share within this collection</q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <q-icon name="content_copy" color="accent" />
+            </q-item-section>
+          </q-item>
 
-        <q-item clickable v-close-popup @click="copyLink('private')" disabled>
-          <q-item-section avatar>
-            <q-avatar icon="public_off" color="accent" text-color="white" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Share only this video</q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            <q-icon name="content_copy" color="accent" />
-          </q-item-section>
-        </q-item>
-      </q-list>
-    </q-btn-dropdown>
-    <span class="text-h6" v-text="chapter.title"></span>
-    <div class="text-subtitle2 q-pl-xl" v-html="chapter.description_sanitised"></div>
+          <q-item clickable v-close-popup @click="copyLink('private')" disabled>
+            <q-item-section avatar>
+              <q-avatar icon="public_off" color="accent" text-color="white" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Share only this video</q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <q-icon name="content_copy" color="accent" />
+            </q-item-section>
+            <q-tooltip>Not yet supported</q-tooltip>
+          </q-item>
+        </q-list>
+      </q-btn-dropdown>
+      <div class="text-subtitle2 q-pl-xl" v-html="chapter.description_sanitised"></div>
+    </div>
 
     <div class="q-pt-md text-h6" v-if="movie.chapters?.filter(ch => ch.id !== chapter.id)?.length > 0">
       Related Content

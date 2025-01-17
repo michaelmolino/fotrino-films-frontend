@@ -1,17 +1,18 @@
 <template>
   <q-item dense>
-    <q-item-section side>
+    <q-item-section side v-if="$q.screen.gt.xs">
       <q-avatar>
         <img :src=this.collection.cover>
       </q-avatar>
     </q-item-section>
     <q-item-section>
-      <q-breadcrumbs class="text-h5">
+      <q-breadcrumbs>
       <template v-slot:separator>
         <q-icon size="1.5em" name="chevron_right" color="primary" />
       </template>
       <q-breadcrumbs-el
         v-for="location in breadcrumbs"
+        :class="$q.screen.gt.xs ? 'text-h5' : 'text-h6'"
         :key="location.id"
         :label="location.label"
         :to="location.to"
