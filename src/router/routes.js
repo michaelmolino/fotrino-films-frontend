@@ -1,6 +1,6 @@
 const routes = [
   {
-    path: '/',
+    path: '',
     component: () => import('@components/MainLayout.vue'),
     children: [
       { path: '', component: () => import('@components/pages/Home.vue') },
@@ -41,10 +41,11 @@ const routes = [
     ]
   },
   {
+    path: '/private',
     component: () => import('@components/MainLayout.vue'),
     children: [
       {
-        path: '/private/:privateId([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})',
+        path: ':privateId([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})',
         component: () => import('@components/collection/PrivateLink.vue')
       }
     ]
