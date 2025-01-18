@@ -1,9 +1,10 @@
-import { nullCollection } from 'boot/global'
+import { nullCollection, nullChapter } from 'boot/global'
 
 export default function() {
   return {
     collection: nullCollection,
     collections: [],
-    history: []
+    history: [],
+    privateChapter: nullChapter
   }
 }

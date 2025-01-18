@@ -7,7 +7,11 @@ export function SET_MOVIE(state, movie) {
 }
 
 export function SET_CHAPTER(state, chapter) {
-  state.movie = chapter
+  state.chapter = chapter
+}
+
+export function SET_PRIVATE_CHAPTER(state, chapter) {
+  state.privateChapter = chapter
 }
 
 export function SET_COLLECTIONS(state, collections) {

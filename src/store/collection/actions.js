@@ -2,7 +2,22 @@ import { LocalStorage } from 'quasar'
 import _ from 'underscore'
 import { api } from 'boot/axios'
 import DOMPurify from 'dompurify'
-import { nullCollection } from 'boot/global'
+import { nullCollection, nullChapter } from 'boot/global'
+
+export async function getPrivateChapter(context, chapter) {
+  try {
+    const response = await api
+      .get('/collections/chapters/private/' + chapter)
+    const _ch = response.data
+    _ch.chapter.description_sanitised = DOMPurify.sanitize(_ch.chapter.description_unsafe, {
+      ALLOWED_TAGS: ['br', 'i', 'p', 'strong']
+    })
+    context.commit('SET_PRIVATE_CHAPTER', _ch)
+  } catch (error) {
+    context.commit('SET_PRIVATE_CHAPTER', nullChapter)
+    return await Promise.reject(error)
+  }
+}
 
 export function createCollection(context, collection) {
   return api.post('/collections', collection).catch(error => {

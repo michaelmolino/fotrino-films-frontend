@@ -8,11 +8,11 @@
       :chapter="chapter.main ? this.$nullChapter : chapter"
     />
 
-    <PlyrPlayer v-if="!(this.$route.query?.fallback ?? false)" :chapter="chapter" style="width: 100%; max-width: 720px; min-width: 240px;" />
+    <PlyrPlayer v-if="!(this.$route.query?.fallback ?? false)" :chapter="chapter" style="width: 100%; max-width: 720px; min-width: 240px;" class="q-pb-md" />
     <VidstackPlayer v-else :chapter="chapter" style="width: 100%; max-width: 720px; min-width: 240px;" />
 
     <div style="width: 100%; max-width: 720px; min-width: 240px;">
-      <span class="text-h6" v-text="chapter.title"></span>
+      <q-icon name="public" size = "md" class="q-pr-sm" /><span class="text-h6" v-text="chapter.title"></span>
       <q-btn-dropdown dropdown-icon="share" class="q-pa-md float-right" flat color="accent">
         <q-list>
           <q-item clickable v-close-popup @click="copyLink('public')">
@@ -27,7 +27,7 @@
             </q-item-section>
           </q-item>
 
-          <q-item clickable v-close-popup @click="copyLink('private')" disabled>
+          <q-item clickable v-close-popup @click="copyLink('private')">
             <q-item-section avatar>
               <q-avatar icon="public_off" color="accent" text-color="white" />
             </q-item-section>
@@ -37,7 +37,6 @@
             <q-item-section side>
               <q-icon name="content_copy" color="accent" />
             </q-item-section>
-            <q-tooltip>Not yet supported</q-tooltip>
           </q-item>
         </q-list>
       </q-btn-dropdown>
@@ -149,8 +148,18 @@ export default {
           })
       }
       if (val === 'private') {
-        console.log(window.location.origin)
-        console.log(this.$route.path)
+        copyToClipboard(window.location.origin + '/private/' + this.chapter.privateId)
+          .then(() => {
+            Notify.create({
+              message: 'URL copied to clipboard',
+              color: 'accent',
+              icon: 'content_paste',
+              timeout: 1000
+            })
+          })
+          .catch(() => {
+            // fail
+          })
       }
     }
   }

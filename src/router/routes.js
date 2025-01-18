@@ -40,15 +40,15 @@ const routes = [
       }
     ]
   },
-  // {
-  //   component: () => import('@components/MainLayout.vue'),
-  //   children: [
-  //     {
-  //       path: '/private/:privateSlug([0-9a-zA-Z]+)',
-  //       component: () => import('@components/collection/PrivateMovie.vue')
-  //     }
-  //   ]
-  // },
+  {
+    component: () => import('@components/MainLayout.vue'),
+    children: [
+      {
+        path: '/private/:privateId([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})',
+        component: () => import('@components/collection/PrivateLink.vue')
+      }
+    ]
+  },
   {
     path: '/dashboard',
     component: () => import('@components/MainLayout.vue'),
