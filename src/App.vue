@@ -25,10 +25,20 @@ export default {
   computed: {
     collection: {
       get() {
-        return this.$store.state.collection.collection
+        let _collection = null
+        if (this.$route.params?.uuid) {
+          _collection = this.$store.state.collection.collection
+        } else if (this.$route.params.privateId) {
+          _collection = this.$store.state.collection.privateChapter
+        }
+        return _collection
       },
       set(_collection) {
-        this.$store.commit('collection/SET_COLLECTION', _collection)
+        if (this.$route.params?.uuid) {
+          this.$store.commit('collection/SET_COLLECTION', _collection)
+        } else if (this.$route.params?.privateId) {
+          this.$store.commit('collection/SET_PRIVATE_CHAPTER', _collection)
+        }
       }
     }
   },
@@ -45,20 +55,33 @@ export default {
 
   watch: {
     $route(to, from) {
-      this.$store.cache
-        .dispatch('collection/getCollection', to.params.uuid)
-        .then(_collection => {
-          this.collection = _collection
-          this.updatePageProperties()
-        })
-        .catch(() => {
-          this.collection = this.$nullCollection
-          this.updatePageProperties()
-        })
+      if (to.params?.uuid) {
+        this.$store.cache
+          .dispatch('collection/getCollection', to.params.uuid)
+          .then(_collection => {
+            // this.collection = _collection
+            this.updatePageProperties()
+          })
+          .catch(() => {
+            this.collection = this.$nullCollection
+            this.updatePageProperties()
+          })
+      } else if (to.params?.privateId) {
+        this.$store.cache
+          .dispatch('collection/getPrivateChapter', to.params.privateId)
+          .then(_collection => {
+            // this.collection = _collection
+            this.updatePageProperties()
+          })
+          .catch(() => {
+            this.collection = this.$nullCollection
+            this.updatePageProperties()
+          })
+      }
     },
     collection() {
       if (
-        this.collection.uuid &&
+        this.collection?.uuid &&
         this.$route.params.collectionSlug &&
         this.collection.slug !== this.$route.params.collectionSlug
       ) {
@@ -67,8 +90,8 @@ export default {
         })
       }
       if (
-        this.collection.deleted === true &&
-        this.$route.params.collectionSlug
+        this.collection?.deleted === true &&
+        this.$route.params?.collectionSlug
       ) {
         this.$q.notify({
           type: 'info',

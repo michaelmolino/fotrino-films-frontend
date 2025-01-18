@@ -146,8 +146,7 @@ export default {
           .catch(() => {
             // fail
           })
-      }
-      if (val === 'private') {
+      } else if (val === 'private') {
         copyToClipboard(window.location.origin + '/private/' + this.chapter.privateId)
           .then(() => {
             Notify.create({

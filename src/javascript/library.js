@@ -25,6 +25,13 @@ export function getMetaData(route, collection) {
     type = 'video.other'
   }
 
+  if (route?.params.privateId) {
+    title = collection?.movie?.chapter?.title
+    description = collection?.movie?.chapter?.description_text
+    image = collection?.movie?.chapter?.preview
+    type = 'video.other'
+  }
+
   if (title !== null) {
     title += ' | Fotrino Films'
   } else {

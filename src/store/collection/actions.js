@@ -8,11 +8,11 @@ export async function getPrivateChapter(context, chapter) {
   try {
     const response = await api
       .get('/collections/chapters/private/' + chapter)
-    const _ch = response.data
-    _ch.chapter.description_sanitised = DOMPurify.sanitize(_ch.chapter.description_unsafe, {
+    const collection = response.data
+    collection.movie.chapter.description_sanitised = DOMPurify.sanitize(collection.movie.chapter.description_unsafe, {
       ALLOWED_TAGS: ['br', 'i', 'p', 'strong']
     })
-    context.commit('SET_PRIVATE_CHAPTER', _ch)
+    context.commit('SET_PRIVATE_CHAPTER', collection)
   } catch (error) {
     context.commit('SET_PRIVATE_CHAPTER', nullChapter)
     return await Promise.reject(error)
