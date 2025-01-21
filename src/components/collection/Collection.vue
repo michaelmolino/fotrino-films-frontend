@@ -20,10 +20,27 @@
           color="white"
           text-color="primary"
           :options="[
-            {label: 'Movies', value: 'movies'},
+            {value: 'movies', slot: 'movie'},
+            {value: 'main', slot: 'main'},
             {value: 'all', slot: 'all'}
           ]"
         >
+        <template v-slot:movie>
+            <div class="row items-center no-wrap">
+              <div class="text-center">
+                Movie Groups &nbsp;
+              </div>
+              <q-avatar color="accent" text-color="white" size="sm" square>{{ collection.movies.length }}</q-avatar>
+            </div>
+          </template>
+          <template v-slot:main>
+            <div class="row items-center no-wrap">
+              <div class="text-center">
+                Featured Media &nbsp;
+              </div>
+              <q-avatar color="accent" text-color="white" size="sm" square>{{ collection.movies.length }}</q-avatar>
+            </div>
+          </template>
           <template v-slot:all>
             <div class="row items-center no-wrap">
               <div class="text-center">
@@ -52,10 +69,10 @@
         This collection is empty!
       </div>
     </div>
-    <div class="row q-pt-md" v-if="selectedView=='all'">
+    <div class="row q-pt-md" v-else>
         <div
           class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm"
-          v-for="item in collection.movies.flatMap(movie => movie.chapters.map(chapter => ({ chapter: chapter, movie: movie }))).sort((b, a) => a.chapter.created.localeCompare(b.chapter.created))"
+          v-for="item in collection.movies.flatMap(movie => movie.chapters.map(chapter => ({ chapter: chapter, movie: movie }))).filter((f) => selectedView == 'main' ? f.chapter.main : true).sort((b, a) => a.chapter.created.localeCompare(b.chapter.created))"
           :key="item.chapter.id"
         >
         <ChapterPreview
@@ -92,7 +109,7 @@ export default {
 
   data() {
     return {
-      selectedView: 'movies'
+      selectedView: 'all'
     }
   },
 
@@ -104,15 +121,5 @@ export default {
     }
   }
 
-  // methods: {
-  //   changeViewMode() {
-  //     if (this.selectedView === 'collections') {
-  //       this.$router.push({ path: '/' + this.collection.uuid + '/' + this.collection.slug })
-  //     }
-  //     if (this.selectedView === 'all') {
-  //       this.$router.push({ path: '/' + this.collection.uuid + '/' + this.collection.slug + '/all' })
-  //     }
-  //   }
-  // }
 }
 </script>

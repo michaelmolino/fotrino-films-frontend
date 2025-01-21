@@ -10,10 +10,6 @@ const routes = [
       },
       { path: 'help', component: () => import('@components/pages/Help.vue') },
       {
-        path: 'pricing',
-        component: () => import('@components/pages/Pricing.vue')
-      },
-      {
         path: 'terms',
         component: () => import('@components/pages/Terms.vue')
       },
@@ -42,7 +38,7 @@ const routes = [
     children: [
       {
         path: ':privateId([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})',
-        component: () => import('@components/collection/PrivateLink.vue')
+        component: () => import('@components/collection/Movie.vue')
       }
     ]
   },
@@ -53,16 +49,6 @@ const routes = [
       {
         path: '',
         component: () => import('@components/account/CollectionDashboard.vue')
-      },
-      {
-        path:
-          ':uuid([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})/:collectionSlug([0-9a-zA-Z-]+)',
-        component: () => import('@components/account/MovieDashboard.vue')
-      },
-      {
-        path:
-          ':uuid([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})/:collectionSlug([0-9a-zA-Z-]+)/:movieSlug([0-9a-zA-Z-]+)',
-        component: () => import('@components/account/ChapterDashboard.vue')
       }
     ]
   },

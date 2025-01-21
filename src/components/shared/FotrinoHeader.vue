@@ -13,10 +13,12 @@
         />
         <q-btn-dropdown
           v-if="history.length > 0"
+          split
           :icon="showHistory ? 'history' : 'videocam'"
           @before-show="showHistory = true"
           @before-hide="showHistory = false"
           :label="$q.screen.gt.xs ? 'Fotrino Films' : ''"
+          to="/"
           flat
           no-caps
           size="lg"
@@ -42,6 +44,9 @@
               size="md"
               @click="$store.dispatch('collection/rmHistory', collection.uuid)"
             />
+          </div>
+          <div v-if="history.length === 0" class="row q-pa-sm">
+            No history
           </div>
         </q-btn-dropdown>
       </q-toolbar-title>
@@ -73,7 +78,6 @@
         flat
         no-caps
         size="md"
-        disabled
       >
         <q-btn
           v-if="!$q.screen.gt.sm"
@@ -126,18 +130,6 @@
           label="Profile"
           size="md"
           class="fit"
-        />
-        <q-separator />
-        <q-btn
-          to="/pricing"
-          align="left"
-          flat
-          no-caps
-          icon="paid"
-          label="Upgrade Account"
-          size="md"
-          class="fit"
-          disable
         />
         <q-separator />
         <q-btn

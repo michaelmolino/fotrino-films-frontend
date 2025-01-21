@@ -1,26 +1,49 @@
 <template>
-  <q-item dense>
-    <q-item-section side v-if="$q.screen.gt.xs">
-      <q-avatar>
-        <img :src=this.collection.cover>
-      </q-avatar>
-    </q-item-section>
-    <q-item-section>
-      <q-breadcrumbs>
-      <template v-slot:separator>
-        <q-icon size="1.5em" name="chevron_right" color="primary" />
-      </template>
-      <q-breadcrumbs-el
-        v-for="location in breadcrumbs"
-        :class="$q.screen.gt.xs ? 'text-h5' : 'text-h6'"
-        :key="location.id"
-        :label="location.label"
-        :to="location.to"
-      />
-      </q-breadcrumbs>
-    <q-item-label caption>By {{ collection.ownername }}</q-item-label>
-    </q-item-section>
-  </q-item>
+  <span>
+    <q-item dense v-if="!hideLinks">
+      <q-item-section side v-if="$q.screen.gt.xs">
+        <q-avatar>
+          <img :src=this.collection.cover>
+        </q-avatar>
+      </q-item-section>
+      <q-item-section>
+        <q-breadcrumbs>
+        <template v-slot:separator>
+          <q-icon size="1.5em" name="chevron_right" color="primary" />
+        </template>
+        <q-breadcrumbs-el
+          v-for="location in breadcrumbs"
+          :class="$q.screen.gt.xs ? 'text-h5' : 'text-h6'"
+          :key="location.id"
+          :label="location.label"
+          :to="location.to"
+        />
+        </q-breadcrumbs>
+      <q-item-label caption>By {{ collection.ownername }}</q-item-label>
+      </q-item-section>
+    </q-item>
+    <q-item dense v-if="hideLinks">
+      <q-item-section side v-if="$q.screen.gt.xs">
+        <q-avatar>
+          <img :src=this.collection.cover>
+        </q-avatar>
+      </q-item-section>
+      <q-item-section>
+        <q-breadcrumbs>
+        <template v-slot:separator>
+          <q-icon size="1.5em" name="chevron_right" color="primary" />
+        </template>
+        <q-breadcrumbs-el
+          v-for="location in breadcrumbs"
+          :class="$q.screen.gt.xs ? 'text-h5' : 'text-h6'"
+          :key="location.id"
+          :label="location.label"
+        />
+        </q-breadcrumbs>
+      <q-item-label caption>By {{ collection.ownername }}</q-item-label>
+      </q-item-section>
+    </q-item>
+  </span>
 </template>
 
 <script>
@@ -30,7 +53,8 @@ export default {
   props: {
     collection: Object,
     movie: Object,
-    chapter: Object
+    chapter: Object,
+    hideLinks: Boolean
   },
 
   computed: {

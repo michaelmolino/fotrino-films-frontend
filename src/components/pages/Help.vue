@@ -151,9 +151,9 @@
         </q-card>
       </q-expansion-item>
       <q-separator />
-      <!-- <q-expansion-item
+      <q-expansion-item
         group="faq"
-        label="Why can I only login with Google or Facebook?"
+        label="Why can I only login with Google?"
         header-class="text-bold"
       >
         <q-card>
@@ -166,20 +166,6 @@
             Instagram, and Microsoft Live.
           </q-card-section>
         </q-card>
-      </q-expansion-item> -->
-      <q-separator />
-      <q-expansion-item
-        group="faq"
-        label="Why can't I log in?"
-        header-class="text-bold"
-      >
-        <q-card>
-          <q-card-section>
-            There is no need to login to view content - login is only required
-            to upload and manage your content. These features are currently in
-            development and not yet available.
-          </q-card-section>
-        </q-card>
       </q-expansion-item>
       <q-separator />
       <q-expansion-item
@@ -189,6 +175,7 @@
       >
         <q-card>
           <q-card-section>
+            This is confusing and likely to change.
             <ul>
               <li>
                 The top level of Fotrino Films is a <strong>collection</strong>.
