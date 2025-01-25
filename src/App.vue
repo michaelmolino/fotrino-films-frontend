@@ -59,7 +59,7 @@ export default {
         this.$store.cache
           .dispatch('collection/getCollection', to.params.uuid)
           .then(_collection => {
-            // this.collection = _collection
+            this.collection = _collection
             this.updatePageProperties()
           })
           .catch(() => {

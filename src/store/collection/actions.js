@@ -4,10 +4,10 @@ import { api } from 'boot/axios'
 import DOMPurify from 'dompurify'
 import { nullCollection, nullChapter } from 'boot/global'
 
-export async function getPrivateChapter(context, chapter) {
+export async function getPrivateChapter(context, privateChapter) {
   try {
     const response = await api
-      .get('/collections/chapters/private/' + chapter)
+      .get('/collections/chapters/private/' + privateChapter)
     const collection = response.data
     collection.movie.chapter.description_sanitised = DOMPurify.sanitize(collection.movie.chapter.description_unsafe, {
       ALLOWED_TAGS: ['br', 'i', 'p', 'strong']

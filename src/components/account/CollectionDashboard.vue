@@ -1,11 +1,15 @@
 <template>
   <div>
     <div v-if="profile.id">
-      Not much to see here.
-      <ul>
-        <li v-for="c in collections" :key="c.id">{{ c.uuid }}</li>
-      </ul>
-      Coming "soon": The ability to create and upload content via a local bash script.
+        <div v-if="collections.length === 0">Not much to see here</div>
+        <div v-for="c in collections" :key="c.id" class="q-py-xs">
+          <q-btn flat :to="'/' + c.uuid + '/' + c.slug">
+            <q-avatar>
+              <img :src="c.cover">
+            </q-avatar>
+            <div class="q-pl-sm">{{ c.title }}</div>
+          </q-btn>
+        </div>
     </div>
     <div v-if="!profile.id" class="q-py-md">
       Not logged in!

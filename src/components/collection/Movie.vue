@@ -42,7 +42,7 @@
             </q-item>
           </q-list>
         </q-btn-dropdown>
-        <div class="text-subtitle2">Published: {{ daysSince }}</div>
+        <div class="text-subtitle2 q-pl-xl">Published: {{ daysSince }}</div>
       </q-card-section>
 
       <q-separator inset v-if="chapter.description_sanitised" />

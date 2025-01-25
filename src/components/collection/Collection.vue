@@ -38,7 +38,7 @@
               <div class="text-center">
                 Featured Media &nbsp;
               </div>
-              <q-avatar color="accent" text-color="white" size="sm" square>{{ collection.movies.length }}</q-avatar>
+              <q-avatar color="accent" text-color="white" size="sm" square>{{ collection.movies.flatMap(movie => movie.chapters).filter(ch => ch.main).length }}</q-avatar>
             </div>
           </template>
           <template v-slot:all>
@@ -74,6 +74,7 @@
           class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm"
           v-for="item in collection.movies.flatMap(movie => movie.chapters.map(chapter => ({ chapter: chapter, movie: movie }))).filter((f) => selectedView == 'main' ? f.chapter.main : true).sort((b, a) => a.chapter.created.localeCompare(b.chapter.created))"
           :key="item.chapter.id"
+          align="center"
         >
         <ChapterPreview
             :style="item.chapter.deleted ? 'filter: brightness(37.5%); max-width: 360px;' : 'max-width: 360px;'"
