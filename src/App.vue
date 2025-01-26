@@ -70,7 +70,7 @@ export default {
         this.$store.cache
           .dispatch('collection/getPrivateChapter', to.params.privateId)
           .then(_collection => {
-            // this.collection = _collection
+            this.collection = this.$nullCollection
             this.updatePageProperties()
           })
           .catch(() => {

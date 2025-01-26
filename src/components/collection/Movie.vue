@@ -113,6 +113,9 @@ export default {
         } else if (this.$route.params.privateId) {
           _collection = this.$store.state.collection.privateChapter
         }
+        if (!_collection) {
+          this.$router.replace('/404')
+        }
         return _collection
       }
     },
@@ -123,11 +126,11 @@ export default {
           _movie = this.collection.movies.find(
             m => m.slug === this.$route.params.movieSlug
           )
-          if (this.collection.uuid && !_movie) {
-            this.$router.replace('/404')
-          }
         } else if (this.$route.params.privateId) {
           _movie = this.collection.movie
+        }
+        if (!_movie) {
+          this.$router.replace('/404')
         }
         return _movie
       }
@@ -142,16 +145,19 @@ export default {
           if (!_chapter) {
             _chapter = this.movie?.chapters.find(ch => ch.main)
           }
-          if (this.collection.uuid && !_chapter) {
-            this.$router.replace('/404')
-          }
-          if (_chapter.main) {
-            this.$router.replace({
-              params: { chapterSlug: null }
-            })
+          if (!_chapter) {
+            _chapter = this.movie?.chapters[0]
           }
         } else if (this.$route.params.privateId) {
           _chapter = this.collection.movie.chapter
+        }
+        if (!_chapter) {
+          this.$router.replace('/404')
+        } else {
+          this.$router.replace({
+            params: { chapterSlug: _chapter.slug }
+          })
+          console.log(_chapter.slug)
         }
         return _chapter
       }
