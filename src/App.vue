@@ -11,9 +11,7 @@ export default {
   name: 'App',
 
   created() {
-    this.$store.dispatch('account/getProfile').catch(error => {
-      console.log(error)
-    })
+    this.$store.dispatch('account/getProfile')
   },
 
   methods: {
@@ -33,11 +31,11 @@ export default {
         }
         return _collection
       },
-      set(_collection) {
+      set(value) {
         if (this.$route.params?.uuid) {
-          this.$store.commit('collection/SET_COLLECTION', _collection)
+          this.$store.commit('collection/SET_COLLECTION', value)
         } else if (this.$route.params?.privateId) {
-          this.$store.commit('collection/SET_PRIVATE_CHAPTER', _collection)
+          this.$store.commit('collection/SET_PRIVATE_CHAPTER', value)
         }
       }
     }
@@ -60,51 +58,20 @@ export default {
           .dispatch('collection/getCollection', to.params.uuid)
           .then(_collection => {
             this.collection = _collection
-            this.updatePageProperties()
           })
           .catch(() => {
             this.collection = this.$nullCollection
-            this.updatePageProperties()
           })
       } else if (to.params?.privateId) {
         this.$store.cache
           .dispatch('collection/getPrivateChapter', to.params.privateId)
-          .then(_collection => {
-            this.collection = this.$nullCollection
-            this.updatePageProperties()
-          })
-          .catch(() => {
-            this.collection = this.$nullCollection
-            this.updatePageProperties()
-          })
       }
+      this.updatePageProperties()
     },
     collection() {
-      if (
-        this.collection?.uuid &&
-        this.$route.params.collectionSlug &&
-        this.collection.slug !== this.$route.params.collectionSlug
-      ) {
+      if (this.collection?.uuid) {
         this.$router.replace({
           params: { collectionSlug: this.collection.slug }
-        })
-      }
-      if (
-        this.collection?.deleted === true &&
-        this.$route.params?.collectionSlug
-      ) {
-        this.$q.notify({
-          type: 'info',
-          timeout: 0,
-          message: 'This collection has been deleted. Only you can see it.',
-          icon: 'info',
-          multiLine: false,
-          actions: [
-            {
-              label: 'Dismiss',
-              color: 'white'
-            }
-          ]
         })
       }
       this.updatePageProperties()

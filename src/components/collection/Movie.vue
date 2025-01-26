@@ -1,5 +1,5 @@
 <template>
-  <div v-if="movie">
+  <div v-if="movie && chapter">
 
     <Breadcrumbs
       :collection="collection"
@@ -8,7 +8,7 @@
       :hideLinks="$route.params.privateId ? true : false"
     />
 
-    <PlyrPlayer v-if="!(this.$route.query?.fallback ?? false)" :chapter="chapter" style="width: 100%; max-width: 720px; min-width: 240px;" class="q-py-md" />
+    <PlyrPlayer :chapter="chapter" style="width: 100%; max-width: 720px; min-width: 240px;" class="q-py-md" />
 
     <q-card flat bordered style="width: 100%; max-width: 720px; min-width: 240px;">
       <q-card-section vertical>
@@ -27,7 +27,6 @@
                 <q-icon name="content_copy" color="accent" />
               </q-item-section>
             </q-item>
-
             <q-item clickable v-close-popup @click="copyLink('private')">
               <q-item-section avatar>
                 <q-avatar icon="public_off" color="accent" text-color="white" />
@@ -44,19 +43,16 @@
         </q-btn-dropdown>
         <div class="text-subtitle2 q-pl-xl">Published: {{ daysSince }}</div>
       </q-card-section>
-
       <q-separator inset v-if="chapter.description_sanitised" />
-
       <q-card-section vertical>
         <div class="text-body1" v-html="chapter.description_sanitised"></div>
       </q-card-section>
     </q-card>
 
-    <span v-if="$route.params.uuid">
-      <div class="q-pt-md text-h6" v-if="movie.chapters?.filter(ch => ch.id !== chapter.id)?.length > 0">
+    <span v-if="$route.params.uuid && movie.chapters?.filter(ch => ch.id !== chapter.id)?.length > 0">
+      <div class="q-pt-md text-h6">
         Related Content
       </div>
-
       <div class="row">
         <div
           class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
@@ -85,9 +81,7 @@
 import { defineAsyncComponent } from 'vue'
 import { Notify, copyToClipboard } from 'quasar'
 import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-
-dayjs.extend(relativeTime)
+import relativeTime from 'dayjs/plugin/relativeTime'; dayjs.extend(relativeTime)
 
 export default {
   name: 'ChapterIndex',
@@ -113,9 +107,6 @@ export default {
         } else if (this.$route.params.privateId) {
           _collection = this.$store.state.collection.privateChapter
         }
-        if (!_collection) {
-          this.$router.replace('/404')
-        }
         return _collection
       }
     },
@@ -129,9 +120,6 @@ export default {
         } else if (this.$route.params.privateId) {
           _movie = this.collection.movie
         }
-        if (!_movie) {
-          this.$router.replace('/404')
-        }
         return _movie
       }
     },
@@ -142,22 +130,22 @@ export default {
           _chapter = this.movie?.chapters.find(
             ch => ch.slug === this.$route.params.chapterSlug
           )
-          if (!_chapter) {
+          if (!_chapter && !this.$route.params.chapterSlug) {
             _chapter = this.movie?.chapters.find(ch => ch.main)
           }
-          if (!_chapter) {
+          if (!_chapter && !this.$route.params.chapterSlug) {
             _chapter = this.movie?.chapters[0]
+          }
+          if (_chapter) {
+            this.$router.replace({
+              params: { chapterSlug: _chapter.slug }
+            })
           }
         } else if (this.$route.params.privateId) {
           _chapter = this.collection.movie.chapter
         }
         if (!_chapter) {
           this.$router.replace('/404')
-        } else {
-          this.$router.replace({
-            params: { chapterSlug: _chapter.slug }
-          })
-          console.log(_chapter.slug)
         }
         return _chapter
       }
@@ -181,9 +169,6 @@ export default {
               timeout: 1000
             })
           })
-          .catch(() => {
-            // fail
-          })
       } else if (val === 'private') {
         copyToClipboard(window.location.origin + '/private/' + this.chapter.privateId)
           .then(() => {
@@ -193,9 +178,6 @@ export default {
               icon: 'content_paste',
               timeout: 1000
             })
-          })
-          .catch(() => {
-            // fail
           })
       }
     }

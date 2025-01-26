@@ -7,50 +7,48 @@
         :movie="this.$nullMovie"
         :chapter="this.$nullChapter"
       />
-
       <q-space />
-
       <q-btn-toggle
-          class="q-py-md"
-          v-model="selectedView"
-          no-caps
-          rounded
-          unelevated
-          toggle-color="primary"
-          color="white"
-          text-color="primary"
-          :options="[
-            {value: 'movies', slot: 'movie'},
-            {value: 'main', slot: 'main'},
-            {value: 'all', slot: 'all'}
-          ]"
-        >
+        class="q-py-md"
+        v-model="selectedView"
+        no-caps
+        rounded
+        unelevated
+        toggle-color="primary"
+        color="white"
+        text-color="primary"
+        :options="[
+          {value: 'movies', slot: 'movie'},
+          {value: 'main', slot: 'main'},
+          {value: 'all', slot: 'all'}
+        ]"
+      >
         <template v-slot:movie>
-            <div class="row items-center no-wrap">
-              <div class="text-center">
-                Movie Groups &nbsp;
-              </div>
-              <q-avatar color="accent" text-color="white" size="sm" square>{{ collection.movies.length }}</q-avatar>
+          <div class="row items-center no-wrap">
+            <div class="text-center">
+              Movie Groups &nbsp;
             </div>
-          </template>
-          <template v-slot:main>
-            <div class="row items-center no-wrap">
-              <div class="text-center">
-                Featured Media &nbsp;
-              </div>
-              <q-avatar color="accent" text-color="white" size="sm" square>{{ collection.movies.flatMap(movie => movie.chapters).filter(ch => ch.main).length }}</q-avatar>
+            <q-avatar color="accent" text-color="white" size="sm" square>{{ collection.movies.length }}</q-avatar>
+          </div>
+        </template>
+        <template v-slot:main>
+          <div class="row items-center no-wrap">
+            <div class="text-center">
+              Featured Media &nbsp;
             </div>
-          </template>
-          <template v-slot:all>
-            <div class="row items-center no-wrap">
-              <div class="text-center">
-                All Media &nbsp;
-              </div>
-              <q-avatar color="accent" text-color="white" size="sm" square>{{ collection.movies.flatMap(movie => movie.chapters).length }}</q-avatar>
+            <q-avatar color="accent" text-color="white" size="sm" square>{{ collection.movies.flatMap(movie => movie.chapters).filter(ch => ch.main).length }}</q-avatar>
+          </div>
+        </template>
+        <template v-slot:all>
+          <div class="row items-center no-wrap">
+            <div class="text-center">
+              All Media &nbsp;
             </div>
-          </template>
-        </q-btn-toggle>
-  </div>
+            <q-avatar color="accent" text-color="white" size="sm" square>{{ collection.movies.flatMap(movie => movie.chapters).length }}</q-avatar>
+          </div>
+        </template>
+      </q-btn-toggle>
+    </div>
 
     <div class="row" v-if="selectedView=='movies'">
       <div
@@ -64,28 +62,31 @@
           :to="'/' + collection.uuid + '/' + collection.slug + '/' + movie.slug"
         />
       </div>
-
       <div v-if="collection.movies.length === 0">
         This collection is empty!
       </div>
     </div>
+
     <div class="row q-pt-md" v-else>
-        <div
-          class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm"
-          v-for="item in collection.movies.flatMap(movie => movie.chapters.map(chapter => ({ chapter: chapter, movie: movie }))).filter((f) => selectedView == 'main' ? f.chapter.main : true).sort((b, a) => a.chapter.created.localeCompare(b.chapter.created))"
-          :key="item.chapter.id"
-          align="center"
-        >
+      <div
+        class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm"
+        v-for="item in collection.movies.flatMap(movie => movie.chapters.map(chapter => ({ chapter: chapter, movie: movie }))).filter((f) => selectedView == 'main' ? f.chapter.main : true).sort((b, a) => a.chapter.created.localeCompare(b.chapter.created))"
+        :key="item.chapter.id"
+        align="center"
+      >
         <ChapterPreview
-            :style="item.chapter.deleted ? 'filter: brightness(37.5%); max-width: 360px;' : 'max-width: 360px;'"
-            :collection="collection"
-            :movie="item.movie"
-            :chapter="item.chapter"
-            :to="'/' + collection.uuid + '/' + collection.slug + '/' + item.movie.slug + '/' + item.chapter.slug"
-            :detail=true
-          />
-        </div>
+          :style="item.chapter.deleted ? 'filter: brightness(37.5%); max-width: 360px;' : 'max-width: 360px;'"
+          :collection="collection"
+          :movie="item.movie"
+          :chapter="item.chapter"
+          :to="'/' + collection.uuid + '/' + collection.slug + '/' + item.movie.slug + '/' + item.chapter.slug"
+          :detail=true
+        />
       </div>
+      <div v-if="collection.movies.flatMap(movie => movie.chapters.map(chapter => ({ chapter: chapter, movie: movie }))).filter((f) => selectedView == 'main' ? f.chapter.main : true).length === 0">
+        This collection is empty!
+      </div>
+    </div>
 
   </div>
 </template>
