@@ -4,7 +4,7 @@
       <div v-for="c in collections" :key="c.id" class="q-py-xs">
         <q-btn flat :to="'/' + c.uuid + '/' + c.slug">
           <q-avatar>
-            <img :src="c.cover">
+            <img :src="c.cover" :alt="profile.name">
           </q-avatar>
           <div class="q-pl-sm">{{ c.title }}</div>
         </q-btn>

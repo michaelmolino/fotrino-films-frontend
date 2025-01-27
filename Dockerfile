@@ -1,12 +1,7 @@
 FROM node:lts-alpine
 WORKDIR /www/fotrino-films/
 COPY ./ ./
-RUN yarn install
-RUN yarn global add @quasar/cli
-RUN quasar build -m spa
-RUN yarn cache clean
-RUN rm -rf node_modules
+RUN yarn install && yarn global add @quasar/cli && quasar build -m spa && yarn cache clean && rm -rf node_modules && addgroup -S fotrino && adduser -S fotrino -G fotrino
 EXPOSE 4000
-RUN addgroup -S fotrino && adduser -S fotrino -G fotrino
 USER fotrino
-CMD quasar serve -p 4000 -H 0.0.0.0 /www/fotrino-films/dist/spa/ --history
+CMD ["quasar", "serve", "-p", "4000", "-H", "0.0.0.0", "/www/fotrino-films/dist/spa/", "--history"]

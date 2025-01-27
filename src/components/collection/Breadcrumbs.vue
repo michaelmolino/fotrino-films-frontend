@@ -3,7 +3,7 @@
     <q-item>
       <q-item-section side v-if="$q.screen.gt.xs">
         <q-avatar>
-          <img :src=this.collection.cover>
+          <img :src=this.collection.cover :alt="this.collection.title">
         </q-avatar>
       </q-item-section>
       <q-item-section>
