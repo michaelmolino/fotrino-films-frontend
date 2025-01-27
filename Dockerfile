@@ -1,7 +1,7 @@
 FROM node:lts-alpine
 WORKDIR /www/fotrino-films/
 COPY ./ ./
-RUN yarn install && yarn global add @quasar/cli && \
+RUN yarn install --ignore-scripts && yarn global add @quasar/cli && \
     quasar build -m spa && \
     yarn cache clean && rm -rf node_modules && \
     addgroup -S fotrino && adduser -S fotrino -G fotrino
