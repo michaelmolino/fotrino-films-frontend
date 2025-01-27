@@ -92,7 +92,9 @@ module.exports = function(/* ctx */) {
           '@javascript': path.resolve(__dirname, './src/javascript'),
           '@deps': path.resolve(__dirname, './node_modules')
         }
-      }
+      },
+
+      sourcemap: true
     },
 
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer

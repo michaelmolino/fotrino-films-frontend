@@ -54,6 +54,7 @@
 
 <script>
 import { defineAsyncComponent } from 'vue'
+import { LocalStorage } from 'quasar'
 
 export default {
   name: 'Collection-Root',
@@ -78,11 +79,20 @@ export default {
 
   data() {
     return {
-      selectedView: 'all'
+      view: null
     }
   },
 
   computed: {
+    selectedView: {
+      get() {
+        return this.view || LocalStorage.getItem('last-selected-view') || 'all'
+      },
+      set(val) {
+        LocalStorage.set('last-selected-view', val)
+        this.view = val
+      }
+    },
     collection: {
       get() {
         return this.$store.state.collection.collection

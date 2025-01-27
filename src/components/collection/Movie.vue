@@ -5,7 +5,7 @@
       :collection="collection"
       :movie="movie"
       :chapter="chapter.main ? this.$nullChapter : chapter"
-      :hideLinks="$route.params.privateId ? true : false"
+      :private="$route.params.privateId ? true : false"
     />
 
     <NothingText v-if="movie.chapters?.length === 0" />
