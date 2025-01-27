@@ -8,46 +8,11 @@
         :chapter="this.$nullChapter"
       />
       <q-space />
-      <q-btn-toggle
-        class="q-py-md"
-        v-model="selectedView"
-        no-caps
-        rounded
-        unelevated
-        toggle-color="primary"
-        color="white"
-        text-color="primary"
-        :options="[
-          {value: 'movies', slot: 'movie'},
-          {value: 'main', slot: 'main'},
-          {value: 'all', slot: 'all'}
-        ]"
-      >
-        <template v-slot:movie>
-          <div class="row items-center no-wrap">
-            <div class="text-center">
-              Movie Groups &nbsp;
-            </div>
-            <q-avatar color="accent" text-color="white" size="sm" square>{{ collection.movies.length }}</q-avatar>
-          </div>
-        </template>
-        <template v-slot:main>
-          <div class="row items-center no-wrap">
-            <div class="text-center">
-              Featured Media &nbsp;
-            </div>
-            <q-avatar color="accent" text-color="white" size="sm" square>{{ collection.movies.flatMap(movie => movie.chapters).filter(ch => ch.main).length }}</q-avatar>
-          </div>
-        </template>
-        <template v-slot:all>
-          <div class="row items-center no-wrap">
-            <div class="text-center">
-              All Media &nbsp;
-            </div>
-            <q-avatar color="accent" text-color="white" size="sm" square>{{ collection.movies.flatMap(movie => movie.chapters).length }}</q-avatar>
-          </div>
-        </template>
-      </q-btn-toggle>
+      <ViewToggle v-model="selectedView"
+        :movieCount="collection.movies.length"
+        :mainCount="collection.movies.flatMap(movie => movie.chapters).filter(ch => ch.main).length"
+        :allCount="collection.movies.flatMap(movie => movie.chapters).length"
+      />
     </div>
 
     <div class="row" v-if="selectedView=='movies'">
@@ -62,9 +27,7 @@
           :to="'/' + collection.uuid + '/' + collection.slug + '/' + movie.slug"
         />
       </div>
-      <div v-if="collection.movies.length === 0">
-        This collection is empty!
-      </div>
+      <NothingText v-if="collection.movies.length === 0" />
     </div>
 
     <div class="row q-pt-md" v-else>
@@ -83,9 +46,7 @@
           :detail=true
         />
       </div>
-      <div v-if="collection.movies.flatMap(movie => movie.chapters.map(chapter => ({ chapter: chapter, movie: movie }))).filter((f) => selectedView == 'main' ? f.chapter.main : true).length === 0">
-        This collection is empty!
-      </div>
+      <NothingText v-if="collection.movies.flatMap(movie => movie.chapters.map(chapter => ({ chapter: chapter, movie: movie }))).filter((f) => selectedView == 'main' ? f.chapter.main : true).length === 0" />
     </div>
 
   </div>
@@ -106,6 +67,12 @@ export default {
     ),
     ChapterPreview: defineAsyncComponent(() =>
       import('@components/collection/ChapterPreview.vue')
+    ),
+    ViewToggle: defineAsyncComponent(() =>
+      import('@components/collection/ViewToggle.vue')
+    ),
+    NothingText: defineAsyncComponent(() =>
+      import('@components/shared/NothingText.vue')
     )
   },
 

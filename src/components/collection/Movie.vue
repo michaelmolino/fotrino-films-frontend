@@ -1,5 +1,5 @@
 <template>
-  <div v-if="movie && chapter">
+  <div v-if="movie">
 
     <Breadcrumbs
       :collection="collection"
@@ -8,80 +8,40 @@
       :hideLinks="$route.params.privateId ? true : false"
     />
 
-    <PlyrPlayer :chapter="chapter" style="width: 100%; max-width: 720px; min-width: 240px;" class="q-py-md" />
+    <NothingText v-if="movie.chapters?.length === 0" />
 
-    <q-card flat bordered style="width: 100%; max-width: 720px; min-width: 240px;">
-      <q-card-section vertical>
-        <q-icon :name="$route.params.uuid ? 'public' : 'public_off'" size = "md" class="q-pr-sm" />
-        <span class="text-h6" v-text="chapter.title"></span>
-        <q-btn-dropdown dropdown-icon="share" class="q-pa-md float-right" flat>
-          <q-list>
-            <q-item v-if="$route.params.uuid" clickable v-close-popup @click="copyLink('public')">
-              <q-item-section avatar>
-                <q-avatar icon="public" color="accent" text-color="white" />
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>Share within this collection</q-item-label>
-              </q-item-section>
-              <q-item-section side>
-                <q-icon name="content_copy" color="accent" />
-              </q-item-section>
-            </q-item>
-            <q-item clickable v-close-popup @click="copyLink('private')">
-              <q-item-section avatar>
-                <q-avatar icon="public_off" color="accent" text-color="white" />
-              </q-item-section>
-              <q-item-section>
-                <q-item-label v-if="$route.params.uuid">Share only this video</q-item-label>
-                <q-item-label v-if="$route.params.privateId">Share this video</q-item-label>
-              </q-item-section>
-              <q-item-section side>
-                <q-icon name="content_copy" color="accent" />
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-btn-dropdown>
-        <div class="text-subtitle2 q-pl-xl">Published: {{ daysSince }}</div>
-      </q-card-section>
-      <q-separator inset v-if="chapter.description_sanitised" />
-      <q-card-section vertical>
-        <div class="text-body1" v-html="chapter.description_sanitised"></div>
-      </q-card-section>
-    </q-card>
+    <span v-else>
+      <PlyrPlayer :chapter="chapter" style="width: 100%; max-width: 720px; min-width: 240px;" class="q-py-md" />
 
-    <span v-if="$route.params.uuid && movie.chapters?.filter(ch => ch.id !== chapter.id)?.length > 0">
-      <div class="q-pt-md text-h6">
-        Related Content
-      </div>
-      <div class="row">
-        <div
-          class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
-          v-for="chapter in movie.chapters?.filter(ch => ch.id !== chapter.id)"
-          :key="chapter.id"
-        >
-          <ChapterPreview
-            :style="chapter.deleted ? 'filter: brightness(37.5%); max-width: 360px;' : 'max-width: 360px;'"
-            :collection="collection"
-            :movie="movie"
-            :chapter="chapter"
-            :to="'/' + collection.uuid + '/' + collection.slug + '/' + movie.slug + '/' + chapter.slug"
-          />
+      <ChapterDescription :chapter="chapter" />
+
+      <span v-if="$route.params.uuid && movie.chapters?.filter(ch => ch.id !== chapter.id)?.length > 0">
+        <div class="q-pt-md text-h6">
+          Related Content
         </div>
-      </div>
+        <div class="row">
+          <div
+            class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
+            v-for="chapter in movie.chapters?.filter(ch => ch.id !== chapter.id)"
+            :key="chapter.id"
+          >
+            <ChapterPreview
+              :style="chapter.deleted ? 'filter: brightness(37.5%); max-width: 360px;' : 'max-width: 360px;'"
+              :collection="collection"
+              :movie="movie"
+              :chapter="chapter"
+              :to="'/' + collection.uuid + '/' + collection.slug + '/' + movie.slug + '/' + chapter.slug"
+            />
+          </div>
+        </div>
+      </span>
     </span>
-
-    <div v-if="movie.chapters?.length === 0" class="q-pa-md">
-      This movie is empty!
-    </div>
 
   </div>
 </template>
 
 <script>
 import { defineAsyncComponent } from 'vue'
-import { Notify, copyToClipboard } from 'quasar'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'; dayjs.extend(relativeTime)
 
 export default {
   name: 'ChapterIndex',
@@ -95,6 +55,12 @@ export default {
     ),
     PlyrPlayer: defineAsyncComponent(() =>
       import('@components/collection/PlyrPlayer.vue')
+    ),
+    ChapterDescription: defineAsyncComponent(() =>
+      import('@components/collection/ChapterDescription.vue')
+    ),
+    NothingText: defineAsyncComponent(() =>
+      import('@components/shared/NothingText.vue')
     )
   },
 
@@ -117,6 +83,9 @@ export default {
           _movie = this.collection.movies.find(
             m => m.slug === this.$route.params.movieSlug
           )
+          if (this.collection.id && this.$route.params.movieSlug && !_movie) {
+            this.$router.replace('/404')
+          }
         } else if (this.$route.params.privateId) {
           _movie = this.collection.movie
         }
@@ -141,46 +110,16 @@ export default {
               params: { chapterSlug: _chapter.slug }
             })
           }
+          if (this.collection.id && this.$route.params.chapterSlug && !_chapter) {
+            this.$router.replace('/404')
+          }
         } else if (this.$route.params.privateId) {
           _chapter = this.collection.movie.chapter
         }
-        if (!_chapter) {
-          this.$router.replace('/404')
-        }
         return _chapter
-      }
-    },
-    daysSince: {
-      get() {
-        return dayjs(this.chapter.created).fromNow()
-      }
-    }
-  },
-
-  methods: {
-    copyLink(val) {
-      if (val === 'public') {
-        copyToClipboard(window.location.href)
-          .then(() => {
-            Notify.create({
-              message: 'URL copied to clipboard',
-              color: 'accent',
-              icon: 'content_paste',
-              timeout: 1000
-            })
-          })
-      } else if (val === 'private') {
-        copyToClipboard(window.location.origin + '/private/' + this.chapter.privateId)
-          .then(() => {
-            Notify.create({
-              message: 'URL copied to clipboard',
-              color: 'accent',
-              icon: 'content_paste',
-              timeout: 1000
-            })
-          })
       }
     }
   }
+
 }
 </script>
