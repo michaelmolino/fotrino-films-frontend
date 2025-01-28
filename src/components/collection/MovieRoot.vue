@@ -1,7 +1,7 @@
 <template>
   <div v-if="movie">
 
-    <Breadcrumbs
+    <BreadCrumbs
       :collection="collection"
       :movie="movie"
       :chapter="chapter.main ? this.$nullChapter : chapter"
@@ -44,11 +44,11 @@
 import { defineAsyncComponent } from 'vue'
 
 export default {
-  name: 'ChapterIndex',
+  name: 'MovieRoot',
 
   components: {
-    Breadcrumbs: defineAsyncComponent(() =>
-      import('@components/collection/Breadcrumbs.vue')
+    BreadCrumbs: defineAsyncComponent(() =>
+      import('@components/collection/BreadCrumbs.vue')
     ),
     ChapterPreview: defineAsyncComponent(() =>
       import('@components/collection/ChapterPreview.vue')
@@ -67,13 +67,7 @@ export default {
   computed: {
     collection: {
       get() {
-        let _collection = null
-        if (this.$route.params.uuid) {
-          _collection = this.$store.state.collection.collection
-        } else if (this.$route.params.privateId) {
-          _collection = this.$store.state.collection.privateChapter
-        }
-        return _collection
+        return this.$store.state.collection.collection
       }
     },
     movie: {
@@ -96,21 +90,17 @@ export default {
       get() {
         let _chapter = null
         if (this.$route.params.uuid) {
-          _chapter = this.movie?.chapters.find(
-            ch => ch.slug === this.$route.params.chapterSlug
-          )
-          if (!_chapter && !this.$route.params.chapterSlug) {
-            _chapter = this.movie?.chapters.find(ch => ch.main)
-          }
-          if (!_chapter && !this.$route.params.chapterSlug) {
-            _chapter = this.movie?.chapters[0]
-          }
-          if (_chapter) {
+          if (this.$route.params.chapterSlug) {
+            _chapter = this.movie?.chapters.find(
+              ch => ch.slug === this.$route.params.chapterSlug
+            )
+          } else if (!this.$route.params.chapterSlug) {
+            _chapter = this.movie?.chapters.find(ch => ch.main) || this.movie?.chapters[0]
             this.$router.replace({
               params: { chapterSlug: _chapter.slug }
             })
           }
-          if (this.collection.id && this.$route.params.chapterSlug && !_chapter) {
+          if (this.collection.id && !_chapter) {
             this.$router.replace('/404')
           }
         } else if (this.$route.params.privateId) {

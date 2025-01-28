@@ -12,9 +12,10 @@ export async function getPrivateChapter(context, privateChapter) {
     collection.movie.chapter.description_sanitised = DOMPurify.sanitize(collection.movie.chapter.description_unsafe, {
       ALLOWED_TAGS: ['br', 'i', 'p', 'strong']
     })
-    context.commit('SET_PRIVATE_CHAPTER', collection)
+    context.commit('SET_COLLECTION', collection)
+    return Promise.resolve(collection)
   } catch (error) {
-    context.commit('SET_PRIVATE_CHAPTER', nullChapter)
+    context.commit('SET_COLLECTION', nullChapter)
     return await Promise.reject(error)
   }
 }

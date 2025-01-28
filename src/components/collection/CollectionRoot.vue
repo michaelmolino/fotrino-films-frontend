@@ -2,7 +2,7 @@
   <div v-if="collection.uuid">
 
     <div class="row">
-      <Breadcrumbs
+      <BreadCrumbs
         :collection="collection"
         :movie="this.$nullMovie"
         :chapter="this.$nullChapter"
@@ -57,11 +57,11 @@ import { defineAsyncComponent } from 'vue'
 import { LocalStorage } from 'quasar'
 
 export default {
-  name: 'Collection-Root',
+  name: 'CollectionRoot',
 
   components: {
-    Breadcrumbs: defineAsyncComponent(() =>
-      import('@components/collection/Breadcrumbs.vue')
+    BreadCrumbs: defineAsyncComponent(() =>
+      import('@components/collection/BreadCrumbs.vue')
     ),
     MoviePoster: defineAsyncComponent(() =>
       import('@components/collection/MoviePoster.vue')

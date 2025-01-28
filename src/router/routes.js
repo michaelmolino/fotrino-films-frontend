@@ -1,7 +1,7 @@
 const routes = [
   {
     path: '',
-    component: () => import('@components/MainLayout.vue'),
+    component: () => import('@layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('@components/pages/Home.vue') },
       {
@@ -20,31 +20,31 @@ const routes = [
   {
     path:
       '/:uuid([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})/:collectionSlug([0-9a-zA-Z-]+)',
-    component: () => import('@components/MainLayout.vue'),
+    component: () => import('@layouts/MainLayout.vue'),
     children: [
       {
         path: '',
-        component: () => import('@components/collection/Collection.vue')
+        component: () => import('@components/collection/CollectionRoot.vue')
       },
       {
         path: ':movieSlug([0-9a-zA-Z-]+)/:chapterSlug([0-9a-zA-Z-]+)?',
-        component: () => import('@components/collection/Movie.vue')
+        component: () => import('@components/collection/MovieRoot.vue')
       }
     ]
   },
   {
     path: '/private',
-    component: () => import('@components/MainLayout.vue'),
+    component: () => import('@layouts/MainLayout.vue'),
     children: [
       {
         path: ':privateId([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})',
-        component: () => import('@components/collection/Movie.vue')
+        component: () => import('@components/collection/MovieRoot.vue')
       }
     ]
   },
   {
     path: '/dashboard',
-    component: () => import('@components/MainLayout.vue'),
+    component: () => import('@layouts/MainLayout.vue'),
     children: [
       {
         path: '',

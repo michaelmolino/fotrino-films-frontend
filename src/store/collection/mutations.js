@@ -10,10 +10,6 @@ export function SET_CHAPTER(state, chapter) {
   state.chapter = chapter
 }
 
-export function SET_PRIVATE_CHAPTER(state, privateChapter) {
-  state.privateChapter = privateChapter
-}
-
 export function SET_COLLECTIONS(state, collections) {
   state.collections = collections
 }

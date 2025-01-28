@@ -10,10 +10,6 @@ export function chapter(state) {
   return state.chapter
 }
 
-export function privateChapter(state) {
-  return state.privateChapter
-}
-
 export function collections(state) {
   return state.collections
 }

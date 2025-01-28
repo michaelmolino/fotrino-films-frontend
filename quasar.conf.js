@@ -88,6 +88,7 @@ module.exports = function(/* ctx */) {
           ...cfg.resolve.alias, // This adds the existing alias
 
           // Add your own alias like this
+          '@layouts': path.resolve(__dirname, './src/layouts'),
           '@components': path.resolve(__dirname, './src/components'),
           '@javascript': path.resolve(__dirname, './src/javascript'),
           '@deps': path.resolve(__dirname, './node_modules')
