@@ -47,7 +47,7 @@ export default {
           to: '/' + this.collection.uuid + '/' + this.collection.slug
         })
 
-        if (this.movie.id !== null) {
+        if (this.movie?.id) {
           _breadcrumbs.push({
             id: 1,
             label: this.movie.title,
@@ -61,7 +61,7 @@ export default {
           })
         }
 
-        if (this.movie.id !== null && this.chapter.id !== null) {
+        if (this.movie?.id && this.chapter?.id) {
           _breadcrumbs.push({
             id: 2,
             label: this.chapter.title,

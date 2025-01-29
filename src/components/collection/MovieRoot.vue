@@ -4,7 +4,7 @@
     <BreadCrumbs
       :collection="collection"
       :movie="movie"
-      :chapter="chapter.main ? this.$nullChapter : chapter"
+      :chapter="chapter.main ? null : chapter"
       :private="$route.params.privateId ? true : false"
     />
 
@@ -74,14 +74,14 @@ export default {
       get() {
         let _movie = null
         if (this.$route.params.uuid) {
-          _movie = this.collection.movies.find(
+          _movie = this.collection?.movies.find(
             m => m.slug === this.$route.params.movieSlug
           )
-          if (this.collection.id && this.$route.params.movieSlug && !_movie) {
+          if (this.collection?.id && this.$route.params.movieSlug && !_movie) {
             this.$router.replace('/404')
           }
         } else if (this.$route.params.privateId) {
-          _movie = this.collection.movie
+          _movie = this.collection?.movie
         }
         return _movie
       }

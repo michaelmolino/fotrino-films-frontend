@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="profile.id">
+    <div v-if="profile?.id">
       <div v-for="c in collections" :key="c.id" class="q-py-xs">
         <q-btn flat :to="'/' + c.uuid + '/' + c.slug">
           <q-avatar>

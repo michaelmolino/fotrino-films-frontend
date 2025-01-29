@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'; dayjs.extend(relativeTime)
+import DOMPurify from 'dompurify'
 
 export function getMetaData(route, collection) {
   let movie = null
@@ -23,19 +24,19 @@ export function getMetaData(route, collection) {
       chapter = movie?.chapters.find(ch => ch.main)
     }
     title = chapter?.title
-    description = chapter?.description_text
+    description = sanitizeText(chapter?.description_unsafe)
     image = chapter?.preview
     type = 'video.other'
   }
 
   if (route?.params.privateId) {
     title = collection?.movie?.chapter?.title
-    description = collection?.movie?.chapter?.description_text
+    description = sanitizeText(collection?.movie?.chapter?.description_unsafe)
     image = collection?.movie?.chapter?.preview
     type = 'video.other'
   }
 
-  if (title !== null) {
+  if (title) {
     title += ' | Fotrino Films'
   } else {
     title = 'Fotrino Films'
@@ -71,4 +72,15 @@ export function getMetaData(route, collection) {
 
 export function daysSince(start) {
   return dayjs(start).fromNow()
+}
+
+export function sanitizeHtml(unsafe) {
+  const ALLOWED_TAGS = ['br', 'i', 'p', 'strong']
+  return DOMPurify.sanitize(unsafe, { ALLOWED_TAGS: ALLOWED_TAGS })
+}
+
+export function sanitizeText(unsafe) {
+  const ALLOWED_TAGS = []
+  // const text = unsafe.replace(/<br[^>]*>/gi, '\n').replace(/<\/?p[^>]*>/gi, '\n')
+  return DOMPurify.sanitize(unsafe, { ALLOWED_TAGS: ALLOWED_TAGS })
 }

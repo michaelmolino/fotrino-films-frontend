@@ -24,12 +24,6 @@ export default {
     this.$store.dispatch('account/getProfile')
   },
 
-  methods: {
-    updatePageProperties(r, c) {
-      this.metaData = getMetaData(r, c)
-    }
-  },
-
   computed: {
     collection: {
       get() {
@@ -52,21 +46,23 @@ export default {
           .dispatch('collection/getCollection', to.params.uuid)
           .then(_collection => {
             this.collection = _collection
-            this.updatePageProperties(this.$route, _collection)
+            this.metaData = getMetaData(this.$route, _collection)
           })
           .catch(() => {
-            this.collection = this.$nullCollection
+            this.collection = null
           })
       } else if (to.params?.privateId) {
         this.$store.cache
           .dispatch('collection/getPrivateChapter', to.params.privateId)
           .then(_collection => {
             this.collection = _collection
-            this.updatePageProperties(this.$route, _collection)
+            this.metaData = getMetaData(this.$route, _collection)
           })
           .catch(() => {
-            this.collection = this.$nullCollection
+            this.collection = null
           })
+      } else {
+        this.metaData = getMetaData(this.$route, null)
       }
     }
   },

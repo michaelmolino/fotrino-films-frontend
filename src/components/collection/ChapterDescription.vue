@@ -32,16 +32,16 @@
         </q-btn-dropdown>
         <div class="text-subtitle2 q-pl-xl">Published: {{ daysSince }}</div>
       </q-card-section>
-      <q-separator inset v-if="chapter.description_sanitised" />
+      <q-separator inset v-if="description_safe" />
       <q-card-section vertical>
-        <div class="text-body1" v-html="chapter.description_sanitised"></div>
+        <div class="text-body1" v-html="description_safe"></div>
       </q-card-section>
     </q-card>
 </template>
 
 <script>
 import { Notify, copyToClipboard } from 'quasar'
-import { daysSince } from '@javascript/library.js'
+import { daysSince, sanitizeHtml } from '@javascript/library.js'
 
 export default {
   name: 'ChapterDescription',
@@ -54,6 +54,11 @@ export default {
     daysSince: {
       get() {
         return daysSince(this.chapter.created)
+      }
+    },
+    description_safe: {
+      get() {
+        return sanitizeHtml(this.chapter.description_unsafe)
       }
     }
   },

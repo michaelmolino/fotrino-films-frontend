@@ -72,7 +72,7 @@
       />
 
       <q-btn-dropdown
-        v-if="!profile.id"
+        v-if="!profile?.id"
         icon="account_box"
         :label="$q.screen.gt.sm ? 'Sign Up/Login' : ''"
         flat
@@ -102,7 +102,7 @@
         </span>
       </q-btn-dropdown>
       <q-btn-dropdown
-        v-if="profile.id"
+        v-if="profile?.id"
         :icon="'img:' + profile.profile_pic"
         :label="$q.screen.gt.sm ? 'Account' : ''"
         flat

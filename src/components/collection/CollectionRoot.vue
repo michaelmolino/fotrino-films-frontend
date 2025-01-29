@@ -1,11 +1,11 @@
 <template>
-  <div v-if="collection.uuid">
+  <div v-if="collection?.uuid">
 
     <div class="row">
       <BreadCrumbs
         :collection="collection"
-        :movie="this.$nullMovie"
-        :chapter="this.$nullChapter"
+        :movie=null
+        :chapter=null
       />
       <q-space />
       <ViewToggle v-model="selectedView"
@@ -79,14 +79,14 @@ export default {
 
   data() {
     return {
-      view: null
+      view: LocalStorage.getItem('last-selected-view') || 'all'
     }
   },
 
   computed: {
     selectedView: {
       get() {
-        return this.view || LocalStorage.getItem('last-selected-view') || 'all'
+        return this.view
       },
       set(val) {
         LocalStorage.set('last-selected-view', val)

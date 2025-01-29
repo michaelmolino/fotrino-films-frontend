@@ -1,5 +1,4 @@
 import { api } from 'boot/axios'
-import { nullProfile } from 'boot/global'
 
 export function getProfile(context) {
   return api
@@ -8,7 +7,7 @@ export function getProfile(context) {
       context.commit('SET_PROFILE', response.data)
     })
     .catch(error => {
-      context.commit('SET_PROFILE', nullProfile)
+      context.commit('SET_PROFILE', null)
       return Promise.reject(error)
     })
 }
