@@ -27,11 +27,10 @@ export default {
   computed: {
     collection: {
       get() {
-        let _collection = null
         if (this.$route.params?.uuid || this.$route.params.privateId) {
-          _collection = this.$store.state.collection.collection
+          return this.$store.state.collection.collection
         }
-        return _collection
+        return null
       },
       set(value) {
         this.$store.commit('collection/SET_COLLECTION', value)
@@ -64,14 +63,14 @@ export default {
       } else {
         this.metaData = getMetaData(this.$route, null)
       }
-    }
-  },
+    },
 
-  collection() {
-    if (this.collection?.uuid) {
-      this.$router.replace({
-        params: { collectionSlug: this.collection.slug }
-      })
+    collection(val1, val2) {
+      if (this.collection?.uuid) {
+        this.$router.replace({
+          params: { collectionSlug: this.collection.slug }
+        })
+      }
     }
   }
 }
