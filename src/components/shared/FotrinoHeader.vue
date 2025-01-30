@@ -122,17 +122,6 @@
         />
         <q-separator />
         <q-btn
-          to="/profile"
-          align="left"
-          flat
-          no-caps
-          icon="account_box"
-          label="Profile"
-          size="md"
-          class="fit"
-        />
-        <q-separator />
-        <q-btn
           :href="logout"
           align="left"
           flat
