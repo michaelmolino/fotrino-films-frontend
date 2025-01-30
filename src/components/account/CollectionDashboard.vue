@@ -1,23 +1,23 @@
 <template>
   <div>
       <q-card v-if="profile?.id" flat style="width: 100%; max-width: 750px;">
-        <q-card-section horizontal>
+        <q-card-section :horizontal="$q.screen.gt.sm ? true : false">
           <q-card-section>
-            <div class="text-h6 text-center">
+            <div :class="$q.screen.gt.sm ? 'text-h6 text-center' : 'text-h6'">
               <q-icon :name="'fab fa-' + profile.identity_provider" /> {{ profile.name }}
             </div>
-            <img :src="profile.profile_pic" :alt="profile.name" class="q-pa-md" />
-            <div class="text-subtitle2 text-center">
+            <img :src="profile.profile_pic" :alt="profile.name" class="q-pa-md text-center" />
+            <div :class="$q.screen.gt.sm ? 'text-h6 text-center' : 'text-h6'">
               <q-icon name="fas fa-inbox" /> {{ profile.email }}
             </div>
           </q-card-section>
           <q-card-section>
-            <div class="text-h6 text-center">
+            <div :class="$q.screen.gt.sm ? 'text-h6 text-center' : 'text-h6'">
               <q-icon name="fas fa-layer-group" /> Collections
             </div>
             <div v-for="c in collections" :key="c.id" class="q-py-xs">
-              <q-btn flat :to="'/' + c.uuid + '/' + c.slug">
-                <q-avatar>
+              <q-btn flat :to="'/' + c.uuid + '/' + c.slug" no-wrap>
+                <q-avatar v-if="$q.screen.gt.xs ? true : false" >
                   <img :src="c.cover" :alt="profile.name">
                 </q-avatar>
                 <div class="q-pl-sm">{{ c.title }}</div>
