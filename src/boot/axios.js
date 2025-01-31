@@ -13,11 +13,6 @@ export default boot(({ app, router, store }) => {
     return req
   })
 
-  axios.interceptors.request.use(req => {
-    Loading.show()
-    return req
-  })
-
   api.interceptors.response.use(
     function(response) {
       Loading.hide()
@@ -64,20 +59,7 @@ export default boot(({ app, router, store }) => {
     }
   )
 
-  axios.interceptors.response.use(
-    function(response) {
-      Loading.hide()
-      return response
-    },
-
-    function(error) {
-      Loading.hide()
-      return Promise.reject(error)
-    }
-  )
-
-  app.config.globalProperties.$axios = axios
   app.config.globalProperties.$api = api
 })
 
-export { axios, api }
+export { api }
