@@ -1,33 +1,31 @@
 <template>
-  <div>
-      <q-card v-if="profile?.id" flat style="width: 100%; max-width: 750px;">
-        <q-card-section :horizontal="$q.screen.gt.sm ? true : false">
-          <q-card-section>
-            <div :class="$q.screen.gt.sm ? 'text-h6 text-center ellipsis' : 'text-h6 ellipsis'" style="max-width: 300px;">
-              <q-icon :name="'fab fa-' + profile.identity_provider" /> {{ profile.name }}
-            </div>
-            <img :src="profile.profile_pic" :alt="profile.name" class="q-pa-md text-center" />
-            <div :class="$q.screen.gt.sm ? 'text-h6 text-center ellipsis' : 'text-h6 ellipsis'" style="max-width: 300px;">
-              <q-icon name="fas fa-inbox" /> {{ profile.email }}
-            </div>
-          </q-card-section>
-          <q-card-section>
-            <div :class="$q.screen.gt.sm ? 'text-h6 text-center' : 'text-h6'">
-              <q-icon name="fas fa-layer-group" /> Collections
-            </div>
-            <div v-for="c in collections" :key="c.id" class="q-py-xs">
-              <q-btn flat class="fit" :to="'/' + c.uuid + '/' + c.slug" align="left">
-                <q-avatar v-if="$q.screen.gt.xs ? true : false" >
-                  <img :src="c.cover" :alt="profile.name">
-                </q-avatar>
-                <div class="q-pl-md ellipsis">{{ c.title }}</div>
-              </q-btn>
-            </div>
-          </q-card-section>
-        </q-card-section>
-      </q-card>
+  <span>
+    <div v-if="profile?.id" class="q-pa-lg">
+      <q-img :src="profile.profile_pic" style="width: 250px">
+        <q-badge class="bg-accent q-pa-md z-top" floating transparent>
+          <q-icon :name="'fab fa-' + profile.identity_provider" />
+        </q-badge>
+        <div class="absolute-bottom text-center">
+          <div class="ellipsis">{{ profile.name }}</div>
+          <div class="ellipsis">{{ profile.email }}</div>
+        </div>
+      </q-img>
+      <span v-if="collections.length">
+        <div class="text-h6 q-pt-md">
+          Collections
+        </div>
+        <div v-for="c in collections" :key="c.id" class="q-py-xs">
+          <q-btn flat :to="'/' + c.uuid + '/' + c.slug" align="left" style="width: 100%; max-width: 480px" no-wrap>
+            <q-avatar>
+              <img :src="c.cover" :alt="profile.name">
+            </q-avatar>
+            <div class="q-pl-md ellipsis">{{ c.title }}</div>
+          </q-btn>
+        </div>
+      </span>
+    </div>
     <NothingText v-if="!profile?.id || collections.length === 0" />
-  </div>
+  </span>
 </template>
 
 <script>
@@ -56,9 +54,7 @@ export default {
   },
 
   created: function() {
-    this.$store.cache.dispatch('collection/getCollections').catch(error => {
-      console.log(error)
-    })
+    this.$store.cache.dispatch('collection/getCollections').catch(error => { console.log(error) })
   }
 }
 </script>

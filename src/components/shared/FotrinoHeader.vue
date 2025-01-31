@@ -111,12 +111,23 @@
       >
         <q-separator />
         <q-btn
-          to="/dashboard"
+          to="/account/dashboard"
           align="left"
           flat
           no-caps
           icon="dashboard"
           label="Dashboard"
+          size="md"
+          class="fit"
+        />
+        <q-separator />
+        <q-btn
+          to="/account/upload"
+          align="left"
+          flat
+          no-caps
+          icon="upload"
+          label="Upload Media"
           size="md"
           class="fit"
         />
