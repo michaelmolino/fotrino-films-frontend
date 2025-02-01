@@ -46,9 +46,9 @@ export function getCollection(context, uuid) {
     })
 }
 
-export function getPrivateChapter(context, privateChapter) {
+export function getPrivateChapter(context, privateId) {
   return api
-    .get('/collections/chapters/private/' + privateChapter)
+    .get('/collections/chapters/private/' + privateId)
     .then(response => {
       const collection = response.data
       context.commit('SET_COLLECTION', collection)
