@@ -2,7 +2,7 @@
   <span>
     <div v-if="profile?.id" class="q-pa-lg">
       <q-img :src="profile.profile_pic" style="width: 250px">
-        <q-badge class="bg-accent q-pa-md z-top" floating transparent>
+        <q-badge class="bg-accent q-pa-md" floating transparent>
           <q-icon :name="'fab fa-' + profile.identity_provider" />
         </q-badge>
         <div class="absolute-bottom text-center">
@@ -12,7 +12,7 @@
       </q-img>
       <span v-if="collections.length">
         <div class="text-h6 q-pt-md">
-          Collections
+          Collections <q-btn flat round icon="fas fa-square-plus" size="sm" to="/account/upload" ><q-tooltip :offset="[10, 10]">Create a new collection</q-tooltip></q-btn>
         </div>
         <div v-for="c in collections" :key="c.id" class="q-py-xs">
           <q-btn flat :to="'/' + c.uuid + '/' + c.slug" align="left" style="width: 100%; max-width: 480px" no-wrap>
