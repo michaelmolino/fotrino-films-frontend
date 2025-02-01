@@ -1,7 +1,7 @@
 <template>
     <span>
         <div v-if="profile?.id" class="q-pa-lg">
-            <div v-if="!forceWShow && $q.platform.is.mobile">
+            <div v-if="!forceShow && $q.platform.is.mobile">
                 <q-icon name="fas fa-mobile-screen-button" class="q-px-sm" size="sm" /> Mobile upload is not supported and is a longer term goal. Please login from a desktop browser. You can still see the Apple Mac instructions if you really want to.<p />
                 <q-btn flat icon="fas fa-exclamation-triangle" size="md" label="Show me!" @click="forceShow = true" />
             </div>
