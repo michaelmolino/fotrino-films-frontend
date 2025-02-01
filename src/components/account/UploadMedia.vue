@@ -39,7 +39,7 @@
                 </div>
                 <div class="q-pa-sm">Create a folder for your project such as <span class="inline-token">mkdir ~/fotrino/VideoUpload</span>.</div>
                 <div class="q-pa-sm">
-                    Add the following media files to your new folder. The naming is important; you'll be able to set the display names later. This will create a new selection. Support to add a new chapter to an existing movie or a new movie to an existing collection will be added later.
+                    Add the following media files to your new folder. The naming is important; you'll be able to set the display names later. This will create a new collection. Support to add a new chapter to an existing movie or a new movie to an existing collection will be added later.
                     <q-list style="width: 100%; max-width: 480px;" dense bordered class="q-my-md">
                         <q-item>
                             <q-item-section class="text-weight-bold text-center">Description</q-item-section>
@@ -82,10 +82,10 @@
                     <QCodeBlock
                         :theme="$q.dark.isActive ? 'nightOwl' : 'github'"
                         :code="code2"
-                        language="bash"
+                        language="json"
                         numbered
                         showHeader
-                        file-name="Media Description"
+                        file-name="Collection Descriptor"
                         style="width: 100%;"
                     />
                     <div class="q-pa-sm">
