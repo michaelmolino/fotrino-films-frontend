@@ -41,7 +41,7 @@
                 <div class="q-pa-sm">Create a folder for your project such as <span class="inline-code">mkdir -p ~/fotrino/Collection</span>.</div>
                 <div class="q-pa-sm">
                     Add the following media files to your new folder. The naming is important; you'll be able to set the display names later. This will create a new collection. Support to add a new chapter to an existing movie or a new movie to an existing collection will be added later.
-                    <q-list style="width: 100%; max-width: 480px;" dense bordered class="q-my-md">
+                    <q-list style="width: 100%; max-width: 720px;" dense bordered class="q-my-md">
                         <q-item>
                             <q-item-section class="text-weight-bold text-center">Description</q-item-section>
                             <q-item-section class="text-weight-bold text-center">Aspect Ratio</q-item-section>
@@ -50,12 +50,12 @@
                         <q-item>
                             <q-item-section>Collection Cover</q-item-section>
                             <q-item-section>Square</q-item-section>
-                            <q-item-section><span class="inline-code">Collection.jpg</span></q-item-section>
+                            <q-item-section><span class="inline-code">Cover.(jpg|png)</span></q-item-section>
                         </q-item>
                         <q-item>
                             <q-item-section>Movie Poster</q-item-section>
                             <q-item-section>2:3 (portrait)</q-item-section>
-                            <q-item-section><span class="inline-code">Movie.jpg</span></q-item-section>
+                            <q-item-section><span class="inline-code">Poster.(jpg|png)</span></q-item-section>
                         </q-item>
                         <q-item>
                             <q-item-section>Media File 1</q-item-section>
@@ -65,7 +65,7 @@
                         <q-item>
                             <q-item-section>Media Preview 1</q-item-section>
                             <q-item-section>16:9 (landscape)</q-item-section>
-                            <q-item-section><span class="inline-code">Media1.jpg</span></q-item-section>
+                            <q-item-section><span class="inline-code">Preview1.(jpg|png)</span></q-item-section>
                         </q-item>
                         <q-item>
                             <q-item-section>Media File 2 (...)</q-item-section>
@@ -75,11 +75,11 @@
                         <q-item>
                             <q-item-section>Media Preview 2 (...)</q-item-section>
                             <q-item-section>16:9 (landscape)</q-item-section>
-                            <q-item-section><span class="inline-code">Media2.jpg</span></q-item-section>
+                            <q-item-section><span class="inline-code">Preview2.(jpg|png)</span></q-item-section>
                         </q-item>
                     </q-list>
                 </div>
-                <div class="q-pa-sm">Add a file to your folder called <span class="inline-code">Collection.json</span> with the following contents and customise as appropriate.</div>
+                <div class="q-pa-sm">Add a file to your folder called <span class="inline-code">Collection.json</span> with the following contents and customise as appropriate. Do not manually set any <span class="inline-code">$VARIABLE</span> s, these will be handled automatically. If you add elements to an array, increment the variable's number.</div>
                     <QCodeBlock
                         :theme="$q.dark.isActive ? 'nightOwl' : 'github'"
                         :code="code2"
@@ -102,7 +102,9 @@
                       The first time you run the above script, you'll need to provide an API token. Please keep it secret. It can be used to access your account.
                     </div>
                     <div class="q-pa-sm">
-                      <q-btn flat icon="fas fa-key" size="sm" label="Copy secret token to clipboard!" @click="getToken()" />
+                      <q-btn :disabled="$q.platform.is.mobile ? true : false" flat icon="fas fa-key" size="sm" label="Copy secret token to clipboard!" @click="getToken()">
+                        <q-tooltip v-if="$q.platform.is.mobile">Token generation disabled on mobile</q-tooltip>
+                      </q-btn>
                     </div>
             </div>
         </div>
@@ -130,31 +132,27 @@ export default {
       forceShow: false,
       code1: `xcode-select --install
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" # Requires sudo
-brew install coreutils python ffmpeg graphicsmagick gnu-tar git exiftool curl mediainfo
+brew install coreutils python ffmpeg graphicsmagick gnu-tar git exiftool curl mediainfo jq
 git clone https://github.com/vincentbernat/video2hls.git ~/Workspace/video2hls # Credit to Vincent Bernat
 git clone https://github.com/michaelmolino/fotrino-films-uploader.git ~/Workspace/fotrino-films-uploader # This is still under development`,
       code2: `{
   "title": "My New Collection",
-  "created": "2025-01-01T12:00:00",
+  "cover": "$COVER",
+  "created": "2025-01-01",
   "movies": [
     {
       "title": "My Movie Title",
       "subtitle": "There can be multiple media files (chapters) within a movie",
-      "created": "2025-01-01T12:00:00",
+      "poster": "$POSTER1",
+      "created": "2025-01-01",
       "chapters": [
         {
           "title": "My Media Title",
           "description_unsafe": "You can use some HTML tags here - p, br, strong, i.",
+          "preview": "$PREVIEW1",
           "type": "application/vnd.apple.mpegurl",
           "main": true,
-          "created": "2025-01-01T12:00:00"
-        },
-        {
-          "title": "Another Media Title",
-          "description_unsafe": "Add or delete from this array as appropriate.",
-          "type": "application/vnd.apple.mpegurl",
-          "main": true,
-          "created": "2025-01-01T12:00:00"
+          "created": "2025-01-01"
         }
       ]
     }
