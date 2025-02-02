@@ -60,7 +60,7 @@
                         <q-item>
                             <q-item-section>Media File 1</q-item-section>
                             <q-item-section>16:9 (landscape)</q-item-section>
-                            <q-item-section><span class="inline-code">Media1.mp4</span></q-item-section>
+                            <q-item-section><span class="inline-code">Media1.(mp4|mov)</span></q-item-section>
                         </q-item>
                         <q-item>
                             <q-item-section>Media Preview 1</q-item-section>
@@ -70,7 +70,7 @@
                         <q-item>
                             <q-item-section>Media File 2 (...)</q-item-section>
                             <q-item-section>16:9 (landscape)</q-item-section>
-                            <q-item-section><span class="inline-code">Media2.mp4</span></q-item-section>
+                            <q-item-section><span class="inline-code">Media2.(mp4|mov)</span></q-item-section>
                         </q-item>
                         <q-item>
                             <q-item-section>Media Preview 2 (...)</q-item-section>
