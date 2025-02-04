@@ -65,7 +65,7 @@ export default {
       }
     },
 
-    collection(val1, val2) {
+    collection() {
       if (this.collection?.uuid) {
         this.$router.replace({
           params: { collectionSlug: this.collection.slug }
