@@ -45,7 +45,7 @@ export default boot(({ app, router, store }) => {
         type: 'negative',
         timeout: 0,
         message: msg,
-        icon: 'warning',
+        icon: 'fas fa-triangle-exclamation',
         multiLine: false,
         actions: [
           {

@@ -9,7 +9,7 @@
       <q-item-section>
         <q-breadcrumbs>
         <template v-slot:separator>
-          <q-icon size="1.5em" name="chevron_right" color="primary" />
+          <q-icon size="1.5em" name="fas fa-chevron-right" color="primary" />
         </template>
         <q-breadcrumbs-el
           v-for="location in breadcrumbs"

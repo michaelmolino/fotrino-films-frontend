@@ -3,7 +3,7 @@
     <div class="row no-wrap">
       <q-btn
         flat
-        icon="copyright"
+        icon="far fa-copyright"
         :label="$q.screen.gt.xs ? year + ' Michael Molino' : year"
         :ripple="false"
         class="no-pointer-events"
@@ -11,7 +11,7 @@
       <q-space />
       <q-btn
         flat
-        icon="policy"
+        icon="fas fa-shield-halved"
         :label="$q.screen.gt.xs ? 'Terms/Privacy' : ''"
         to="/terms"
       />

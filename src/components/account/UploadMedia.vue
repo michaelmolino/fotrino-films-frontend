@@ -1,119 +1,94 @@
 <template>
-    <span>
-        <div v-if="profile?.id" class="q-pa-lg">
-            <div v-if="!forceShow && $q.platform.is.mobile">
-                <q-icon name="fas fa-mobile-screen-button" class="q-px-sm" size="sm" /> Mobile upload is not supported and is a longer term goal. Please login from a desktop browser. You can still see the Apple Mac instructions if you really want to.<p />
-                <q-btn flat icon="fas fa-exclamation-triangle" size="md" label="Show me!" @click="forceShow = true" />
+  <div v-if="profile?.id">
+    <div v-if="!$q.platform.is.mobile && !$q.platform.is.desktop">
+      Unsupported platform.
+    </div>
+    <div v-if="$q.platform.is.mobile">
+      Mobile upload is not supported.
+    </div>
+    <div v-if="$q.platform.is.desktop">
+      <q-item class="q-pa-md">
+          <q-item-section side>
+              <q-icon name="fab fa-apple" size="xl" />
+          </q-item-section>
+          <q-item-section>
+              <q-item-label class="text-h4">Upload for Apple Mac</q-item-label>
+              <q-item-label>Uploading media is an advanced operation; you should be comfortable using the terminal.</q-item-label>
+          </q-item-section>
+      </q-item>
+      <q-stepper
+        v-model="step"
+        ref="stepper"
+        flat
+        bordered
+        active-color="info"
+        :inactive-color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
+        done-color="positive"
+      >
+        <q-step
+          :name="1"
+          title="Collection"
+          icon="fas fa-video"
+          :done="step > 1"
+        >
+          <div class="row">
+            <div class="q-pa-md" style="width: 50%;">
+              <q-select outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" label="Collection"
+                v-model="collectionModel" :options="collections.map(({ uuid, title }) => ({ value: uuid, label: title })).concat({ value: 0, label: 'New...' })"
+              />
             </div>
-            <div v-if="!forceShow && ($q.platform.is.win || $q.platform.is.linux)" class="q-py-sm">
-                <q-icon :name="$q.platform.is.win ? 'fab fa-windows' : 'fab fa-linux'" class="q-px-sm" size="sm" />
-                {{ $q.platform.is.win ? 'Windows' : 'Linux' }} is not yet supported, but will be soon.
-                Advanced users can adapt the steps from the Mac instructions.
-                Would you like to display them?<p />
-                <q-btn flat icon="fas fa-exclamation-triangle" size="md" label="Show me!" @click="forceShow = true" />
+            <div class="q-pa-md" style="width: 50%;">
+              <span v-if="collectionModel?.value === 0">
+                <q-input outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
+                  v-model="collectionModelNew" label="Collection"
+                />
+              </span>
             </div>
-            <div v-if="!$q.platform.is.linux && !$q.platform.is.win && !$q.platform.is.mac && !$q.platform.is.mobile" class="q-py-sm">
-                <q-icon name="fas fa-bug" /> Unknown platform. Upload is not supported.
-            </div>
+          </div>
+        </q-step>
 
-            <div v-if="$q.platform.is.mac || forceShow">
-                <q-item>
-                    <q-item-section side>
-                        <q-icon name="fab fa-apple" size="xl" />
-                        <q-icon name="fas fa-exclamation-triangle" size="lg" />
-                    </q-item-section>
-                    <q-item-section>
-                        <q-item-label class="text-h4">Instructions for Apple Mac</q-item-label>
-                        <q-item-label>Uploading media is an advanced operation; you should be comfortable using the terminal and understand what each step does.</q-item-label>
-                    </q-item-section>
-                </q-item>
-                <div class="row q-py-sm">
-                  <QCodeBlock
-                      :theme="$q.dark.isActive ? 'nightOwl' : 'github'"
-                      :code="code1"
-                      language="bash"
-                      numbered
-                      showHeader
-                      file-name="Install Dependencies"
-                      style="width: 100%;"
-                  />
-                </div>
-                <div class="q-pa-sm">Create a folder for your project such as <span class="inline-code">mkdir -p ~/fotrino/Collection</span>.</div>
-                <div class="q-pa-sm">
-                    Add the following media files to your new folder. The naming is important; you'll be able to set the display names later. This will create a new collection. Support to add a new chapter to an existing movie or a new movie to an existing collection will be added later.
-                    <q-list style="width: 100%; max-width: 720px;" dense bordered class="q-my-md">
-                        <q-item>
-                            <q-item-section class="text-weight-bold text-center">Description</q-item-section>
-                            <q-item-section class="text-weight-bold text-center">Aspect Ratio</q-item-section>
-                            <q-item-section class="text-weight-bold text-center">Filename</q-item-section>
-                        </q-item>
-                        <q-item>
-                            <q-item-section>Collection Cover</q-item-section>
-                            <q-item-section>Square</q-item-section>
-                            <q-item-section><span class="inline-code">Cover.(jpg|png)</span></q-item-section>
-                        </q-item>
-                        <q-item>
-                            <q-item-section>Movie Poster</q-item-section>
-                            <q-item-section>2:3 (portrait)</q-item-section>
-                            <q-item-section><span class="inline-code">Poster.(jpg|png)</span></q-item-section>
-                        </q-item>
-                        <q-item>
-                            <q-item-section>Media File 1</q-item-section>
-                            <q-item-section>16:9 (landscape)</q-item-section>
-                            <q-item-section><span class="inline-code">Media1.(mp4|mov)</span></q-item-section>
-                        </q-item>
-                        <q-item>
-                            <q-item-section>Media Preview 1</q-item-section>
-                            <q-item-section>16:9 (landscape)</q-item-section>
-                            <q-item-section><span class="inline-code">Preview1.(jpg|png)</span></q-item-section>
-                        </q-item>
-                        <q-item>
-                            <q-item-section>Media File 2 (...)</q-item-section>
-                            <q-item-section>16:9 (landscape)</q-item-section>
-                            <q-item-section><span class="inline-code">Media2.(mp4|mov)</span></q-item-section>
-                        </q-item>
-                        <q-item>
-                            <q-item-section>Media Preview 2 (...)</q-item-section>
-                            <q-item-section>16:9 (landscape)</q-item-section>
-                            <q-item-section><span class="inline-code">Preview2.(jpg|png)</span></q-item-section>
-                        </q-item>
-                    </q-list>
-                </div>
-                <div class="q-pa-sm">Add a file to your folder called <span class="inline-code">Collection.json</span> with the following contents and customise as appropriate. Do not manually set any <span class="inline-code">$VARIABLE</span> s, these will be handled automatically. If you add elements to an array, increment the variable's number.</div>
-                    <QCodeBlock
-                        :theme="$q.dark.isActive ? 'nightOwl' : 'github'"
-                        :code="code2"
-                        language="json"
-                        numbered
-                        showHeader
-                        file-name="Collection Descriptor"
-                        style="width: 100%;"
-                    />
-                    <QCodeBlock
-                        :theme="$q.dark.isActive ? 'nightOwl' : 'github'"
-                        code="~/Workspace/fotrino-films-uploader/fotrino-upload.sh ~/fotrino/Collection"
-                        language="bash"
-                        numbered
-                        showHeader
-                        file-name="Media Prepare / Upload"
-                        style="width: 100%;"
-                    />
-                    <div class="q-pa-sm">
-                      The first time you run the above script, you'll need to provide an API token. Please keep it secret. It can be used to access your account.
-                    </div>
-                    <div class="q-pa-sm">
-                      <q-btn :disabled="$q.platform.is.mobile ? true : false" flat icon="fas fa-key" size="sm" label="Copy secret token to clipboard!" @click="getToken()">
-                        <q-tooltip v-if="$q.platform.is.mobile">Token generation disabled on mobile</q-tooltip>
-                      </q-btn>
-                    </div>
-            </div>
-        </div>
-        <NothingText v-else />
-    </span>
-  </template>
+        <q-step
+          :name="2"
+          title="Movie"
+          icon="fas fa-film"
+          :done="step > 2"
+        >
+          TODO
+        </q-step>
+
+        <q-step
+          :name="3"
+          title="Media"
+          icon="fas fa-file-video"
+        >
+          TODO
+        </q-step>
+
+        <q-step
+          :name="4"
+          title="Upload"
+          caption="via Terminal"
+          icon="fas fa-terminal"
+        >
+          <QCodeBlock :theme="$q.dark.isActive ? 'nightOwl' : 'github'" language="text" code="Hello World" />
+        </q-step>
+
+        <template v-slot:navigation>
+          <q-stepper-navigation>
+            <q-btn flat @click="$refs.stepper.previous()" label="Back" :disabled="step==1 ? true : false" />
+            <q-btn flat @click="$refs.stepper.next()" label="Next" :disabled="(step==4 ? true : false) || !next" />
+          </q-stepper-navigation>
+        </template>
+      </q-stepper>
+    </div>
+  </div>
+  <div v-else>
+    <NothingText />
+  </div>
+</template>
 
 <script>
-import { defineAsyncComponent } from 'vue'
+import { defineAsyncComponent, ref } from 'vue'
 import { Notify, copyToClipboard } from 'quasar'
 import { CodeBlock } from 'vuejs-code-block'
 
@@ -127,37 +102,17 @@ export default {
     QCodeBlock: CodeBlock
   },
 
+  created: function() {
+    this.$store.cache.dispatch('collection/getCollections').catch(error => { console.log(error) })
+  },
+
   data() {
     return {
-      forceShow: false,
-      code1: `xcode-select --install
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" # Requires sudo
-brew install coreutils python ffmpeg graphicsmagick gnu-tar git exiftool curl mediainfo jq
-git clone https://github.com/vincentbernat/video2hls.git ~/Workspace/video2hls # Credit to Vincent Bernat
-git clone https://github.com/michaelmolino/fotrino-films-uploader.git ~/Workspace/fotrino-films-uploader # This is still under development`,
-      code2: `{
-  "title": "My New Collection",
-  "cover": "$COVER",
-  "created": "2025-01-01",
-  "movies": [
-    {
-      "title": "My Movie Title",
-      "subtitle": "There can be multiple media files (chapters) within a movie",
-      "poster": "$POSTER1",
-      "created": "2025-01-01",
-      "chapters": [
-        {
-          "title": "My Media Title",
-          "description_unsafe": "You can use some HTML tags here - p, br, strong, i.",
-          "preview": "$PREVIEW1",
-          "type": "application/vnd.apple.mpegurl",
-          "main": true,
-          "created": "2025-01-01"
-        }
-      ]
-    }
-  ]
-}`
+      step: ref(1),
+      collectionModel: ref(null),
+      collectionModelNew: ref(null),
+      movieModel: ref(null),
+      movieModelNew: ref(null)
     }
   },
 
@@ -165,6 +120,21 @@ git clone https://github.com/michaelmolino/fotrino-films-uploader.git ~/Workspac
     profile: {
       get() {
         return this.$store.state.account.profile
+      }
+    },
+    collections: {
+      get() {
+        return this.$store.state.collection.collections
+      }
+    },
+    movies: {
+      get() {
+        return null
+      }
+    },
+    next: {
+      get() {
+        return (this.step === 1 && (this.collectionModel?.value || this.collectionModelNew)) || false
       }
     }
   },
@@ -177,7 +147,7 @@ git clone https://github.com/michaelmolino/fotrino-films-uploader.git ~/Workspac
             Notify.create({
               message: 'Secret token copied to clipboard!',
               color: 'accent',
-              icon: 'content_paste',
+              icon: 'far fa-clipboard',
               timeout: 0,
               actions: [{ label: 'Clear Clipboard', color: 'white', handler: () => { copyToClipboard('Secret token cleared from clipboard!') } }]
             })

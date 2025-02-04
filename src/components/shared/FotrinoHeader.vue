@@ -25,7 +25,7 @@
         >
           <div v-for="collection in history" :key="collection.uuid" class="row">
             <q-btn
-              icon="movie"
+              icon="fas fa-clapperboard"
               align="left"
               flat
               no-caps
@@ -36,7 +36,7 @@
               :to="'/' + collection.uuid + '/' + collection.slug"
             />
             <q-btn
-              icon="remove_circle"
+              icon="fas fa-circle-minus"
               flat
               no-caps
               no-wrap
@@ -53,8 +53,8 @@
 
       <q-toggle
         v-model="darkMode"
-        unchecked-icon="wb_sunny"
-        checked-icon="nights_stay"
+        unchecked-icon="far fa-sun"
+        checked-icon="far fa-moon"
         color="secondary"
         keep-color
         size="md"
@@ -63,7 +63,7 @@
       </q-toggle>
 
       <q-btn
-        icon="help"
+        icon="fas fa-circle-question"
         :label="$q.screen.gt.sm ? 'Help' : ''"
         flat
         no-caps
@@ -73,7 +73,7 @@
 
       <q-btn-dropdown
         v-if="!profile?.id"
-        icon="account_box"
+        icon="fas fa-user"
         :label="$q.screen.gt.sm ? 'Sign Up/Login' : ''"
         flat
         no-caps
@@ -115,7 +115,7 @@
           align="left"
           flat
           no-caps
-          icon="dashboard"
+          icon="fas fa-chalkboard"
           label="Dashboard"
           size="md"
           class="fit"
@@ -126,7 +126,7 @@
           align="left"
           flat
           no-caps
-          icon="upload"
+          icon="fas fa-cloud-arrow-up"
           label="Upload Media"
           size="md"
           class="fit"
@@ -137,7 +137,7 @@
           align="left"
           flat
           no-caps
-          icon="logout"
+          icon="fas fa-right-from-bracket"
           label="Logout"
           size="md"
           class="fit"

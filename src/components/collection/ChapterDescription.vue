@@ -3,7 +3,7 @@
       <q-card-section vertical>
         <q-icon :name="$route.params.uuid ? 'public' : 'public_off'" size = "md" class="q-pr-sm" />
         <span class="text-h6" v-text="chapter.title"></span>
-        <q-btn-dropdown dropdown-icon="share" class="q-pa-md float-right" flat>
+        <q-btn-dropdown dropdown-icon="fas fa-share-nodes" class="q-pa-md float-right" flat>
           <q-list>
             <q-item v-if="$route.params.uuid" clickable v-close-popup @click="copyLink('public')">
               <q-item-section avatar>
@@ -13,7 +13,7 @@
                 <q-item-label>Share within this collection</q-item-label>
               </q-item-section>
               <q-item-section side>
-                <q-icon name="content_copy" color="accent" />
+                <q-icon name="far fa-copy" color="accent" />
               </q-item-section>
             </q-item>
             <q-item clickable v-close-popup @click="copyLink('private')">
@@ -25,7 +25,7 @@
                 <q-item-label v-if="$route.params.privateId">Share this video</q-item-label>
               </q-item-section>
               <q-item-section side>
-                <q-icon name="content_copy" color="accent" />
+                <q-icon name="far fa-copy" color="accent" />
               </q-item-section>
             </q-item>
           </q-list>
@@ -71,17 +71,17 @@ export default {
             Notify.create({
               message: 'URL copied to clipboard',
               color: 'accent',
-              icon: 'content_paste',
+              icon: 'far fa-clipboard',
               timeout: 1000
             })
           })
       } else if (val === 'private') {
-        copyToClipboard(window.location.origin + '/private/' + this.chapter.privateId)
+        copyToClipboard(window.location.origin + '/private/' + this.chapter.private_id)
           .then(() => {
             Notify.create({
               message: 'URL copied to clipboard',
               color: 'accent',
-              icon: 'content_paste',
+              icon: 'far fa-clipboard',
               timeout: 1000
             })
           })

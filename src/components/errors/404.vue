@@ -5,7 +5,7 @@
       <div class="text-h2" style="opacity: 0.4">Not Found</div>
       <q-btn
         class="q-py-md"
-        icon="videocam"
+        icon="fas fa-house"
         label="Home"
         flat
         no-caps

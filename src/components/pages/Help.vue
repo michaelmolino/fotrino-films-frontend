@@ -140,7 +140,7 @@
             <q-btn
               flat
               dense
-              icon="facebook"
+              icon="fab fa-facebook"
               label="Facebook Link Debugger"
               href="https://developers.facebook.com/tools/debug/"
             />
