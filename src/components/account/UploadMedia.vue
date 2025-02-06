@@ -215,7 +215,7 @@ export default {
       secret: '',
       code1: `xcode-select --install
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" # Requires sudo
-brew install coreutils python ffmpeg graphicsmagick gnu-tar git exiftool curl mediainfo
+brew install coreutils gnu-tar git python ffmpeg graphicsmagick exiftool mediainfo jq curl
 git clone https://github.com/vincentbernat/video2hls.git ~/Workspace/video2hls # Credit to Vincent Bernat
 git clone https://github.com/michaelmolino/fotrino-films-uploader.git ~/Workspace/fotrino-films-uploader # This is still under development`
     }
