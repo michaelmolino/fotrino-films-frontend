@@ -22,7 +22,8 @@ import 'plyr/dist/plyr.css'
 export default {
   name: 'PlyrPlayer',
   props: {
-    chapter: Object
+    chapter: Object,
+    artist: String
   },
   data() {
     return {
@@ -83,6 +84,16 @@ export default {
   },
   mounted() {
     this.setSourceHack()
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: this.chapter.title,
+        artist: this.artist,
+        artwork: [{
+          src: this.chapter.preview,
+          type: 'image/jpeg'
+        }]
+      })
+    }
   },
   beforeUnmount() {
     try {

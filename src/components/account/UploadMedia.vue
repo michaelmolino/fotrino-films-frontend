@@ -4,15 +4,15 @@
       Unsupported platform.
     </div>
     <div v-if="$q.platform.is.mobile">
-      Mobile upload is not supported.
+      Mobile upload is not supported. This is a longer term goal.
     </div>
     <div v-if="$q.platform.is.desktop">
       <q-item class="q-pa-md">
           <q-item-section side>
-              <q-icon name="fab fa-apple" size="xl" />
+              <q-icon name="fas fa-cloud-arrow-up" size="xl" />
           </q-item-section>
           <q-item-section>
-              <q-item-label class="text-h4">Upload for Apple Mac</q-item-label>
+              <q-item-label class="text-h4">Upload Media</q-item-label>
               <q-item-label>Uploading media is an advanced operation; you should be comfortable using the terminal.</q-item-label>
           </q-item-section>
       </q-item>
@@ -31,6 +31,12 @@
           icon="fas fa-video"
           :done="step > 1"
         >
+            <div>
+              A Collection represents the highest level of organization for your media. If you intend to upload all of your videos in one location then you will only ever need a single collection. If you create multiple collections, they will remain independent of one another; media from one collection (such as movies or chapters) will not be accessible or discoverable from another.
+            </div>
+            <div class="q-pt-md">
+              For more help, see <q-btn flat icon="fas fa-circle-question" label="Terminology" to="/help?item=terminology"/>.
+            </div>
           <div class="row">
             <div class="q-pa-md" style="width: 50%;">
               <q-select outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" label="Collection"
@@ -42,7 +48,6 @@
                 <q-input outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md"
                   v-model="modelCollectionNew.title" label="Collection Title"
                 />
-                <q-input v-model="modelCollectionNew.date" outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" type="date" />
               </span>
             </div>
           </div>
@@ -54,6 +59,9 @@
           icon="fas fa-film"
           :done="step > 2"
         >
+          <div>
+            Movies are the next organizational level for your chapters (media files). Each collection can include multiple Movies, with each Movie containing at least one chapter.
+          </div>
           <div class="row">
             <div class="q-pa-md" style="width: 50%;">
               <q-select outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" label="Movie"
@@ -68,7 +76,6 @@
                 <q-input outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md"
                   v-model="modelMovieNew.subtitle" label="Movie SubTitle"
                 />
-                <q-input v-model="modelMovieNew.date" outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" type="date" />
               </span>
             </div>
           </div>
@@ -76,9 +83,16 @@
 
         <q-step
           :name="3"
-          title="Media"
+          title="Chapter"
           icon="fas fa-file-video"
+          :done="step > 3"
         >
+          <div>
+            Chapters represent the actual media files and can be either video or audio. Completing this form will create a `pending` record of the chapter on our servers. Once you click `Finish` you will receive instructions on how to upload your media from your desktop computer.
+          </div>
+          <div class="q-pt-md">
+            <strong>Note</strong>: This process is currently intended for advanced users but will be made more user-friendly in the future.
+          </div>
           <div class="row">
             <div class="q-pa-md" style="width: 50%;">
               <q-input outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md"
@@ -87,7 +101,7 @@
               <q-input outlined autogrow :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md"
                 v-model="modelChapterNew.description" label="Description - p, br, strong, and i tags allowed"
               />
-              <q-input v-model="modelChapterNew.date" outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" type="date" />
+              <q-checkbox outlined v-model="modelChapterNew.main" label="Featured" />
             </div>
           </div>
         </q-step>
@@ -97,6 +111,7 @@
           title="Upload"
           caption="via Terminal"
           icon="fas fa-terminal"
+          active-icon="fas fa-terminal"
         >
           Upload not yet implemented.
           <QCodeBlock :theme="$q.dark.isActive ? 'nightOwl' : 'github'" language="json" :code="payload" />
@@ -105,7 +120,7 @@
         <template v-slot:navigation>
           <q-stepper-navigation>
             <!-- <q-btn flat @click="$refs.stepper.previous()" label="Back" :disabled="step==1 ? true : false" /> -->
-            <q-btn v-if="step < 4" flat @click="$refs.stepper.next()" label="Next" :disabled="(step==4 ? true : false) || !next" />
+            <q-btn v-if="step < 4" flat @click="$refs.stepper.next()" :label="step <3 ? 'Next' : 'Finish'" :disabled="(step==4 ? true : false) || !next" />
           </q-stepper-navigation>
         </template>
       </q-stepper>
@@ -139,11 +154,11 @@ export default {
     return {
       step: ref(1),
       modelCollection: ref(null),
-      modelCollectionNew: ref({ title: null, date: new Date().toISOString().split('T')[0] }),
+      modelCollectionNew: ref({ title: null }),
       modelMovie: ref(null),
-      modelMovieNew: ref({ title: null, subtitle: null, date: new Date().toISOString().split('T')[0] }),
+      modelMovieNew: ref({ title: null, subtitle: null }),
       movies: [],
-      modelChapterNew: ref({ title: null, description: null, main: true, date: new Date().toISOString().split('T')[0] })
+      modelChapterNew: ref({ title: null, description: null, main: true })
     }
   },
 
@@ -160,6 +175,16 @@ export default {
           })
       } else {
         this.movies = []
+      }
+    },
+    step(s) {
+      if (s === 4) {
+        this.$store.dispatch('collection/postUpload', this.payload).then(_response => {
+          // Not implemented yet
+        })
+          .catch(err => {
+            console.log(err)
+          })
       }
     }
   },
@@ -182,7 +207,6 @@ export default {
           obj.uuid = this.modelCollection.value
         } else {
           obj.title = this.modelCollectionNew.title
-          obj.created = this.modelCollectionNew.date
         }
         obj.movie = {}
         if (this.modelMovie.value !== 0) {
@@ -190,12 +214,11 @@ export default {
         } else {
           obj.movie.title = this.modelMovieNew.title
           obj.movie.subtitle = this.modelMovieNew.subtitle
-          obj.movie.created = this.modelMovieNew.date
         }
         obj.movie.chapter = {}
         obj.movie.chapter.title = this.modelChapterNew.title
         obj.movie.chapter.description = this.modelChapterNew.description
-        obj.movie.chapter.created = this.modelChapterNew.date
+        obj.movie.chapter.main = this.modelChapterNew.main
         return JSON.stringify(obj, null, 4)
       }
     },

@@ -9,3 +9,7 @@ export function collection(state) {
 export function history(state) {
   return state.history
 }
+
+export function upload(state) {
+  return state.upload
+}

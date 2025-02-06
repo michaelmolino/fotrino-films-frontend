@@ -9,3 +9,7 @@ export function SET_COLLECTION(state, collection) {
 export function SET_HISTORY(state, history) {
   state.history = history
 }
+
+export function SET_UPLOAD(state, upload) {
+  state.upload = upload
+}

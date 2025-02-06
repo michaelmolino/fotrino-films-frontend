@@ -11,7 +11,7 @@
     <NothingText v-if="movie.chapters?.length === 0" />
 
     <span v-else>
-      <PlyrPlayer :chapter="chapter" style="width: 100%; max-width: 720px; min-width: 240px;" class="q-py-md" />
+      <PlyrPlayer :chapter="chapter" :artist="collection.ownername" style="width: 100%; max-width: 720px; min-width: 240px;" class="q-py-md" />
 
       <ChapterDescription :chapter="chapter" />
 

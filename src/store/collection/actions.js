@@ -60,6 +60,27 @@ export function getPrivateChapter(context, privateId) {
     })
 }
 
+export function postUpload(context, payload) {
+  return api
+    .post(
+      '/collections/chapters', payload, {
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        }
+      }
+    )
+    .then(response => {
+      const upload = response.data
+      context.commit('SET_UPLOAD', upload)
+      return Promise.resolve(upload)
+    })
+    .catch(error => {
+      context.commit('SET_UPLOAD', null)
+      return Promise.reject(error)
+    })
+}
+
 export function getHistory(context) {
   const history = LocalStorage.getItem('fotrino-films-history') || []
   context.commit('SET_HISTORY', history)

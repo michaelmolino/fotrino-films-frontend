@@ -4,8 +4,9 @@
       <q-expansion-item
         group="faq"
         label="What is Fotrino Films?"
-        default-opened
+        :default-opened="!$route.query.item || $route.query.item === 'about'"
         header-class="text-bold"
+        @show="this.$router.replace({query: { item: 'about' }})"
       >
         <q-card>
           <q-card-section>
@@ -20,6 +21,8 @@
         group="faq"
         label="How is it different from other video hosts?"
         header-class="text-bold"
+        :default-opened="$route.query.item === 'different'"
+        @show="this.$router.replace({query: { item: 'different' }})"
       >
         <q-card>
           <q-card-section>
@@ -43,6 +46,8 @@
         group="faq"
         label="Is Fotrino Films open source?"
         header-class="text-bold"
+        :default-opened="$route.query.item === 'opensource'"
+        @show="this.$router.replace({query: { item: 'opensource' }})"
       >
         <q-card>
           <q-card-section>
@@ -59,6 +64,8 @@
         group="faq"
         label="Is my content public or private?"
         header-class="text-bold"
+        :default-opened="$route.query.item === 'privacy'"
+        @show="this.$router.replace({query: { item: 'privacy' }})"
       >
         <q-card>
           <q-card-section>
@@ -75,6 +82,8 @@
         group="faq"
         label="Is it ready to use?"
         header-class="text-bold"
+        :default-opened="$route.query.item === 'production'"
+        @show="this.$router.replace({query: { item: 'production' }})"
       >
         <q-card>
           <q-card-section>
@@ -87,6 +96,8 @@
         group="faq"
         label="Does it work on mobile?"
         header-class="text-bold"
+        :default-opened="$route.query.item === 'mobilesupport'"
+        @show="this.$router.replace({query: { item: 'mobilesupport' }})"
       >
         <q-card>
           <q-card-section>
@@ -99,6 +110,8 @@
         group="faq"
         label="Do videos have any DRM?  Can I download a video?"
         header-class="text-bold"
+        :default-opened="$route.query.item === 'download'"
+        @show="this.$router.replace({query: { item: 'download' }})"
       >
         <q-card>
           <q-card-section>
@@ -114,6 +127,8 @@
         group="faq"
         label="I'm having problems with buffering or poor quality.  What can I do?"
         header-class="text-bold"
+        :default-opened="$route.query.item === 'buffering'"
+        @show="this.$router.replace({query: { item: 'buffering' }})"
       >
         <q-card>
           <q-card-section>
@@ -133,6 +148,8 @@
         group="faq"
         label="When I share a link on Facebook, I'm not getting a preview image.  What should I do?"
         header-class="text-bold"
+        :default-opened="$route.query.item === 'facebook'"
+        @show="this.$router.replace({query: { item: 'facebook' }})"
       >
         <q-card>
           <q-card-section>
@@ -155,6 +172,8 @@
         group="faq"
         label="Why can I only login with Google?"
         header-class="text-bold"
+        :default-opened="$route.query.item === 'login'"
+        @show="this.$router.replace({query: { item: 'login' }})"
       >
         <q-card>
           <q-card-section>
@@ -172,6 +191,8 @@
         group="faq"
         label="Terminology"
         header-class="text-bold"
+        :default-opened="$route.query.item === 'terminology'"
+        @show="this.$router.replace({query: { item: 'terminology' }})"
       >
         <q-card>
           <q-card-section>

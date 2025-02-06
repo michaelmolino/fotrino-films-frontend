@@ -39,6 +39,9 @@ export default boot(({ app, router, store }) => {
         case 409:
           router.replace('/409')
           return Promise.reject(error)
+        case 501:
+          msg = 'Not yet implemented.'
+          break
       }
 
       Notify.create({
