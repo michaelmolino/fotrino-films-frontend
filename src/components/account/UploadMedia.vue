@@ -113,9 +113,62 @@
           icon="fas fa-terminal"
           active-icon="fas fa-terminal"
         >
-          Upload not yet implemented.
-          <QCodeBlock :theme="$q.dark.isActive ? 'nightOwl' : 'github'" language="json" :code="payload" />
-        </q-step>
+          <div class="row q-py-sm">
+            <div class="q-pa-sm">Install dependencies; These instructions are for Mac; Windows and Linux users will need to adapt them.</div>
+            <QCodeBlock
+                :theme="$q.dark.isActive ? 'nightOwl' : 'github'"
+                :code="code1"
+                language="bash"
+                numbered
+                showHeader
+                file-name="Install Dependencies"
+                style="width: 100%;"
+            />
+          </div>
+          <div class="q-pa-sm">Create a folder for your media such as <span class="inline-code">mkdir -p ~/fotrino/Media</span>.</div>
+          <div class="q-pa-sm">
+            Add the following media files to your new folder.
+            <q-list style="width: 100%; max-width: 720px;" dense bordered class="q-my-md">
+              <q-item>
+                <q-item-section class="text-weight-bold text-center">Description</q-item-section>
+                <q-item-section class="text-weight-bold text-center">Aspect Ratio</q-item-section>
+                <q-item-section class="text-weight-bold text-center">Filename</q-item-section>
+              </q-item>
+              <q-item v-if="modelCollection.value === 0">
+                <q-item-section>Collection Cover</q-item-section>
+                <q-item-section>Square</q-item-section>
+                <q-item-section><span class="inline-code">Collection.jpg</span></q-item-section>
+              </q-item>
+              <q-item v-if="modelMovie.value === 0">
+                <q-item-section>Movie Poster</q-item-section>
+                <q-item-section>2:3 (portrait)</q-item-section>
+                <q-item-section><span class="inline-code">Movie.jpg</span></q-item-section>
+              </q-item>
+              <q-item>
+                <q-item-section>Media File</q-item-section>
+                <q-item-section>16:9 (landscape)</q-item-section>
+                <q-item-section><span class="inline-code">Media.(mp4|mov|mp3)</span></q-item-section>
+              </q-item>
+              <q-item>
+                <q-item-section>Media Preview</q-item-section>
+                <q-item-section>16:9 (landscape)</q-item-section>
+                <q-item-section><span class="inline-code">Preview.(jpg|png)</span></q-item-section>
+              </q-item>
+            </q-list>
+          </div>
+          <div class="q-pa-sm">Run the upload script.</div>
+          <QCodeBlock
+              :theme="$q.dark.isActive ? 'nightOwl' : 'github'"
+              code="~/Workspace/fotrino-films-uploader/fotrino-upload.sh ~/fotrino/Media"
+              language="bash"
+              numbered
+              showHeader
+              file-name="Media Prepare / Upload"
+              style="width: 100%;"
+          />
+          <div class="q-pa-sm">When prompted, copy/past the below JSON - it should never be shared with anyone.</div>
+        <QCodeBlock :showHeader="true" :theme="$q.dark.isActive ? 'nightOwl' : 'github'" language="json" :code="secret" />
+      </q-step>
 
         <template v-slot:navigation>
           <q-stepper-navigation>
@@ -158,7 +211,13 @@ export default {
       modelMovie: ref(null),
       modelMovieNew: ref({ title: null, subtitle: null }),
       movies: [],
-      modelChapterNew: ref({ title: null, description: null, main: true })
+      modelChapterNew: ref({ title: null, description: null, main: true }),
+      secret: '',
+      code1: `xcode-select --install
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" # Requires sudo
+brew install coreutils python ffmpeg graphicsmagick gnu-tar git exiftool curl mediainfo
+git clone https://github.com/vincentbernat/video2hls.git ~/Workspace/video2hls # Credit to Vincent Bernat
+git clone https://github.com/michaelmolino/fotrino-films-uploader.git ~/Workspace/fotrino-films-uploader # This is still under development`
     }
   },
 
@@ -180,7 +239,7 @@ export default {
     step(s) {
       if (s === 4) {
         this.$store.dispatch('collection/postUpload', this.payload).then(_response => {
-          // Not implemented yet
+          this.secret = JSON.stringify(_response, null, 4)
         })
           .catch(err => {
             console.log(err)
