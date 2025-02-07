@@ -9,17 +9,17 @@
         color="white"
         text-color="primary"
         :options="[
-            {value: 'movies', slot: 'movie'},
+            {value: 'projects', slot: 'project'},
             {value: 'main', slot: 'main'},
             {value: 'all', slot: 'all'}
         ]"
         >
-        <template v-slot:movie>
+        <template v-slot:project>
             <div class="row items-center no-wrap">
             <div class="text-center">
-                Movie Groups &nbsp;
+                Project Groups &nbsp;
             </div>
-            <q-avatar color="accent" text-color="white" size="sm" square>{{ movieCount }}</q-avatar>
+            <q-avatar color="accent" text-color="white" size="sm" square>{{ projectCount }}</q-avatar>
             </div>
         </template>
         <template v-slot:main>
@@ -48,7 +48,7 @@ export default {
 
   props: {
     selectedView: String,
-    movieCount: Number,
+    projectCount: Number,
     mainCount: Number,
     allCount: Number
   }

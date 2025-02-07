@@ -1,13 +1,13 @@
 import { createStore } from 'vuex'
 import createCache from 'vuex-cache'
 import account from './account'
-import collection from './collection'
+import channel from './channel'
 
 export default function(/* { ssrContext } */) {
   const Store = createStore({
     modules: {
       account,
-      collection
+      channel
     },
     plugins: [createCache({ timeout: 3600000 })],
     strict: process.env.DEBUGGING

@@ -15,16 +15,16 @@ const routes = [
   },
   {
     path:
-      '/:uuid([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})/:collectionSlug([0-9a-zA-Z-]+)',
+      '/:uuid([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})/:channelSlug([0-9a-zA-Z-]+)',
     component: () => import('@layouts/MainLayout.vue'),
     children: [
       {
         path: '',
-        component: () => import('@components/collection/CollectionRoot.vue')
+        component: () => import('@components/channel/ChannelRoot.vue')
       },
       {
-        path: ':movieSlug([0-9a-zA-Z-]+)/:chapterSlug([0-9a-zA-Z-]+)?',
-        component: () => import('@components/collection/MovieRoot.vue')
+        path: ':projectSlug([0-9a-zA-Z-]+)/:mediaSlug([0-9a-zA-Z-]+)?',
+        component: () => import('@components/channel/ProjectRoot.vue')
       }
     ]
   },
@@ -34,7 +34,7 @@ const routes = [
     children: [
       {
         path: ':privateId([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})',
-        component: () => import('@components/collection/MovieRoot.vue')
+        component: () => import('@components/channel/ProjectRoot.vue')
       }
     ]
   },
@@ -44,7 +44,7 @@ const routes = [
     children: [
       {
         path: 'dashboard',
-        component: () => import('@components/account/CollectionDashboard.vue')
+        component: () => import('@components/account/ChannelDashboard.vue')
       },
       {
         path: 'upload',

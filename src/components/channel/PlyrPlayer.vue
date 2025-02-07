@@ -1,15 +1,15 @@
 <template>
     <div>
       <div v-if="view == 'video'">
-        <video id="player" controls :key="chapter.id" style="width: 100%; aspect-ratio: 16 / 9" />
+        <video id="player" controls :key="media.id" style="width: 100%; aspect-ratio: 16 / 9" />
       </div>
       <div v-else>
         <q-img
-          :src="chapter.preview"
+          :src="media.preview"
           style="width: 100%;"
           :ratio="16/9"
         />
-        <audio id="player" controls :key="chapter.id" style="width: 100%;"></audio>
+        <audio id="player" controls :key="media.id" style="width: 100%;"></audio>
       </div>
     </div>
 </template>
@@ -22,7 +22,7 @@ import 'plyr/dist/plyr.css'
 export default {
   name: 'PlyrPlayer',
   props: {
-    chapter: Object,
+    media: Object,
     artist: String
   },
   data() {
@@ -34,7 +34,7 @@ export default {
   computed: {
     view: {
       get() {
-        return this.chapter.type.startsWith('audio/') ? 'audio' : 'video'
+        return this.media.type.startsWith('audio/') ? 'audio' : 'video'
       }
     }
   },
@@ -65,7 +65,7 @@ export default {
 
       if (this.view === 'video') {
         const video = document.querySelector('video')
-        const source = this.chapter.src
+        const source = this.media.src
         if (Hls.isSupported()) {
           this.hls = new Hls()
           this.hls.loadSource(source)
@@ -74,11 +74,11 @@ export default {
         } else {
           video.src = source
         }
-        this.player.poster = this.chapter.preview
+        this.player.poster = this.media.preview
       } else {
         const audio = document.querySelector('audio')
-        audio.src = this.chapter.src
-        audio.type = this.chapter.type
+        audio.src = this.media.src
+        audio.type = this.media.type
       }
     }
   },
@@ -86,10 +86,10 @@ export default {
     this.setSourceHack()
     if ('mediaSession' in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({
-        title: this.chapter.title,
+        title: this.media.title,
         artist: this.artist,
         artwork: [{
-          src: this.chapter.preview,
+          src: this.media.preview,
           type: 'image/jpeg'
         }]
       })

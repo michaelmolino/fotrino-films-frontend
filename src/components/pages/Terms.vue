@@ -37,7 +37,7 @@
           <li>Encourages or disseminates misinformation, hate speech, violence, or conspiracy theories</li>
           <li>Violates copyright, trademarks, or intellectual property laws</li>
         </ul>
-        <div>This list may be updated at our discretion. If you encounter content that violates these guidelines, please report it to creative@michaelmolino.com.</div>
+        <div>This list may be updated at our discretion. If you encounter content that violates these guidelines, please report it to michael@fotrino.com.</div>
       </li>
       <li>
         <div class="text-h6">Data Security</div>
@@ -58,7 +58,7 @@
       </li>
       <li>
         <div class="text-h6">Data Retention & Account Deletion</div>
-        If you wish to delete your account and associated data, please email creative@michaelmolino.com. Your request must include the email address linked to your account. If the request comes from a different email address, additional verification will be required.
+        If you wish to delete your account and associated data, please email michael@fotrino.com. Your request must include the email address linked to your account. If the request comes from a different email address, additional verification will be required.
         Upon deletion, your personal information and content will be permanently removed from our systems, except for data stored in system logs, which may be retained for up to 30 days for security and compliance purposes.
         If you need to export your data, contact us at the same email address, and we will provide a downloadable file containing the information we hold about you.
       </li>
@@ -73,7 +73,7 @@
       <li>
         <div class="text-h6">Acceptance of This Policy</div>
         By continuing to use Fotrino Films, you acknowledge and agree to this Privacy Policy & Terms of Use. If you do not agree, please discontinue use of the platform.
-        For questions or concerns, contact us at creative@michaelmolino.com.
+        For questions or concerns, contact us at michael@fotrino.com.
       </li>
     </ol>
   </div>

@@ -27,26 +27,26 @@
       >
         <q-step
           :name="1"
-          title="Collection"
+          title="Channel"
           icon="fas fa-video"
           :done="step > 1"
         >
             <div>
-              A Collection represents the highest level of organization for your media. If you intend to upload all of your videos in one location then you will only ever need a single collection. If you create multiple collections, they will remain independent of one another; media from one collection (such as movies or chapters) will not be accessible or discoverable from another.
+              A Channel represents the highest level of organization for your media. If you intend to upload all of your videos in one location then you will only ever need a single channel. If you create multiple channels, they will remain independent of one another; media from one channel (such as projects or media) will not be accessible or discoverable from another.
             </div>
             <div class="q-pt-md">
               For more help, see <q-btn flat icon="fas fa-circle-question" label="Terminology" to="/help?item=terminology"/>.
             </div>
           <div class="row">
             <div class="q-pa-md" style="width: 50%;">
-              <q-select outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" label="Collection"
-                v-model="modelCollection" :options="collections.map(({ uuid, title }) => ({ value: uuid, label: title })).concat({ value: 0, label: 'New...' })"
+              <q-select outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" label="Channel"
+                v-model="modelChannel" :options="channels.map(({ uuid, title }) => ({ value: uuid, label: title })).concat({ value: 0, label: 'New...' })"
               />
             </div>
             <div class="q-pa-md" style="width: 50%;">
-              <span v-if="modelCollection?.value === 0">
+              <span v-if="modelChannel?.value === 0">
                 <q-input outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md"
-                  v-model="modelCollectionNew.title" label="Collection Title"
+                  v-model="modelChannelNew.title" label="Channel Title"
                 />
               </span>
             </div>
@@ -55,26 +55,26 @@
 
         <q-step
           :name="2"
-          title="Movie"
+          title="Project"
           icon="fas fa-film"
           :done="step > 2"
         >
           <div>
-            Movies are the next organizational level for your chapters (media files). Each collection can include multiple Movies, with each Movie containing at least one chapter.
+            Projects are the next organizational level for your media (media files). Each channel can include multiple Projects, with each Project containing at least one media.
           </div>
           <div class="row">
             <div class="q-pa-md" style="width: 50%;">
-              <q-select outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" label="Movie"
-                v-model="modelMovie" :options="movies.map(({ id, title }) => ({ value: id, label: title })).concat({ value: 0, label: 'New...' })"
+              <q-select outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" label="Project"
+                v-model="modelProject" :options="projects.map(({ id, title }) => ({ value: id, label: title })).concat({ value: 0, label: 'New...' })"
               />
             </div>
             <div class="q-pa-md" style="width: 50%;">
-              <span v-if="modelMovie?.value === 0">
+              <span v-if="modelProject?.value === 0">
                 <q-input outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md"
-                  v-model="modelMovieNew.title" label="Movie Title"
+                  v-model="modelProjectNew.title" label="Project Title"
                 />
                 <q-input outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md"
-                  v-model="modelMovieNew.subtitle" label="Movie SubTitle"
+                  v-model="modelProjectNew.subtitle" label="Project SubTitle"
                 />
               </span>
             </div>
@@ -83,12 +83,12 @@
 
         <q-step
           :name="3"
-          title="Chapter"
+          title="Media"
           icon="fas fa-file-video"
           :done="step > 3"
         >
           <div>
-            Chapters represent the actual media files and can be either video or audio. Completing this form will create a `pending` record of the chapter on our servers. Once you click `Finish` you will receive instructions on how to upload your media from your desktop computer.
+            Medias represent the actual media files and can be either video or audio. Completing this form will create a `pending` record of the media on our servers. Once you click `Finish` you will receive instructions on how to upload your media from your desktop computer.
           </div>
           <div class="q-pt-md">
             <strong>Note</strong>: This process is currently intended for advanced users but will be made more user-friendly in the future.
@@ -96,12 +96,12 @@
           <div class="row">
             <div class="q-pa-md" style="width: 50%;">
               <q-input outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md"
-                v-model="modelChapterNew.title" label="Title"
+                v-model="modelMediaNew.title" label="Title"
               />
               <q-input outlined autogrow :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md"
-                v-model="modelChapterNew.description" label="Description - p, br, strong, and i tags allowed"
+                v-model="modelMediaNew.description" label="Description - p, br, strong, and i tags allowed"
               />
-              <q-checkbox outlined v-model="modelChapterNew.main" label="Featured" />
+              <q-checkbox outlined v-model="modelMediaNew.main" label="Featured" />
             </div>
           </div>
         </q-step>
@@ -134,15 +134,15 @@
                 <q-item-section class="text-weight-bold text-center">Aspect Ratio</q-item-section>
                 <q-item-section class="text-weight-bold text-center">Filename</q-item-section>
               </q-item>
-              <q-item v-if="modelCollection.value === 0">
-                <q-item-section>Collection Cover</q-item-section>
+              <q-item v-if="modelChannel.value === 0">
+                <q-item-section>Channel Cover</q-item-section>
                 <q-item-section>Square</q-item-section>
-                <q-item-section><span class="inline-code">Collection.jpg</span></q-item-section>
+                <q-item-section><span class="inline-code">Channel.jpg</span></q-item-section>
               </q-item>
-              <q-item v-if="modelMovie.value === 0">
-                <q-item-section>Movie Poster</q-item-section>
+              <q-item v-if="modelProject.value === 0">
+                <q-item-section>Project Poster</q-item-section>
                 <q-item-section>2:3 (portrait)</q-item-section>
-                <q-item-section><span class="inline-code">Movie.jpg</span></q-item-section>
+                <q-item-section><span class="inline-code">Project.jpg</span></q-item-section>
               </q-item>
               <q-item>
                 <q-item-section>Media File</q-item-section>
@@ -200,18 +200,18 @@ export default {
   },
 
   created: function() {
-    this.$store.cache.dispatch('collection/getCollections').catch(error => { console.log(error) })
+    this.$store.cache.dispatch('channel/getChannels').catch(error => { console.log(error) })
   },
 
   data() {
     return {
       step: ref(1),
-      modelCollection: ref(null),
-      modelCollectionNew: ref({ title: null }),
-      modelMovie: ref(null),
-      modelMovieNew: ref({ title: null, subtitle: null }),
-      movies: [],
-      modelChapterNew: ref({ title: null, description: null, main: true }),
+      modelChannel: ref(null),
+      modelChannelNew: ref({ title: null }),
+      modelProject: ref(null),
+      modelProjectNew: ref({ title: null, subtitle: null }),
+      projects: [],
+      modelMediaNew: ref({ title: null, description: null, main: true }),
       secret: '',
       code1: `xcode-select --install
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" # Requires sudo
@@ -222,23 +222,23 @@ git clone https://github.com/michaelmolino/fotrino-films-uploader.git ~/Workspac
   },
 
   watch: {
-    modelCollection(c) {
+    modelChannel(c) {
       if (c && c.value !== 0) {
         this.$store.cache
-          .dispatch('collection/getCollection', c.value)
-          .then(_collection => {
-            this.movies = _collection.movies
+          .dispatch('channel/getChannel', c.value)
+          .then(_channel => {
+            this.projects = _channel.projects
           })
           .catch(() => {
-            this.modelCollection = null
+            this.modelChannel = null
           })
       } else {
-        this.movies = []
+        this.projects = []
       }
     },
     step(s) {
       if (s === 4) {
-        this.$store.dispatch('collection/postUpload', this.payload).then(_response => {
+        this.$store.dispatch('channel/postUpload', this.payload).then(_response => {
           this.secret = JSON.stringify(_response, null, 4)
         })
           .catch(err => {
@@ -254,30 +254,30 @@ git clone https://github.com/michaelmolino/fotrino-films-uploader.git ~/Workspac
         return this.$store.state.account.profile
       }
     },
-    collections: {
+    channels: {
       get() {
-        return this.$store.state.collection.collections
+        return this.$store.state.channel.channels
       }
     },
     payload: {
       get() {
         const obj = {}
-        if (this.modelCollection.value !== 0) {
-          obj.uuid = this.modelCollection.value
+        if (this.modelChannel.value !== 0) {
+          obj.uuid = this.modelChannel.value
         } else {
-          obj.title = this.modelCollectionNew.title
+          obj.title = this.modelChannelNew.title
         }
-        obj.movie = {}
-        if (this.modelMovie.value !== 0) {
-          obj.movie.id = this.modelMovie.value
+        obj.project = {}
+        if (this.modelProject.value !== 0) {
+          obj.project.id = this.modelProject.value
         } else {
-          obj.movie.title = this.modelMovieNew.title
-          obj.movie.subtitle = this.modelMovieNew.subtitle
+          obj.project.title = this.modelProjectNew.title
+          obj.project.subtitle = this.modelProjectNew.subtitle
         }
-        obj.movie.chapter = {}
-        obj.movie.chapter.title = this.modelChapterNew.title
-        obj.movie.chapter.description = this.modelChapterNew.description
-        obj.movie.chapter.main = this.modelChapterNew.main
+        obj.project.media = {}
+        obj.project.media.title = this.modelMediaNew.title
+        obj.project.media.description = this.modelMediaNew.description
+        obj.project.media.main = this.modelMediaNew.main
         return JSON.stringify(obj, null, 4)
       }
     },
@@ -285,11 +285,11 @@ git clone https://github.com/michaelmolino/fotrino-films-uploader.git ~/Workspac
       get() {
         switch (this.step) {
           case 1:
-            return this.modelCollection?.value || this.modelCollectionNew.title
+            return this.modelChannel?.value || this.modelChannelNew.title
           case 2:
-            return this.modelMovie?.value || this.modelMovieNew.title
+            return this.modelProject?.value || this.modelProjectNew.title
           case 3:
-            return this.modelChapterNew.title
+            return this.modelMediaNew.title
           case 4:
             return false
           default:

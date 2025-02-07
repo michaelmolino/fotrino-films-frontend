@@ -1,7 +1,7 @@
 export default function() {
   return {
-    collections: [],
-    collection: null,
+    channels: [],
+    channel: null,
     upload: null,
     history: []
   }

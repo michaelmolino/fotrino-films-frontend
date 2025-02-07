@@ -3,7 +3,7 @@
     <q-item>
       <q-item-section side v-if="$q.screen.gt.xs">
         <q-avatar>
-          <img :src=this.collection.cover :alt="this.collection.title">
+          <img :src=this.channel.cover :alt="this.channel.title">
         </q-avatar>
       </q-item-section>
       <q-item-section>
@@ -19,7 +19,7 @@
           :to="location.to"
         />
         </q-breadcrumbs>
-      <q-item-label caption>By {{ collection.ownername }}</q-item-label>
+      <q-item-label caption>By {{ channel.ownername }}</q-item-label>
       </q-item-section>
     </q-item>
   </span>
@@ -30,9 +30,9 @@ export default {
   name: 'BreadCrumbs',
 
   props: {
-    collection: Object,
-    movie: Object,
-    chapter: Object,
+    channel: Object,
+    project: Object,
+    media: Object,
     private: Boolean
   },
 
@@ -43,37 +43,37 @@ export default {
 
         _breadcrumbs.push({
           id: 0,
-          label: this.collection.title,
-          to: '/' + this.collection.uuid + '/' + this.collection.slug
+          label: this.channel.title,
+          to: '/' + this.channel.uuid + '/' + this.channel.slug
         })
 
-        if (this.movie?.id) {
+        if (this.project?.id) {
           _breadcrumbs.push({
             id: 1,
-            label: this.movie.title,
+            label: this.project.title,
             to:
               '/' +
-              this.collection.uuid +
+              this.channel.uuid +
               '/' +
-              this.collection.slug +
+              this.channel.slug +
               '/' +
-              this.movie.slug
+              this.project.slug
           })
         }
 
-        if (this.movie?.id && this.chapter?.id) {
+        if (this.project?.id && this.media?.id) {
           _breadcrumbs.push({
             id: 2,
-            label: this.chapter.title,
+            label: this.media.title,
             to:
               '/' +
-              this.collection.uuid +
+              this.channel.uuid +
               '/' +
-              this.collection.slug +
+              this.channel.slug +
               '/' +
-              this.movie.slug +
+              this.project.slug +
               '/' +
-              this.chapter.slug
+              this.media.slug
           })
         }
 

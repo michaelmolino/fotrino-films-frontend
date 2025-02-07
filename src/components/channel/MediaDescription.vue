@@ -2,7 +2,7 @@
     <q-card flat bordered style="width: 100%; max-width: 720px; min-width: 240px;">
       <q-card-section vertical>
         <q-icon :name="$route.params.uuid ? 'public' : 'public_off'" size = "md" class="q-pr-sm" />
-        <span class="text-h6" v-text="chapter.title"></span>
+        <span class="text-h6" v-text="media.title"></span>
         <q-btn-dropdown dropdown-icon="fas fa-share-nodes" class="q-pa-md float-right" flat>
           <q-list>
             <q-item v-if="$route.params.uuid" clickable v-close-popup @click="copyLink('public')">
@@ -10,7 +10,7 @@
                 <q-avatar icon="public" color="accent" text-color="white" />
               </q-item-section>
               <q-item-section>
-                <q-item-label>Share within this collection</q-item-label>
+                <q-item-label>Share within this channel</q-item-label>
               </q-item-section>
               <q-item-section side>
                 <q-icon name="far fa-copy" color="accent" />
@@ -44,21 +44,21 @@ import { Notify, copyToClipboard } from 'quasar'
 import { daysSince, sanitizeHtml } from '@javascript/library.js'
 
 export default {
-  name: 'ChapterDescription',
+  name: 'MediaDescription',
 
   props: {
-    chapter: Object
+    media: Object
   },
 
   computed: {
     daysSince: {
       get() {
-        return daysSince(this.chapter.created)
+        return daysSince(this.media.created)
       }
     },
     description_safe: {
       get() {
-        return sanitizeHtml(this.chapter.description_unsafe)
+        return sanitizeHtml(this.media.description_unsafe)
       }
     }
   },
@@ -76,7 +76,7 @@ export default {
             })
           })
       } else if (val === 'private') {
-        copyToClipboard(window.location.origin + '/private/' + this.chapter.private_id)
+        copyToClipboard(window.location.origin + '/private/' + this.media.private_id)
           .then(() => {
             Notify.create({
               message: 'URL copied to clipboard',

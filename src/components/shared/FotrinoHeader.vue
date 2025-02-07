@@ -23,7 +23,7 @@
           no-caps
           size="lg"
         >
-          <div v-for="collection in history" :key="collection.uuid" class="row">
+          <div v-for="channel in history" :key="channel.uuid" class="row">
             <q-btn
               icon="fas fa-clapperboard"
               align="left"
@@ -31,9 +31,9 @@
               no-caps
               no-wrap
               class="col-xs-10"
-              :label="collection.title"
+              :label="channel.title"
               size="md"
-              :to="'/' + collection.uuid + '/' + collection.slug"
+              :to="'/' + channel.uuid + '/' + channel.slug"
             />
             <q-btn
               icon="fas fa-circle-minus"
@@ -42,7 +42,7 @@
               no-wrap
               class="col-xs-2"
               size="md"
-              @click="$store.dispatch('collection/rmHistory', collection.uuid)"
+              @click="$store.dispatch('channel/rmHistory', channel.uuid)"
             />
           </div>
           <div v-if="history.length === 0" class="row q-pa-sm">
@@ -166,13 +166,13 @@ export default {
   },
 
   created: function() {
-    this.$store.dispatch('collection/getHistory')
+    this.$store.dispatch('channel/getHistory')
   },
 
   computed: {
     history: {
       get() {
-        return this.$store.state.collection.history
+        return this.$store.state.channel.history
       }
     },
     darkMode: {

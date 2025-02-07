@@ -4,20 +4,20 @@
     dense
     no-caps
     padding="8px"
-    :class="chapter.main ? 'fit bg-accent' : 'fit'"
+    :class="media.main ? 'fit bg-accent' : 'fit'"
     style="max-width: 640px"
   >
     <q-badge
-      v-if="chapter.type.startsWith('audio/')"
+      v-if="media.type.startsWith('audio/')"
       class="bg-accent q-pa-md z-top"
       floating
       transparent
     >
       <span class="text-bold">Audio</span>
     </q-badge>
-    <q-img :src="chapter.preview" :ratio="16 / 9">
+    <q-img :src="media.preview" :ratio="16 / 9">
       <div class="absolute-bottom text-center">
-        <div class="ellipsis"><span>{{ chapter.title }}</span><span v-if="detail && chapter.title !== movie.title"><br>{{ movie.title }}</span></div>
+        <div class="ellipsis"><span>{{ media.title }}</span><span v-if="detail && media.title !== project.title"><br>{{ project.title }}</span></div>
       </div>
       <template v-slot:error>
         <div class="absolute-full bg-black text-center text-h6">
@@ -26,7 +26,7 @@
           </div>
         </div>
         <div class="absolute-bottom text-center">
-          <div class="ellipsis"><span>{{ chapter.title }}</span><span v-if="detail && chapter.title !== movie.title"><br>{{ movie.title }}</span></div>
+          <div class="ellipsis"><span>{{ media.title }}</span><span v-if="detail && media.title !== project.title"><br>{{ project.title }}</span></div>
         </div>
       </template>
     </q-img>
@@ -35,11 +35,11 @@
 
 <script>
 export default {
-  name: 'ChapterPreview',
+  name: 'MediaPreview',
 
   props: {
-    chapter: Object,
-    movie: Object,
+    media: Object,
+    project: Object,
     detail: Boolean
   }
 }

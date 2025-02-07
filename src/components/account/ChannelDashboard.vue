@@ -10,9 +10,9 @@
       </div>
     </q-img>>
     <div class="text-h6 q-pt-md">
-      Collections
+      Channels
     </div>
-    <div v-for="c in collections" :key="c.id" class="q-py-xs">
+    <div v-for="c in channels" :key="c.id" class="q-py-xs">
       <q-btn flat :to="'/' + c.uuid + '/' + c.slug" align="left" style="width: 100%; max-width: 480px" no-wrap>
         <q-avatar>
           <img :src="c.cover" :alt="profile.name">
@@ -20,15 +20,15 @@
         <div class="q-pl-md ellipsis">{{ c.title }}</div>
       </q-btn>
     </div>
-    <div v-if="collections.length === 0">
-      No collections yet.
+    <div v-if="channels.length === 0">
+      No channels yet.
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Collection-Dashboard',
+  name: 'Channel-Dashboard',
 
   computed: {
     profile: {
@@ -36,15 +36,15 @@ export default {
         return this.$store.state.account.profile
       }
     },
-    collections: {
+    channels: {
       get() {
-        return this.$store.state.collection.collections
+        return this.$store.state.channel.channels
       }
     }
   },
 
   created: function() {
-    this.$store.cache.dispatch('collection/getCollections').catch(error => { console.log(error) })
+    this.$store.cache.dispatch('channel/getChannels').catch(error => { console.log(error) })
   }
 }
 </script>

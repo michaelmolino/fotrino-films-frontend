@@ -2,37 +2,37 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'; dayjs.extend(relativeTime)
 import DOMPurify from 'dompurify'
 
-export function getMetaData(route, collection) {
-  let movie = null
-  let chapter = null
+export function getMetaData(route, channel) {
+  let project = null
+  let media = null
   let title = null
   let description = ''
   let image = null
   let type = 'website'
 
   if (route?.params.uuid) {
-    title = collection?.title
+    title = channel?.title
     description += title
-    image = collection?.cover
+    image = channel?.cover
   }
 
-  if (route?.params.movieSlug) {
-    movie = collection.movies.find(m => m.slug === route.params.movieSlug)
-    if (route?.params.chapterSlug) {
-      chapter = movie?.chapters?.find(ch => ch.slug === route.params.chapterSlug)
+  if (route?.params.projectSlug) {
+    project = channel.projects.find(m => m.slug === route.params.projectSlug)
+    if (route?.params.mediaSlug) {
+      media = project?.media?.find(ch => ch.slug === route.params.mediaSlug)
     } else {
-      chapter = movie?.chapters.find(ch => ch.main)
+      media = project?.media.find(ch => ch.main)
     }
-    title = chapter?.title
-    description = sanitizeText(chapter?.description_unsafe)
-    image = chapter?.preview
+    title = media?.title
+    description = sanitizeText(media?.description_unsafe)
+    image = media?.preview
     type = 'video.other'
   }
 
   if (route?.params.privateId) {
-    title = collection?.movie?.chapter?.title
-    description = sanitizeText(collection?.movie?.chapter?.description_unsafe)
-    image = collection?.movie?.chapter?.preview
+    title = channel?.project?.media?.title
+    description = sanitizeText(channel?.project?.media?.description_unsafe)
+    image = channel?.project?.media?.preview
     type = 'video.other'
   }
 

@@ -70,7 +70,7 @@
         <q-card>
           <q-card-section>
             By default, your content is available to anyone that has the link to
-            your specific collection of movies. Your movies should not appear in
+            your specific channel. Your content should not appear in
             search engines and the URL to your videos is impossible for someone
             to guess or discover via brute force. The only way to discover your
             videos is for someone to be given the link.
@@ -199,16 +199,16 @@
             This is confusing and likely to change.
             <ul>
               <li>
-                The top level of Fotrino Films is a <strong>collection</strong>.
-                A <strong>collection</strong> contains <strong>movies</strong>.
+                The top level of Fotrino Films is a <strong>channel</strong>.
+                A <strong>channel</strong> contains <strong>projects</strong>.
               </li>
               <li>
-                A <strong>movie</strong> contains <strong>chapters</strong>. A
-                <strong>movie</strong> has a poster, a title, and a sub-title.
+                A <strong>project</strong> contains <strong>media</strong>. A
+                <strong>project</strong> has a poster, a title, and a sub-title.
               </li>
               <li>
-                A <strong>chapter</strong> is a playable video or audio file. It
-                has a preview, a title, and a description.
+                <strong>Media</strong> are playable video or audio files. They
+                have a preview, a title, and a description.
               </li>
             </ul>
           </q-card-section>

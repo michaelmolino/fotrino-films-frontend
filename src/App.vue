@@ -25,15 +25,15 @@ export default {
   },
 
   computed: {
-    collection: {
+    channel: {
       get() {
         if (this.$route.params?.uuid || this.$route.params.privateId) {
-          return this.$store.state.collection.collection
+          return this.$store.state.channel.channel
         }
         return null
       },
       set(value) {
-        this.$store.commit('collection/SET_COLLECTION', value)
+        this.$store.commit('channel/SET_CHANNEL', value)
       }
     }
   },
@@ -42,33 +42,33 @@ export default {
     $route(to, from) {
       if (to.params?.uuid) {
         this.$store.cache
-          .dispatch('collection/getCollection', to.params.uuid)
-          .then(_collection => {
-            this.collection = _collection
-            this.metaData = getMetaData(this.$route, _collection)
+          .dispatch('channel/getChannel', to.params.uuid)
+          .then(_channel => {
+            this.channel = _channel
+            this.metaData = getMetaData(this.$route, _channel)
           })
           .catch(() => {
-            this.collection = null
+            this.channel = null
           })
       } else if (to.params?.privateId) {
         this.$store.cache
-          .dispatch('collection/getPrivateChapter', to.params.privateId)
-          .then(_collection => {
-            this.collection = _collection
-            this.metaData = getMetaData(this.$route, _collection)
+          .dispatch('channel/getPrivateMedia', to.params.privateId)
+          .then(_channel => {
+            this.channel = _channel
+            this.metaData = getMetaData(this.$route, _channel)
           })
           .catch(() => {
-            this.collection = null
+            this.channel = null
           })
       } else {
         this.metaData = getMetaData(this.$route, null)
       }
     },
 
-    collection() {
-      if (this.collection?.uuid) {
+    channel() {
+      if (this.channel?.uuid) {
         this.$router.replace({
-          params: { collectionSlug: this.collection.slug }
+          params: { channelSlug: this.channel.slug }
         })
       }
     }

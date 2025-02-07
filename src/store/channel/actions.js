@@ -2,60 +2,60 @@ import { LocalStorage } from 'quasar'
 import _ from 'underscore'
 import { api } from 'boot/axios'
 
-function updateHistory(context, collection) {
+function updateHistory(context, channel) {
   const history = LocalStorage.getItem('fotrino-films-history') || []
   history.push({
-    uuid: collection.uuid,
-    title: collection.title,
-    slug: collection.slug
+    uuid: channel.uuid,
+    title: channel.title,
+    slug: channel.slug
   })
   const uniq = _.uniq(history, c => c.uuid)
   context.commit('SET_HISTORY', uniq)
   LocalStorage.set('fotrino-films-history', uniq)
 }
 
-export function getCollections(context) {
+export function getChannels(context) {
   return api
-    .get('/collections')
+    .get('/channels')
     .then(response => {
-      const collections = response.data
-      context.commit('SET_COLLECTIONS', collections)
-      return Promise.resolve(collections)
+      const channels = response.data
+      context.commit('SET_CHANNELS', channels)
+      return Promise.resolve(channels)
     })
     .catch(error => {
-      context.commit('SET_COLLECTIONS', [])
+      context.commit('SET_CHANNELS', [])
       return Promise.reject(error)
     })
 }
 
-export function getCollection(context, uuid) {
+export function getChannel(context, uuid) {
   return api
-    .get('/collections/' + uuid)
+    .get('/channels/' + uuid)
     .then(response => {
-      const collection = response.data
-      collection.movies = collection.movies.sort((a, b) => { return a.sort - b.sort })
-      collection.movies.forEach(m => { m.chapters = m.chapters.sort((a, b) => { return a.sort - b.sort }) })
-      context.commit('SET_COLLECTION', collection)
-      updateHistory(context, collection)
-      return Promise.resolve(collection)
+      const channel = response.data
+      channel.projects = channel.projects.sort((a, b) => { return a.sort - b.sort })
+      channel.projects.forEach(m => { m.media = m.media.sort((a, b) => { return a.sort - b.sort }) })
+      context.commit('SET_CHANNEL', channel)
+      updateHistory(context, channel)
+      return Promise.resolve(channel)
     })
     .catch(error => {
-      context.commit('SET_COLLECTION', null)
+      context.commit('SET_CHANNEL', null)
       rmHistory(context, uuid)
       return Promise.reject(error)
     })
 }
 
-export function getPrivateChapter(context, privateId) {
+export function getPrivateMedia(context, privateId) {
   return api
-    .get('/collections/chapters/private/' + privateId)
+    .get('/channels/media/private/' + privateId)
     .then(response => {
-      const collection = response.data
-      context.commit('SET_COLLECTION', collection)
-      return Promise.resolve(collection)
+      const channel = response.data
+      context.commit('SET_CHANNEL', channel)
+      return Promise.resolve(channel)
     })
     .catch(error => {
-      context.commit('SET_COLLECTION', null)
+      context.commit('SET_CHANNEL', null)
       return Promise.reject(error)
     })
 }
@@ -63,7 +63,7 @@ export function getPrivateChapter(context, privateId) {
 export function postUpload(context, payload) {
   return api
     .post(
-      '/collections/chapters', payload, {
+      '/channels/media', payload, {
         headers: {
           'Content-Type': 'application/json',
           Accept: 'application/json'
