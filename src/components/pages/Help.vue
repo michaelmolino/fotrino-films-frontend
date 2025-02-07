@@ -7,6 +7,7 @@
         :default-opened="!$route.query.item || $route.query.item === 'about'"
         header-class="text-bold"
         @show="this.$router.replace({query: { item: 'about' }})"
+        @hide="this.$router.replace({query: { }})"
       >
         <q-card>
           <q-card-section>
@@ -23,6 +24,7 @@
         header-class="text-bold"
         :default-opened="$route.query.item === 'different'"
         @show="this.$router.replace({query: { item: 'different' }})"
+        @hide="this.$router.replace({query: { }})"
       >
         <q-card>
           <q-card-section>
@@ -33,7 +35,7 @@
               or harvest or sell personal data. You simply upload the content
               you want to share and give the link to people you know.
             </div>
-            <div>
+            <div class="q-py-sm">
               Another way to think of it is most video platforms are designed
               for people who want to get paid to upload content. Fotrino Films
               is for people that want to pay to host their content without ads.
@@ -48,14 +50,12 @@
         header-class="text-bold"
         :default-opened="$route.query.item === 'opensource'"
         @show="this.$router.replace({query: { item: 'opensource' }})"
+        @hide="this.$router.replace({query: { }})"
       >
         <q-card>
           <q-card-section>
             The Fotrino Films frontend is open source and there is a link to the
-            source code in the footer. I will likely eventually make the backend
-            available as open source as well. I may choose to leave certain
-            parts of the platform as proprietary, for instance, any integration
-            with a billing provider.
+            source code in the footer. I might open source the backend one day.
           </q-card-section>
         </q-card>
       </q-expansion-item>
@@ -66,14 +66,23 @@
         header-class="text-bold"
         :default-opened="$route.query.item === 'privacy'"
         @show="this.$router.replace({query: { item: 'privacy' }})"
+        @hide="this.$router.replace({query: { }})"
       >
         <q-card>
           <q-card-section>
-            By default, your content is available to anyone that has the link to
-            your specific channel. Your content should not appear in
-            search engines and the URL to your videos is impossible for someone
-            to guess or discover via brute force. The only way to discover your
-            videos is for someone to be given the link.
+            <div>
+              By default, your content is available to anyone that has the link to
+              your specific channel. Your content should not appear in
+              search engines and the URL to your videos is impossible for someone
+              to guess or discover via brute force. The only way to discover your
+              videos is for someone to be given the link.
+            </div>
+            <div class="q-py-sm">
+              If you'd like to share a specific media file without revealing the
+              content from the rest of your channel, you can share a private link
+              from the share icon located below the video preview. Important note:
+              currently this leaks your channel ID. This will be fixed in the future.
+            </div>
           </q-card-section>
         </q-card>
       </q-expansion-item>
@@ -84,6 +93,7 @@
         header-class="text-bold"
         :default-opened="$route.query.item === 'production'"
         @show="this.$router.replace({query: { item: 'production' }})"
+        @hide="this.$router.replace({query: { }})"
       >
         <q-card>
           <q-card-section>
@@ -98,10 +108,11 @@
         header-class="text-bold"
         :default-opened="$route.query.item === 'mobilesupport'"
         @show="this.$router.replace({query: { item: 'mobilesupport' }})"
+        @hide="this.$router.replace({query: { }})"
       >
         <q-card>
           <q-card-section>
-            Yes!
+            Yes! Mobile users can browse and watch content from their devices. Unfortunately, uploading media from mobile is not yet supported.
           </q-card-section>
         </q-card>
       </q-expansion-item>
@@ -112,6 +123,7 @@
         header-class="text-bold"
         :default-opened="$route.query.item === 'download'"
         @show="this.$router.replace({query: { item: 'download' }})"
+        @hide="this.$router.replace({query: { }})"
       >
         <q-card>
           <q-card-section>
@@ -129,6 +141,7 @@
         header-class="text-bold"
         :default-opened="$route.query.item === 'buffering'"
         @show="this.$router.replace({query: { item: 'buffering' }})"
+        @hide="this.$router.replace({query: { }})"
       >
         <q-card>
           <q-card-section>
@@ -150,6 +163,7 @@
         header-class="text-bold"
         :default-opened="$route.query.item === 'facebook'"
         @show="this.$router.replace({query: { item: 'facebook' }})"
+        @hide="this.$router.replace({query: { }})"
       >
         <q-card>
           <q-card-section>
@@ -174,6 +188,7 @@
         header-class="text-bold"
         :default-opened="$route.query.item === 'login'"
         @show="this.$router.replace({query: { item: 'login' }})"
+        @hide="this.$router.replace({query: { }})"
       >
         <q-card>
           <q-card-section>
@@ -181,8 +196,8 @@
             from hackers and other online threats. No information about your
             content or usage of Fotrino Films is shared with third parties other
             than what is required to negotiate the login session. More identity
-            providers will be supported in the future including Github,
-            Instagram, and Microsoft Live.
+            providers will be supported in the future including Apple, GitHub,
+            Microsoft, Live, and Amazon.
           </q-card-section>
         </q-card>
       </q-expansion-item>
@@ -193,22 +208,24 @@
         header-class="text-bold"
         :default-opened="$route.query.item === 'terminology'"
         @show="this.$router.replace({query: { item: 'terminology' }})"
+        @hide="this.$router.replace({query: { }})"
       >
         <q-card>
           <q-card-section>
-            This is confusing and likely to change.
             <ul>
               <li>
                 The top level of Fotrino Films is a <strong>channel</strong>.
-                A <strong>channel</strong> contains <strong>projects</strong>.
+                If you have more than one channel, they are completely separate from each other.
+                Most users will probably have just one channel, but you can make as many as you want.
               </li>
               <li>
-                A <strong>project</strong> contains <strong>media</strong>. A
-                <strong>project</strong> has a poster, a title, and a sub-title.
+                A channel can contain <strong>projects</strong>.
+                Think of projects like folders for organising your content.
               </li>
               <li>
-                <strong>Media</strong> are playable video or audio files. They
-                have a preview, a title, and a description.
+                A project contains <strong>media</strong>.
+                Fotrino Films supports both Video and Audio files.
+                You can select some of your media to be featured media to make navigation easier.
               </li>
             </ul>
           </q-card-section>

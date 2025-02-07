@@ -32,7 +32,7 @@
           :done="step > 1"
         >
             <div>
-              A Channel represents the highest level of organization for your media. If you intend to upload all of your videos in one location then you will only ever need a single channel. If you create multiple channels, they will remain independent of one another; media from one channel (such as projects or media) will not be accessible or discoverable from another.
+              A channel represents the highest level of organization for your media. If you intend to upload all of your videos in one location then you will only ever need a single channel. If you create multiple channels, they will remain independent of one another; media from one channel will not be accessible or discoverable from another.
             </div>
             <div class="q-pt-md">
               For more help, see <q-btn flat icon="fas fa-circle-question" label="Terminology" to="/help?item=terminology"/>.
@@ -60,7 +60,7 @@
           :done="step > 2"
         >
           <div>
-            Projects are the next organizational level for your media (media files). Each channel can include multiple Projects, with each Project containing at least one media.
+            Projects are the next organizational level for your media. Each channel can include multiple projects, with each project containing at least one media file.
           </div>
           <div class="row">
             <div class="q-pa-md" style="width: 50%;">
@@ -88,7 +88,7 @@
           :done="step > 3"
         >
           <div>
-            Medias represent the actual media files and can be either video or audio. Completing this form will create a `pending` record of the media on our servers. Once you click `Finish` you will receive instructions on how to upload your media from your desktop computer.
+            Media can be either video or audio. Completing this form will create a `pending` record of the media on our servers. Once you click `Finish` you will receive instructions on how to upload your media from your desktop computer.
           </div>
           <div class="q-pt-md">
             <strong>Note</strong>: This process is currently intended for advanced users but will be made more user-friendly in the future.
@@ -239,7 +239,7 @@ git clone https://github.com/michaelmolino/fotrino-films-uploader.git ~/Workspac
     step(s) {
       if (s === 4) {
         this.$store.dispatch('channel/postUpload', this.payload).then(_response => {
-          this.secret = JSON.stringify(_response, null, 4)
+          this.secret = JSON.stringify(_response)
         })
           .catch(err => {
             console.log(err)

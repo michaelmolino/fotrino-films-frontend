@@ -17,7 +17,7 @@
         <template v-slot:project>
             <div class="row items-center no-wrap">
             <div class="text-center">
-                Project Groups &nbsp;
+                Projects &nbsp;
             </div>
             <q-avatar color="accent" text-color="white" size="sm" square>{{ projectCount }}</q-avatar>
             </div>
