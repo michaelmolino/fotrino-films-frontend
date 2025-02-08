@@ -17,25 +17,25 @@
         <template v-slot:project>
             <div class="row items-center no-wrap">
             <div class="text-center">
-                Projects &nbsp;
+                Projects
             </div>
-            <q-avatar color="accent" text-color="white" size="sm" square>{{ projectCount }}</q-avatar>
+            <q-avatar color="accent" text-color="white" size="sm" square class="q-ml-sm">{{ projectCount }}</q-avatar>
             </div>
         </template>
         <template v-slot:main>
             <div class="row items-center no-wrap">
             <div class="text-center">
-                Featured Media &nbsp;
+                Featured Media
             </div>
-            <q-avatar color="accent" text-color="white" size="sm" square>{{ mainCount }}</q-avatar>
+            <q-avatar color="accent" text-color="white" size="sm" square class="q-ml-sm">{{ mainCount }}</q-avatar>
             </div>
         </template>
         <template v-slot:all>
             <div class="row items-center no-wrap">
             <div class="text-center">
-                All Media &nbsp;
+                All Media
             </div>
-            <q-avatar color="accent" text-color="white" size="sm" square>{{ allCount }}</q-avatar>
+            <q-avatar color="accent" text-color="white" size="sm" square class="q-ml-sm">{{ allCount }}</q-avatar>
             </div>
         </template>
         </q-btn-toggle>

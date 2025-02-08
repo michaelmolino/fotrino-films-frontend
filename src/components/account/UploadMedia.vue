@@ -36,20 +36,18 @@
           </div>
           <q-expansion-item
             expand-separator
-            icon="fas fa-terminal"
+            :icon="$q.platform.is.mac ? 'fab fa-apple' : $q.platform.is.win ? 'fab fa-windows' : 'fab fa-linux'"
             label="Dependencies"
             caption="Click to read before continuing."
           >
             <q-card>
               <q-card-section>
-                The instructions are for Mac but should be easy to adapt for other platforms.
                 <QCodeBlock
                   :theme="$q.dark.isActive ? 'nightOwl' : 'github'"
-                  :code="code1"
+                  :code="$q.platform.is.mac ? codeMac : $q.platform.is.win ? codeWin : codeLinux"
                   language="bash"
                   numbered
                   showHeader
-                  file-name="Install Dependencies"
                   style="width: 100%;"
                 />
               </q-card-section>
@@ -169,12 +167,10 @@
               code="~/Workspace/fotrino-films-uploader/fotrino-upload.sh ~/fotrino/Media"
               language="bash"
               numbered
-              showHeader
-              file-name="Media Prepare / Upload"
               style="width: 100%;"
           />
-          <div class="q-pa-sm">When prompted, copy/past the below JSON - it should never be shared with anyone.</div>
-        <QCodeBlock :showHeader="true" :theme="$q.dark.isActive ? 'nightOwl' : 'github'" language="json" :code="secret" file-name="The following JSON contains secrets - DO NOT SHARE!" />
+          <div class="q-pa-sm">When prompted, copy/past the below JSON. This contains secrets that can be used to access your account - DO NOT SHARE WITH ANYONE.</div>
+        <QCodeBlock :theme="$q.dark.isActive ? 'nightOwl' : 'github'" language="json" :code="secret" showHeader/>
       </q-step>
 
         <template v-slot:navigation>
@@ -220,10 +216,30 @@ export default {
       projects: [],
       modelMediaNew: ref({ title: null, description: null, main: true }),
       secret: '',
-      code1: `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" # Requires sudo
-brew install coreutils gnu-tar git python ffmpeg graphicsmagick exiftool mediainfo jq curl
-git clone https://github.com/vincentbernat/video2hls.git ~/Workspace/video2hls # Credit to Vincent Bernat
-git clone https://github.com/michaelmolino/fotrino-films-uploader.git ~/Workspace/fotrino-films-uploader # This is still under development`
+      codeMac: [
+        '# If you don\'t already have Brew installed, uncomment the following line. Requires sudo.',
+        '# /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
+        'brew install coreutils gnu-tar git python ffmpeg graphicsmagick exiftool mediainfo jq curl',
+        'git clone https://github.com/vincentbernat/video2hls.git ~/Workspace/video2hls # Credit to Vincent Bernat',
+        'git clone https://github.com/michaelmolino/fotrino-films-uploader.git ~/Workspace/fotrino-films-uploader # This is still under development'
+      ].join('\n'),
+      codeWin: [
+        '# I haven\'t tried this on Windows, but you can try using Chocolatey from PowerShell.',
+        'Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString(\'https://community.chocolatey.org/install.ps1\'))',
+        'choco install coreutils gnuwin32-gtar git python ffmpeg graphicsmagick exiftool mediainfo jq curl',
+        'git clone https://github.com/vincentbernat/video2hls.git ~/Workspace/video2hls # Credit to Vincent Bernat',
+        'git clone https://github.com/michaelmolino/fotrino-films-uploader.git ~/Workspace/fotrino-films-uploader # This is still under development'
+      ].join('\n'),
+      codeLinux: [
+        '# Ubuntu',
+        'sudo apt update && sudo apt install git python ffmpeg graphicsmagick exiftool mediainfo jq curl',
+        '# Fedora, CentOS, RHEL',
+        '# sudo dnf install git python ffmpeg graphicsmagick exiftool mediainfo jq curl',
+        '# Arch',
+        '# sudo pacman -S git python ffmpeg graphicsmagick exiftool mediainfo jq curl',
+        'git clone https://github.com/vincentbernat/video2hls.git ~/Workspace/video2hls # Credit to Vincent Bernat',
+        'git clone https://github.com/michaelmolino/fotrino-films-uploader.git ~/Workspace/fotrino-films-uploader # This is still under development'
+      ].join('\n')
     }
   },
 
@@ -284,7 +300,7 @@ git clone https://github.com/michaelmolino/fotrino-films-uploader.git ~/Workspac
         obj.project.media.title = this.modelMediaNew.title
         obj.project.media.description = this.modelMediaNew.description
         obj.project.media.main = this.modelMediaNew.main
-        return JSON.stringify(obj, null, 4)
+        return obj
       }
     },
     next: {
