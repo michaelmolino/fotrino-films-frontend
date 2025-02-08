@@ -31,12 +31,34 @@
           icon="fas fa-video"
           :done="step > 1"
         >
-            <div>
-              A channel represents the highest level of organization for your media. If you intend to upload all of your videos in one location then you will only ever need a single channel. If you create multiple channels, they will remain independent of one another; media from one channel will not be accessible or discoverable from another.
-            </div>
-            <div class="q-pt-md">
-              For more help, see <q-btn flat icon="fas fa-circle-question" label="Terminology" to="/help?item=terminology"/>.
-            </div>
+          <div class="q-pb-md">
+            <strong>Note</strong>: This process is currently intended for advanced users but will be made more user-friendly in the future.
+          </div>
+          <q-expansion-item
+            expand-separator
+            icon="fas fa-terminal"
+            label="Dependencies"
+            caption="Click to read before continuing."
+          >
+            <q-card>
+              <q-card-section>
+                The instructions are for Mac but should be easy to adapt for other platforms.
+                <QCodeBlock
+                  :theme="$q.dark.isActive ? 'nightOwl' : 'github'"
+                  :code="code1"
+                  language="bash"
+                  numbered
+                  showHeader
+                  file-name="Install Dependencies"
+                  style="width: 100%;"
+                />
+              </q-card-section>
+            </q-card>
+          </q-expansion-item>
+          <div class="q-py-md">
+            A channel represents the highest level of organization for your media. If you intend to upload all of your videos in one location then you will only ever need a single channel. If you create multiple channels they will remain independent of one another; media from one channel will not be accessible or discoverable from another.
+            For more help, see <q-btn flat icon="fas fa-circle-question" label="Terminology" to="/help?item=terminology"/>.
+          </div>
           <div class="row">
             <div class="q-pa-md" style="width: 50%;">
               <q-select outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" label="Channel"
@@ -88,10 +110,7 @@
           :done="step > 3"
         >
           <div>
-            Media can be either video or audio. Completing this form will create a `pending` record of the media on our servers. Once you click `Finish` you will receive instructions on how to upload your media from your desktop computer.
-          </div>
-          <div class="q-pt-md">
-            <strong>Note</strong>: This process is currently intended for advanced users but will be made more user-friendly in the future.
+            Media can be either video or audio. Completing this form will create a <span class="inline-code">pending</span> record of the media on our servers. Once you click <span class="inline-code">Finish</span> you will receive instructions on how to upload your media from your desktop computer.
           </div>
           <div class="row">
             <div class="q-pa-md" style="width: 50%;">
@@ -113,18 +132,6 @@
           icon="fas fa-terminal"
           active-icon="fas fa-terminal"
         >
-          <div class="row q-py-sm">
-            <div class="q-pa-sm">Install dependencies; These instructions are for Mac; Windows and Linux users will need to adapt them.</div>
-            <QCodeBlock
-                :theme="$q.dark.isActive ? 'nightOwl' : 'github'"
-                :code="code1"
-                language="bash"
-                numbered
-                showHeader
-                file-name="Install Dependencies"
-                style="width: 100%;"
-            />
-          </div>
           <div class="q-pa-sm">Create a folder for your media such as <span class="inline-code">mkdir -p ~/fotrino/Media</span>.</div>
           <div class="q-pa-sm">
             Add the following media files to your new folder.
@@ -167,7 +174,7 @@
               style="width: 100%;"
           />
           <div class="q-pa-sm">When prompted, copy/past the below JSON - it should never be shared with anyone.</div>
-        <QCodeBlock :showHeader="true" :theme="$q.dark.isActive ? 'nightOwl' : 'github'" language="json" :code="secret" />
+        <QCodeBlock :showHeader="true" :theme="$q.dark.isActive ? 'nightOwl' : 'github'" language="json" :code="secret" file-name="The following JSON contains secrets - DO NOT SHARE!" />
       </q-step>
 
         <template v-slot:navigation>
@@ -213,8 +220,7 @@ export default {
       projects: [],
       modelMediaNew: ref({ title: null, description: null, main: true }),
       secret: '',
-      code1: `xcode-select --install
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" # Requires sudo
+      code1: `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" # Requires sudo
 brew install coreutils gnu-tar git python ffmpeg graphicsmagick exiftool mediainfo jq curl
 git clone https://github.com/vincentbernat/video2hls.git ~/Workspace/video2hls # Credit to Vincent Bernat
 git clone https://github.com/michaelmolino/fotrino-films-uploader.git ~/Workspace/fotrino-films-uploader # This is still under development`
