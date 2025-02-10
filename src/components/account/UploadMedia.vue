@@ -37,14 +37,14 @@
           <q-expansion-item
             expand-separator
             :icon="$q.platform.is.mac ? 'fab fa-apple' : $q.platform.is.win ? 'fab fa-windows' : 'fab fa-linux'"
-            label="Dependencies"
+            label="Install Dependencies"
             caption="Click to read before continuing."
           >
             <q-card>
               <q-card-section>
                 <QCodeBlock
                   :theme="$q.dark.isActive ? 'nightOwl' : 'github'"
-                  :code="$q.platform.is.mac ? codeMac : $q.platform.is.win ? codeWin : codeLinux"
+                  :code="$q.platform.is.mac ? codeMac.concat(codeCommon).join('\n') : $q.platform.is.win ? codeWin.concat(this.codeCommon).join('\n') : codeLinux.concat(this.codeCommon).join('\n')"
                   language="bash"
                   numbered
                   showHeader
@@ -54,7 +54,7 @@
             </q-card>
           </q-expansion-item>
           <div class="q-py-md">
-            A channel represents the highest level of organization for your media. If you intend to upload all of your videos in one location then you will only ever need a single channel. If you create multiple channels they will remain independent of one another; media from one channel will not be accessible or discoverable from another.
+            A channel serves as the highest level of organization for your media. Each channel operates independently; media within one channel is neither accessible nor discoverable from another.
             For more help, see <q-btn flat icon="fas fa-circle-question" label="Terminology" to="/help?item=terminology"/>.
           </div>
           <div class="row">
@@ -80,7 +80,7 @@
           :done="step > 2"
         >
           <div>
-            Projects are the next organizational level for your media. Each channel can include multiple projects, with each project containing at least one media file.
+            Projects are the next level of organization for your media. Each channel can contain multiple projects.
           </div>
           <div class="row">
             <div class="q-pa-md" style="width: 50%;">
@@ -108,7 +108,7 @@
           :done="step > 3"
         >
           <div>
-            Media can be either video or audio. Completing this form will create a <span class="inline-code">pending</span> record of the media on our servers. Once you click <span class="inline-code">Finish</span> you will receive instructions on how to upload your media from your desktop computer.
+            Completing this form will create a <span class="inline-code">pending</span> record of the media on our servers. Once you click <span class="inline-code">Finish</span> you will receive instructions on how to upload your media.
           </div>
           <div class="row">
             <div class="q-pa-md" style="width: 50%;">
@@ -130,9 +130,9 @@
           icon="fas fa-terminal"
           active-icon="fas fa-terminal"
         >
-          <div class="q-pa-sm">Create a folder for your media such as <span class="inline-code">mkdir -p ~/fotrino/Media</span>.</div>
+          <div class="q-pa-sm">Create a folder for your media such as <span class="inline-code">mkdir -p ~/Movies/fotrino/</span>.</div>
           <div class="q-pa-sm">
-            Add the following media files to your new folder.
+            Add the following media files to your new folder. The aspect ratio and exact filenames are important.
             <q-list style="width: 100%; max-width: 720px;" dense bordered class="q-my-md">
               <q-item>
                 <q-item-section class="text-weight-bold text-center">Description</q-item-section>
@@ -152,7 +152,7 @@
               <q-item>
                 <q-item-section>Media File</q-item-section>
                 <q-item-section>16:9 (landscape)</q-item-section>
-                <q-item-section><span class="inline-code">Media.(mp4|mov|mp3)</span></q-item-section>
+                <q-item-section><span class="inline-code">Media.(mp4|mov|webm)</span></q-item-section>
               </q-item>
               <q-item>
                 <q-item-section>Media Preview</q-item-section>
@@ -164,7 +164,7 @@
           <div class="q-pa-sm">Run the upload script.</div>
           <QCodeBlock
               :theme="$q.dark.isActive ? 'nightOwl' : 'github'"
-              code="~/Workspace/fotrino-films-uploader/fotrino-upload.sh ~/fotrino/Media"
+              :code="script"
               language="bash"
               numbered
               style="width: 100%;"
@@ -189,7 +189,6 @@
 
 <script>
 import { defineAsyncComponent, ref } from 'vue'
-import { Notify, copyToClipboard } from 'quasar'
 import { CodeBlock } from 'vuejs-code-block'
 
 export default {
@@ -216,19 +215,19 @@ export default {
       projects: [],
       modelMediaNew: ref({ title: null, description: null, main: true }),
       secret: '',
+      codeCommon: [
+        'git clone https://github.com/vincentbernat/video2hls.git ~/Workspace/video2hls # Credit to Vincent Bernat',
+        'git clone https://github.com/michaelmolino/fotrino-films-uploader.git ~/Workspace/fotrino-films-uploader'
+      ],
       codeMac: [
         '# If you don\'t already have Brew installed, uncomment the following line. Requires sudo.',
         '# /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
-        'brew install coreutils gnu-tar git python ffmpeg graphicsmagick exiftool mediainfo jq curl',
-        'git clone https://github.com/vincentbernat/video2hls.git ~/Workspace/video2hls # Credit to Vincent Bernat',
-        'git clone https://github.com/michaelmolino/fotrino-films-uploader.git ~/Workspace/fotrino-films-uploader # This is still under development'
-      ].join('\n'),
+        'brew install coreutils gnu-tar git python ffmpeg graphicsmagick exiftool mediainfo jq curl'
+      ],
       codeWin: [
         '# I haven\'t tried this on Windows, but you can try using Chocolatey from PowerShell.',
         'Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString(\'https://community.chocolatey.org/install.ps1\'))',
-        'choco install coreutils gnuwin32-gtar git python ffmpeg graphicsmagick exiftool mediainfo jq curl',
-        'git clone https://github.com/vincentbernat/video2hls.git ~/Workspace/video2hls # Credit to Vincent Bernat',
-        'git clone https://github.com/michaelmolino/fotrino-films-uploader.git ~/Workspace/fotrino-films-uploader # This is still under development'
+        'choco install coreutils gnuwin32-gtar git python ffmpeg graphicsmagick exiftool mediainfo jq curl'
       ].join('\n'),
       codeLinux: [
         '# Ubuntu',
@@ -236,9 +235,11 @@ export default {
         '# Fedora, CentOS, RHEL',
         '# sudo dnf install git python ffmpeg graphicsmagick exiftool mediainfo jq curl',
         '# Arch',
-        '# sudo pacman -S git python ffmpeg graphicsmagick exiftool mediainfo jq curl',
-        'git clone https://github.com/vincentbernat/video2hls.git ~/Workspace/video2hls # Credit to Vincent Bernat',
-        'git clone https://github.com/michaelmolino/fotrino-films-uploader.git ~/Workspace/fotrino-films-uploader # This is still under development'
+        '# sudo pacman -S git python ffmpeg graphicsmagick exiftool mediainfo jq curl'
+      ].join('\n'),
+      script: [
+        'cd ~/Workspace/fotrino-films-uploader/',
+        './fotrino-upload.sh ~/Movies/fotrino'
       ].join('\n')
     }
   },
@@ -318,23 +319,6 @@ export default {
             return false
         }
       }
-    }
-  },
-
-  methods: {
-    getToken() {
-      this.$store.cache.dispatch('account/getToken').then(_token => {
-        copyToClipboard(_token)
-          .then(() => {
-            Notify.create({
-              message: 'Secret token copied to clipboard!',
-              color: 'accent',
-              icon: 'far fa-clipboard',
-              timeout: 0,
-              actions: [{ label: 'Clear Clipboard', color: 'white', handler: () => { copyToClipboard('Secret token cleared from clipboard!') } }]
-            })
-          })
-      })
     }
   }
 }
