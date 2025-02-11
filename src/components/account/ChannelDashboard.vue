@@ -8,7 +8,7 @@
         <div class="ellipsis">{{ profile.name }}</div>
         <div class="ellipsis">{{ profile.email }}</div>
       </div>
-    </q-img>>
+    </q-img>
     <div class="text-h6 q-pt-md">
       Channels
     </div>
