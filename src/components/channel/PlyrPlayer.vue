@@ -8,6 +8,7 @@
           :src="media.preview"
           style="width: 100%;"
           :ratio="16/9"
+          fit="cover"
         />
         <audio id="player" controls :key="media.id" style="width: 100%;"></audio>
       </div>

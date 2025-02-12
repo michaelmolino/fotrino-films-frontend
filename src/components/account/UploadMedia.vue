@@ -68,6 +68,15 @@
                 <q-input outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md"
                   v-model="modelChannelNew.title" label="Channel Title"
                 />
+                <div class="row" style="width: 100%;">
+                  <div style="width: 50%;" class="text-center">
+                    <q-radio v-model="coverImgChoice" val="profile" label="Profile Photo" color="accent" /><br />
+                    <q-img v-if="coverImgChoice === 'profile'" :src="profile.profile_pic" style="width: 250px" :ratio="1 / 1" fit="cover"></q-img>
+                  </div>
+                  <div style="width: 50%;" class="text-center">
+                    <q-radio v-model="coverImgChoice" val="new" label="Upload Photo" color="accent" />
+                  </div>
+                </div>
               </span>
             </div>
           </div>
@@ -139,7 +148,7 @@
                 <q-item-section class="text-weight-bold text-center">Aspect Ratio</q-item-section>
                 <q-item-section class="text-weight-bold text-center">Filename</q-item-section>
               </q-item>
-              <q-item v-if="modelChannel.value === 0">
+              <q-item v-if="modelChannel.value === 0 && coverImgChoice === 'new'">
                 <q-item-section>Channel Cover</q-item-section>
                 <q-item-section>Square</q-item-section>
                 <q-item-section><span class="inline-code">Channel.jpg</span></q-item-section>
@@ -183,7 +192,7 @@
     </div>
   </div>
   <div v-else>
-    <NothingText />
+    <NothingText text="You must be logged in to see this page" />
   </div>
 </template>
 
@@ -214,6 +223,9 @@ export default {
       modelProjectNew: ref({ title: null, subtitle: null }),
       projects: [],
       modelMediaNew: ref({ title: null, description: null, main: true }),
+
+      coverImgChoice: ref('profile'),
+
       secret: '',
       codeCommon: [
         'git clone https://github.com/vincentbernat/video2hls.git ~/Workspace/video2hls # Credit to Vincent Bernat',
@@ -289,6 +301,7 @@ export default {
           obj.uuid = this.modelChannel.value
         } else {
           obj.title = this.modelChannelNew.title
+          obj.cover = this.coverImgChoice
         }
         obj.project = {}
         if (this.modelProject.value !== 0) {

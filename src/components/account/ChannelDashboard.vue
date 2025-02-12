@@ -1,6 +1,6 @@
 <template>
   <div v-if="profile?.id" class="q-pa-lg">
-    <q-img :src="profile.profile_pic" style="width: 250px">
+    <q-img :src="profile.profile_pic" style="width: 250px" :ratio="1 / 1" fit="cover">
       <q-badge class="bg-accent q-pa-md" floating transparent>
         <q-icon :name="'fab fa-' + profile.identity_provider" />
       </q-badge>
@@ -20,15 +20,20 @@
         <div class="q-pl-md ellipsis">{{ c.title }}</div>
       </q-btn>
     </div>
-    <div v-if="channels.length === 0">
-      No channels yet.
-    </div>
+    <NothingText v-if="channels.length === 0" text="Click Account and upload some media to get started."/>
   </div>
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue'
 export default {
   name: 'Channel-Dashboard',
+
+  components: {
+    NothingText: defineAsyncComponent(() =>
+      import('@components/shared/NothingText.vue')
+    )
+  },
 
   computed: {
     profile: {

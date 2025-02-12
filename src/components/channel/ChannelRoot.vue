@@ -27,7 +27,7 @@
           :to="'/' + channel.uuid + '/' + channel.slug + '/' + project.slug"
         />
       </div>
-      <NothingText v-if="channel.projects.length === 0" />
+      <NothingText v-if="channel.projects.length === 0" text="No content available." />
     </div>
 
     <div class="row q-pt-md" v-else>
@@ -46,7 +46,7 @@
           :detail=true
         />
       </div>
-      <NothingText v-if="channel.projects.flatMap(project => project.media.map(media => ({ media: media, project: project }))).filter((f) => selectedView == 'main' ? f.media.main : true).length === 0" />
+      <NothingText v-if="channel.projects.flatMap(project => project.media.map(media => ({ media: media, project: project }))).filter((f) => selectedView == 'main' ? f.media.main : true).length === 0" text="No content available." />
     </div>
 
   </div>

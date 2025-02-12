@@ -3,7 +3,7 @@
     <q-badge class="bg-accent q-pa-md z-top" floating transparent>
       <span class="text-bold">{{ project.media.length }}</span>
     </q-badge>
-    <q-img :src="project.poster" :ratio="2 / 3">
+    <q-img :src="project.poster" :ratio="2 / 3" fit="cover">
       <div class="absolute-bottom text-center">
         <div class="ellipsis">{{ project.title }}</div>
         <div class="ellipsis">{{ project.subtitle }}</div>

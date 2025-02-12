@@ -15,7 +15,7 @@
     >
       <span class="text-bold">Audio</span>
     </q-badge>
-    <q-img :src="media.preview" :ratio="16 / 9">
+    <q-img :src="media.preview" :ratio="16 / 9" fit="cover">
       <div class="absolute-bottom text-center">
         <div class="ellipsis"><span>{{ media.title }}</span><span v-if="detail && media.title !== project.title"><br>{{ project.title }}</span></div>
       </div>
