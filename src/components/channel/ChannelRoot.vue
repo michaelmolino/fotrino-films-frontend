@@ -1,5 +1,5 @@
 <template>
-  <div v-if="channel?.uuid">
+  <div v-if="channel?.uuid" class="q-pa-md">
 
     <div class="row">
       <BreadCrumbs

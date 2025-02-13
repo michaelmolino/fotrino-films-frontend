@@ -1,5 +1,5 @@
 <template>
-  <div v-if="profile?.id">
+  <div v-if="profile?.id" class="q-pa-md">
     <div v-if="!$q.platform.is.mobile && !$q.platform.is.desktop">
       Unsupported platform.
     </div>
@@ -7,7 +7,7 @@
       Mobile upload is not supported. This is a longer term goal.
     </div>
     <div v-if="$q.platform.is.desktop">
-      <q-item class="q-pa-md">
+      <q-item>
           <q-item-section side>
               <q-icon name="fas fa-cloud-arrow-up" size="xl" />
           </q-item-section>

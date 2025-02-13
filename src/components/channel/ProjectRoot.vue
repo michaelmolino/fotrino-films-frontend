@@ -1,48 +1,43 @@
 <template>
-  <span>
-    <div v-if="project">
+  <div v-if="channel && project" class="q-pa-md">
 
-      <BreadCrumbs
-        :channel="channel"
-        :project="project"
-        :media="media.main ? null : media"
-        :private="$route.params.privateId ? true : false"
-      />
+    <BreadCrumbs
+      :channel="channel"
+      :project="project"
+      :media="media?.main ? null : media"
+      :private="$route.params.privateId ? true : false"
+    />
 
-      <NothingText v-if="project.media?.length === 0" />
+    <NothingText v-if="project.media?.length === 0" />
 
-      <span v-else>
-        <PlyrPlayer :media="media" :artist="channel.ownername" style="width: 100%; max-width: 720px; min-width: 240px;" class="q-py-md" />
+    <span v-if="project.media?.length > 0 || project.media.private_id">
+      <PlyrPlayer :media="media" :artist="channel.ownername" style="width: 100%; max-width: 720px; min-width: 240px;" class="q-py-md" />
 
-        <MediaDescription :media="media" />
+      <MediaDescription :media="media" />
 
-        <span v-if="$route.params.uuid && project.media?.filter(ch => ch.id !== media.id)?.length > 0">
-          <div class="q-pt-md text-h6">
-            Related Content
+      <span v-if="$route.params.uuid && project.media?.filter(ch => ch.id !== media.id)?.length > 0">
+        <div class="q-pt-md text-h6">
+          Related Content
+        </div>
+        <div class="row">
+          <div
+            class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
+            v-for="media in project.media?.filter(ch => ch.id !== media.id)"
+            :key="media.id"
+          >
+            <MediaPreview
+              :style="media.deleted ? 'filter: brightness(37.5%); max-width: 360px;' : 'max-width: 360px;'"
+              :channel="channel"
+              :project="project"
+              :media="media"
+              :to="'/' + channel.uuid + '/' + channel.slug + '/' + project.slug + '/' + media.slug"
+            />
           </div>
-          <div class="row">
-            <div
-              class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
-              v-for="media in project.media?.filter(ch => ch.id !== media.id)"
-              :key="media.id"
-            >
-              <MediaPreview
-                :style="media.deleted ? 'filter: brightness(37.5%); max-width: 360px;' : 'max-width: 360px;'"
-                :channel="channel"
-                :project="project"
-                :media="media"
-                :to="'/' + channel.uuid + '/' + channel.slug + '/' + project.slug + '/' + media.slug"
-              />
-            </div>
-          </div>
-        </span>
+        </div>
       </span>
+    </span>
 
-    </div>
-    <div class="q-px-lg" v-else>
-      <NothingText text="No content available." />
-    </div>
-  </span>
+  </div>
 </template>
 
 <script>
@@ -82,11 +77,11 @@ export default {
           _project = this.channel?.projects.find(
             m => m.slug === this.$route.params.projectSlug
           )
-          if (this.channel?.id && this.$route.params.projectSlug && !_project) {
-            this.$router.replace('/404')
-          }
         } else if (this.$route.params.privateId) {
           _project = this.channel?.project
+        }
+        if (this.channel && !_project) {
+          this.$router.replace('/404')
         }
         return _project
       }
@@ -105,11 +100,11 @@ export default {
               params: { mediaSlug: _media.slug }
             })
           }
-          if (this.channel.id && !_media) {
-            this.$router.replace('/404')
-          }
         } else if (this.$route.params.privateId) {
           _media = this.channel.project.media
+        }
+        if (this.channel && this.project && !_media) {
+          this.$router.replace('/404')
         }
         return _media
       }

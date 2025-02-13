@@ -1,5 +1,5 @@
 <template>
-  <div style="max-width: 1023px">
+  <div style="max-width: 1023px" class="q-pa-md">
     <div class="text-h4">Privacy Policy & Terms of Use</div>
     <div>Last updated: <i>2025-02-05</i></div>
     <ol>

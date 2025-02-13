@@ -2,7 +2,7 @@
   <q-layout view="hHh lpR fFf">
     <FotrinoHeader />
     <q-page-container>
-      <router-view class="q-pa-md" />
+      <router-view />
     </q-page-container>
     <FotrinoFooter />
   </q-layout>

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="profile?.id" class="q-pa-lg">
+  <div v-if="profile?.id" class="q-pa-md">
     <q-img :src="profile.profile_pic" style="width: 250px" :ratio="1 / 1" fit="cover">
       <q-badge class="bg-accent q-pa-md" floating transparent>
         <q-icon :name="'fab fa-' + profile.identity_provider" />

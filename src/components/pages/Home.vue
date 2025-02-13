@@ -1,5 +1,5 @@
 <template>
-  <div class="absolute-center">
+  <div class="q-pa-md absolute-center">
     <div class="text-h4 text-right">
       <div>
         <span :class="$q.dark.isActive ? 'text-white' : 'text-secondary'">

@@ -1,5 +1,5 @@
 <template>
-  <div style="max-width: 1023px">
+  <div style="max-width: 1023px" class="q-pa-md">
     <q-list bordered>
       <q-expansion-item
         group="faq"
