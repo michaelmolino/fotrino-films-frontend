@@ -1,6 +1,6 @@
 <template>
   <span>
-    <div v-if="project?.media.length">
+    <div v-if="project">
 
       <BreadCrumbs
         :channel="channel"
