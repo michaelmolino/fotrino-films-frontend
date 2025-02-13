@@ -234,20 +234,20 @@ export default {
       codeMac: [
         '# If you don\'t already have Brew installed, uncomment the following line. Requires sudo.',
         '# /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
-        'brew install coreutils gnu-tar git python ffmpeg graphicsmagick exiftool mediainfo jq curl'
+        'brew install coreutils gnu-tar git python ffmpeg graphicsmagick jq curl'
       ],
       codeWin: [
         '# I haven\'t tried this on Windows, but you can try using Chocolatey from PowerShell.',
         'Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString(\'https://community.chocolatey.org/install.ps1\'))',
-        'choco install coreutils gnuwin32-gtar git python ffmpeg graphicsmagick exiftool mediainfo jq curl'
+        'choco install coreutils gnuwin32-gtar git python ffmpeg graphicsmagick jq curl'
       ].join('\n'),
       codeLinux: [
         '# Ubuntu',
-        'sudo apt update && sudo apt install git python ffmpeg graphicsmagick exiftool mediainfo jq curl',
+        'sudo apt update && sudo apt install git python ffmpeg graphicsmagick jq curl',
         '# Fedora, CentOS, RHEL',
-        '# sudo dnf install git python ffmpeg graphicsmagick exiftool mediainfo jq curl',
+        '# sudo dnf install git python ffmpeg graphicsmagick jq curl',
         '# Arch',
-        '# sudo pacman -S git python ffmpeg graphicsmagick exiftool mediainfo jq curl'
+        '# sudo pacman -S git python ffmpeg graphicsmagick jq curl'
       ].join('\n'),
       script: [
         'cd ~/Workspace/fotrino-films-uploader/',
