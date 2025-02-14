@@ -16,6 +16,12 @@
           Video Host
         </span>
       </div>
+      <div class="text-caption text-center q-py-md">
+        <q-btn flat href="https://films.fotrino.com/9944fa03-8a73-4e52-84bc-e8a514bd1271/Sample-Channel" align="left" no-wrap>
+          <q-avatar icon="far fa-circle-play" />
+          <div class="q-pl-md ellipsis">Sample Channel</div>
+        </q-btn>
+      </div>
     </div>
   </div>
 </template>
