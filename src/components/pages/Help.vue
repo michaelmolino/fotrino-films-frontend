@@ -80,8 +80,7 @@
             <div class="q-py-sm">
               If you'd like to share a specific media file without revealing the
               content from the rest of your channel, you can share a private link
-              from the share icon located below the video preview. Important note:
-              currently this leaks your channel ID. This will be fixed in the future.
+              from the share icon located below the video preview.
             </div>
           </q-card-section>
         </q-card>
