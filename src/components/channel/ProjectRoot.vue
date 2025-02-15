@@ -94,7 +94,7 @@ export default {
             _media = this.project?.media.find(
               ch => ch.slug === this.$route.params.mediaSlug
             )
-          } else if (!this.$route.params.mediaSlug) {
+          } else {
             _media = this.project?.media.find(ch => ch.main) || this.project?.media[0]
             this.$router.replace({
               params: { mediaSlug: _media.slug }

@@ -151,12 +151,12 @@
               <q-item v-if="modelChannel.value === 0 && coverImgChoice === 'new'">
                 <q-item-section>Channel Cover</q-item-section>
                 <q-item-section>Square</q-item-section>
-                <q-item-section><span class="inline-code">Channel.jpg</span></q-item-section>
+                <q-item-section><span class="inline-code">Channel.(jpg|jpeg|png|webp)</span></q-item-section>
               </q-item>
               <q-item v-if="modelProject.value === 0">
                 <q-item-section>Project Poster</q-item-section>
                 <q-item-section>2:3 (portrait)</q-item-section>
-                <q-item-section><span class="inline-code">Project.jpg</span></q-item-section>
+                <q-item-section><span class="inline-code">Project.(jpg|jpeg|png|webp)</span></q-item-section>
               </q-item>
               <q-item>
                 <q-item-section>Media File</q-item-section>
@@ -166,7 +166,7 @@
               <q-item>
                 <q-item-section>Media Preview</q-item-section>
                 <q-item-section>16:9 (landscape)</q-item-section>
-                <q-item-section><span class="inline-code">Preview.(jpg|png)</span></q-item-section>
+                <q-item-section><span class="inline-code">Preview.(jpg|jpeg|png|webp)</span></q-item-section>
               </q-item>
             </q-list>
           </div>
@@ -184,7 +184,6 @@
 
         <template v-slot:navigation>
           <q-stepper-navigation>
-            <!-- <q-btn flat @click="$refs.stepper.previous()" label="Back" :disabled="step==1 ? true : false" /> -->
             <q-btn v-if="step < 4" flat @click="$refs.stepper.next()" :label="step <3 ? 'Next' : 'Finish'" :disabled="(step==4 ? true : false) || !next" />
           </q-stepper-navigation>
         </template>
