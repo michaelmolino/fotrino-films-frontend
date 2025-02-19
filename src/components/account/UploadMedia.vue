@@ -61,22 +61,29 @@
             <div class="q-pa-md" style="width: 50%;">
               <q-select outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" label="Channel"
                 v-model="modelChannel" :options="channels.map(({ uuid, title }) => ({ value: uuid, label: title })).concat({ value: 0, label: 'New...' })"
-              />
+                class="q-pb-md"
+                />
+              <q-skeleton v-if ="!modelChannel" style="width: 250px; height: 250px;" />
+              <q-img v-if="modelChannel && modelChannel.value !== 0" :src="channels.find(ch => ch.uuid === modelChannel.value).cover" style="width: 250px" :ratio="1 / 1" fit="cover" />
+              <q-img v-if="modelChannel && modelChannel.value === 0 && coverImgChoice === 'profile'" :src="profile.profile_pic" style="width: 250px" :ratio="1 / 1" fit="cover" />
+              <q-skeleton v-if ="modelChannel && modelChannel.value === 0 && coverImgChoice === 'new' && !fileCover" style="width: 250px; height: 250px;" />
+              <q-img v-if="modelChannel && modelChannel.value === 0 && coverImgChoice === 'new' && fileCover" :src="fileCoverPreview" style="width: 250px" :ratio="1 / 1" fit="cover" />
             </div>
             <div class="q-pa-md" style="width: 50%;">
               <span v-if="modelChannel?.value === 0">
                 <q-input outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md"
                   v-model="modelChannelNew.title" label="Channel Title"
                 />
-                <div class="row" style="width: 100%;">
-                  <div style="width: 50%;" class="text-center">
-                    <q-radio v-model="coverImgChoice" val="profile" label="Profile Photo" color="accent" /><br />
-                    <q-img v-if="coverImgChoice === 'profile'" :src="profile.profile_pic" style="width: 250px" :ratio="1 / 1" fit="cover"></q-img>
-                  </div>
-                  <div style="width: 50%;" class="text-center">
-                    <q-radio v-model="coverImgChoice" val="new" label="Upload Photo" color="accent" />
-                  </div>
-                </div>
+                  <q-radio v-model="coverImgChoice" val="profile" label="Profile Photo" color="accent" /><br />
+                  <q-radio v-model="coverImgChoice" val="new" label="Upload Photo" color="accent" /><br />
+                  <q-file v-if="coverImgChoice === 'new'" outlined v-model="fileCover" accept="image/*" class="q-py-md" color="accent" @update:model-value="(file) => handleFile(file, 'cover')">
+                    <template v-slot:prepend>
+                      <q-icon name="image" @click.stop.prevent />
+                    </template>
+                    <template v-slot:append>
+                      <q-icon name="close" @click.stop.prevent="fileCover = null" class="cursor-pointer" />
+                    </template>
+                  </q-file>
               </span>
             </div>
           </div>
@@ -95,7 +102,13 @@
             <div class="q-pa-md" style="width: 50%;">
               <q-select outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" label="Project"
                 v-model="modelProject" :options="projects.map(({ id, title }) => ({ value: id, label: title })).concat({ value: 0, label: 'New...' })"
+                class="q-pb-md"
               />
+              <q-skeleton v-if ="!modelProject" style="width: 250px; height: 375px;" />
+              <q-img v-if="modelProject && modelProject.value !== 0" :src="projects.find(p => p.id === modelProject.value).poster" style="width: 250px" :ratio="2 / 3" fit="cover" />
+              <q-img v-if="modelProject && modelProject.value === 0 && posterImgChoice === 'default'" src="/images/poster.png" style="width: 250px" :ratio="2 / 3" fit="cover" />
+              <q-skeleton v-if ="modelProject && modelProject.value === 0 && posterImgChoice === 'new' && !filePoster" style="width: 250px; height: 375px;" />
+              <q-img v-if="modelProject && modelProject.value === 0 && posterImgChoice === 'new' && filePoster" :src="filePosterPreview" style="width: 250px" :ratio="2 / 3" fit="cover" />
             </div>
             <div class="q-pa-md" style="width: 50%;">
               <span v-if="modelProject?.value === 0">
@@ -105,6 +118,16 @@
                 <q-input outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md"
                   v-model="modelProjectNew.subtitle" label="Project SubTitle"
                 />
+                  <q-radio v-model="posterImgChoice" val="default" label="Default" color="accent" /><br />
+                  <q-radio v-model="posterImgChoice" val="new" label="Upload Photo" color="accent" />
+                  <q-file v-if="posterImgChoice === 'new'" outlined v-model="filePoster" accept="image/*" class="q-py-md" color="accent" @update:model-value="(file) => handleFile(file, 'poster')">
+                    <template v-slot:prepend>
+                      <q-icon name="image" @click.stop.prevent />
+                    </template>
+                    <template v-slot:append>
+                      <q-icon name="close" @click.stop.prevent="filePoster = null" class="cursor-pointer" />
+                    </template>
+                  </q-file>
               </span>
             </div>
           </div>
@@ -127,6 +150,18 @@
               <q-input outlined autogrow :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md"
                 v-model="modelMediaNew.description" label="Description - p, br, strong, and i tags allowed"
               />
+              <q-skeleton v-if ="!filePreview" style="width: 250px; height: 141px;" />
+              <q-img v-if="filePreview" :src="filePreviewPreview" style="width: 250px" :ratio="16 / 9" fit="cover" class="q-pa-md" />
+            </div>
+            <div style="width: 50%;">
+              <q-file outlined v-model="filePreview" accept="image/*" class="q-py-md" color="accent" @update:model-value="(file) => handleFile(file, 'preview')">
+                <template v-slot:prepend>
+                  <q-icon name="image" @click.stop.prevent />
+                </template>
+                <template v-slot:append>
+                  <q-icon name="close" @click.stop.prevent="filePreview = null" class="cursor-pointer" />
+                </template>
+              </q-file>
               <q-checkbox outlined v-model="modelMediaNew.main" label="Featured" />
             </div>
           </div>
@@ -139,37 +174,6 @@
           icon="fas fa-terminal"
           active-icon="fas fa-terminal"
         >
-          <div class="q-pa-sm">Create a folder for your media such as <span class="inline-code">mkdir -p ~/Movies/fotrino/</span>.</div>
-          <div class="q-pa-sm">
-            Add the following media files to your new folder. The aspect ratio and exact filenames are important.
-            <q-list style="width: 100%; max-width: 720px;" dense bordered class="q-my-md">
-              <q-item>
-                <q-item-section class="text-weight-bold text-center">Description</q-item-section>
-                <q-item-section class="text-weight-bold text-center">Aspect Ratio</q-item-section>
-                <q-item-section class="text-weight-bold text-center">Filename</q-item-section>
-              </q-item>
-              <q-item v-if="modelChannel.value === 0 && coverImgChoice === 'new'">
-                <q-item-section>Channel Cover</q-item-section>
-                <q-item-section>Square</q-item-section>
-                <q-item-section><span class="inline-code">Cover.(jpg|jpeg|png|webp)</span></q-item-section>
-              </q-item>
-              <q-item v-if="modelProject.value === 0">
-                <q-item-section>Project Poster</q-item-section>
-                <q-item-section>2:3 (portrait)</q-item-section>
-                <q-item-section><span class="inline-code">Poster.(jpg|jpeg|png|webp)</span></q-item-section>
-              </q-item>
-              <q-item>
-                <q-item-section>Media File</q-item-section>
-                <q-item-section>16:9 (landscape)</q-item-section>
-                <q-item-section><span class="inline-code">Media.(mp4|mov|webm)</span></q-item-section>
-              </q-item>
-              <q-item>
-                <q-item-section>Media Preview</q-item-section>
-                <q-item-section>16:9 (landscape)</q-item-section>
-                <q-item-section><span class="inline-code">Preview.(jpg|jpeg|png|webp)</span></q-item-section>
-              </q-item>
-            </q-list>
-          </div>
           <div class="q-pa-sm">Run the upload script.</div>
           <QCodeBlock
               :theme="$q.dark.isActive ? 'nightOwl' : 'github'"
@@ -189,6 +193,12 @@
         </template>
       </q-stepper>
     </div>
+    <q-ajax-bar
+      ref="bar"
+      position="bottom"
+      color="accent"
+      size="20px"
+    />
   </div>
   <div v-else>
     <NothingText text="You must be logged in to see this page" />
@@ -198,6 +208,9 @@
 <script>
 import { defineAsyncComponent, ref } from 'vue'
 import { CodeBlock } from 'vuejs-code-block'
+import axios from 'axios'
+
+import imageCompression from 'browser-image-compression'
 
 export default {
   name: 'UploadMedia',
@@ -223,7 +236,22 @@ export default {
       projects: [],
       modelMediaNew: ref({ title: null, description: null, main: true }),
 
+      fileCover: ref(null),
+      fileCoverPreview: ref(null),
+      filePoster: ref(null),
+      filePosterPreview: ref(null),
+      filePreview: ref(null),
+      filePreviewPreview: ref(null),
+
       coverImgChoice: ref('profile'),
+      posterImgChoice: ref('default'),
+      previewImgChoice: ref('default'),
+
+      uploadFiles: [
+        { type: 'cover', file: null, hash: null },
+        { type: 'poster', file: null, hash: null },
+        { type: 'preview', file: null, hash: null }
+      ],
 
       secret: '',
       codeCommon: [
@@ -233,24 +261,24 @@ export default {
       codeMac: [
         '# If you don\'t already have Brew installed, uncomment the following line. Requires sudo.',
         '# /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
-        'brew install coreutils gnu-tar git python ffmpeg graphicsmagick jq curl'
+        'brew install coreutils gnu-tar git python ffmpeg jq curl'
       ],
       codeWin: [
         '# I haven\'t tried this on Windows, but you can try using Chocolatey from PowerShell.',
         'Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString(\'https://community.chocolatey.org/install.ps1\'))',
-        'choco install coreutils gnuwin32-gtar git python ffmpeg graphicsmagick jq curl'
+        'choco install coreutils gnuwin32-gtar git python ffmpeg jq curl'
       ].join('\n'),
       codeLinux: [
         '# Ubuntu',
-        'sudo apt update && sudo apt install git python ffmpeg graphicsmagick jq curl',
+        'sudo apt update && sudo apt install git python ffmpeg jq curl',
         '# Fedora, CentOS, RHEL',
-        '# sudo dnf install git python ffmpeg graphicsmagick jq curl',
+        '# sudo dnf install git python ffmpeg jq curl',
         '# Arch',
-        '# sudo pacman -S git python ffmpeg graphicsmagick jq curl'
+        '# sudo pacman -S git python ffmpeg jq curl'
       ].join('\n'),
       script: [
         'cd ~/Workspace/fotrino-films-uploader/',
-        './fotrino-upload.sh ~/Movies/fotrino'
+        './fotrino-upload.sh /path/to/your/media.{mp4,mov,webm}'
       ].join('\n')
     }
   },
@@ -272,12 +300,65 @@ export default {
     },
     step(s) {
       if (s === 4) {
-        this.$store.dispatch('channel/postUpload', this.payload).then(_response => {
-          this.secret = JSON.stringify(_response)
+        this.$store.dispatch('channel/postUpload', this.payload).then(async _response => {
+          this.secret = JSON.stringify(
+            {
+              userToken: _response.userToken,
+              uploadToken: _response.uploadToken
+            }
+          )
+          const uploadUrls = _response.upload_Urls
+          // Show Spinner
+          for (const [type, url] of Object.entries(uploadUrls)) {
+            const file = this.uploadFiles.find(f => f.type === type).file
+            try {
+              await axios.put(url, file, {
+                headers: {
+                  'Content-Type': file.type
+                }
+              })
+            } catch (error) {
+              console.error(`Error uploading ${type}:`, error)
+            }
+          }
+          // Hide Spinner
         })
           .catch(err => {
             console.log(err)
           })
+      }
+    },
+    fileCover(newFile) {
+      if (newFile) {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          this.fileCoverPreview = e.target.result
+        }
+        reader.readAsDataURL(newFile)
+      } else {
+        this.fileCoverPreview = null
+      }
+    },
+    filePoster(newFile) {
+      if (newFile) {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          this.filePosterPreview = e.target.result
+        }
+        reader.readAsDataURL(newFile)
+      } else {
+        this.filePosterPreview = null
+      }
+    },
+    filePreview(newFile) {
+      if (newFile) {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          this.filePreviewPreview = e.target.result
+        }
+        reader.readAsDataURL(newFile)
+      } else {
+        this.filePreviewPreview = null
       }
     }
   },
@@ -300,7 +381,13 @@ export default {
           obj.uuid = this.modelChannel.value
         } else {
           obj.title = this.modelChannelNew.title
-          obj.cover = this.coverImgChoice
+          if (this.coverImgChoice === 'new') {
+            obj.coverType = 'object'
+            obj.coverObject = 'covers/' + this.uploadFiles.find(f => f.type === 'cover').hash + '.jpg'
+          } else {
+            obj.coverType = 'url'
+            obj.coverUrl = this.profile.profile_pic
+          }
         }
         obj.project = {}
         if (this.modelProject.value !== 0) {
@@ -308,11 +395,19 @@ export default {
         } else {
           obj.project.title = this.modelProjectNew.title
           obj.project.subtitle = this.modelProjectNew.subtitle
+          if (this.posterImgChoice === 'new') {
+            obj.project.posterType = 'object'
+            obj.project.posterObject = 'posters/' + this.uploadFiles.find(f => f.type === 'poster').hash + '.jpg'
+          } else {
+            obj.project.posterType = 'url'
+            obj.project.posterUrl = '/images/poster.png'
+          }
         }
         obj.project.media = {}
         obj.project.media.title = this.modelMediaNew.title
         obj.project.media.description = this.modelMediaNew.description
         obj.project.media.main = this.modelMediaNew.main
+        obj.project.media.previewObject = 'previews/' + this.uploadFiles.find(f => f.type === 'preview').hash + '.jpg'
         return obj
       }
     },
@@ -320,17 +415,46 @@ export default {
       get() {
         switch (this.step) {
           case 1:
-            return this.modelChannel?.value || this.modelChannelNew.title
+            return this.modelChannel?.value || (this.modelChannelNew.title && (this.fileCover || this.coverImgChoice === 'profile'))
           case 2:
-            return this.modelProject?.value || this.modelProjectNew.title
+            return this.modelProject?.value || (this.modelProjectNew.title && (this.filePoster || this.posterImgChoice === 'default'))
           case 3:
-            return this.modelMediaNew.title
+            return this.modelMediaNew.title && this.filePreview
           case 4:
             return false
           default:
             return false
         }
       }
+    }
+  },
+
+  methods: {
+    async handleFile(file, resourceType) {
+      if (!file) return
+
+      try {
+        const options = {
+          fileType: 'image/jpeg',
+          maxWidthOrHeight: 720,
+          useWebWorker: true
+        }
+        const compressedFile = await imageCompression(file, options)
+        this.uploadFiles.find(f => f.type === resourceType).file = compressedFile
+
+        const arrayBuffer = await compressedFile.arrayBuffer()
+        const hash = await this.computeMD5(arrayBuffer)
+        this.uploadFiles.find(f => f.type === resourceType).hash = hash
+      } catch (error) {
+        console.error('Error processing file:', error)
+      }
+    },
+
+    async computeMD5(buffer) {
+      const hashBuffer = await crypto.subtle.digest('SHA-256', buffer)
+      return Array.from(new Uint8Array(hashBuffer))
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('')
     }
   }
 }

@@ -17,6 +17,7 @@
   "dependencies": {
     "@quasar/extras": "^1.16.15",
     "axios": "^1.6.0",
+    "browser-image-compression": "^2.0.2",
     "dayjs": "^1.11.13",
     "dompurify": "^3.2.4",
     "hls.js": "^1.5.20",

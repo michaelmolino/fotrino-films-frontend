@@ -81,6 +81,6 @@ export function sanitizeHtml(unsafe) {
 
 export function sanitizeText(unsafe) {
   const ALLOWED_TAGS = []
-  const text = unsafe.replace(/<br[^>]*>/gi, '\n').replace(/<\/?p[^>]*>/gi, '\n')
+  const text = unsafe?.replace(/<br[^>]*>/gi, '\n').replace(/<\/?p[^>]*>/gi, '\n')
   return DOMPurify.sanitize(text, { ALLOWED_TAGS: ALLOWED_TAGS })
 }
