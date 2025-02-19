@@ -193,12 +193,6 @@
         </template>
       </q-stepper>
     </div>
-    <q-ajax-bar
-      ref="bar"
-      position="bottom"
-      color="accent"
-      size="20px"
-    />
   </div>
   <div v-else>
     <NothingText text="You must be logged in to see this page" />
