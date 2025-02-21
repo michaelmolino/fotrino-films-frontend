@@ -4,7 +4,7 @@
       Unsupported platform.
     </div>
     <div v-if="$q.platform.is.mobile">
-      Mobile upload is not supported. This is a longer term goal.
+      Mobile upload is not yet supported. This is in development.
     </div>
     <div v-if="$q.platform.is.desktop">
       <q-item>
@@ -13,7 +13,6 @@
           </q-item-section>
           <q-item-section>
               <q-item-label class="text-h4">Upload Media</q-item-label>
-              <q-item-label>Uploading media is an advanced operation; you should be comfortable using the terminal.</q-item-label>
           </q-item-section>
       </q-item>
       <q-stepper
@@ -31,28 +30,6 @@
           icon="fas fa-video"
           :done="step > 1"
         >
-          <div class="q-pb-md">
-            <strong>Note</strong>: This process is currently intended for advanced users but will be made more user-friendly in the future.
-          </div>
-          <q-expansion-item
-            expand-separator
-            :icon="$q.platform.is.mac ? 'fab fa-apple' : $q.platform.is.win ? 'fab fa-windows' : 'fab fa-linux'"
-            label="Install Dependencies"
-            caption="Click to read before continuing."
-          >
-            <q-card>
-              <q-card-section>
-                <QCodeBlock
-                  :theme="$q.dark.isActive ? 'nightOwl' : 'github'"
-                  :code="$q.platform.is.mac ? codeMac.concat(codeCommon).join('\n') : $q.platform.is.win ? codeWin.concat(this.codeCommon).join('\n') : codeLinux.concat(this.codeCommon).join('\n')"
-                  language="bash"
-                  numbered
-                  showHeader
-                  style="width: 100%;"
-                />
-              </q-card-section>
-            </q-card>
-          </q-expansion-item>
           <div class="q-py-md">
             A channel serves as the highest level of organization for your media. Each channel operates independently; media within one channel is neither accessible nor discoverable from another.
             For more help, see <q-btn flat icon="fas fa-circle-question" label="Terminology" to="/help?item=terminology"/>.
@@ -76,7 +53,7 @@
                 />
                   <q-radio v-model="coverImgChoice" val="profile" label="Profile Photo" color="accent" /><br />
                   <q-radio v-model="coverImgChoice" val="new" label="Upload Photo" color="accent" /><br />
-                  <q-file v-if="coverImgChoice === 'new'" outlined v-model="fileCover" accept="image/*" class="q-py-md" color="accent" @update:model-value="(file) => handleFile(file, 'cover')">
+                  <q-file v-if="coverImgChoice === 'new'" label = "Channel Cover (Image)" appendoutlined v-model="fileCover" accept="image/*" class="q-py-md" color="accent" @update:model-value="(file) => handleFile(file, 'cover')">
                     <template v-slot:prepend>
                       <q-icon name="image" @click.stop.prevent />
                     </template>
@@ -120,7 +97,7 @@
                 />
                   <q-radio v-model="posterImgChoice" val="default" label="Default" color="accent" /><br />
                   <q-radio v-model="posterImgChoice" val="new" label="Upload Photo" color="accent" />
-                  <q-file v-if="posterImgChoice === 'new'" outlined v-model="filePoster" accept="image/*" class="q-py-md" color="accent" @update:model-value="(file) => handleFile(file, 'poster')">
+                  <q-file v-if="posterImgChoice === 'new'" label = "Profile Poster (Image)" outlined v-model="filePoster" accept="image/*" class="q-py-md" color="accent" @update:model-value="(file) => handleFile(file, 'poster')">
                     <template v-slot:prepend>
                       <q-icon name="image" @click.stop.prevent />
                     </template>
@@ -154,12 +131,20 @@
               <q-img v-if="filePreview" :src="filePreviewPreview" style="width: 250px" :ratio="16 / 9" fit="cover" class="q-pa-md" />
             </div>
             <div style="width: 50%;">
-              <q-file outlined v-model="filePreview" accept="image/*" class="q-py-md" color="accent" @update:model-value="(file) => handleFile(file, 'preview')">
+              <q-file label = "Media Preview (Image)" outlined v-model="filePreview" accept="image/*" class="q-py-md" color="accent" @update:model-value="(file) => handleFile(file, 'preview')">
                 <template v-slot:prepend>
                   <q-icon name="image" @click.stop.prevent />
                 </template>
                 <template v-slot:append>
                   <q-icon name="close" @click.stop.prevent="filePreview = null" class="cursor-pointer" />
+                </template>
+              </q-file>
+              <q-file label = "Media (Video)" outlined v-model="fileMedia" accept="video/*" class="q-pb-md" color="accent">
+                <template v-slot:prepend>
+                  <q-icon name="movie" @click.stop.prevent />
+                </template>
+                <template v-slot:append>
+                  <q-icon name="close" @click.stop.prevent="fileMedia = null" class="cursor-pointer" />
                 </template>
               </q-file>
               <q-checkbox outlined v-model="modelMediaNew.main" label="Featured" />
@@ -169,25 +154,18 @@
 
         <q-step
           :name="4"
-          title="Upload"
-          caption="via Terminal"
-          icon="fas fa-terminal"
-          active-icon="fas fa-terminal"
+          title="Processing"
+          icon="fa fa-gears"
+          active-icon="fa fa-gears"
         >
-          <div class="q-pa-sm">Run the upload script.</div>
-          <QCodeBlock
-              :theme="$q.dark.isActive ? 'nightOwl' : 'github'"
-              :code="script"
-              language="bash"
-              numbered
-              style="width: 100%;"
-          />
-          <div class="q-pa-sm">When prompted, copy/past the below JSON. This contains secrets that can be used to access your account - DO NOT SHARE WITH ANYONE.</div>
-        <QCodeBlock :theme="$q.dark.isActive ? 'nightOwl' : 'github'" language="json" :code="secret" showHeader/>
+          <div>
+            Your media is now processing. This can take some time. Your media will be live as soon as it's done.
+          </div>
       </q-step>
 
         <template v-slot:navigation>
           <q-stepper-navigation>
+            <q-btn v-if="step < 4" flat @click="$refs.stepper.previous()" label="Back" :disabled="(step==1 ? true : false)" />
             <q-btn v-if="step < 4" flat @click="$refs.stepper.next()" :label="step <3 ? 'Next' : 'Finish'" :disabled="(step==4 ? true : false) || !next" />
           </q-stepper-navigation>
         </template>
@@ -201,7 +179,6 @@
 
 <script>
 import { defineAsyncComponent, ref } from 'vue'
-import { CodeBlock } from 'vuejs-code-block'
 import axios from 'axios'
 
 import imageCompression from 'browser-image-compression'
@@ -212,8 +189,7 @@ export default {
   components: {
     NothingText: defineAsyncComponent(() =>
       import('@components/shared/NothingText.vue')
-    ),
-    QCodeBlock: CodeBlock
+    )
   },
 
   created: function() {
@@ -222,12 +198,12 @@ export default {
 
   data() {
     return {
+      projects: [],
       step: ref(1),
       modelChannel: ref(null),
       modelChannelNew: ref({ title: null }),
       modelProject: ref(null),
       modelProjectNew: ref({ title: null, subtitle: null }),
-      projects: [],
       modelMediaNew: ref({ title: null, description: null, main: true }),
 
       fileCover: ref(null),
@@ -236,6 +212,7 @@ export default {
       filePosterPreview: ref(null),
       filePreview: ref(null),
       filePreviewPreview: ref(null),
+      fileMedia: ref(null),
 
       coverImgChoice: ref('profile'),
       posterImgChoice: ref('default'),
@@ -245,35 +222,7 @@ export default {
         { type: 'cover', file: null, hash: null },
         { type: 'poster', file: null, hash: null },
         { type: 'preview', file: null, hash: null }
-      ],
-
-      secret: '',
-      codeCommon: [
-        'git clone https://github.com/vincentbernat/video2hls.git ~/Workspace/video2hls # Credit to Vincent Bernat',
-        'git clone https://github.com/michaelmolino/fotrino-films-uploader.git ~/Workspace/fotrino-films-uploader'
-      ],
-      codeMac: [
-        '# If you don\'t already have Brew installed, uncomment the following line. Requires sudo.',
-        '# /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
-        'brew install coreutils gnu-tar git python ffmpeg jq curl'
-      ],
-      codeWin: [
-        '# I haven\'t tried this on Windows, but you can try using Chocolatey from PowerShell.',
-        'Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString(\'https://community.chocolatey.org/install.ps1\'))',
-        'choco install coreutils gnuwin32-gtar git python ffmpeg jq curl'
-      ].join('\n'),
-      codeLinux: [
-        '# Ubuntu',
-        'sudo apt update && sudo apt install git python ffmpeg jq curl',
-        '# Fedora, CentOS, RHEL',
-        '# sudo dnf install git python ffmpeg jq curl',
-        '# Arch',
-        '# sudo pacman -S git python ffmpeg jq curl'
-      ].join('\n'),
-      script: [
-        'cd ~/Workspace/fotrino-films-uploader/',
-        './fotrino-upload.sh /path/to/your/media.{mp4,mov,webm}'
-      ].join('\n')
+      ]
     }
   },
 
@@ -292,20 +241,26 @@ export default {
         this.projects = []
       }
     },
+    projects(p) {
+      if (p.length === 0) {
+        this.modelProject = ref({ value: 0, label: 'New...' })
+      }
+    },
     step(s) {
       if (s === 4) {
         this.$store.dispatch('channel/postUpload', this.payload).then(async _response => {
+          const uploadToken = _response.uploadToken
           this.secret = JSON.stringify(
             {
               userToken: _response.userToken,
-              uploadToken: _response.uploadToken
+              uploadToken: uploadToken
             }
           )
           const uploadUrls = _response.upload_Urls
-          // Show Spinner
           for (const [type, url] of Object.entries(uploadUrls)) {
             const file = this.uploadFiles.find(f => f.type === type).file
             try {
+              // await this.$store.dispatch('upload/putObject', (url, file))
               await axios.put(url, file, {
                 headers: {
                   'Content-Type': file.type
@@ -315,7 +270,9 @@ export default {
               console.error(`Error uploading ${type}:`, error)
             }
           }
-          // Hide Spinner
+          const formData = new FormData()
+          formData.append('file', this.fileMedia)
+          await this.$store.dispatch('upload/postFile', { formData, uploadToken })
         })
           .catch(err => {
             console.log(err)
@@ -413,9 +370,7 @@ export default {
           case 2:
             return this.modelProject?.value || (this.modelProjectNew.title && (this.filePoster || this.posterImgChoice === 'default'))
           case 3:
-            return this.modelMediaNew.title && this.filePreview
-          case 4:
-            return false
+            return this.modelMediaNew.title && this.filePreview && this.fileMedia
           default:
             return false
         }
