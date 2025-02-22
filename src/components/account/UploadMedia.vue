@@ -42,8 +42,8 @@
                 v-model="modelChannelNew.title" label="Channel Title"
               />
                 <q-radio v-model="coverImgChoice" val="profile" label="Profile Photo" color="accent" /><br />
-                <q-radio v-model="coverImgChoice" val="new" label="Upload Photo" color="accent" /><br />
-                <q-file v-if="coverImgChoice === 'new'" label = "Channel Cover (Image)" appendoutlined v-model="fileCover" accept="image/*" class="q-py-md" color="accent" @update:model-value="(file) => handleFile(file, 'cover')">
+                <q-radio v-model="coverImgChoice" val="new" label="Upload Photo" color="accent" class="q-pb-md" /><br />
+                <q-file v-if="coverImgChoice === 'new'" label = "Channel Cover (Image)" appendoutlined v-model="fileCover" accept="image/*" color="accent" @update:model-value="(file) => handleFile(file, 'cover')">
                   <template v-slot:prepend>
                     <q-icon name="image" @click.stop.prevent />
                   </template>
@@ -111,18 +111,19 @@
             <q-input outlined autogrow :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md"
               v-model="modelMediaNew.description" label="Description - p, br, strong, and i tags allowed"
             />
-            <q-skeleton v-if ="!filePreview" style="width: 250px; height: 141px;" />
-            <q-img v-if="filePreview" :src="filePreviewPreview" style="width: 250px" :ratio="16 / 9" fit="cover" />
+            <q-checkbox outlined v-model="modelMediaNew.main" label="Featured" class="q-pb-md" />
+            <div class="row no-wrap">
+              <div>
+                <q-skeleton v-if ="(previewImgChoice === 'new' && !filePreview) || (previewImgChoice === 'frame' && !fileMedia)" style="width: 250px; height: 141px;" />
+                <q-img v-if="previewImgChoice === 'new' && filePreview" :src="filePreviewPreview" style="width: 250px" :ratio="16 / 9" fit="cover" />
+                <q-img v-if="previewImgChoice === 'frame' && fileMedia" :src="randomFrameUrl" style="width: 250px" :ratio="16 / 9" fit="cover" />
+              </div>
+              <div class="q-px-lg flex items-center">
+                <q-btn v-if="previewImgChoice === 'frame' && fileMedia" icon="fas fa-arrows-rotate" flat size="xl" @click="counter++" />
+              </div>
+            </div>
           </div>
           <div class="col-xs-12 col-md-6 q-pa-sm">
-            <q-file label = "Media Preview (Image)" outlined v-model="filePreview" accept="image/*" class="q-pb-md" color="accent" @update:model-value="(file) => handleFile(file, 'preview')">
-              <template v-slot:prepend>
-                <q-icon name="image" @click.stop.prevent />
-              </template>
-              <template v-slot:append>
-                <q-icon name="close" @click.stop.prevent="filePreview = null" class="cursor-pointer" />
-              </template>
-            </q-file>
             <q-file label = "Media (Video)" outlined v-model="fileMedia" accept="video/*" class="q-pb-md" color="accent">
               <template v-slot:prepend>
                 <q-icon name="movie" @click.stop.prevent />
@@ -131,7 +132,16 @@
                 <q-icon name="close" @click.stop.prevent="fileMedia = null" class="cursor-pointer" />
               </template>
             </q-file>
-            <q-checkbox outlined v-model="modelMediaNew.main" label="Featured" />
+            <q-radio v-model="previewImgChoice" val="frame" label="Video Frame" color="accent" /><br />
+            <q-radio v-model="previewImgChoice" val="new" label="Upload Photo" color="accent" />
+            <q-file v-if="previewImgChoice === 'new'" label = "Media Preview (Image)" outlined v-model="filePreview" accept="image/*" class="q-pb-md" color="accent" @update:model-value="(file) => handleFile(file, 'preview')">
+              <template v-slot:prepend>
+                <q-icon name="image" @click.stop.prevent />
+              </template>
+              <template v-slot:append>
+                <q-icon name="close" @click.stop.prevent="filePreview = null" class="cursor-pointer" />
+              </template>
+            </q-file>
           </div>
         </div>
       </q-step>
@@ -143,7 +153,7 @@
         active-icon="fa fa-gears"
       >
         <div class="q-pa-sm">
-          Your media is now processing. This can take some time. Your media will be live as soon as it's done.
+          {{ confirmText }}
         </div>
     </q-step>
 
@@ -162,6 +172,7 @@
 <script>
 import { defineAsyncComponent, ref } from 'vue'
 import axios from 'axios'
+import { Notify } from 'quasar'
 
 import imageCompression from 'browser-image-compression'
 
@@ -198,17 +209,34 @@ export default {
 
       coverImgChoice: ref('profile'),
       posterImgChoice: ref('default'),
-      previewImgChoice: ref('default'),
+      previewImgChoice: ref('frame'),
+      randomFrameUrl: null,
+
+      counter: 0,
 
       uploadFiles: [
         { type: 'cover', file: null, hash: null },
         { type: 'poster', file: null, hash: null },
         { type: 'preview', file: null, hash: null }
-      ]
+      ],
+
+      confirmText: 'Do not navigate away from this page yet!'
     }
   },
 
   watch: {
+    async randomFrameUrl(url) {
+      if (url) {
+        try {
+          const response = await fetch(url)
+          const blob = await response.blob()
+          const file = new File([blob], 'frame.jpg', { type: 'image/jpeg' })
+          this.handleFile(file, 'preview')
+        } catch (err) {
+          console.error('Error converting URL to file:', err)
+        }
+      }
+    },
     modelChannel(c) {
       if (c && c.value !== 0) {
         this.$store.cache
@@ -226,6 +254,8 @@ export default {
     projects(p) {
       if (p.length === 0) {
         this.modelProject = ref({ value: 0, label: 'New...' })
+      } else {
+        this.modelProject = ref(null)
       }
     },
     step(s) {
@@ -248,6 +278,7 @@ export default {
           const formData = new FormData()
           formData.append('file', this.fileMedia)
           await this.$store.dispatch('upload/postFile', { formData, uploadToken })
+          this.confirmText = 'Your media is now being processed. This can take some time. Your media will be live as soon as it\'s done.'
         })
           .catch(err => {
             console.log(err)
@@ -285,6 +316,11 @@ export default {
         reader.readAsDataURL(newFile)
       } else {
         this.filePreviewPreview = null
+      }
+    },
+    async previewImgChoiceAndFileMedia(newValues) {
+      if (newValues.previewImgChoice === 'frame' && newValues.fileMedia) {
+        this.randomFrameUrl = await this.getRandomFrame()
       }
     }
   },
@@ -333,6 +369,7 @@ export default {
         obj.project.media.title = this.modelMediaNew.title
         obj.project.media.description = this.modelMediaNew.description
         obj.project.media.main = this.modelMediaNew.main
+        obj.project.media.previewType = 'object'
         obj.project.media.previewObject = 'previews/' + this.uploadFiles.find(f => f.type === 'preview').hash + '.jpg'
         return obj
       }
@@ -345,10 +382,17 @@ export default {
           case 2:
             return this.modelProject?.value || (this.modelProjectNew.title && (this.filePoster || this.posterImgChoice === 'default'))
           case 3:
-            return this.modelMediaNew.title && this.filePreview && this.fileMedia
+            return this.modelMediaNew.title && this.fileMedia && ((this.previewImgChoice === 'new' && this.filePreview) || (this.previewImgChoice === 'frame' && this.randomFrameUrl))
           default:
             return false
         }
+      }
+    },
+    previewImgChoiceAndFileMedia(newValues) {
+      return {
+        previewImgChoice: this.previewImgChoice,
+        fileMedia: this.fileMedia,
+        counter: this.counter
       }
     }
   },
@@ -367,18 +411,65 @@ export default {
         this.uploadFiles.find(f => f.type === resourceType).file = compressedFile
 
         const arrayBuffer = await compressedFile.arrayBuffer()
-        const hash = await this.computeMD5(arrayBuffer)
+        const hash = await this.computeHash(arrayBuffer)
         this.uploadFiles.find(f => f.type === resourceType).hash = hash
       } catch (error) {
         console.error('Error processing file:', error)
       }
     },
 
-    async computeMD5(buffer) {
+    async computeHash(buffer) {
       const hashBuffer = await crypto.subtle.digest('SHA-256', buffer)
       return Array.from(new Uint8Array(hashBuffer))
         .map((b) => b.toString(16).padStart(2, '0'))
         .join('')
+    },
+
+    async getRandomFrame() {
+      const video = document.createElement('video')
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+
+      video.src = URL.createObjectURL(this.fileMedia)
+      video.muted = true
+      video.playsInline = true
+
+      return new Promise((resolve, reject) => {
+        video.onloadedmetadata = () => {
+          video.currentTime = Math.random() * video.duration
+        }
+
+        video.onseeked = () => {
+          canvas.width = video.videoWidth
+          canvas.height = video.videoHeight
+          ctx.drawImage(video, 0, 0)
+          canvas.toBlob(blob => {
+            try {
+              const url = URL.createObjectURL(blob)
+              resolve(url)
+            } catch (e) {
+              this.previewImgChoice = 'new'
+              Notify.create({
+                type: 'negative',
+                timeout: 0,
+                message: 'Error extracting frames from video.',
+                icon: 'fas fa-triangle-exclamation',
+                multiLine: false,
+                actions: [
+                  {
+                    label: 'Dismiss',
+                    color: 'white'
+                  }
+                ]
+              })
+            }
+          }, 'image/jpeg')
+        }
+
+        video.onerror = (e) => {
+          reject(e)
+        }
+      })
     }
   }
 }
