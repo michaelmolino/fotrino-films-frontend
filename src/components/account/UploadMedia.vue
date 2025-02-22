@@ -161,7 +161,6 @@
 
 <script>
 import { defineAsyncComponent, ref } from 'vue'
-import axios from 'axios'
 
 import imageCompression from 'browser-image-compression'
 
@@ -232,22 +231,11 @@ export default {
       if (s === 4) {
         this.$store.dispatch('channel/postUpload', this.payload).then(async _response => {
           const uploadToken = _response.uploadToken
-          this.secret = JSON.stringify(
-            {
-              userToken: _response.userToken,
-              uploadToken: uploadToken
-            }
-          )
           const uploadUrls = _response.upload_Urls
           for (const [type, url] of Object.entries(uploadUrls)) {
             const file = this.uploadFiles.find(f => f.type === type).file
             try {
-              // await this.$store.dispatch('upload/putObject', (url, file))
-              await axios.put(url, file, {
-                headers: {
-                  'Content-Type': file.type
-                }
-              })
+              await this.$store.dispatch('upload/putObject', { url, file })
             } catch (error) {
               console.error(`Error uploading ${type}:`, error)
             }
