@@ -6,7 +6,13 @@ const api = axios.create({ baseURL: process.env.API })
 
 export default boot(({ app, router, store }) => {
   api.interceptors.request.use(req => {
-    Loading.show()
+    if (req.url === '/upload/media') {
+      Loading.show({
+        message: 'Media uploading. Please wait...'
+      })
+    } else {
+      Loading.show()
+    }
     if (['post', 'put', 'delete'].includes(req.method)) {
       req.headers['X-CSRFToken'] = store.state.account.profile.csrf_token
     }

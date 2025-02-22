@@ -161,6 +161,7 @@
 
 <script>
 import { defineAsyncComponent, ref } from 'vue'
+import axios from 'axios'
 
 import imageCompression from 'browser-image-compression'
 
@@ -235,7 +236,11 @@ export default {
           for (const [type, url] of Object.entries(uploadUrls)) {
             const file = this.uploadFiles.find(f => f.type === type).file
             try {
-              await this.$store.dispatch('upload/putObject', { url, file })
+              await axios.put(url, file, {
+                headers: {
+                  'Content-Type': file.type
+                }
+              })
             } catch (error) {
               console.error(`Error uploading ${type}:`, error)
             }
