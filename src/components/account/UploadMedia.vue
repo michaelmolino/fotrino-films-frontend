@@ -103,7 +103,7 @@
         icon="fas fa-file-video"
         :done="step > 3"
       >
-        <div class="row">
+        <div class="row" v-if="progress < 0">
           <div class="col-xs-12 col-md-6 q-pa-sm">
             <q-input outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md"
               v-model="modelMediaNew.title" label="Title"
@@ -146,6 +146,16 @@
             </q-file>
           </div>
         </div>
+        <div v-else class="text-center">
+          <q-circular-progress
+            :value="progress"
+            size="50px"
+            color="accent"
+            class="q-ma-xl"
+            show-value
+          /><br />
+          Uploading media in progress. Do not navigate away from this page!
+        </div>
       </q-step>
 
       <q-step
@@ -162,7 +172,7 @@
       <template v-slot:navigation>
         <q-stepper-navigation>
           <q-btn v-if="step < 3" flat @click="$refs.stepper.next()" label="Next" :disabled="!next" />
-          <q-btn v-if="step === 3 && !uploadClicked" flat label="Upload" :disabled="!next" @click="uploadClicked = true && $refs.mediaUploader.upload()"/>
+          <q-btn v-if="step === 3 && !uploadClicked" flat label="Upload" :disabled="!next" @click="uploadClicked = true; progress = 0; $refs.mediaUploader.upload()"/>
           <q-btn v-if="step === 3 && uploadClicked" flat label="Uploading..." disabled />
         </q-stepper-navigation>
       </template>
@@ -225,6 +235,7 @@ export default {
       ],
 
       uploadClicked: false,
+      progress: -1,
       confirmText: 'Do not navigate away from this page yet!'
     }
   },
@@ -397,7 +408,7 @@ export default {
         }
         const formData = new FormData()
         formData.append('file', this.fileMedia)
-        await this.$store.dispatch('upload/postFile', { formData, uploadToken })
+        await this.$store.dispatch('upload/postFile', { formData, uploadToken, onUploadProgress: this.onUploadProgress })
         this.confirmText = 'Your media is now being processed. This can take some time. Your media will be live as soon as it\'s done.'
         this.step = 4
         return Promise.resolve()
@@ -405,6 +416,9 @@ export default {
         console.log(err)
         return Promise.reject(err)
       })
+    },
+    onUploadProgress(progressEvent) {
+      this.progress = Math.round((progressEvent.loaded * 100) / progressEvent.total)
     },
     async handleFile(file, resourceType) {
       if (!file) return
