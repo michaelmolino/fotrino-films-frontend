@@ -5,6 +5,8 @@ export function postFile(context, params) {
   const uploadToken = params.uploadToken
   const onUploadProgress = params.onUploadProgress
 
+  let nextKeepAliveThreshold = 5 * 1024 * 1024
+
   return api
     .post('/upload/media', formData, {
       headers: {
@@ -12,8 +14,9 @@ export function postFile(context, params) {
       },
       onUploadProgress: (progressEvent) => {
         onUploadProgress(progressEvent)
-        if (progressEvent.loaded % (1024 * 1024 * 5) === 0) {
+        if (progressEvent.loaded >= nextKeepAliveThreshold) {
           api.post('/upload/keep-alive').catch(console.error)
+          nextKeepAliveThreshold += 5 * 1024 * 1024
         }
       }
     })
