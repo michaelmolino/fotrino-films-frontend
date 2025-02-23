@@ -112,13 +112,13 @@
               v-model="modelMediaNew.description" label="Description - p, br, strong, and i tags allowed"
             />
             <q-checkbox outlined v-model="modelMediaNew.main" label="Featured" class="q-pb-md" />
-            <div class="row no-wrap">
+            <div class="row">
               <div>
                 <q-skeleton v-if ="(previewImgChoice === 'new' && !filePreview) || (previewImgChoice === 'frame' && !fileMedia)" style="width: 250px; height: 141px;" />
                 <q-img v-if="previewImgChoice === 'new' && filePreview" :src="filePreviewPreview" style="width: 250px" :ratio="16 / 9" fit="cover" />
                 <q-img v-if="previewImgChoice === 'frame' && fileMedia" :src="randomFrameUrl" style="width: 250px" :ratio="16 / 9" fit="cover" />
               </div>
-              <div class="q-px-lg flex items-center">
+              <div class="q-pa-md flex items-center">
                 <q-btn v-if="previewImgChoice === 'frame' && fileMedia" icon="fas fa-arrows-rotate" flat size="xl" @click="counter++" />
               </div>
             </div>
