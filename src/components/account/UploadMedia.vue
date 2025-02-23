@@ -124,16 +124,14 @@
             </div>
           </div>
           <div class="col-xs-12 col-md-6 q-pa-sm">
-            <q-uploader
-              label="Media (Video)"
-              @added="fileAdded"
-              :factory="factoryUpload"
-              accept="video/*" class="q-pb-md"
-              max-file-size="5368709120"
-              hide-upload-btn
-              ref="mediaUploader"
-              @uploaded="step = 4"
-            />
+            <q-file label = "Media (Video)" outlined v-model="fileMedia" accept="video/*" max-file-size="5368709120" class="q-pb-md" color="accent">
+              <template v-slot:prepend>
+                <q-icon name="movie" @click.stop.prevent />
+              </template>
+              <template v-slot:append>
+                <q-icon name="close" @click.stop.prevent="fileMedia = null" class="cursor-pointer" />
+              </template>
+            </q-file>
             <q-radio v-model="previewImgChoice" val="frame" label="Video Frame" color="accent" /><br />
             <q-radio v-model="previewImgChoice" val="new" label="Upload Photo" color="accent" />
             <q-file v-if="previewImgChoice === 'new'" label = "Media Preview (Image)" outlined v-model="filePreview" accept="image/*" class="q-pb-md" color="accent" @update:model-value="(file) => handleFile(file, 'preview')">
@@ -171,9 +169,14 @@
 
       <template v-slot:navigation>
         <q-stepper-navigation>
-          <q-btn v-if="step < 3" flat @click="$refs.stepper.next()" label="Next" :disabled="!next" />
-          <q-btn v-if="step === 3 && !uploadClicked" flat label="Upload" :disabled="!next" @click="uploadClicked = true; progress = 0; $refs.mediaUploader.upload()"/>
-          <q-btn v-if="step === 3 && uploadClicked" flat label="Uploading..." disabled />
+          <q-btn v-if="step < 3" icon="fas fa-arrow-right" flat @click="$refs.stepper.next()" label="Next" :disabled="!next" />
+          <q-btn v-if="step === 3 && !uploadClicked" icon="fas fa-cloud-arrow-up" flat label="Upload" :disabled="!next" @click="uploadClicked = true; progress = 0; factoryUpload()"/>
+          <q-btn v-if="step === 3 && uploadClicked" :loading="true" flat disabled>
+            Uploading...
+            <template v-slot:loading>
+              <q-spinner-hourglass />
+            </template>
+          </q-btn>
         </q-stepper-navigation>
       </template>
     </q-stepper>
@@ -371,7 +374,7 @@ export default {
           case 2:
             return this.modelProject?.value || (this.modelProjectNew.title && (this.filePoster || this.posterImgChoice === 'default'))
           case 3:
-            return this.modelMediaNew.title && this.$refs.mediaUploader.canUpload && ((this.previewImgChoice === 'new' && this.filePreview) || (this.previewImgChoice === 'frame' && this.randomFrameUrl))
+            return this.modelMediaNew.title && this.fileMedia && ((this.previewImgChoice === 'new' && this.filePreview) || (this.previewImgChoice === 'frame' && this.randomFrameUrl))
           default:
             return false
         }
@@ -387,9 +390,6 @@ export default {
   },
 
   methods: {
-    fileAdded(files) {
-      this.fileMedia = files[0]
-    },
     factoryUpload() {
       return this.$store.dispatch('channel/postUpload', this.payload).then(async _response => {
         const uploadToken = _response.uploadToken
