@@ -132,6 +132,7 @@
               max-file-size="5368709120"
               hide-upload-btn
               ref="mediaUploader"
+              @uploaded="step = 4"
             />
             <q-radio v-model="previewImgChoice" val="frame" label="Video Frame" color="accent" /><br />
             <q-radio v-model="previewImgChoice" val="new" label="Upload Photo" color="accent" />
@@ -160,7 +161,9 @@
 
       <template v-slot:navigation>
         <q-stepper-navigation>
-          <q-btn v-if="step < 4" flat @click="$refs.stepper.next()" :label="step <3 ? 'Next' : 'Upload'" :disabled="(step==4 ? true : false) || !next" />
+          <q-btn v-if="step < 3" flat @click="$refs.stepper.next()" label="Next" :disabled="!next" />
+          <q-btn v-if="step === 3 && !uploadClicked" flat label="Upload" :disabled="!next" @click="uploadClicked = true && $refs.mediaUploader.upload()"/>
+          <q-btn v-if="step === 3 && uploadClicked" flat label="Uploading..." disabled />
         </q-stepper-navigation>
       </template>
     </q-stepper>
@@ -221,6 +224,7 @@ export default {
         { type: 'preview', file: null, hash: null }
       ],
 
+      uploadClicked: false,
       confirmText: 'Do not navigate away from this page yet!'
     }
   },
@@ -257,11 +261,6 @@ export default {
         this.modelProject = ref({ value: 0, label: 'New...' })
       } else {
         this.modelProject = ref(null)
-      }
-    },
-    step(s) {
-      if (s === 4) {
-        this.$refs.mediaUploader.upload()
       }
     },
     fileCover(newFile) {
@@ -361,7 +360,7 @@ export default {
           case 2:
             return this.modelProject?.value || (this.modelProjectNew.title && (this.filePoster || this.posterImgChoice === 'default'))
           case 3:
-            return this.modelMediaNew.title !== null && this.fileMedia !== null && ((this.previewImgChoice === 'new' && this.filePreview !== null) || (this.previewImgChoice === 'frame' && this.randomFrameUrl !== null))
+            return this.modelMediaNew.title && this.$refs.mediaUploader.canUpload && ((this.previewImgChoice === 'new' && this.filePreview) || (this.previewImgChoice === 'frame' && this.randomFrameUrl))
           default:
             return false
         }
@@ -381,13 +380,10 @@ export default {
       this.fileMedia = files[0]
     },
     factoryUpload() {
-      console.log('Debug1')
       return this.$store.dispatch('channel/postUpload', this.payload).then(async _response => {
-        console.log('Debug2')
         const uploadToken = _response.uploadToken
         const uploadUrls = _response.upload_Urls
         for (const [type, url] of Object.entries(uploadUrls)) {
-          console.log('DebugLoop')
           const file = this.uploadFiles.find(f => f.type === type).file
           try {
             await axios.put(url, file, {
@@ -399,12 +395,11 @@ export default {
             console.error(`Error uploading ${type}:`, error)
           }
         }
-        console.log('Debug4')
         const formData = new FormData()
         formData.append('file', this.fileMedia)
         await this.$store.dispatch('upload/postFile', { formData, uploadToken })
-        console.log('Debug5')
         this.confirmText = 'Your media is now being processed. This can take some time. Your media will be live as soon as it\'s done.'
+        this.step = 4
         return Promise.resolve()
       }).catch(err => {
         console.log(err)
