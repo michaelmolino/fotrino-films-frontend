@@ -7,6 +7,11 @@ export function postFile(context, params) {
     .post('/upload/media', formData, {
       headers: {
         'X-Upload-Token': uploadToken
+      },
+      onUploadProgress: (progressEvent) => {
+        if (progressEvent.loaded % (1024 * 1024 * 5) === 0) {
+          api.post('/upload/keep-alive').catch(console.error)
+        }
       }
     })
     .then(() => {

@@ -124,14 +124,15 @@
             </div>
           </div>
           <div class="col-xs-12 col-md-6 q-pa-sm">
-            <q-file label = "Media (Video)" outlined v-model="fileMedia" accept="video/*" class="q-pb-md" color="accent">
-              <template v-slot:prepend>
-                <q-icon name="movie" @click.stop.prevent />
-              </template>
-              <template v-slot:append>
-                <q-icon name="close" @click.stop.prevent="fileMedia = null" class="cursor-pointer" />
-              </template>
-            </q-file>
+            <q-uploader
+              label="Media (Video)"
+              @added="fileAdded"
+              :factory="factoryUpload"
+              accept="video/*" class="q-pb-md"
+              max-file-size="5368709120"
+              hide-upload-btn
+              ref="mediaUploader"
+            />
             <q-radio v-model="previewImgChoice" val="frame" label="Video Frame" color="accent" /><br />
             <q-radio v-model="previewImgChoice" val="new" label="Upload Photo" color="accent" />
             <q-file v-if="previewImgChoice === 'new'" label = "Media Preview (Image)" outlined v-model="filePreview" accept="image/*" class="q-pb-md" color="accent" @update:model-value="(file) => handleFile(file, 'preview')">
@@ -159,7 +160,7 @@
 
       <template v-slot:navigation>
         <q-stepper-navigation>
-          <q-btn v-if="step < 4" flat @click="$refs.stepper.next()" :label="step <3 ? 'Next' : 'Finish'" :disabled="(step==4 ? true : false) || !next" />
+          <q-btn v-if="step < 4" flat @click="$refs.stepper.next()" :label="step <3 ? 'Next' : 'Upload'" :disabled="(step==4 ? true : false) || !next" />
         </q-stepper-navigation>
       </template>
     </q-stepper>
@@ -260,29 +261,7 @@ export default {
     },
     step(s) {
       if (s === 4) {
-        this.$store.dispatch('channel/postUpload', this.payload).then(async _response => {
-          const uploadToken = _response.uploadToken
-          const uploadUrls = _response.upload_Urls
-          for (const [type, url] of Object.entries(uploadUrls)) {
-            const file = this.uploadFiles.find(f => f.type === type).file
-            try {
-              await axios.put(url, file, {
-                headers: {
-                  'Content-Type': file.type
-                }
-              })
-            } catch (error) {
-              console.error(`Error uploading ${type}:`, error)
-            }
-          }
-          const formData = new FormData()
-          formData.append('file', this.fileMedia)
-          await this.$store.dispatch('upload/postFile', { formData, uploadToken })
-          this.confirmText = 'Your media is now being processed. This can take some time. Your media will be live as soon as it\'s done.'
-        })
-          .catch(err => {
-            console.log(err)
-          })
+        this.$refs.mediaUploader.upload()
       }
     },
     fileCover(newFile) {
@@ -382,7 +361,7 @@ export default {
           case 2:
             return this.modelProject?.value || (this.modelProjectNew.title && (this.filePoster || this.posterImgChoice === 'default'))
           case 3:
-            return this.modelMediaNew.title && this.fileMedia && ((this.previewImgChoice === 'new' && this.filePreview) || (this.previewImgChoice === 'frame' && this.randomFrameUrl))
+            return this.modelMediaNew.title !== null && this.fileMedia !== null && ((this.previewImgChoice === 'new' && this.filePreview !== null) || (this.previewImgChoice === 'frame' && this.randomFrameUrl !== null))
           default:
             return false
         }
@@ -398,6 +377,40 @@ export default {
   },
 
   methods: {
+    fileAdded(files) {
+      this.fileMedia = files[0]
+    },
+    factoryUpload() {
+      console.log('Debug1')
+      return this.$store.dispatch('channel/postUpload', this.payload).then(async _response => {
+        console.log('Debug2')
+        const uploadToken = _response.uploadToken
+        const uploadUrls = _response.upload_Urls
+        for (const [type, url] of Object.entries(uploadUrls)) {
+          console.log('DebugLoop')
+          const file = this.uploadFiles.find(f => f.type === type).file
+          try {
+            await axios.put(url, file, {
+              headers: {
+                'Content-Type': file.type
+              }
+            })
+          } catch (error) {
+            console.error(`Error uploading ${type}:`, error)
+          }
+        }
+        console.log('Debug4')
+        const formData = new FormData()
+        formData.append('file', this.fileMedia)
+        await this.$store.dispatch('upload/postFile', { formData, uploadToken })
+        console.log('Debug5')
+        this.confirmText = 'Your media is now being processed. This can take some time. Your media will be live as soon as it\'s done.'
+        return Promise.resolve()
+      }).catch(err => {
+        console.log(err)
+        return Promise.reject(err)
+      })
+    },
     async handleFile(file, resourceType) {
       if (!file) return
 
