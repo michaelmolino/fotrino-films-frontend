@@ -456,6 +456,9 @@ export default {
       video.muted = true
       video.playsInline = true
 
+      video.play()
+      video.pause()
+
       return new Promise((resolve, reject) => {
         video.onloadedmetadata = () => {
           video.currentTime = Math.random() * video.duration
