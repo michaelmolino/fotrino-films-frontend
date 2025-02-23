@@ -26,7 +26,6 @@
     "underscore": "^1.13.2",
     "vue": "^3.2.47",
     "vue-router": "^4.0.0",
-    "vuejs-code-block": "^1.0.1",
     "vuex": "4",
     "vuex-cache": "^3.4.0"
   },

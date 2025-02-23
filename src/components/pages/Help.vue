@@ -111,7 +111,7 @@
       >
         <q-card>
           <q-card-section>
-            Yes! Mobile users can browse and watch content from their devices. Unfortunately, uploading media from mobile is not yet supported.
+            Yes!
           </q-card-section>
         </q-card>
       </q-expansion-item>
