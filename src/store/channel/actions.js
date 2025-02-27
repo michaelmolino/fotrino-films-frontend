@@ -71,12 +71,19 @@ export function postUpload(context, payload) {
       }
     )
     .then(response => {
-      const upload = response.data
-      context.commit('SET_UPLOAD', upload)
-      return Promise.resolve(upload)
+      context.commit('SET_UPLOAD', response.data)
+      return Promise.resolve(response.data)
     })
     .catch(error => {
       context.commit('SET_UPLOAD', null)
+      return Promise.reject(error)
+    })
+}
+
+export function confirmUpload(context, media) {
+  return api
+    .put('/channels/media/' + media)
+    .catch(error => {
       return Promise.reject(error)
     })
 }

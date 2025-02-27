@@ -3,7 +3,7 @@
     <q-badge class="bg-accent q-pa-md z-top" floating transparent>
       <span class="text-bold">{{ project.media.length }}</span>
     </q-badge>
-    <q-img :src="project.poster" :ratio="2 / 3" fit="cover">
+    <q-img v-if="project.poster" :src="project.poster" :ratio="2 / 3" fit="cover">
       <div class="absolute-bottom text-center">
         <div class="ellipsis">{{ project.title }}</div>
         <div class="ellipsis">{{ project.subtitle }}</div>
@@ -20,6 +20,7 @@
         </div>
       </template>
     </q-img>
+    <q-skeleton v-if="!project.poster" style="width: 218px; height: 327px;" />
   </q-btn>
 </template>
 
