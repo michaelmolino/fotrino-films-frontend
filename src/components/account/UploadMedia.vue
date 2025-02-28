@@ -155,6 +155,8 @@
       >
       <div class="text-center">
           <q-circular-progress
+            :indeterminate="progress === -1"
+            :instant-feedback="progress < 1"
             :value="progress"
             size="50px"
             color="accent"
@@ -256,7 +258,7 @@ export default {
 
       uploadFiles: [],
 
-      progress: -1,
+      progress: 0,
       statusText: ref(null)
     }
   },
@@ -419,11 +421,11 @@ export default {
 
   methods: {
     factoryUpload() {
-      this.progress = 0
       return this.$store.dispatch('channel/postUpload', this.payload).then(async upload => {
         let counter = 1
         const total = upload.length
         let media = null
+        let stop = false
         for (const u of upload) {
           this.progress = 0
           const file = this.uploadFiles.find(f => f.resourceType === u.resourceType).file
@@ -436,6 +438,9 @@ export default {
               onUploadProgress: this.onUploadProgress
             })
           } catch (error) {
+            stop = true
+            this.progress = -1
+            this.statusText = 'Something went wrong!'
             console.error(`Error uploading ${u.resourceType}:`, error)
           }
           if (u.resourceType === 'media') {
@@ -443,11 +448,15 @@ export default {
           }
           counter++
         }
+        if (stop) {
+          return Promise.reject()
+        }
         this.$store.dispatch('channel/confirmUpload', media)
         this.$refs.stepper.next()
         return Promise.resolve()
       }).catch(err => {
-        this.statusText = 'Something went wrong: ' + err
+        this.progress = -1
+        this.statusText = 'Something went wrong!'
         return Promise.reject(err)
       })
     },

@@ -26,7 +26,7 @@ export default boot(({ app, router, store }) => {
       const actions = [{ label: 'Dismiss', color: 'white' }]
       switch (error.response.status) {
         case 400:
-          msg = error
+          msg = error.response.data
           break
         case 401:
           msg = 'Unauthorised.  Please login.'
