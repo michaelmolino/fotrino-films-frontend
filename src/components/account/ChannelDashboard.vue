@@ -49,7 +49,7 @@ export default {
   },
 
   created: function() {
-    this.$store.cache.dispatch('channel/getChannels').catch(error => { console.log(error) })
+    this.$store.cache.dispatch('channel/getChannels')
   }
 }
 </script>

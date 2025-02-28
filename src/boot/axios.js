@@ -6,9 +6,7 @@ const api = axios.create({ baseURL: process.env.API })
 
 export default boot(({ app, router, store }) => {
   api.interceptors.request.use(req => {
-    if (req.url !== '/upload/media' && req.url !== '/upload/keep-alive') {
-      Loading.show()
-    }
+    Loading.show()
     if (['post', 'put', 'delete'].includes(req.method)) {
       req.headers['X-CSRFToken'] = store.state.account.profile.csrf_token
     }
@@ -25,7 +23,11 @@ export default boot(({ app, router, store }) => {
       Loading.hide()
 
       let msg = 'Something went wrong!'
+      const actions = [{ label: 'Dismiss', color: 'white' }]
       switch (error.response.status) {
+        case 400:
+          msg = error
+          break
         case 401:
           msg = 'Unauthorised.  Please login.'
           break
@@ -52,12 +54,7 @@ export default boot(({ app, router, store }) => {
         message: msg,
         icon: 'fas fa-triangle-exclamation',
         multiLine: false,
-        actions: [
-          {
-            label: 'Dismiss',
-            color: 'white'
-          }
-        ]
+        actions: actions
       })
 
       return Promise.reject(error)

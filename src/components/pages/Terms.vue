@@ -64,7 +64,7 @@
       </li>
       <li>
         <div class="text-h6">Server Locations & Data Storage</div>
-        Our servers are hosted in multiple geographic regions, including but not limited to the European Union and the United States. By using Fotrino Films, you acknowledge that your data may be stored and processed in countries that may have different data protection laws than your own.
+        Our servers are hosted in multiple geographic regions, including but not limited to the European Union, the United States, and the United Kingdom. By using Fotrino Films, you acknowledge that your data may be stored and processed in countries that may have different data protection laws than your own.
       </li>
       <li>
         <div class="text-h6">Account Suspension & Content Removal</div>

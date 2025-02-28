@@ -150,7 +150,7 @@
         :name="4"
         title="Upload"
         icon="fas fa-cloud-arrow-up"
-        active-icon="fa fa-gears"
+        active-icon="fas fa-cloud-arrow-up"
         :done="step > 4"
       >
       <div class="text-center">
@@ -221,7 +221,7 @@ export default {
   },
 
   created: function() {
-    this.$store.cache.dispatch('channel/getChannels').catch(error => { console.log(error) })
+    this.$store.cache.dispatch('channel/getChannels')
   },
 
   data() {
@@ -447,7 +447,7 @@ export default {
         this.$refs.stepper.next()
         return Promise.resolve()
       }).catch(err => {
-        console.log(err)
+        this.statusText = 'Something went wrong: ' + err
         return Promise.reject(err)
       })
     },
