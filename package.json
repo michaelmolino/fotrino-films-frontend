@@ -15,7 +15,7 @@
     "yaml": "^2.2.2"
   },
   "dependencies": {
-    "@quasar/extras": "^1.16.15",
+    "@quasar/extras": "^1.16.17",
     "axios": "^1.6.0",
     "axios-retry": "^4.5.0",
     "browser-image-compression": "^2.0.2",
