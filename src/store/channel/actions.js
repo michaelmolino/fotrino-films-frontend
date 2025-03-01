@@ -14,9 +14,9 @@ function updateHistory(context, channel) {
   LocalStorage.set('fotrino-films-history', uniq)
 }
 
-export function getChannels(context) {
+export function getChannels(context, deep) {
   return api
-    .get('/channels')
+    .get(!deep ? '/channels' : '/channels/deep')
     .then(response => {
       const channels = response.data
       context.commit('SET_CHANNELS', channels)

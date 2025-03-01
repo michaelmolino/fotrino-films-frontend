@@ -12,14 +12,35 @@
     <div class="text-h6 q-pt-md">
       Channels
     </div>
-    <div v-for="c in channels" :key="c.id" class="q-py-xs">
-      <q-btn flat :to="'/' + c.uuid + '/' + c.slug" align="left" style="width: 100%; max-width: 480px" no-wrap>
-        <q-avatar>
-          <img :src="c.cover" :alt="profile.name">
-        </q-avatar>
-        <div class="q-pl-md ellipsis">{{ c.title }}</div>
-      </q-btn>
-    </div>
+    <q-tree
+      v-if="channels.length > 0"
+      accordion
+      no-connectors
+      :nodes="channels"
+      node-key="key"
+      label-key="title"
+      children-key="children"
+    >
+      <template v-slot:default-header="tree">
+        <div class="flex items-center">
+          <div class="q-px-lg">
+            <q-avatar>
+              <img :src=tree.node.img>
+            </q-avatar>
+          </div>
+          <div>
+            {{ tree.node.title }}
+          </div>
+        </div>
+      </template>
+      <template v-slot:header-media="tree">
+        <div class="flex items-center">
+          <div class="q-pl-md">
+            <q-btn flat :icon="'img:' + tree.node.img" :label="tree.node.title" icon-right="link" :to="getMediaLink(tree.node.id)" />
+          </div>
+        </div>
+      </template>
+    </q-tree>
     <NothingText v-if="channels.length === 0" text="Click Account and upload some media to get started."/>
   </div>
 </template>
@@ -43,13 +64,48 @@ export default {
     },
     channels: {
       get() {
-        return this.$store.state.channel.channels
+        const channels = this.$store.state.channel.channels.map(channel => ({
+          ...channel,
+          key: channel.uuid,
+          img: channel.cover,
+          header: 'channel',
+          body: 'channel',
+          children: (channel.projects || []).map(project => ({
+            ...project,
+            key: channel.id + '-' + project.id,
+            img: project.poster,
+            header: 'project',
+            body: 'project',
+            children: (project.media || []).map(media => ({
+              ...media,
+              key: channel.id + '-' + project.id + '-' + media.id,
+              img: media.preview,
+              header: 'media',
+              body: 'media'
+            }))
+          }))
+        }))
+        return channels
       }
     }
   },
 
+  methods: {
+    getMediaLink(mediaId) {
+      for (const channel of this.channels) {
+        for (const project of channel.projects) {
+          const media = project.media.find((m) => m.id === mediaId)
+          if (media) {
+            return '/' + [channel.uuid, channel.slug, project.slug, media.slug].join('/')
+          }
+        }
+      }
+      return null
+    }
+  },
+
   created: function() {
-    this.$store.cache.dispatch('channel/getChannels')
+    this.$store.cache.dispatch('channel/getChannels', true)
   }
 }
 </script>
