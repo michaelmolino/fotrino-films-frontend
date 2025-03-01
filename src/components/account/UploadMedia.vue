@@ -124,6 +124,7 @@
               </div>
               <div class="q-pa-md flex items-center">
                 <q-btn v-if="payload.project.media.previewType === 'frame' && mediaFile" icon="fas fa-arrows-rotate" flat size="xl" @click="counter++" />
+                <span v-if="payload.project.media.previewType === 'frame' && mediaFile">refresh thumbnail</span>
               </div>
             </div>
           </div>
@@ -190,7 +191,7 @@
           <q-btn v-if="step === 3"
             icon="fas fa-cloud-arrow-up" flat label="Upload"
             :disabled="!next"
-            @click="$refs.stepper.next(); factoryUpload()" >
+            @click="$refs.stepper.next()" >
           </q-btn>
           <q-btn v-if="step === 4" loading disabled flat label="Uploading">
             <template v-slot:loading>
@@ -295,6 +296,9 @@ export default {
           .then(ch => {
             this.projects = ch.projects
           })
+      }
+      if (s === 4) {
+        this.factoryUpload()
       }
     },
     coverFile(file) {
