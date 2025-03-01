@@ -36,7 +36,7 @@
       <template v-slot:header-media="tree">
         <div class="flex items-center">
           <div class="q-pl-md">
-            <q-btn flat :icon="'img:' + tree.node.img" :label="tree.node.title" icon-right="link" :to="getMediaLink(tree.node.id)" />
+            <q-btn flat no-caps :icon="'img:' + tree.node.img" :label="tree.node.title" icon-right="link" :to="getMediaLink(tree.node.id)" />
           </div>
         </div>
       </template>
