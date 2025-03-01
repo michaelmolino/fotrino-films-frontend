@@ -209,8 +209,8 @@
 
 <script>
 import { defineAsyncComponent, ref } from 'vue'
-import axios from 'axios'
 import { Notify } from 'quasar'
+import { objectApi } from 'boot/axios'
 
 import imageCompression from 'browser-image-compression'
 
@@ -459,7 +459,7 @@ export default {
           const file = this.uploadFiles.find(f => f.resourceType === u.resourceType).file
           this.statusText = `Uploading file (${u.resourceType}) ${counter} of ${total}. Do not navigate away from this page!`
           try {
-            await axios.put(u.url, file, {
+            await objectApi.put(u.url, file, {
               headers: {
                 'Content-Type': file.type
               },

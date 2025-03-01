@@ -4,12 +4,19 @@ import axiosRetry from 'axios-retry'
 import { Notify, Loading } from 'quasar'
 
 const api = axios.create({ baseURL: process.env.API })
-
 axiosRetry(api, {
-  retries: 3,
-  retryDelay: (retryCount) => {
-    return retryCount * 1000
-  },
+  retries: 6,
+  retryDelay: axiosRetry.exponentialDelay,
+  retryCondition: (error) => {
+    return error.code === 'ECONNABORTED' || error.code === 'ECONNRESET' || error.code === 'ECONNREFUSED' ||
+       !(error.config.method === 'PUT' && error.config.url === '/channels/media')
+  }
+})
+
+const objectApi = axios.create()
+axiosRetry(objectApi, {
+  retries: 6,
+  retryDelay: axiosRetry.exponentialDelay,
   retryCondition: (error) => {
     return axiosRetry.isNetworkOrIdempotentRequestError(error) || error.response.status === 408
   }
@@ -75,4 +82,4 @@ export default boot(({ app, router, store }) => {
   app.config.globalProperties.$api = api
 })
 
-export { api }
+export { api, objectApi }
