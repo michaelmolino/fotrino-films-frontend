@@ -1,8 +1,19 @@
 import { boot } from 'quasar/wrappers'
 import axios from 'axios'
+import axiosRetry from 'axios-retry'
 import { Notify, Loading } from 'quasar'
 
 const api = axios.create({ baseURL: process.env.API })
+
+axiosRetry(api, {
+  retries: 3,
+  retryDelay: (retryCount) => {
+    return retryCount * 1000
+  },
+  retryCondition: (error) => {
+    return axiosRetry.isNetworkOrIdempotentRequestError(error) || error.response.status === 408
+  }
+})
 
 export default boot(({ app, router, store }) => {
   api.interceptors.request.use(req => {
