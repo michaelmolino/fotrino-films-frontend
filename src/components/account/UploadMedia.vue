@@ -230,7 +230,7 @@ export default {
   },
 
   created: function() {
-    this.$store.cache.dispatch('channel/getChannels')
+    this.$store.dispatch('channel/getChannels')
   },
 
   data() {

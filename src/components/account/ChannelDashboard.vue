@@ -106,7 +106,7 @@ export default {
   },
 
   created: function() {
-    this.$store.cache.dispatch('channel/getChannels', true)
+    this.$store.dispatch('channel/getChannels', true)
   }
 }
 </script>
