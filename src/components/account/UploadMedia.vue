@@ -174,7 +174,7 @@
         active-icon="fa fa-gears"
       >
         <div class="q-pa-sm">
-          Your media is now processing and will be available immediately when it is done (you'll get an email to let you know when). You can safely close this window.
+          Your media is processing and will be available shortly (you'll receive an email once it's ready). You may now close this window.
         </div>
       </q-step>
 
