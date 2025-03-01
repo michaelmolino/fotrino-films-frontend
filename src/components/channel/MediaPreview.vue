@@ -30,7 +30,7 @@
         </div>
       </template>
     </q-img>
-    <q-skeleton v-if="!media.preview" style="width: 250px; height: 141px;" />
+    <q-skeleton v-if="!media.preview" class="cursor-not-allowed" style="width: 250px; height: 141px;" />
   </q-btn>
 </template>
 

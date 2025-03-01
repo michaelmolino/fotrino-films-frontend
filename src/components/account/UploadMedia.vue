@@ -17,12 +17,14 @@
       :inactive-color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
       done-color="positive"
       :vertical="$q.screen.lt.md"
+      header-nav
     >
       <q-step
         :name="1"
         title="Channel"
         icon="fas fa-video"
         :done="step > 1"
+        :header-nav="false"
       >
         <div class="row">
           <div class="col-xs-12 col-md-6 q-pa-sm">
@@ -32,7 +34,7 @@
               class="q-pb-lg"
               />
             <q-avatar size="150px" class="q-pl-lg">
-              <q-skeleton v-if ="!payload.uuid || (payload.uuid && payload.uuid.value === 0 && payload.coverType === 'new' && !coverFile)" style="width: 250px; height: 250px;" />
+              <q-skeleton v-if ="!payload.uuid || (payload.uuid && payload.uuid.value === 0 && payload.coverType === 'new' && !coverFile)" class="cursor-not-allowed" style="width: 250px; height: 250px;" />
               <q-img v-if="payload.uuid && payload.uuid.value !== 0" :src="channels.find(ch => ch.uuid === payload.uuid.value).cover" style="width: 250px" :ratio="1 / 1" fit="cover" />
               <q-img v-if="payload.uuid && payload.uuid.value === 0" :src="payload.coverType === 'profile' ? profile.profile_pic : coverThumb" style="width: 250px" :ratio="1 / 1" fit="cover" />
             </q-avatar>
@@ -62,6 +64,7 @@
         title="Project"
         icon="fas fa-film"
         :done="step > 2"
+        :header-nav="step === 1 && !!next"
       >
         <div class="row">
           <div class="col-xs-12 col-md-6 q-pa-sm">
@@ -102,6 +105,7 @@
         title="Media"
         icon="fas fa-file-video"
         :done="step > 3"
+        :header-nav="step === 2 && !!next"
       >
         <div class="row">
           <div class="col-xs-12 col-md-6 q-pa-sm">
@@ -152,6 +156,7 @@
         icon="fas fa-cloud-arrow-up"
         active-icon="fas fa-cloud-arrow-up"
         :done="step > 4"
+        :header-nav="step === 3 && !!next"
       >
       <div class="text-center">
           <q-circular-progress
@@ -172,6 +177,7 @@
         title="Processing"
         icon="fa fa-gears"
         active-icon="fa fa-gears"
+        :header-nav="step === 4 && !!next"
       >
         <div class="q-pa-sm">
           Your media is processing and will be available shortly (you'll receive an email once it's ready). You may now close this window.
@@ -235,9 +241,11 @@ export default {
       payload: ref({
         uuid: null,
         coverType: 'profile',
+        title: 'My Channel',
         project: {
           id: null,
           posterType: 'default',
+          title: 'My Videos',
           media: {
             main: true,
             previewType: 'frame'
@@ -264,6 +272,22 @@ export default {
   },
 
   watch: {
+    channels(ch) {
+      if (ch.length === 0 && this.step === 1) {
+        this.payload.uuid = { value: 0, label: 'New...' }
+      }
+      if (ch.length === 1 && this.step === 1) {
+        this.payload.uuid = ch.map(({ uuid, title }) => ({ value: uuid, label: title }))[0]
+      }
+    },
+    projects(p) {
+      if (p.length === 0 && this.step === 2) {
+        this.payload.project.id = { value: 0, label: 'New...' }
+      }
+      if (p.length === 1 && this.step === 2) {
+        this.payload.project.id = p.map(({ id, title }) => ({ value: id, label: title }))[0]
+      }
+    },
     step(s) {
       if (s === 2 && this.payload.uuid.value !== 0) {
         this.$store.cache

@@ -12,6 +12,7 @@
     <div class="text-h6 q-pt-md">
       Channels
     </div>
+    <q-btn to="/account/upload" flat no-caps icon="fas fa-cloud-arrow-up" label="Upload Media" />
     <q-tree
       v-if="channels.length > 0"
       accordion
@@ -41,7 +42,7 @@
         </div>
       </template>
     </q-tree>
-    <NothingText v-if="channels.length === 0" text="Click Account and upload some media to get started."/>
+    <NothingText v-if="channels.length === 0" text="Your media will appear here (once you have some)."/>
   </div>
 </template>
 

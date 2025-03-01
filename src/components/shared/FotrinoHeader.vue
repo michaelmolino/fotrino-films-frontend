@@ -79,14 +79,6 @@
         no-caps
         size="md"
       >
-        <q-btn
-          v-if="!$q.screen.gt.sm"
-          flat
-          no-caps
-          size="md"
-          class="fit no-pointer-events"
-          label="Sign Up/Login"
-        />
         <span v-for="provider in oauthProviders" :key="provider.name">
           <q-separator />
           <q-btn
