@@ -114,7 +114,7 @@
         />
         <q-separator />
         <q-btn
-          to="/account/upload"
+          href="/account/upload"
           align="left"
           flat
           no-caps

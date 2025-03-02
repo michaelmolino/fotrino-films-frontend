@@ -329,7 +329,17 @@ export default {
           .dispatch('channel/getChannel', this.payload.uuid.value)
           .then(ch => {
             this.projects = ch.projects
+            if (this.projects.length === 0) {
+              this.payload.project.id = { value: 0, label: 'New...' }
+            }
+            if (this.projects.length === 1) {
+              this.payload.project.id = this.projects.map(({ id, title }) => ({ value: id, label: title }))[0]
+            }
           })
+      } else {
+        if (this.projects.length === 0) {
+          this.payload.project.id = { value: 0, label: 'New...' }
+        }
       }
       if (s === 4) {
         this.factoryUpload()
