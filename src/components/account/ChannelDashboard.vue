@@ -36,8 +36,13 @@
       </template>
       <template v-slot:header-media="tree">
         <div class="flex items-center">
-          <div class="q-pl-md">
-            <q-btn flat no-caps :label="tree.node.title" icon="link" :to="getMediaLink(tree.node.id)" />
+          <div class="q-px-sm">
+            <q-btn dense flat no-caps icon="link" :to="getMediaLink(tree.node.id)" />
+            <q-btn dense flat no-caps icon="delete" @click="deleteMedia(tree.node.id)" />
+            <q-btn dense flat no-caps :icon="'img:' + tree.node.img" :alt="tree.node.title" class="no-pointer-events" />
+          </div>
+          <div>
+            {{ tree.node.title }}
           </div>
         </div>
       </template>
@@ -102,6 +107,9 @@ export default {
         }
       }
       return null
+    },
+    deleteMedia(mediaId) {
+      this.$store.dispatch('channel/deleteMedia', mediaId)
     }
   },
 

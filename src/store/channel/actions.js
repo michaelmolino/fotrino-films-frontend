@@ -99,3 +99,20 @@ export function rmHistory(context, uuid) {
   context.commit('SET_HISTORY', history)
   LocalStorage.set('fotrino-films-history', history)
 }
+
+export function deleteMedia(context, id) {
+  return api
+    .delete('/channels/media/' + id).then(() => {
+      const channels = context.state.channels.map(channel => ({
+        ...channel,
+        projects: channel.projects.map(project => ({
+          ...project,
+          media: project.media.filter(media => media.id !== id)
+        }))
+      }))
+      context.commit('SET_CHANNELS', channels)
+    })
+    .catch(error => {
+      return Promise.reject(error)
+    })
+}

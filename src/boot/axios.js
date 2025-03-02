@@ -25,11 +25,28 @@ axiosRetry(objectApi, {
 
 export default boot(({ app, router, store }) => {
   api.interceptors.request.use(req => {
-    Loading.show()
     if (['post', 'put', 'delete'].includes(req.method)) {
       req.headers['X-CSRFToken'] = store.state.account.profile.csrf_token
     }
-    return req
+    if (req.method === 'delete') {
+      return new Promise((resolve, reject) => {
+        Notify.create({
+          type: 'warning',
+          timeout: 0,
+          message: 'Resources are "soft" deleted; files will be permanently removed later. For urgent file removal, please email michael@fotrino.com.',
+          position: 'center',
+          icon: 'fas fa-info',
+          multiLine: false,
+          actions: [
+            { icon: 'fas fa-circle-exclamation', label: 'Confirm delete', color: 'black', handler: () => { Loading.show(); resolve(req) } },
+            { icon: 'fas fa-rotate-left', label: 'Go Back', color: 'black', handler: () => { /* Do Nothing */ } }
+          ]
+        })
+      })
+    } else {
+      Loading.show()
+      return req
+    }
   })
 
   api.interceptors.response.use(
@@ -43,7 +60,7 @@ export default boot(({ app, router, store }) => {
 
       let msg = 'Something went wrong!'
       const actions = [{ label: 'Dismiss', color: 'white' }]
-      switch (error.response.status) {
+      switch (error.response?.status) {
         case 400:
           msg = error.response.data
           break
