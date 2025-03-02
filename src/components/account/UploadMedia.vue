@@ -453,11 +453,11 @@ export default {
       get() {
         switch (this.step) {
           case 1:
-            return this.payload.uuid?.value || (this.payload.title && (this.coverFile || this.payload.coverType === 'profile'))
+            return this.payload.uuid !== null && (!!this.payload.uuid?.value || (!!this.payload.title && (!!this.coverFile || this.payload.coverType === 'profile')))
           case 2:
-            return this.payload.project.id?.value || (this.payload.project.title && (this.posterFile || this.payload.project.posterType === 'default'))
+            return this.payload.project.id !== null && (!!this.payload.project.id?.value || (!!this.payload.project.title && (!!this.posterFile || this.payload.project.posterType === 'default')))
           case 3:
-            return this.payload.project.media.title && this.mediaFile && ((this.payload.project.media.previewType === 'new' && this.previewFile) || (this.payload.project.media.previewType === 'frame' && this.previewThumbRandom))
+            return !!this.payload.project.media.title && !!this.mediaFile && ((this.payload.project.media.previewType === 'new' && !!this.previewFile) || (this.payload.project.media.previewType === 'frame' && !!this.previewThumbRandom))
           default:
             return false
         }
