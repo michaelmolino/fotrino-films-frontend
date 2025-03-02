@@ -16,15 +16,17 @@
     <q-tree
       v-if="channels.length > 0"
       accordion
-      no-connectors
       :nodes="channels"
       node-key="key"
       label-key="title"
       children-key="children"
+      style="max-width: 720px;"
+      :no-transition="!animate"
     >
-      <template v-slot:default-header="tree">
+    <template v-slot:default-header="tree">
         <div class="flex items-center">
-          <div class="q-px-lg">
+          <div class="q-px-md">
+            <q-btn dense flat no-caps icon="fas fa-circle-minus" color="negative" @click="deleteResource(tree.node.poster ? 'project' : 'channel', tree.node.id)" class="q-px-sm" />
             <q-avatar>
               <img :src="tree.node.img" :alt="tree.node.title">
             </q-avatar>
@@ -36,13 +38,9 @@
       </template>
       <template v-slot:header-media="tree">
         <div class="flex items-center">
-          <div class="q-px-sm">
-            <q-btn dense flat no-caps icon="link" :to="getMediaLink(tree.node.id)" />
-            <q-btn dense flat no-caps icon="delete" @click="deleteMedia(tree.node.id)" />
-            <q-btn dense flat no-caps :icon="'img:' + tree.node.img" :alt="tree.node.title" class="no-pointer-events" />
-          </div>
-          <div>
-            {{ tree.node.title }}
+          <div class="q-px-md">
+            <q-btn dense flat no-caps icon="fas fa-circle-minus" color="negative" @click="deleteResource('media', tree.node.id)" class="q-px-sm" />
+            <q-btn dense flat no-caps :icon="'img:' + tree.node.img" :alt="tree.node.title" :label="tree.node.title" :to="getMediaLink(tree.node.id)" />
           </div>
         </div>
       </template>
@@ -52,7 +50,7 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue'
+import { defineAsyncComponent, ref } from 'vue'
 export default {
   name: 'Channel-Dashboard',
 
@@ -60,6 +58,12 @@ export default {
     NothingText: defineAsyncComponent(() =>
       import('@components/shared/NothingText.vue')
     )
+  },
+
+  data() {
+    return {
+      animate: ref(true)
+    }
   },
 
   computed: {
@@ -96,6 +100,12 @@ export default {
     }
   },
 
+  watch: {
+    channels(chs) {
+      this.animate = new Blob([JSON.stringify(chs)]).size < 131072
+    }
+  },
+
   methods: {
     getMediaLink(mediaId) {
       for (const channel of this.channels) {
@@ -108,8 +118,8 @@ export default {
       }
       return null
     },
-    deleteMedia(mediaId) {
-      this.$store.dispatch('channel/deleteMedia', mediaId)
+    deleteResource(type, r) {
+      this.$store.dispatch('channel/deleteResource', { type: type, id: r })
     }
   },
 

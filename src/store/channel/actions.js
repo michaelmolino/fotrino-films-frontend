@@ -100,19 +100,29 @@ export function rmHistory(context, uuid) {
   LocalStorage.set('fotrino-films-history', history)
 }
 
-export function deleteMedia(context, id) {
-  return api
-    .delete('/channels/media/' + id).then(() => {
-      const channels = context.state.channels.map(channel => ({
-        ...channel,
-        projects: channel.projects.map(project => ({
-          ...project,
-          media: project.media.filter(media => media.id !== id)
-        }))
-      }))
-      context.commit('SET_CHANNELS', channels)
-    })
-    .catch(error => {
-      return Promise.reject(error)
-    })
+export function deleteResource(context, resource) {
+  const url = resource.type === 'channel'
+    ? `/channels/${resource.id}`
+    : `/channels/${resource.type}/${resource.id}`
+
+  return api.delete(url).then(() => {
+    const channels = context.state.channels.map(channel => {
+      if (resource.type === 'channel' && channel.id === resource.id) {
+        return null
+      }
+      const projects = channel.projects.map(project => {
+        if (resource.type === 'project' && project.id === resource.id) {
+          return null
+        }
+        const media = project.media.filter(media =>
+          !(resource.type === 'media' && media.id === resource.id)
+        )
+        return { ...project, media }
+      }).filter(Boolean)
+      return { ...channel, projects }
+    }).filter(Boolean)
+    context.commit('SET_CHANNELS', channels)
+  }).catch(error => {
+    return Promise.reject(error)
+  })
 }
