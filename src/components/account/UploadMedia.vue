@@ -211,7 +211,6 @@
 import { defineAsyncComponent, ref } from 'vue'
 import { Notify } from 'quasar'
 import { objectApi } from 'boot/axios'
-
 import imageCompression from 'browser-image-compression'
 
 export default {
@@ -231,6 +230,31 @@ export default {
 
   created: function() {
     this.$store.dispatch('channel/getChannels')
+  },
+
+  mounted() {
+    this.beforeUnloadHandler = (event) => {
+      if (this.isUploading) {
+        event.preventDefault()
+        event.returnValue = ''
+      }
+    }
+    window.addEventListener('beforeunload', this.beforeUnloadHandler)
+  },
+
+  beforeUnmount() {
+    window.removeEventListener('beforeunload', this.beforeUnloadHandler)
+  },
+
+  beforeRouteLeave(to, from, next) {
+    if (this.isUploading) {
+      const answer = window.confirm('You have uploads in progress. Are you sure you want to leave?')
+      if (!answer) {
+        next(false)
+        return
+      }
+    }
+    next()
   },
 
   data() {
@@ -266,6 +290,7 @@ export default {
       counter: 0,
 
       uploadFiles: [],
+      isUploading: false,
 
       progress: 0,
       statusText: ref(null)
@@ -449,6 +474,7 @@ export default {
 
   methods: {
     factoryUpload() {
+      this.isUploading = true
       return this.$store.dispatch('channel/postUpload', this.payload).then(async upload => {
         let counter = 1
         const total = upload.length
@@ -477,14 +503,17 @@ export default {
           counter++
         }
         if (stop) {
+          this.isUploading = false
           return Promise.reject()
         }
         this.$store.dispatch('channel/confirmUpload', media)
         this.$refs.stepper.next()
+        this.isUploading = false
         return Promise.resolve()
       }).catch(err => {
         this.progress = -1
         this.statusText = 'Something went wrong!'
+        this.isUploading = false
         return Promise.reject(err)
       })
     },
