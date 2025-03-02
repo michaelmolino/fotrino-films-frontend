@@ -506,10 +506,17 @@ export default {
           this.isUploading = false
           return Promise.reject()
         }
-        this.$store.dispatch('channel/confirmUpload', media)
-        this.$refs.stepper.next()
-        this.isUploading = false
-        return Promise.resolve()
+        this.$store.dispatch('channel/confirmUpload', media).then(() => {
+          this.$refs.stepper.next()
+          this.isUploading = false
+          return Promise.resolve()
+        }).catch(err => {
+          this.progress = -1
+          this.statusText = 'Something went wrong!'
+          this.isUploading = false
+          console.error('Error confirming upload:', err)
+          return Promise.reject(err)
+        })
       }).catch(err => {
         this.progress = -1
         this.statusText = 'Something went wrong!'
