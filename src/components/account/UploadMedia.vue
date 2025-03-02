@@ -28,13 +28,22 @@
       >
         <div class="row">
           <div class="col-xs-12 col-md-6 q-pa-sm">
+            <!-- <div class="text-h6">Instructions:</div> -->
+            <div class="text-body2">
+              To upload media, select a channel and a project. Most users have a single channel, but you can create as many as needed. Projects help organize your media—similar to folders.
+              Currently, only landscape videos are supported. Support for portrait videos and audio files is planned for the future.
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12 col-md-6 q-pa-sm">
             <q-select outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" label="Channel"
               v-model="payload.uuid"
               :options="channels.map(({ uuid, title }) => ({ value: uuid, label: title })).concat({ value: 0, label: 'New...' })"
               class="q-pb-lg"
               />
             <q-avatar size="150px" class="q-pl-lg">
-              <q-skeleton v-if ="!payload.uuid || (payload.uuid && payload.uuid.value === 0 && payload.coverType === 'new' && !coverFile)" class="cursor-not-allowed" style="width: 250px; height: 250px;" />
+              <q-skeleton v-if ="!payload.uuid || (payload.uuid && payload.uuid.value === 0 && payload.coverType === 'new' && !coverFile)" class="cursor-not-allowed" animation="none" style="width: 250px; height: 250px;" />
               <q-img v-if="payload.uuid && payload.uuid.value !== 0" :src="channels.find(ch => ch.uuid === payload.uuid.value).cover" style="width: 250px" :ratio="1 / 1" fit="cover" />
               <q-img v-if="payload.uuid && payload.uuid.value === 0" :src="payload.coverType === 'profile' ? profile.profile_pic : coverThumb" style="width: 250px" :ratio="1 / 1" fit="cover" />
             </q-avatar>
