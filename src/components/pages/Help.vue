@@ -11,9 +11,7 @@
       >
         <q-card>
           <q-card-section>
-            Fotrino Films is a video content hosting platform. It is designed
-            for users to be able to upload content and share it easily with
-            family and friends.
+            Fotrino Films is a platform for hosting video content, allowing users to upload media and share it easily with family and friends.
           </q-card-section>
         </q-card>
       </q-expansion-item>
@@ -29,16 +27,7 @@
         <q-card>
           <q-card-section>
             <div>
-              Fotrino Films is not designed for monetisation of videos or
-              commercial purposes. There are no ads, no algorithms, and no
-              content discovery. We also don't segment your users, track users,
-              or harvest or sell personal data. You simply upload the content
-              you want to share and give the link to people you know.
-            </div>
-            <div class="q-py-sm">
-              Another way to think of it is most video platforms are designed
-              for people who want to get paid to upload content. Fotrino Films
-              is for people that want to pay to host their content without ads.
+              Fotrino Films focuses on private, ad-free video hosting. It’s not built for monetization or content discovery — there are no ads, algorithms, or data tracking. Unlike platforms designed to pay creators for views, Fotrino Films lets you pay to securely host your content and share it directly with people you know.
             </div>
           </q-card-section>
         </q-card>
@@ -54,8 +43,7 @@
       >
         <q-card>
           <q-card-section>
-            The Fotrino Films frontend is open source and there is a link to the
-            source code in the footer. I might open source the backend one day.
+            The frontend of Fotrino Films is open source. The backend might be open-sourced in the future.
           </q-card-section>
         </q-card>
       </q-expansion-item>
@@ -71,16 +59,7 @@
         <q-card>
           <q-card-section>
             <div>
-              By default, your content is available to anyone that has the link to
-              your specific channel. Your content should not appear in
-              search engines and the URL to your videos is impossible for someone
-              to guess or discover via brute force. The only way to discover your
-              videos is for someone to be given the link.
-            </div>
-            <div class="q-py-sm">
-              If you'd like to share a specific media file without revealing the
-              content from the rest of your channel, you can share a private link
-              from the share icon located below the video preview.
+              By default, your content is only accessible to those with the specific link to your channel. It is not indexed by search engines, and the URLs are not easily guessable. To share a specific media file privately, you can use the private link option from the share icon below the video preview, ensuring the rest of your channel remains undisclosed.
             </div>
           </q-card-section>
         </q-card>
@@ -126,17 +105,14 @@
       >
         <q-card>
           <q-card-section>
-            Content is not protected by DRM. We do not officially support
-            downloading videos, however it is certainly possible for a
-            sophisticated user to do so provided the link has been shared with
-            them.
+            Videos on Fotrino Films are not protected by DRM. While downloading videos is not officially supported, it is possible for advanced users to do so if they have your private link.
           </q-card-section>
         </q-card>
       </q-expansion-item>
       <q-separator />
       <q-expansion-item
         group="faq"
-        label="I'm having problems with buffering or poor quality.  What can I do?"
+        label="What can I do if I'm experiencing buffering or poor video quality?"
         header-class="text-bold"
         :default-opened="$route.query.item === 'buffering'"
         @show="this.$router.replace({query: { item: 'buffering' }})"
@@ -144,14 +120,7 @@
       >
         <q-card>
           <q-card-section>
-            All content is hosted with an enterprise storage provider and
-            utilises a global CDN to minimise latency and maximise bandwith.
-            Videos are streamed using adaptive bitrate streaming to ensure you
-            have an optimal viewing experience regardless of the size of your
-            device or speed of your internet connection. The resolution will
-            change as your conditions change. If you still experience poor
-            quality or buffering, you are likely in an area with very poor
-            signal.
+            Fotrino Films uses a global CDN and adaptive bitrate streaming to optimize video quality based on your internet speed and device size. If you're experiencing buffering or poor quality, it may be due to a weak signal in your area. Ensure you have a stable connection for the best experience.
           </q-card-section>
         </q-card>
       </q-expansion-item>
@@ -166,7 +135,7 @@
       >
         <q-card>
           <q-card-section>
-            The
+            Uee the
             <q-btn
               flat
               dense
@@ -174,9 +143,7 @@
               label="Facebook Link Debugger"
               href="https://developers.facebook.com/tools/debug/"
             />
-            is a tool tht allows you to manage how your link will appear on
-            Facebook. You can use this tool to make sure you're happy with the
-            preview before sharing.
+            to check and manage how your link appears on Facebook. This tool lets you confirm the preview image and other metadata before sharing your link.
           </q-card-section>
         </q-card>
       </q-expansion-item>
@@ -191,12 +158,7 @@
       >
         <q-card>
           <q-card-section>
-            Using third party identity providers is safer and helps protect you
-            from hackers and other online threats. No information about your
-            content or usage of Fotrino Films is shared with third parties other
-            than what is required to negotiate the login session. More identity
-            providers will be supported in the future including Apple, GitHub,
-            Microsoft, Live, and Amazon.
+            Third-party identity providers, such as Google, enhance security by protecting you from hackers and other threats. No content or usage data is shared with third parties beyond what’s necessary for login. Additional identity providers, including Apple, GitHub, Microsoft, Live, and Amazon, will be supported in the future.
           </q-card-section>
         </q-card>
       </q-expansion-item>
@@ -213,18 +175,13 @@
           <q-card-section>
             <ul>
               <li>
-                The top level of Fotrino Films is a <strong>channel</strong>.
-                If you have more than one channel, they are completely separate from each other.
-                Most users will probably have just one channel, but you can make as many as you want.
+                Channels are the highest organizational level, with separate, independent spaces for each. Users typically have one, but multiple channels can be created.
               </li>
               <li>
-                A channel can contain <strong>projects</strong>.
-                Think of projects like folders for organising your content.
+                Projects are contained within channels and act as organizational folders for your media.
               </li>
               <li>
-                A project contains <strong>media</strong>.
-                Fotrino Films supports both Video and Audio files.
-                You can select some of your media to be featured media to make navigation easier.
+                Media (videos and audio files) are organized within projects. You can feature certain media for easier navigation.
               </li>
             </ul>
           </q-card-section>

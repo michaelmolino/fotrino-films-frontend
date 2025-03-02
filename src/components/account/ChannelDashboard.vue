@@ -9,10 +9,9 @@
         <div class="ellipsis">{{ profile.email }}</div>
       </div>
     </q-img>
-    <div class="text-h6 q-pt-md">
-      Channels
-    </div>
-    <q-btn to="/account/upload" flat no-caps icon="fas fa-cloud-arrow-up" label="Upload Media" />
+    <div class="text-h6 q-pt-md">Channels</div>
+    <div><q-btn to="/account/upload" flat no-caps icon="fas fa-cloud-arrow-up" label="Upload Media" /></div>
+    <div><q-checkbox v-if="channels.length > 0" v-model="showDelete" label="Show delete button" color="negative" /></div>
     <q-tree
       v-if="channels.length > 0"
       accordion
@@ -26,7 +25,7 @@
     <template v-slot:default-header="tree">
         <div class="flex items-center">
           <div class="q-px-md">
-            <q-btn dense flat no-caps icon="fas fa-circle-minus" color="negative" @click="deleteResource(tree.node.poster ? 'project' : 'channel', tree.node.id)" class="q-px-sm" />
+            <q-btn v-if="showDelete" dense flat no-caps icon="fas fa-circle-minus" color="negative" @click="deleteResource(tree.node.poster ? 'project' : 'channel', tree.node.id)" class="q-px-sm" />
             <q-avatar>
               <img :src="tree.node.img" :alt="tree.node.title">
             </q-avatar>
@@ -39,7 +38,7 @@
       <template v-slot:header-media="tree">
         <div class="flex items-center">
           <div class="q-px-md">
-            <q-btn dense flat no-caps icon="fas fa-circle-minus" color="negative" @click="deleteResource('media', tree.node.id)" class="q-px-sm" />
+            <q-btn v-if="showDelete" dense flat no-caps icon="fas fa-circle-minus" color="negative" @click="deleteResource('media', tree.node.id)" class="q-px-sm" />
             <q-btn dense flat no-caps :icon="'img:' + tree.node.img" :alt="tree.node.title" :label="tree.node.title" :to="getMediaLink(tree.node.id)" />
           </div>
         </div>
@@ -47,6 +46,17 @@
     </q-tree>
     <NothingText v-if="channels.length === 0" text="Your media will appear here (once you have some)."/>
   </div>
+  <q-dialog v-model="showTerms" backdrop-filter="contrast(40%)">
+      <q-card>
+        <q-card-section style="max-height: 50vh" class="scroll">
+          <Terms />
+        </q-card-section>
+        <q-separator />
+        <q-card-actions align="right">
+          <q-btn flat label="OK" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
 </template>
 
 <script>
@@ -55,6 +65,9 @@ export default {
   name: 'Channel-Dashboard',
 
   components: {
+    Terms: defineAsyncComponent(() =>
+      import('@components/pages/Terms.vue')
+    ),
     NothingText: defineAsyncComponent(() =>
       import('@components/shared/NothingText.vue')
     )
@@ -62,7 +75,9 @@ export default {
 
   data() {
     return {
-      animate: ref(true)
+      showTerms: this.$route.query.showTerms === 'true',
+      animate: ref(true),
+      showDelete: ref(false)
     }
   },
 
