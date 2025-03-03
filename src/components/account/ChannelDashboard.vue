@@ -32,6 +32,11 @@
           </div>
           <div>
             {{ tree.node.title }}
+            <q-icon v-if="tree.node.pending" name="fas fa-clock" class="q-px-xs">
+              <q-tooltip>
+                Pending
+              </q-tooltip>
+            </q-icon>
           </div>
         </div>
       </template>
@@ -39,7 +44,12 @@
         <div class="flex items-center">
           <div class="q-px-md">
             <q-btn v-if="showDelete" dense flat no-caps icon="fas fa-circle-minus" color="negative" @click="deleteResource('media', tree.node.id)" class="q-px-sm" />
-            <q-btn dense flat no-caps :icon="'img:' + tree.node.img" :alt="tree.node.title" :label="tree.node.title" :to="getMediaLink(tree.node.id)" />
+            <q-btn dense flat no-caps :icon="'img:' + tree.node.img" :alt="tree.node.title" :label="tree.node.title" :to="getMediaLink(tree.node.id)" :class="tree.node.pending ? 'cursor-not-allowed' : ''" />
+            <q-icon v-if="tree.node.pending" name="fas fa-clock" class="q-px-xs">
+              <q-tooltip>
+                Pending
+              </q-tooltip>
+            </q-icon>
           </div>
         </div>
       </template>
@@ -127,7 +137,11 @@ export default {
         for (const project of channel.projects) {
           const media = project.media.find((m) => m.id === mediaId)
           if (media) {
-            return '/' + [channel.uuid, channel.slug, project.slug, media.slug].join('/')
+            if (!media.pending) {
+              return '/' + [channel.uuid, channel.slug, project.slug, media.slug].join('/')
+            } else {
+              return ''
+            }
           }
         }
       }

@@ -28,9 +28,15 @@ export function getChannels(context, deep) {
     })
 }
 
-export function getChannel(context, uuid) {
+export function getChannel(context, params) {
+  const uuid = params.uuid
+  const pending = params.pending
+  let url = '/channels/' + uuid
+  if (pending) {
+    url += '?pending=true'
+  }
   return api
-    .get('/channels/' + uuid)
+    .get(url)
     .then(response => {
       const channel = response.data
       channel.projects = channel.projects.sort((a, b) => { return a.sort - b.sort })

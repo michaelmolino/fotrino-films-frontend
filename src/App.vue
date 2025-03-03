@@ -42,7 +42,7 @@ export default {
     $route(to, from) {
       if (to.params?.uuid) {
         this.$store.cache
-          .dispatch('channel/getChannel', to.params.uuid)
+          .dispatch('channel/getChannel', { uuid: to.params.uuid, pending: false })
           .then(_channel => {
             this.channel = _channel
             this.metaData = getMetaData(this.$route, _channel)

@@ -28,7 +28,6 @@
       >
         <div class="row">
           <div class="col-xs-12 col-md-6 q-pa-sm">
-            <!-- <div class="text-h6">Instructions:</div> -->
             <div class="text-body2">
               To upload media, select a channel and a project. Most users have a single channel, but you can create as many as needed. Projects help organize your media—similar to folders.
               Currently, only landscape videos are supported. Support for portrait videos and audio files is planned for the future.
@@ -37,7 +36,7 @@
         </div>
         <div class="row">
           <div class="col-xs-12 col-md-6 q-pa-sm">
-            <q-select outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" label="Channel"
+            <q-select outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" label="Channel *"
               v-model="payload.uuid"
               :options="channels.map(({ uuid, title }) => ({ value: uuid, label: title })).concat({ value: 0, label: 'New...' })"
               class="q-pb-lg"
@@ -51,7 +50,7 @@
           <div class="col-xs-12 col-md-6 q-pa-sm">
             <span v-if="payload.uuid?.value === 0">
               <q-input outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md"
-                v-model="payload.title" label="Channel Title"
+                v-model="payload.title" label="Channel Title *" clearable
               />
                 <q-radio v-model="payload.coverType" val="profile" label="Profile Photo" color="accent" /><br />
                 <q-radio v-model="payload.coverType" val="new" label="Upload Photo" color="accent" class="q-pb-md" /><br />
@@ -77,7 +76,7 @@
       >
         <div class="row">
           <div class="col-xs-12 col-md-6 q-pa-sm">
-            <q-select outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" label="Project"
+            <q-select outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" label="Project *"
               v-model="payload.project.id"
               :options="projects.map(({ id, title }) => ({ value: id, label: title })).concat({ value: 0, label: 'New...' })"
               class="q-pb-md"
@@ -88,10 +87,10 @@
           </div>
           <div class="col-xs-12 col-md-6 q-pa-sm">
             <span v-if="payload.project.id?.value === 0">
-              <q-input outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md"
-                v-model="payload.project.title" label="Project Title"
+              <q-input outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md" clearable
+                v-model="payload.project.title" label="Project Title *"
               />
-              <q-input outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md"
+              <q-input outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md" clearable
                 v-model="payload.project.subtitle" label="Project SubTitle"
               />
                 <q-radio v-model="payload.project.posterType" val="default" label="Default" color="accent" /><br />
@@ -118,10 +117,10 @@
       >
         <div class="row">
           <div class="col-xs-12 col-md-6 q-pa-sm">
-            <q-input outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md"
-              v-model="payload.project.media.title" label="Title"
+            <q-input outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md" clearable
+              v-model="payload.project.media.title" label="Title *"
             />
-            <q-input outlined autogrow :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md"
+            <q-input outlined autogrow :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md" clearable
               v-model="payload.project.media.description" label="Description - p, br, strong, and i tags allowed"
             />
             <q-checkbox outlined v-model="payload.project.media.main" label="Featured" class="q-pb-md" />
@@ -138,7 +137,7 @@
             </div>
           </div>
           <div class="col-xs-12 col-md-6 q-pa-sm">
-            <q-file label = "Media (Video)" outlined v-model="mediaFile" accept="video/*" max-file-size="5368709120" class="q-pb-md" color="accent" @update:model-value="(file) => handleFile(file, 'media')">
+            <q-file label = "Media (Video) *" outlined v-model="mediaFile" accept="video/*" max-file-size="5368709120" class="q-pb-md" color="accent" @update:model-value="(file) => handleFile(file, 'media')">
               <template v-slot:prepend>
                 <q-icon name="movie" @click.stop.prevent />
               </template>
@@ -326,7 +325,7 @@ export default {
     step(s) {
       if (s === 2 && this.payload.uuid.value !== 0) {
         this.$store.cache
-          .dispatch('channel/getChannel', this.payload.uuid.value)
+          .dispatch('channel/getChannel', { uuid: this.payload.uuid.value, pending: true })
           .then(ch => {
             this.projects = ch.projects
             if (this.projects.length === 0) {
