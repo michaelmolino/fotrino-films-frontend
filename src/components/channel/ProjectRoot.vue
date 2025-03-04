@@ -1,5 +1,5 @@
 <template>
-  <div v-if="channel && project && media" class="q-pa-md">
+  <div v-if="channel?.uuid === $route.params.uuid && project && media" class="q-pa-md">
 
     <BreadCrumbs
       :channel="channel"
