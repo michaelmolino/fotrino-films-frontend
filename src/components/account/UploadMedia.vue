@@ -51,6 +51,7 @@
             <span v-if="payload.uuid?.value === 0">
               <q-input outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md"
                 v-model="payload.title" label="Channel Title *" clearable
+                @focus="clearDefaultChannelTitle" @blur="restoreDefaultChannelTitle"
               />
                 <q-radio v-model="payload.coverType" val="profile" label="Profile Photo" color="accent" /><br />
                 <q-radio v-model="payload.coverType" val="new" label="Upload Photo" color="accent" class="q-pb-md" /><br />
@@ -89,6 +90,7 @@
             <span v-if="payload.project.id?.value === 0">
               <q-input outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md" clearable
                 v-model="payload.project.title" label="Project Title *"
+                @focus="clearDefaultProjectTitle" @blur="restoreDefaultProjectTitle"
               />
               <q-input outlined :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md" clearable
                 v-model="payload.project.subtitle" label="Project SubTitle"
@@ -491,6 +493,26 @@ export default {
   },
 
   methods: {
+    clearDefaultChannelTitle() {
+      if (this.payload.title === 'My Channel') {
+        this.payload.title = ''
+      }
+    },
+    restoreDefaultChannelTitle() {
+      if (this.payload.title === '') {
+        this.payload.title = 'My Channel'
+      }
+    },
+    clearDefaultProjectTitle() {
+      if (this.payload.project.title === 'My Videos') {
+        this.payload.project.title = ''
+      }
+    },
+    restoreDefaultProjectTitle() {
+      if (this.payload.project.title === '') {
+        this.payload.project.title = 'My Videos'
+      }
+    },
     factoryUpload() {
       this.isUploading = true
       return this.$store.dispatch('channel/postUpload', this.payload).then(async upload => {

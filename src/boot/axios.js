@@ -8,9 +8,7 @@ axiosRetry(api, {
   retries: 6,
   retryDelay: axiosRetry.exponentialDelay,
   retryCondition: (error) => {
-    return error.code === 'ECONNABORTED' || error.code === 'ECONNRESET' || error.code === 'ECONNREFUSED' ||
-       (!(error.config.method === 'PUT' && error.config.url === '/channels/media') &&
-          ![400, 401, 402, 403, 404, 409, 500, 501].includes(error.response.status))
+    return ![400, 401, 402, 403, 404, 409, 500, 501].includes(error.response.status)
   }
 })
 
