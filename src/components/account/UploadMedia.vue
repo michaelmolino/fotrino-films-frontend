@@ -139,7 +139,7 @@
             </div>
           </div>
           <div class="col-xs-12 col-md-6 q-pa-sm">
-            <q-file label = "Media (Video) *" outlined v-model="mediaFile" accept="video/*" max-file-size="5368709120" class="q-pb-md" color="accent" @update:model-value="(file) => handleFile(file, 'media')">
+            <q-file label = "Media (Video) *" outlined v-model="mediaFile" accept="video/*" max-file-size="5368709120" class="q-pb-md" color="accent" @update:model-value="(file) => handleFile(file, 'upload')">
               <template v-slot:prepend>
                 <q-icon name="movie" @click.stop.prevent />
               </template>
@@ -537,7 +537,7 @@ export default {
             this.statusText = 'Something went wrong!'
             console.error(`Error uploading ${u.resourceType}:`, error)
           }
-          if (u.resourceType === 'media') {
+          if (u.resourceType === 'upload') {
             media = u.reference
           }
           counter++
@@ -586,7 +586,7 @@ export default {
         } catch (error) {
           console.error('Error processing file:', error)
         }
-      } else if (resourceType === 'media') {
+      } else if (resourceType === 'upload') {
         const index = this.uploadFiles.findIndex(r => r.resourceType === resourceType)
         if (index !== -1) {
           this.uploadFiles[index].file = file
