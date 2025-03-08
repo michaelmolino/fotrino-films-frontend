@@ -27,7 +27,7 @@
               <q-btn v-if="!channel.pending" :to="getMediaLink('channel', channel.id)" target="_blank" dense unelevated icon="link" color="info" class="q-mx-xs">
                 <q-tooltip>Link</q-tooltip>
               </q-btn>
-              <q-btn v-if="!channel.pending" dense unelevated icon="delete" color="negative" class="q-ml-xs" @click="deleteResource('channel', channel.id)">
+              <q-btn v-if="false && !channel.pending" dense unelevated icon="delete" color="negative" class="q-ml-xs" @click="deleteResource('channel', channel.id)">
                 <q-tooltip>Delete</q-tooltip>
               </q-btn>
             </div>
@@ -62,7 +62,7 @@
               <q-btn v-if="!project.pending" :to="getMediaLink('project', project.id)" target="_blank" dense unelevated icon="link" color="info" class="q-mx-xs">
                 <q-tooltip>Link</q-tooltip>
               </q-btn>
-              <q-btn v-if="!project.pending" dense unelevated icon="delete" color="negative" class="q-ml-xs" @click="deleteResource('project', project.id)">
+              <q-btn v-if="false && !project.pending" dense unelevated icon="delete" color="negative" class="q-ml-xs" @click="deleteResource('project', project.id)">
                 <q-tooltip>Delete</q-tooltip>
               </q-btn>
             </div>
@@ -93,7 +93,7 @@
               <q-btn v-if="!media.pending" :to="getMediaLink('media', media.id)" target="_blank" dense unelevated icon="link" color="info" class="q-mx-xs">
                 <q-tooltip>Link</q-tooltip>
               </q-btn>
-              <q-btn v-if="!media.pending" dense unelevated icon="delete" color="negative" class="q-ml-xs" @click="deleteResource('media', media.id)">
+              <q-btn v-if="!media.pending" dense unelevated icon="delete" color="warning" class="q-ml-xs" @click="deleteResource('media', media.id)">
                 <q-tooltip>Delete</q-tooltip>
               </q-btn>
             </div>

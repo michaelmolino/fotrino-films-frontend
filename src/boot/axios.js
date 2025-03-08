@@ -29,15 +29,15 @@ export default boot(({ app, router, store }) => {
     if (req.method === 'delete') {
       return new Promise((resolve, reject) => {
         Notify.create({
-          type: 'warning',
+          type: 'negative',
           timeout: 0,
-          message: 'Resources are "soft" deleted; files will be permanently removed later. For urgent file removal, please email michael@fotrino.com.',
+          message: 'Resources will be immediately deleted; this action cannot be undone!',
           position: 'center',
           icon: 'fas fa-info',
-          multiLine: false,
+          multiLine: true,
           actions: [
-            { icon: 'fas fa-circle-exclamation', label: 'Confirm delete', color: 'black', handler: () => { Loading.show(); resolve(req) } },
-            { icon: 'fas fa-rotate-left', label: 'Go Back', color: 'black', handler: () => { /* Do Nothing */ } }
+            { icon: 'fas fa-circle-exclamation', label: 'Confirm delete', color: 'white', handler: () => { Loading.show(); resolve(req) } },
+            { icon: 'fas fa-rotate-left', label: 'Go Back', color: 'white', handler: () => { /* Do Nothing */ } }
           ]
         })
       })
