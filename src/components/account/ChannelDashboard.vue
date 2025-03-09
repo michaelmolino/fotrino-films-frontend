@@ -5,7 +5,7 @@
     <NothingText v-if="channels.length === 0" text="Your media will appear here (once you have some)."/>
     <q-dialog v-model="showTerms" backdrop-filter="contrast(40%)">
       <q-card>
-        <q-card-section style="max-height: 50vh" class="scroll">
+        <q-card-section class="scroll terms">
           <Terms />
         </q-card-section>
         <q-separator />
@@ -70,3 +70,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.terms {
+  max-height: 50vh
+}
+</style>

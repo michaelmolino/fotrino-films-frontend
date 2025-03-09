@@ -4,8 +4,7 @@
     dense
     no-caps
     padding="8px"
-    :class="media.main ? 'fit bg-accent' : 'fit'"
-    style="max-width: 640px"
+    :class="media.main ? 'fit bg-accent width720' : 'fit width720'"
   >
     <q-badge
       v-if="media.type?.startsWith('audio/')"
@@ -30,7 +29,7 @@
         </div>
       </template>
     </q-img>
-    <q-skeleton v-if="!media.preview" class="cursor-not-allowed" animation="none" style="width: 250px; height: 141px;" />
+    <q-skeleton v-if="!media.preview" class="cursor-not-allowed preview-skeleton" animation="none" />
   </q-btn>
 </template>
 
@@ -45,3 +44,10 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.preview-skeleton {
+  width: 250px;
+  height: 141px;
+}
+</style>

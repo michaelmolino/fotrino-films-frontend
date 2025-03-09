@@ -22,7 +22,6 @@
         :key="project.id"
       >
         <ProjectPoster
-          :style="project.deleted ? 'max-width: 480px; filter: brightness(37.5%);' : 'max-width: 480px'"
           :project="project"
           :to="'/' + channel.uuid + '/' + channel.slug + '/' + project.slug"
         />
@@ -32,13 +31,11 @@
 
     <div class="row q-pt-md" v-else>
       <div
-        class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm"
-        v-for="item in channel.projects.flatMap(project => project.media.map(media => ({ media: media, project: project }))).filter((f) => selectedView == 'main' ? f.media.main : true).sort((b, a) => a.media.created.localeCompare(b.media.created))"
+        class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm text-center"
+        v-for="item in channel.projects.flatMap(project => project.media.map(media => ({ media: media, project: project }))).filter((f) => selectedView == 'main' ? f.media.main : true).sort((b, a) => a.media.resource_date.localeCompare(b.media.resource_date))"
         :key="item.media.id"
-        style="text-align: center;"
       >
         <MediaPreview
-          :style="item.media.deleted ? 'filter: brightness(37.5%); max-width: 360px;' : 'max-width: 360px;'"
           :channel="channel"
           :project="item.project"
           :media="item.media"

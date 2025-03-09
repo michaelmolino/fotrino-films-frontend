@@ -2,7 +2,7 @@
   <div class="q-pb-md">
     <q-card flat class="profile-card">
       <q-card-section>
-        <q-img :src="profile.profile_pic" style="width: 250px" :ratio="1 / 1" fit="cover">
+        <q-img :src="profile.profile_pic" class="width250x" :ratio="1 / 1" fit="cover">
           <q-badge class="bg-accent q-pa-md" floating transparent>
             <q-icon :name="'fab fa-' + profile.identity_provider" />
           </q-badge>
@@ -15,7 +15,7 @@
       <q-card-section>
         <div class="flex no-wrap">
           <div class="fit">
-            <div class="ellipsis text2">Joined {{ daysSince }}</div>
+            <div class="ellipsis text2">Joined {{ daysSince(profile.created) }}</div>
             <div class="ellipsis text2">{{ mediaCount }} videos</div>
           </div>
           <div class="q-pl-sm">
@@ -39,11 +39,9 @@ export default {
     profile: Object,
     mediaCount: Number
   },
-  computed: {
-    daysSince: {
-      get() {
-        return daysSince(this.profile.created)
-      }
+  methods: {
+    daysSince(date) {
+      return daysSince(date)
     }
   }
 }

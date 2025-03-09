@@ -1,5 +1,11 @@
 import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'; dayjs.extend(relativeTime)
+import relativeTime from 'dayjs/plugin/relativeTime'
+dayjs.extend(relativeTime)
+import isToday from 'dayjs/plugin/isToday'
+import isYesterday from 'dayjs/plugin/isYesterday'
+dayjs.extend(isToday)
+dayjs.extend(isYesterday)
+
 import DOMPurify from 'dompurify'
 
 export function getMetaData(route, channel) {
@@ -70,8 +76,16 @@ export function getMetaData(route, channel) {
   }
 }
 
-export function daysSince(start) {
-  return dayjs(start).fromNow()
+export function daysSince(start, withTime = true) {
+  const day = dayjs(start)
+  if (!withTime) {
+    if (day.isToday()) {
+      return 'today'
+    } else if (day.isYesterday()) {
+      return 'yesterday'
+    }
+  }
+  return day.fromNow()
 }
 
 export function sanitizeHtml(unsafe) {

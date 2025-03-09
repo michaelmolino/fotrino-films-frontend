@@ -1,16 +1,16 @@
 <template>
     <div>
       <div v-if="view == 'video'">
-        <video id="player" controls :key="media.id" style="width: 100%; aspect-ratio: 16 / 9" />
+        <video id="player" controls :key="media.id" class="videoEl" />
       </div>
       <div v-else>
         <q-img
           :src="media.preview"
-          style="width: 100%;"
           :ratio="16/9"
           fit="cover"
+          class="full-width"
         />
-        <audio id="player" controls :key="media.id" style="width: 100%;"></audio>
+        <audio id="player" controls :key="media.id" class="audioEl"></audio>
       </div>
     </div>
 </template>
@@ -124,5 +124,12 @@ export default {
 <style>
 :root {
   --plyr-color-main: #8D6A9F;
+}
+.videoEl {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+.audioEl {
+  width: 100%;
 }
 </style>

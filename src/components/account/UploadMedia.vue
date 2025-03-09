@@ -42,9 +42,9 @@
               class="q-pb-lg"
               />
             <q-avatar size="150px" class="q-pl-lg">
-              <q-skeleton v-if ="!payload.uuid || (payload.uuid && payload.uuid.value === 0 && payload.coverType === 'new' && !coverFile)" class="cursor-not-allowed" animation="none" style="width: 250px; height: 250px;" />
-              <q-img v-if="payload.uuid && payload.uuid.value !== 0" :src="channels.find(ch => ch.uuid === payload.uuid.value).cover" style="width: 250px" :ratio="1 / 1" fit="cover" />
-              <q-img v-if="payload.uuid && payload.uuid.value === 0" :src="payload.coverType === 'profile' ? profile.profile_pic : coverThumb" style="width: 250px" :ratio="1 / 1" fit="cover" />
+              <q-skeleton v-if ="!payload.uuid || (payload.uuid && payload.uuid.value === 0 && payload.coverType === 'new' && !coverFile)" class="cursor-not-allowed width250x height250x" animation="none" />
+              <q-img v-if="payload.uuid && payload.uuid.value !== 0" :src="channels.find(ch => ch.uuid === payload.uuid.value).cover" class="width250x" :ratio="1 / 1" fit="cover" />
+              <q-img v-if="payload.uuid && payload.uuid.value === 0" :src="payload.coverType === 'profile' ? profile.profile_pic : coverThumb" class="width250x" :ratio="1 / 1" fit="cover" />
             </q-avatar>
           </div>
           <div class="col-xs-12 col-md-6 q-pa-sm">
@@ -82,7 +82,7 @@
               :options="projects.map(({ id, title }) => ({ value: id, label: title })).concat({ value: 0, label: 'New...' })"
               class="q-pb-md"
             />
-            <div style="width: 250px">
+            <div class="width250x">
               <ProjectPoster :project = "project" />
             </div>
           </div>
@@ -125,9 +125,20 @@
             <q-input outlined autogrow :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'" class="q-pb-md" clearable
               v-model="payload.project.media.description" label="Description - p, br, strong, and i tags allowed"
             />
-            <q-checkbox outlined v-model="payload.project.media.main" label="Featured" class="q-pb-md" />
+            <q-btn icon="event" flat :label="new Date(payload.project.media.resourceDate).toLocaleDateString()">
+              <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                <q-date v-model="payload.project.media.resourceDate" subtitle="Capture Date" :options="dateOptionsFn">
+                  <div class="row items-center justify-end q-gutter-sm">
+                    <q-btn label="Cancel" flat v-close-popup />
+                    <q-btn label="OK" flat v-close-popup />
+                  </div>
+                </q-date>
+              </q-popup-proxy>
+              <q-tooltip>Capture Date</q-tooltip>
+            </q-btn><br />
+            <q-checkbox outlined v-model="payload.project.media.main" label="Featured" class="q-pb-md q-pl-sm" />
             <div class="row">
-              <div style="width: 250px">
+              <div class="width250x">
                 <MediaPreview
                   :media="media"
                 />
@@ -147,8 +158,8 @@
                 <q-icon name="close" @click.stop.prevent="mediaFile = null" class="cursor-pointer" />
               </template>
             </q-file>
-            <q-radio v-model="payload.project.media.previewType" val="frame" label="Video Frame" color="accent" /><br />
-            <q-radio v-model="payload.project.media.previewType" val="new" label="Upload Photo" color="accent" />
+            <q-radio class="q-pl-sm" v-model="payload.project.media.previewType" val="frame" label="Video Frame" color="accent" /><br />
+            <q-radio class="q-pl-sm" v-model="payload.project.media.previewType" val="new" label="Upload Photo" color="accent" />
             <q-file v-if="payload.project.media.previewType === 'new'" label = "Media Preview (Image)" outlined v-model="previewFile" accept="image/*" class="q-pb-md" color="accent" @update:model-value="(file) => handleFile(file, 'preview')">
               <template v-slot:prepend>
                 <q-icon name="image" @click.stop.prevent />
@@ -283,7 +294,8 @@ export default {
           title: 'My Videos',
           media: {
             main: true,
-            previewType: 'frame'
+            previewType: 'frame',
+            resourceDate: new Date().toISOString().split('T')[0].replace(/-/g, '/')
           }
         }
       }),
@@ -512,6 +524,9 @@ export default {
       if (this.payload.project.title === '') {
         this.payload.project.title = 'My Videos'
       }
+    },
+    dateOptionsFn(date) {
+      return new Date(date) <= new Date()
     },
     factoryUpload() {
       this.isUploading = true

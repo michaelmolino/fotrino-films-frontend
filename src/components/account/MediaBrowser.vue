@@ -1,5 +1,5 @@
 <template>
-<div style="max-width: 480px;">
+<div class="width480">
   <q-list bordered class="rounded-borders">
     <q-expansion-item
       v-for="channel in channels" :key="channel.uuid"
@@ -20,7 +20,7 @@
             {{ channel.title }}
           </q-item-section>
           <q-item-section class="header-buttons">
-            <div class="row no-wrap">
+            <div class="text-no-wrap">
               <q-btn v-if="channel.pending" dense unelevated icon="fas fa-clock" class="cursor-not-allowed">
                 <q-tooltip>Pending</q-tooltip>
               </q-btn>
@@ -55,7 +55,7 @@
             {{ project.title }}
           </q-item-section>
           <q-item-section class="header-buttons">
-            <div class="row no-wrap">
+            <div class="text-no-wrap">
               <q-btn v-if="project.pending" dense unelevated icon="fas fa-clock" class="cursor-not-allowed">
                 <q-tooltip>Pending</q-tooltip>
               </q-btn>
@@ -86,7 +86,7 @@
             {{ media.title }}
           </q-item-section>
           <q-item-section class="header-buttons">
-            <div class="row no-wrap">
+            <div class="text-no-wrap">
               <q-btn v-if="media.pending" dense unelevated icon="fas fa-clock" class="cursor-not-allowed">
                 <q-tooltip>Pending</q-tooltip>
               </q-btn>
@@ -107,8 +107,6 @@
 </template>
 
 <script>
-import { daysSince } from '@javascript/library.js'
-
 export default {
   name: 'MediaBrowser',
 
@@ -117,9 +115,6 @@ export default {
   },
 
   methods: {
-    daysSince(date) {
-      return daysSince(date)
-    },
     getMediaLink(type, id) {
       if (type === 'channel') {
         const channel = this.channels.find((ch) => ch.id === id)
@@ -169,5 +164,6 @@ export default {
 .header-buttons {
   display: flex;
   gap: 8px;
+  max-width: 100px;
 }
 </style>

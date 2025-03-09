@@ -1,5 +1,5 @@
 <template>
-  <div v-if="channel?.uuid === $route.params.uuid && project && media" class="q-pa-md">
+  <div v-if="channel?.uuid === $route.params.uuid && project" class="q-pa-md">
 
     <BreadCrumbs
       :channel="channel"
@@ -11,7 +11,7 @@
     <NothingText v-if="project.media?.length === 0" />
 
     <span v-if="project.media?.length > 0 || project.media.private_id">
-      <PlyrPlayer :media="media" :artist="channel.ownername" style="width: 100%; max-width: 720px; min-width: 240px;" class="q-py-md" />
+      <PlyrPlayer :media="media" :artist="channel.ownername" class="q-py-md plyrplayer" />
 
       <MediaDescription :media="media" />
 
@@ -26,7 +26,6 @@
             :key="media.id"
           >
             <MediaPreview
-              :style="media.deleted ? 'filter: brightness(37.5%); max-width: 360px;' : 'max-width: 360px;'"
               :channel="channel"
               :project="project"
               :media="media"
@@ -97,13 +96,13 @@ export default {
           } else {
             _media = this.project?.media.find(ch => ch.main) || this.project?.media[0]
             this.$router.replace({
-              params: { mediaSlug: _media.slug }
+              params: { mediaSlug: _media?.slug }
             })
           }
         } else if (this.$route.params.privateId) {
           _media = this.channel.project.media
         }
-        if (this.channel && this.project && !_media) {
+        if (this.channel && this.project && this.project.media.length > 0 && !_media) {
           this.$router.replace('/404')
         }
         return _media
@@ -113,3 +112,11 @@ export default {
 
 }
 </script>
+
+<style scoped>
+.plyrplayer {
+  width: 100%;
+  max-width: 720px;
+  min-width: 240px;
+}
+</style>

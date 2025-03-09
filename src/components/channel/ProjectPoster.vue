@@ -20,7 +20,7 @@
         </div>
       </template>
     </q-img>
-    <q-skeleton v-if="!project.poster" class="cursor-not-allowed" animation="none" style="width: 218px; height: 327px;" />
+    <q-skeleton v-if="!project.poster" class="cursor-not-allowed project-skeleton" animation="none" />
   </q-btn>
 </template>
 
@@ -33,3 +33,10 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.project-skeleton {
+  width: 218px;
+  height: 327px;
+}
+</style>

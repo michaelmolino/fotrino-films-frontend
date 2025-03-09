@@ -39,8 +39,8 @@ export function getChannel(context, params) {
     .get(url)
     .then(response => {
       const channel = response.data
-      channel.projects = channel.projects.sort((a, b) => { return a.sort - b.sort })
-      channel.projects.forEach(m => { m.media = m.media.sort((a, b) => { return a.sort - b.sort }) })
+      channel.projects = channel.projects.sort((a, b) => { return new Date(b.resource_date) - new Date(a.resource_date) })
+      channel.projects.forEach(m => { m.media = m.media.sort((a, b) => { return new Date(b.resource_date) - new Date(a.resource_date) }) })
       context.commit('SET_CHANNEL', channel)
       updateHistory(context, channel)
       return Promise.resolve(channel)

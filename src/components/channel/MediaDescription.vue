@@ -1,5 +1,5 @@
 <template>
-    <q-card flat bordered style="width: 100%; max-width: 720px; min-width: 240px;">
+    <q-card flat bordered class="description">
       <q-card-section vertical>
         <q-icon :name="$route.params.uuid ? 'public' : 'public_off'" size = "md" class="q-pr-sm" />
         <span class="text-h6" v-text="media.title"></span>
@@ -30,7 +30,8 @@
             </q-item>
           </q-list>
         </q-btn-dropdown>
-        <div class="text-subtitle2 q-pl-xl">Published: {{ daysSince }}</div>
+        <div class="text-subtitle2 q-pl-xl">Captured {{ daysSince(media.resource_date, false) }}</div>
+        <div class="text-subtitle2 q-pl-xl">Published {{ daysSince(media.created) }}</div>
       </q-card-section>
       <q-separator inset v-if="description_safe" />
       <q-card-section vertical>
@@ -51,11 +52,6 @@ export default {
   },
 
   computed: {
-    daysSince: {
-      get() {
-        return daysSince(this.media.created)
-      }
-    },
     description_safe: {
       get() {
         return sanitizeHtml(this.media.description_unsafe)
@@ -64,6 +60,9 @@ export default {
   },
 
   methods: {
+    daysSince(date, withTime = true) {
+      return daysSince(date, withTime)
+    },
     copyLink(val) {
       if (val === 'public') {
         copyToClipboard(window.location.href)
@@ -90,3 +89,11 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.description {
+  width: 100%;
+  max-width: 720px;
+  min-width: 240px;
+}
+</style>
