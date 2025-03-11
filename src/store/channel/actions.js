@@ -18,6 +18,7 @@ export function getChannels(context, deep) {
   return api
     .get(!deep ? '/channels' : '/channels/deep')
     .then(response => {
+      // TODO: I should sort channels, projects, media
       const channels = response.data
       context.commit('SET_CHANNELS', channels)
       return Promise.resolve(channels)
