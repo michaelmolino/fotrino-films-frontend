@@ -27,7 +27,7 @@
               <q-btn v-if="!channel.pending" :to="getMediaLink('channel', channel.id)" target="_blank" dense unelevated icon="link" color="info" class="q-mx-xs">
                 <q-tooltip>Link</q-tooltip>
               </q-btn>
-              <q-btn v-if="!channel.pending" dense unelevated icon="delete" color="negative" class="q-ml-xs" @click="deleteResource('channel', channel.id)">
+              <q-btn v-if="!channel.pending" dense unelevated icon="delete" color="negative" class="q-ml-xs" @click="deleteResource('channel', channel.uuid)">
                 <q-tooltip>Delete</q-tooltip>
               </q-btn>
             </div>

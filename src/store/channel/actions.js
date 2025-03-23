@@ -114,7 +114,7 @@ export function deleteResource(context, resource) {
 
   return api.delete(url).then(() => {
     const channels = context.state.channels.map(channel => {
-      if (resource.type === 'channel' && channel.id === resource.id) {
+      if (resource.type === 'channel' && channel.uuid === resource.id) {
         return null
       }
       const projects = channel.projects.map(project => {

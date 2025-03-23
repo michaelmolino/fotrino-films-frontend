@@ -21,6 +21,9 @@ export default {
   },
 
   created() {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('WARNING: This is a development server and should not be exposed to the internet.')
+    }
     this.$store.dispatch('account/getProfile')
   },
 
