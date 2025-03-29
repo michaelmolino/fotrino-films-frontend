@@ -18,8 +18,14 @@ export function getChannels(context, deep) {
   return api
     .get(!deep ? '/channels' : '/channels/deep')
     .then(response => {
-      // TODO: I should sort channels, projects, media
-      const channels = response.data
+      let channels = response.data
+      channels = channels?.sort((a, b) => new Date(b.resource_date) - new Date(a.resource_date))
+      channels?.forEach(channel => {
+        channel.projects = channel.projects?.sort((a, b) => new Date(b.resource_date) - new Date(a.resource_date))
+        channel.projects?.forEach(project => {
+          project.media = project.media?.sort((a, b) => new Date(b.resource_date) - new Date(a.resource_date))
+        })
+      })
       context.commit('SET_CHANNELS', channels)
       return Promise.resolve(channels)
     })

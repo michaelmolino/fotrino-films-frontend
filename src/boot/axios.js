@@ -64,6 +64,7 @@ export default boot(({ app, router, store }) => {
           break
         case 401:
           msg = 'Unauthorised.  Please login.'
+          router.replace('/')
           break
         case 402:
           msg = 'You have exceeded a limit for your account type.'

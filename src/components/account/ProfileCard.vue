@@ -4,7 +4,7 @@
       <q-card-section>
         <q-img :src="profile.profile_pic" class="width250x" :ratio="1 / 1" fit="cover">
           <q-badge class="bg-accent q-pa-md" floating transparent>
-            <q-icon :name="'fab fa-' + profile.identity_provider" />
+            <q-icon :name="profile.identity_provider !== 'hydra' ? 'fab fa-' + profile.identity_provider : 'fas fa-code'" />
           </q-badge>
           <div class="absolute-bottom text-center">
             <div class="ellipsis">{{ profile.name }}</div>
