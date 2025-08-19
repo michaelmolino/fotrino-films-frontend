@@ -85,15 +85,18 @@ export default {
   },
   mounted() {
     this.setSourceHack()
-    if ('mediaSession' in navigator) {
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: this.media.title,
-        artist: this.artist,
-        artwork: [{
-          src: this.media.preview,
-          type: 'image/jpeg'
-        }]
-      })
+    const el = document.getElementById('player')
+    if ('mediaSession' in navigator && el) {
+      el.addEventListener('play', () => {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: this.media.title,
+          artist: this.artist,
+          artwork: [{
+            src: this.media.preview,
+            type: 'image/jpeg'
+          }]
+        })
+      }, { once: true })
     }
   },
   beforeUnmount() {

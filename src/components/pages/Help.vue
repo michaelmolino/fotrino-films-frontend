@@ -165,6 +165,21 @@
       <q-separator />
       <q-expansion-item
         group="faq"
+        label="Is there a file size limit for uploads?"
+        header-class="text-bold"
+        :default-opened="$route.query.item === 'filesize'"
+        @show="this.$router.replace({query: { item: 'filesize' }})"
+        @hide="this.$router.replace({query: { }})"
+      >
+        <q-card>
+          <q-card-section>
+            There is a 5GB file size limit for uploads; this is enough for about two hours of 1080p video at 5,400 kbps.
+          </q-card-section>
+        </q-card>
+      </q-expansion-item>
+      <q-separator />
+      <q-expansion-item
+        group="faq"
         label="Terminology"
         header-class="text-bold"
         :default-opened="$route.query.item === 'terminology'"
