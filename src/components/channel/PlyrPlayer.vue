@@ -29,13 +29,14 @@ export default {
   data() {
     return {
       player: {},
-      hls: {}
+      hls: {},
+      playHandler: null
     }
   },
   computed: {
     view: {
       get() {
-        return this.media.type.startsWith('audio/') ? 'audio' : 'video'
+        return this.media.type && this.media.type.startsWith('audio/') ? 'audio' : 'video'
       }
     }
   },
@@ -81,13 +82,14 @@ export default {
         audio.src = this.media.src
         audio.type = this.media.type
       }
-    }
-  },
-  mounted() {
-    this.setSourceHack()
-    const el = document.getElementById('player')
-    if ('mediaSession' in navigator && el) {
-      el.addEventListener('play', () => {
+    },
+    attachMediaSessionHandler() {
+      const el = document.getElementById('player')
+      if (!('mediaSession' in navigator) || !el) return
+      if (this.playHandler) {
+        el.removeEventListener('play', this.playHandler)
+      }
+      this.playHandler = () => {
         navigator.mediaSession.metadata = new MediaMetadata({
           title: this.media.title,
           artist: this.artist,
@@ -96,8 +98,13 @@ export default {
             type: 'image/jpeg'
           }]
         })
-      }, { once: true })
+      }
+      el.addEventListener('play', this.playHandler, { once: true })
     }
+  },
+  mounted() {
+    this.setSourceHack()
+    this.attachMediaSessionHandler()
   },
   beforeUnmount() {
     try {
@@ -120,6 +127,7 @@ export default {
       //
     }
     this.setSourceHack()
+    this.attachMediaSessionHandler()
   }
 }
 </script>
