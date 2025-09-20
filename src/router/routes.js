@@ -4,7 +4,7 @@ const routes = [
     component: () => import('@layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('@components/pages/Home.vue') },
-      { path: 'redirect', component: () => import('@components/pages/Redirect.vue') },
+      { path: 'redirect', component: () => import('@components/pages/RedirectPage.vue') },
       { path: 'help', component: () => import('@components/pages/Help.vue') },
       {
         path: 'terms',

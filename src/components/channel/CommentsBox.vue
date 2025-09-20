@@ -2,7 +2,7 @@
   <q-card flat bordered class="comments">
     <q-card-section>
       <div id="commento"></div>
-      <div v-if="!loggedIn">Please login to view/post comments.</div>
+      <div v-if="!loggedIn" class="q-light text-dark">Please login to view/post comments.</div>
     </q-card-section>
   </q-card>
 </template>
