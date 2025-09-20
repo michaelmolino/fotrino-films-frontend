@@ -3,17 +3,6 @@
     <ProfileCard :profile="profile" :mediaCount="mediaCount" />
     <MediaBrowser v-if="channels.length > 0" :channels="channels" />
     <NothingText v-if="channels.length === 0" text="Your media will appear here (once you have some)."/>
-    <q-dialog v-model="showTerms" backdrop-filter="contrast(40%)">
-      <q-card>
-        <q-card-section class="scroll terms">
-          <Terms />
-        </q-card-section>
-        <q-separator />
-        <q-card-actions align="right">
-          <q-btn flat label="OK" v-close-popup />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
   </div>
 </template>
 
@@ -29,18 +18,9 @@ export default {
     MediaBrowser: defineAsyncComponent(() =>
       import('@components/account/MediaBrowser.vue')
     ),
-    Terms: defineAsyncComponent(() =>
-      import('@components/pages/Terms.vue')
-    ),
     NothingText: defineAsyncComponent(() =>
       import('@components/shared/NothingText.vue')
     )
-  },
-
-  data() {
-    return {
-      showTerms: this.$route.query.showTerms === 'true'
-    }
   },
 
   computed: {

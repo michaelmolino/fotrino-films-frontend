@@ -90,6 +90,7 @@
             :label="provider.name"
             size="md"
             class="fit"
+            @click="storeRedirect"
           />
         </span>
       </q-btn-dropdown>
@@ -140,6 +141,8 @@
 </template>
 
 <script>
+import { LocalStorage } from 'quasar'
+
 export default {
   name: 'FotrinoHeader',
 
@@ -158,15 +161,15 @@ export default {
   },
 
   created: function() {
-    if (process.env.NODE_ENV === 'development') {
-      this.oauthProviders.push(
-        {
-          name: 'Mock Oauth Server',
-          icon: 'fas fa-cube',
-          login: process.env.API + '/account/login/hydra'
-        }
-      )
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    //   this.oauthProviders.push(
+    //     {
+    //       name: 'Mock Oauth Server',
+    //       icon: 'fas fa-cube',
+    //       login: process.env.API + '/account/login/hydra'
+    //     }
+    //   )
+    // }
     this.$store.dispatch('channel/getHistory')
   },
 
@@ -188,6 +191,12 @@ export default {
       get() {
         return this.$store.state.account.profile
       }
+    }
+  },
+
+  methods: {
+    storeRedirect() {
+      LocalStorage.set('postLoginRedirect', window.location.pathname)
     }
   }
 }

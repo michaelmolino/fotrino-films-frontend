@@ -1,14 +1,31 @@
 <template>
+  <q-dialog v-model="showTerms" backdrop-filter="contrast(40%)">
+      <q-card>
+        <q-card-section class="scroll terms">
+          <Terms />
+        </q-card-section>
+        <q-separator />
+        <q-card-actions align="right">
+          <q-btn flat label="OK" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   <router-view />
 </template>
 
 <script>
 import { useMeta } from 'quasar'
-import { ref } from 'vue'
+import { ref, defineAsyncComponent } from 'vue'
 import { getMetaData } from '@javascript/library.js'
 
 export default {
   name: 'App',
+
+  components: {
+    Terms: defineAsyncComponent(() =>
+      import('@components/pages/Terms.vue')
+    )
+  },
 
   setup() {
     const metaData = ref(getMetaData(null, null))
@@ -38,11 +55,27 @@ export default {
       set(value) {
         this.$store.commit('channel/SET_CHANNEL', value)
       }
+    },
+    showTerms: {
+      get() {
+        return this.$route.query?.showTerms === 'true'
+      },
+      set(value) {
+        if (!value) {
+          this.$router.replace({
+            query: { ...this.$route.query, showTerms: undefined },
+            params: { channelSlug: this.channel?.slug }
+          })
+        }
+      }
     }
   },
 
   watch: {
     $route(to, from) {
+      if (to.query?.showTerms) {
+        this.showTerms = true
+      }
       if (to.params?.uuid) {
         this.$store.cache
           .dispatch('channel/getChannel', { uuid: to.params.uuid, pending: false })
@@ -68,11 +101,13 @@ export default {
       }
     },
 
-    channel() {
-      if (this.channel?.uuid) {
-        this.$router.replace({
-          params: { channelSlug: this.channel.slug }
-        })
+    watch: {
+      channel(newChannel) {
+        if (newChannel?.uuid && !this.showTerms) {
+          this.$router.replace({
+            params: { channelSlug: newChannel.slug }
+          })
+        }
       }
     }
   }

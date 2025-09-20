@@ -15,6 +15,8 @@
 
       <MediaDescription :media="media" />
 
+      <CommentsBox :loggedIn="!!profile.id" :privateId="media.private_id" class="q-my-md" />
+
       <span v-if="$route.params.uuid && project.media?.filter(ch => ch.id !== media.id)?.length > 0">
         <div class="q-pt-md text-h6">
           Related Content
@@ -58,12 +60,20 @@ export default {
     MediaDescription: defineAsyncComponent(() =>
       import('@components/channel/MediaDescription.vue')
     ),
+    CommentsBox: defineAsyncComponent(() =>
+      import('@components/channel/CommentsBox.vue')
+    ),
     NothingText: defineAsyncComponent(() =>
       import('@components/shared/NothingText.vue')
     )
   },
 
   computed: {
+    profile: {
+      get() {
+        return this.$store.state.account.profile
+      }
+    },
     channel: {
       get() {
         return this.$store.state.channel.channel
@@ -109,7 +119,6 @@ export default {
       }
     }
   }
-
 }
 </script>
 
