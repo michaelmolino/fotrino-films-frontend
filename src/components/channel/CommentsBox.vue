@@ -53,6 +53,11 @@ export default {
       container.appendChild(newDiv)
 
       commentBox(this.commentoboxInstance, {
+        createBoxUrl(boxId, pageLocation) {
+          pageLocation.href = window.location.origin + '/private/' + boxId
+          pageLocation.search = ''
+          return pageLocation.href
+        },
         onCommentCount: (count) => {
           this.commentCount = Number(count) || 0
           if (!this.loggedIn) {
