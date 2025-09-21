@@ -1,9 +1,11 @@
 <template>
   <q-card flat bordered class="comments">
     <q-card-section>
-      <div id="privateId" :class="loggedIn ? 'commentbox' : 'commentbox hidden'"></div>
-      <div v-if="!loggedIn">
-        <span v-if="commentCount === 1">This media has a comment! </span><span v-if="commentCount > 1">This media has comments! </span>You must be logged in to view or post comments.
+      <div id="commentBoxContainer" class="hidden"></div>
+      <div id = "loggedOutComments" class="hidden">
+        <span v-if="commentCount === 1">This media has a comment! </span>
+        <span v-if="commentCount > 1">This media has {{ commentCount }} comments! </span>
+        You must be logged in to view or post comments.
       </div>
     </q-card-section>
   </q-card>
@@ -29,38 +31,71 @@ export default {
   },
 
   methods: {
-    ...mapActions('account', ['getProfile', 'getCommentboxToken'])
+    ...mapActions('account', ['getProfile', 'getCommentboxToken']),
+
+    clearOldCommentBox(old) {
+      const div = document.getElementById(old)
+      if (div) {
+        div.remove()
+      }
+    },
+
+    initCommentBox() {
+      const container = document.getElementById('commentBoxContainer')
+      container.classList.remove('hidden')
+
+      const loggedOutDiv = document.getElementById('loggedOutComments')
+      loggedOutDiv.classList.add('hidden')
+
+      const newDiv = document.createElement('div')
+      newDiv.id = this.privateId
+      newDiv.className = 'commentbox'
+      container.appendChild(newDiv)
+
+      commentBox(this.commentoboxInstance, {
+        onCommentCount: (count) => {
+          this.commentCount = Number(count) || 0
+          if (!this.loggedIn) {
+            container.classList.add('hidden')
+            loggedOutDiv.classList.remove('hidden')
+          }
+        },
+        singleSignOn: {
+          autoSignOn: true,
+          onSignOn: (onComplete, onError) => {
+            this.getCommentboxToken()
+              .then(token => {
+                onComplete(token)
+              })
+              .catch(err => {
+                onError(err)
+              })
+          },
+          onSignOut: () => {
+            fetch('/api/account/logout', {
+              method: 'GET'
+            })
+              .then(() => {
+                this.getProfile()
+              })
+          }
+        }
+      })
+    }
   },
 
-  mounted() {
-    commentBox(this.commentoboxInstance, {
-      onCommentCount: (count) => {
-        this.commentCount = Number(count) || 0
-      },
-      singleSignOn: {
-        autoSignOn: true,
-        onSignOn: (onComplete, onError) => {
-          this.getCommentboxToken()
-            .then(token => {
-              onComplete(token)
-            })
-            .catch(err => {
-              onError(err)
-            })
-        },
-        onSignOut: () => {
-          fetch('/api/account/logout', {
-            method: 'GET'
-          })
-            .then(() => {
-              this.getProfile()
-            })
-        }
+  watch: {
+    privateId: {
+      immediate: true,
+      handler(newVal, oldVal) {
+        if (oldVal) { this.clearOldCommentBox(oldVal) }
+        this.$nextTick(() => {
+          this.initCommentBox()
+        })
       }
-    })
+    }
   }
 }
-
 </script>
 
 <style scoped>
