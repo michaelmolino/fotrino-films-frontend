@@ -161,15 +161,6 @@ export default {
   },
 
   created: function() {
-    // if (process.env.NODE_ENV === 'development') {
-    //   this.oauthProviders.push(
-    //     {
-    //       name: 'Mock Oauth Server',
-    //       icon: 'fas fa-cube',
-    //       login: process.env.API + '/account/login/hydra'
-    //     }
-    //   )
-    // }
     this.$store.dispatch('channel/getHistory')
   },
 
