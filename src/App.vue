@@ -100,14 +100,11 @@ export default {
         this.metaData = getMetaData(this.$route, null)
       }
     },
-
-    watch: {
-      channel(newChannel) {
-        if (newChannel?.uuid && !this.showTerms) {
-          this.$router.replace({
-            params: { channelSlug: newChannel.slug }
-          })
-        }
+    channel(newChannel) {
+      if (newChannel?.uuid && !this.showTerms) {
+        this.$router.replace({
+          params: { channelSlug: newChannel.slug }
+        })
       }
     }
   }

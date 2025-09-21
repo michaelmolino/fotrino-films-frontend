@@ -19,6 +19,7 @@
     "axios": "^1.8.2",
     "axios-retry": "^4.5.0",
     "browser-image-compression": "^2.0.2",
+    "commentbox.io": "^2.1.0",
     "dayjs": "^1.11.13",
     "dompurify": "^3.2.4",
     "hls.js": "^1.5.20",

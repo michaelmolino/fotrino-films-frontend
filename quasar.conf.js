@@ -91,7 +91,8 @@ module.exports = function(/* ctx */) {
           '@layouts': path.resolve(__dirname, './src/layouts'),
           '@components': path.resolve(__dirname, './src/components'),
           '@javascript': path.resolve(__dirname, './src/javascript'),
-          '@deps': path.resolve(__dirname, './node_modules')
+          '@deps': path.resolve(__dirname, './node_modules'),
+          '@libs': path.resolve(__dirname, './src/libs')
         }
       },
 
@@ -224,7 +225,12 @@ module.exports = function(/* ctx */) {
       // More info: https://quasar.dev/quasar-cli/developing-electron-apps/node-integration
       nodeIntegration: true,
 
-      extendWebpack(/* cfg */) {
+      extendWebpack(cfg) {
+        cfg.module.rules.push({
+          test: /\.js$/,
+          include: path.resolve(__dirname, 'src/libs'),
+          loader: 'ignore-loader'
+        })
         // do something with Electron main process Webpack cfg
         // chainWebpack also available besides this extendWebpack
       }

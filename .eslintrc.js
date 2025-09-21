@@ -44,6 +44,8 @@ module.exports = {
     chrome: true
   },
 
+  ignorePatterns: ['src/libs/**'],
+
   // add your custom rules here
   rules: {
     // allow async-await

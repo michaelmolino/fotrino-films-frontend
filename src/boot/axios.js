@@ -63,6 +63,9 @@ export default boot(({ app, router, store }) => {
           msg = error.response.data
           break
         case 401:
+          if (error.response.config.url.endsWith('/sso/commentbox')) {
+            return error.response
+          }
           msg = 'Unauthorised.  Please login.'
           router.replace('/')
           break

@@ -27,3 +27,17 @@ export function getToken(context) {
       return Promise.reject(error)
     })
 }
+
+export function getCommentboxToken(context) {
+  return api
+    .get('/sso/commentbox')
+    .then(response => {
+      const commentbox = response.data
+      context.commit('SET_COMMENTBOX', commentbox)
+      return Promise.resolve(commentbox)
+    })
+    .catch(error => {
+      context.commit('SET_COMMENTBOX', null)
+      return Promise.reject(error)
+    })
+}

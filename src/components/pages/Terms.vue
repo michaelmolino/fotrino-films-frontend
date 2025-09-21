@@ -46,15 +46,15 @@
       <li>
         <div class="text-h6">Third-Party Services</div>
         <div>Fotrino Films may contain links to third-party websites or services. We do not control or assume responsibility for their privacy practices, terms, or content. We encourage users to review the privacy policies of any third-party services they interact with.</div>
-        <div>We also integrate with the Commento (
+        <div>We also integrate with the CommentBox (
           <q-btn
               flat
               dense
-              :icon="'img:' + 'https://cdn.commento.io/images/logo.svg'"
-              label="commento.io"
-              href="https://commento.io/"
+              :icon="'img:' + 'https://commentbox.io/favicon-32x32.png'"
+              label="commentbox.io"
+              href="https://commentbox.io/"
             />
-            ) comment system. If you choose to log in to Commento through Fotrino Films, we share your name, email address, and profile photo with Commento to enable commenting functionality. Please review Commento’s own privacy policy for details on how they handle your information.</div>
+            ) comment system. We share your name, email address, and profile photo with CommentBox to enable commenting functionality. Please review CommentBox’s own privacy policy for details on how they handle your information.</div>
       </li>
       <li>
         <div class="text-h6">Data Sharing & Legal Compliance</div>
@@ -62,7 +62,7 @@
         <ul>
           <li>When required by law enforcement or legal obligations</li>
           <li>To prevent fraud, abuse, or security threats</li>
-          <li>When enabling third-party services you opt into (such as Commento, as described above)</li>
+          <li>When enabling third-party services you opt into (such as CommentBox, as described above)</li>
           <li>In the event of a merger, acquisition, or business transfer, in which case users will be notified</li>
         </ul>
       </li>
