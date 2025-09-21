@@ -30,6 +30,14 @@ export default {
     }
   },
 
+  computed: {
+    darkMode: {
+      get() {
+        return this.$q.dark.isActive
+      }
+    }
+  },
+
   methods: {
     ...mapActions('account', ['getProfile', 'getCommentboxToken']),
 
@@ -40,7 +48,7 @@ export default {
       }
     },
 
-    initCommentBox() {
+    initCommentBox(dark) {
       const container = document.getElementById('commentBoxContainer')
       container.classList.remove('hidden')
 
@@ -53,6 +61,7 @@ export default {
       container.appendChild(newDiv)
 
       commentBox(this.commentoboxInstance, {
+        textColor: dark ? '#fff' : '#000',
         createBoxUrl(boxId, pageLocation) {
           pageLocation.href = window.location.origin + '/private/' + boxId
           pageLocation.search = ''
@@ -93,9 +102,21 @@ export default {
     privateId: {
       immediate: true,
       handler(newVal, oldVal) {
-        if (oldVal) { this.clearOldCommentBox(oldVal) }
+        if (oldVal) {
+          this.clearOldCommentBox(oldVal)
+        }
         this.$nextTick(() => {
-          this.initCommentBox()
+          this.initCommentBox(this.darkMode)
+        })
+      }
+    },
+
+    darkMode: {
+      immediate: false,
+      handler(newVal, oldVal) {
+        this.clearOldCommentBox(this.privateId)
+        this.$nextTick(() => {
+          this.initCommentBox(newVal)
         })
       }
     }
