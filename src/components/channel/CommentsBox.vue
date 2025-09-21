@@ -23,6 +23,7 @@ export default {
 
   data() {
     return {
+      commentoboxInstance: process.env.NODE_ENV === 'development' ? '5670497807237120-proj' : '5692452404985856-proj',
       commentCount: 0
     }
   },
@@ -32,7 +33,7 @@ export default {
   },
 
   mounted() {
-    commentBox('5692452404985856-proj', {
+    commentBox(this.commentoboxInstance, {
       onCommentCount: (count) => {
         this.commentCount = Number(count) || 0
       },
