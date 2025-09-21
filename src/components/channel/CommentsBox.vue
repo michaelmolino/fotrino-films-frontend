@@ -57,14 +57,14 @@ export default {
       const commento = await waitForCommento()
       if (!props.loggedIn) return
       commento.main()
-      const interval = setInterval(() => {
-        const loginEl = document.querySelector('.commento-login-text')
-        if (loginEl) {
-          loginEl.textContent = 'You can currently view comments, but to post a comment, please click here to log in to our comment system. Since we use single sign-on (SSO), you won\'t need to enter a password.'
-          loginEl.style.textAlign = 'center'
-          clearInterval(interval)
-        }
-      }, 200)
+      // const interval = setInterval(() => {
+      //   const loginEl = document.querySelector('.commento-login-text')
+      //   if (loginEl) {
+      //     loginEl.textContent = 'You can currently view comments, but to post a comment, please click here to log in to our comment system. Since we use single sign-on (SSO), you won\'t need to enter a password.'
+      //     loginEl.style.textAlign = 'center'
+      //     clearInterval(interval)
+      //   }
+      // }, 200)
     }
 
     onMounted(() => {
@@ -83,7 +83,7 @@ export default {
   min-width: 240px;
 }
 
-:deep(#commento-login ~ #commento-textarea-super-container-root) {
+/* :deep(#commento-login ~ #commento-textarea-super-container-root) {
   display: none !important;
-}
+} */
 </style>
