@@ -25,7 +25,7 @@ export default {
 
   data() {
     return {
-      commentoboxInstance: process.env.NODE_ENV === 'development' ? '5670497807237120-proj' : '5692452404985856-proj',
+      commentboxInstance: process.env.NODE_ENV === 'development' ? '5670497807237120-proj' : '5692452404985856-proj',
       commentCount: 0
     }
   },
@@ -39,7 +39,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('account', ['getProfile', 'getCommentboxToken']),
+    ...mapActions('account', ['getCommentboxToken']),
 
     clearOldCommentBox(old) {
       const div = document.getElementById(old)
@@ -60,7 +60,7 @@ export default {
       newDiv.className = 'commentbox'
       container.appendChild(newDiv)
 
-      commentBox(this.commentoboxInstance, {
+      commentBox(this.commentboxInstance, {
         textColor: dark ? '#fff' : '#000',
         createBoxUrl(boxId, pageLocation) {
           pageLocation.href = window.location.origin + '/private/' + boxId
@@ -86,12 +86,7 @@ export default {
               })
           },
           onSignOut: () => {
-            fetch('/api/account/logout', {
-              method: 'GET'
-            })
-              .then(() => {
-                this.getProfile()
-              })
+            this.$emit('logout')
           }
         }
       })
@@ -102,9 +97,7 @@ export default {
     privateId: {
       immediate: true,
       handler(newVal, oldVal) {
-        if (oldVal) {
-          this.clearOldCommentBox(oldVal)
-        }
+        this.clearOldCommentBox(oldVal)
         this.$nextTick(() => {
           this.initCommentBox(this.darkMode)
         })
@@ -113,7 +106,7 @@ export default {
 
     darkMode: {
       immediate: false,
-      handler(newVal, oldVal) {
+      handler(newVal) {
         this.clearOldCommentBox(this.privateId)
         this.$nextTick(() => {
           this.initCommentBox(newVal)

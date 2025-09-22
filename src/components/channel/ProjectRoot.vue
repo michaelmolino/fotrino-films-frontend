@@ -15,7 +15,7 @@
 
       <MediaDescription :media="media" />
 
-      <CommentsBox :loggedIn="!!profile.id" :privateId="media.private_id" class="q-my-md" />
+      <CommentsBox :loggedIn="!!profile.id" :privateId="media.private_id" class="q-my-md" @logout="logout" />
 
       <span v-if="$route.params.uuid && project.media?.filter(ch => ch.id !== media.id)?.length > 0">
         <div class="q-pt-md text-h6">
@@ -117,6 +117,16 @@ export default {
         }
         return _media
       }
+    }
+  },
+  methods: {
+    logout() {
+      fetch('/api/account/logout', {
+        method: 'GET'
+      })
+        .then(() => {
+          this.$store.dispatch('account/getProfile')
+        })
     }
   }
 }
