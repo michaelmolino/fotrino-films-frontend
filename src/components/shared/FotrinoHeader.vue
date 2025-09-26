@@ -183,14 +183,11 @@ watch(darkModePref, (val) => {
 
 onMounted(() => {
   applyDarkMode()
-  // Poll system setting every minute
-  setInterval(() => {
-    const newSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    if (systemDark.value !== newSystemDark) {
-      systemDark.value = newSystemDark
-      if (darkModePref.value === 'auto') applyDarkMode()
-    }
-  }, 60000)
+  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+  mediaQuery.addEventListener('change', (e) => {
+    systemDark.value = e.matches
+    if (darkModePref.value === 'auto') applyDarkMode()
+  })
 })
 
 function storeRedirect() {
