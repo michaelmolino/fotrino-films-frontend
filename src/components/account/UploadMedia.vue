@@ -125,7 +125,7 @@ import MediaStep from './UploadMedia/MediaStep.vue'
 import { Notify } from 'quasar'
 import { objectApi } from 'boot/axios'
 const NothingText = defineAsyncComponent(() => import('@components/shared/NothingText.vue'))
-import { useFileProcessor } from '../../composables/useFileProcessor.js'
+import { useFileProcessor } from '@composables/useFileProcessor.js'
 
 // refs & reactive state
 const store = useStore()
