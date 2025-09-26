@@ -24,7 +24,6 @@
           :loggedIn="!!profile?.id"
           :privateId="media?.private_id"
           class="q-my-md"
-          @logout="logout"
         />
 
         <template v-if="hasRelatedContent">
@@ -102,12 +101,6 @@ const hasRelatedContent = computed(() => !!route.params.uuid && relatedMedia.val
 
 function redirect(pathOrObj) {
   setTimeout(() => router.replace(pathOrObj), 0)
-}
-
-function logout() {
-  fetch('/api/account/logout')
-    .then(() => store.dispatch('account/getProfile'))
-    .catch(err => console.error('Logout failed:', err))
 }
 
 watch(project, (newProject) => {

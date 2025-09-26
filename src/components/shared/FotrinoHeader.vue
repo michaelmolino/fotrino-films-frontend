@@ -103,7 +103,7 @@
           <q-separator />
           <q-btn href="/account/upload" align="left" flat no-caps icon="fas fa-cloud-arrow-up" label="Upload Media" size="md" class="fit" />
           <q-separator />
-          <q-btn :href="logout" align="left" flat no-caps icon="fas fa-right-from-bracket" label="Logout" size="md" class="fit" />
+          <q-btn @click="logout" align="left" flat no-caps icon="fas fa-right-from-bracket" label="Logout" size="md" class="fit" />
         </q-btn-dropdown>
       </template>
     </q-toolbar>
@@ -114,12 +114,12 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useQuasar, LocalStorage } from 'quasar'
+import { logout as sharedLogout } from '@javascript/library.js'
 const $q = useQuasar()
 
 const store = useStore()
 const HISTORY_KEY = 'fotrino-films-history'
 const showHistory = ref(false)
-const logout = ref(process.env.API + '/account/logout')
 const oauthProviders = ref([
   { name: 'Google', icon: 'fab fa-google', login: process.env.API + '/account/login/google' }
 ])
@@ -139,6 +139,10 @@ watch(
   },
   { immediate: true }
 )
+
+function logout() {
+  sharedLogout(store)
+}
 
 function addHistory(channel) {
   const current = LocalStorage.getItem(HISTORY_KEY) || []

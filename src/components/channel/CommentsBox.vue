@@ -11,11 +11,11 @@
 </template>
 
 <script setup>
-const emit = defineEmits(['logout'])
 import { ref, watch, computed, nextTick } from 'vue'
 import { useQuasar } from 'quasar'
 import { useStore } from 'vuex'
 import commentBox from 'commentbox.io'
+import { logout } from '@javascript/library.js'
 
 const props = defineProps({
   loggedIn: Boolean,
@@ -60,7 +60,7 @@ function initCommentBox(dark) {
           .catch(err => onError(err))
       },
       onSignOut: () => {
-        emit('logout')
+        logout(store)
       }
     }
   })
