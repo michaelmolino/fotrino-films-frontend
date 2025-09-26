@@ -20,7 +20,11 @@
         </div>
       </template>
     </q-img>
-    <q-skeleton v-if="!project.poster" class="cursor-not-allowed project-skeleton" animation="none" />
+    <q-skeleton
+      v-if="!project.poster"
+      class="cursor-not-allowed project-skeleton"
+      animation="none"
+    />
   </q-btn>
 </template>
 

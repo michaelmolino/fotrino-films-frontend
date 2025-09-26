@@ -2,43 +2,47 @@
   <div class="q-pa-md">
     <template v-if="channel?.uuid">
       <div :key="channel?.uuid || route.fullPath">
-      <div class="row">
-  <BreadCrumbs :channel="channel" :project="null" :media="null" />
-        <q-space />
-        <ViewToggle v-model="selectedView"
-          :projectCount="projectCount"
-          :mainCount="mainCount"
-          :allCount="allCount"
-        />
-      </div>
-
-  <div class="row" v-if="selectedView === 'projects'">
-        <div
-          class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
-          v-for="project in projects"
-          :key="project.id"
-        >
-          <ProjectPoster :project="project" :to="`/${channel.uuid}/${channel.slug}/${project.slug}`" />
-        </div>
-        <NothingText v-if="projects.length === 0" text="No content available." />
-      </div>
-
-  <div class="row q-pt-md" v-else>
-        <div
-          class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm text-center"
-          v-for="item in sortedMedia"
-          :key="item.media.id"
-        >
-          <MediaPreview
-            :channel="channel"
-            :project="item.project"
-            :media="item.media"
-            :to="`/${channel.uuid}/${channel.slug}/${item.project.slug}/${item.media.slug}`"
-            :detail="true"
+        <div class="row">
+          <BreadCrumbs :channel="channel" :project="null" :media="null" />
+          <q-space />
+          <ViewToggle
+            v-model="selectedView"
+            :projectCount="projectCount"
+            :mainCount="mainCount"
+            :allCount="allCount"
           />
         </div>
-        <NothingText v-if="sortedMedia.length === 0" text="No content available." />
-      </div>
+
+        <div class="row" v-if="selectedView === 'projects'">
+          <div
+            class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
+            v-for="project in projects"
+            :key="project.id"
+          >
+            <ProjectPoster
+              :project="project"
+              :to="`/${channel.uuid}/${channel.slug}/${project.slug}`"
+            />
+          </div>
+          <NothingText v-if="projects.length === 0" text="No content available." />
+        </div>
+
+        <div class="row q-pt-md" v-else>
+          <div
+            class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm text-center"
+            v-for="item in sortedMedia"
+            :key="item.media.id"
+          >
+            <MediaPreview
+              :channel="channel"
+              :project="item.project"
+              :media="item.media"
+              :to="`/${channel.uuid}/${channel.slug}/${item.project.slug}/${item.media.slug}`"
+              :detail="true"
+            />
+          </div>
+          <NothingText v-if="sortedMedia.length === 0" text="No content available." />
+        </div>
       </div>
     </template>
 
@@ -71,7 +75,7 @@ const route = useRoute()
 const view = ref(LocalStorage.getItem('last-selected-view') || 'all')
 const selectedView = computed({
   get: () => view.value,
-  set: (val) => {
+  set: val => {
     LocalStorage.set('last-selected-view', val)
     view.value = val
   }
@@ -93,7 +97,9 @@ const allMedia = computed(() => {
 const mainMedia = computed(() => allMedia.value.filter(f => f.media?.main))
 const sortedMedia = computed(() => {
   const arr = selectedView.value === 'main' ? mainMedia.value : allMedia.value
-  return arr.slice().sort((a, b) => (b.media?.resource_date || '').localeCompare(a.media?.resource_date || ''))
+  return arr
+    .slice()
+    .sort((a, b) => (b.media?.resource_date || '').localeCompare(a.media?.resource_date || ''))
 })
 
 const projectCount = computed(() => projects.value.length)

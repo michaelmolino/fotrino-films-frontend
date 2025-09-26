@@ -2,7 +2,13 @@
   <div class="q-pb-md">
     <q-card v-if="profile" flat class="profile-card">
       <q-card-section>
-        <q-img :src="profilePic" class="width250x" :ratio="1" fit="cover" :alt="safeName || safeEmail">
+        <q-img
+          :src="profilePic"
+          class="width250x"
+          :ratio="1"
+          fit="cover"
+          :alt="safeName || safeEmail"
+        >
           <q-badge class="bg-accent q-pa-md" floating transparent>
             <q-icon :name="providerIcon" />
           </q-badge>
@@ -28,7 +34,6 @@
     </q-card>
     <q-skeleton v-else type="rect" animation="pulse" class="width250x" />
   </div>
-
 </template>
 
 <script setup>

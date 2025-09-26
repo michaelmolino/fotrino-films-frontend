@@ -16,7 +16,10 @@
     </q-badge>
     <q-img v-if="media.preview" :src="media.preview" :ratio="16 / 9" fit="cover">
       <div class="absolute-bottom text-center">
-        <div class="ellipsis"><span>{{ media.title }}</span><span v-if="detail && media.title !== project?.title"><br>{{ project?.title }}</span></div>
+        <div class="ellipsis">
+          <span>{{ media.title }}</span
+          ><span v-if="detail && media.title !== project?.title"><br />{{ project?.title }}</span>
+        </div>
       </div>
       <template v-slot:error>
         <div class="absolute-full bg-black text-center text-h6">
@@ -25,11 +28,18 @@
           </div>
         </div>
         <div class="absolute-bottom text-center">
-          <div class="ellipsis"><span>{{ media.title }}</span><span v-if="detail && media.title !== project?.title"><br>{{ project?.title }}</span></div>
+          <div class="ellipsis">
+            <span>{{ media.title }}</span
+            ><span v-if="detail && media.title !== project?.title"><br />{{ project?.title }}</span>
+          </div>
         </div>
       </template>
     </q-img>
-    <q-skeleton v-if="!media.preview" class="cursor-not-allowed preview-skeleton" animation="none" />
+    <q-skeleton
+      v-if="!media.preview"
+      class="cursor-not-allowed preview-skeleton"
+      animation="none"
+    />
   </q-btn>
 </template>
 

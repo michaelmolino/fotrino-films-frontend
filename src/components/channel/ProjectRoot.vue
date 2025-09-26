@@ -8,7 +8,9 @@
         :private="!!route.params.privateId"
       />
 
-      <NothingText v-if="!route.params.privateId && (project.media?.length || 0) === 0"></NothingText>
+      <NothingText
+        v-if="!route.params.privateId && (project.media?.length || 0) === 0"
+      ></NothingText>
 
       <template v-else>
         <PlyrPlayer
@@ -20,11 +22,7 @@
 
         <MediaDescription v-if="media" :media="media" />
 
-        <CommentsBox
-          :loggedIn="!!profile?.id"
-          :privateId="media?.private_id"
-          class="q-my-md"
-        />
+        <CommentsBox :loggedIn="!!profile?.id" :privateId="media?.private_id" class="q-my-md" />
 
         <template v-if="hasRelatedContent">
           <div class="q-pt-md text-h6">Related Content</div>
@@ -103,19 +101,27 @@ function redirect(pathOrObj) {
   setTimeout(() => router.replace(pathOrObj), 0)
 }
 
-watch(project, (newProject) => {
-  if (channel.value && !newProject && route.params.uuid) {
-    redirect('/404')
-  }
-}, { immediate: true })
+watch(
+  project,
+  newProject => {
+    if (channel.value && !newProject && route.params.uuid) {
+      redirect('/404')
+    }
+  },
+  { immediate: true }
+)
 
-watch(media, (newMedia) => {
-  if (channel.value && project.value && (project.value.media?.length || 0) > 0 && !newMedia) {
-    redirect('/404')
-  } else if (newMedia && !route.params.mediaSlug) {
-    redirect({ params: { ...route.params, mediaSlug: newMedia.slug } })
-  }
-}, { immediate: true })
+watch(
+  media,
+  newMedia => {
+    if (channel.value && project.value && (project.value.media?.length || 0) > 0 && !newMedia) {
+      redirect('/404')
+    } else if (newMedia && !route.params.mediaSlug) {
+      redirect({ params: { ...route.params, mediaSlug: newMedia.slug } })
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <style scoped>

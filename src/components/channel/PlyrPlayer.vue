@@ -1,18 +1,13 @@
 <template>
-    <div>
-      <div v-if="view == 'video'">
-        <video id="player" controls :key="media.id" class="videoEl" />
-      </div>
-      <div v-else>
-        <q-img
-          :src="media.preview"
-          :ratio="16/9"
-          fit="cover"
-          class="full-width"
-        />
-        <audio id="player" controls :key="media.id" class="audioEl"></audio>
-      </div>
+  <div>
+    <div v-if="view == 'video'">
+      <video id="player" controls :key="media.id" class="videoEl" />
     </div>
+    <div v-else>
+      <q-img :src="media.preview" :ratio="16 / 9" fit="cover" class="full-width" />
+      <audio id="player" controls :key="media.id" class="audioEl"></audio>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -36,11 +31,15 @@ const view = computed(() => (props.media?.type?.startsWith('audio/') ? 'audio' :
 
 function destroyPlayers() {
   if (Hls.isSupported() && hls.value) {
-    try { hls.value.destroy() } catch {}
+    try {
+      hls.value.destroy()
+    } catch {}
     hls.value = null
   }
   if (player.value) {
-    try { player.value.destroy() } catch {}
+    try {
+      player.value.destroy()
+    } catch {}
     player.value = null
   }
 }
@@ -51,8 +50,18 @@ function setSource() {
   player.value = new Plyr(el, {
     settings: [],
     controls: [
-      'play-large', 'restart', 'rewind', 'play', 'fast-forward', 'progress',
-      'current-time', 'duration', 'mute', 'volume', 'airplay', 'fullscreen'
+      'play-large',
+      'restart',
+      'rewind',
+      'play',
+      'fast-forward',
+      'progress',
+      'current-time',
+      'duration',
+      'mute',
+      'volume',
+      'airplay',
+      'fullscreen'
     ]
   })
 
@@ -106,9 +115,12 @@ onBeforeUnmount(() => {
   destroyPlayers()
 })
 
-watch(() => props.media?.id, async () => {
-  await rebuild()
-})
+watch(
+  () => props.media?.id,
+  async () => {
+    await rebuild()
+  }
+)
 
 watch(view, async () => {
   await rebuild()
@@ -117,7 +129,7 @@ watch(view, async () => {
 
 <style>
 :root {
-  --plyr-color-main: #8D6A9F;
+  --plyr-color-main: #8d6a9f;
 }
 .videoEl {
   width: 100%;

@@ -3,7 +3,7 @@ import axios from 'axios'
 import axiosRetry from 'axios-retry'
 import { Notify, Loading } from 'quasar'
 
-const shouldRetryApi = (error) => {
+const shouldRetryApi = error => {
   const status = error?.response?.status
   if (status == null) {
     return axiosRetry.isNetworkOrIdempotentRequestError(error)
@@ -11,16 +11,24 @@ const shouldRetryApi = (error) => {
   return ![400, 401, 402, 403, 404, 409, 500, 501].includes(status)
 }
 
-const shouldRetryObjects = (error) => {
+const shouldRetryObjects = error => {
   const status = error?.response?.status
   return axiosRetry.isNetworkOrIdempotentRequestError(error) || status === 408
 }
 
 const api = axios.create({ baseURL: process.env.API })
-axiosRetry(api, { retries: 6, retryDelay: axiosRetry.exponentialDelay, retryCondition: shouldRetryApi })
+axiosRetry(api, {
+  retries: 6,
+  retryDelay: axiosRetry.exponentialDelay,
+  retryCondition: shouldRetryApi
+})
 
 const objectApi = axios.create()
-axiosRetry(objectApi, { retries: 6, retryDelay: axiosRetry.exponentialDelay, retryCondition: shouldRetryObjects })
+axiosRetry(objectApi, {
+  retries: 6,
+  retryDelay: axiosRetry.exponentialDelay,
+  retryCondition: shouldRetryObjects
+})
 
 export default boot(({ app, router, store }) => {
   // Track concurrent requests to avoid hiding the loader too early
@@ -31,7 +39,10 @@ export default boot(({ app, router, store }) => {
     }
     pending++
   }
-  const hideLoader = () => { pending = Math.max(0, pending - 1); if (pending === 0) Loading.hide() }
+  const hideLoader = () => {
+    pending = Math.max(0, pending - 1)
+    if (pending === 0) Loading.hide()
+  }
 
   api.interceptors.request.use(req => {
     const method = (req.method || '').toLowerCase()
@@ -54,8 +65,23 @@ export default boot(({ app, router, store }) => {
           icon: 'fas fa-info',
           multiLine: true,
           actions: [
-            { icon: 'fas fa-circle-exclamation', label: 'Confirm delete', color: 'white', handler: () => { showLoader(); resolve(req) } },
-            { icon: 'fas fa-rotate-left', label: 'Go Back', color: 'white', handler: () => { reject(new axios.Cancel('User cancelled delete')) } }
+            {
+              icon: 'fas fa-circle-exclamation',
+              label: 'Confirm delete',
+              color: 'white',
+              handler: () => {
+                showLoader()
+                resolve(req)
+              }
+            },
+            {
+              icon: 'fas fa-rotate-left',
+              label: 'Go Back',
+              color: 'white',
+              handler: () => {
+                reject(new axios.Cancel('User cancelled delete'))
+              }
+            }
           ]
         })
       })
@@ -66,11 +92,11 @@ export default boot(({ app, router, store }) => {
   })
 
   api.interceptors.response.use(
-    (response) => {
+    response => {
       hideLoader()
       return response
     },
-    (error) => {
+    error => {
       hideLoader()
 
       const status = error?.response?.status

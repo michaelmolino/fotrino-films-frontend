@@ -25,9 +25,7 @@ export default {
   name: 'App',
 
   components: {
-    Terms: defineAsyncComponent(() =>
-      import('@components/pages/Terms.vue')
-    )
+    Terms: defineAsyncComponent(() => import('@components/pages/Terms.vue'))
   },
 
   setup() {
@@ -71,7 +69,9 @@ export default {
 
     onMounted(() => {
       if (process.env.NODE_ENV === 'development') {
-        console.warn('WARNING: This is a development server and should not be exposed to the internet.')
+        console.warn(
+          'WARNING: This is a development server and should not be exposed to the internet.'
+        )
       }
       store.dispatch('account/getProfile')
     })

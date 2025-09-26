@@ -16,8 +16,7 @@ onMounted(() => {
   const redirectUrl = LocalStorage.getItem('postLoginRedirect') || '/'
   LocalStorage.remove('postLoginRedirect')
 
-  const url =
-    redirectUrl + (route.query?.newUser === 'true' ? '?showTerms=true' : '')
+  const url = redirectUrl + (route.query?.newUser === 'true' ? '?showTerms=true' : '')
 
   window.location.href = url
 })

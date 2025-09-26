@@ -4,7 +4,9 @@
       <div id="commentBoxContainer" v-if="loggedIn"></div>
       <div id="loggedOutComments" v-if="!loggedIn" class="q-pa-md text-center">
         <q-icon name="comment" color="grey-6" size="24px" class="q-mb-sm" />
-        <div class="text-caption text-grey-7 q-mt-sm">You must be logged in to view or post comments.</div>
+        <div class="text-caption text-grey-7 q-mt-sm">
+          You must be logged in to view or post comments.
+        </div>
       </div>
     </q-card-section>
   </q-card>
@@ -25,7 +27,8 @@ const props = defineProps({
 const $q = useQuasar()
 const store = useStore()
 const commentCount = ref(0)
-const commentboxInstance = process.env.NODE_ENV === 'development' ? '5670497807237120-proj' : '5692452404985856-proj'
+const commentboxInstance =
+  process.env.NODE_ENV === 'development' ? '5670497807237120-proj' : '5692452404985856-proj'
 const darkMode = computed(() => $q.dark.isActive)
 
 function clearOldCommentBox(old) {
@@ -49,13 +52,14 @@ function initCommentBox(dark) {
       pageLocation.search = ''
       return pageLocation.href
     },
-    onCommentCount: (count) => {
+    onCommentCount: count => {
       commentCount.value = Number(count) || 0
     },
     singleSignOn: {
       autoSignOn: true,
       onSignOn: (onComplete, onError) => {
-        store.dispatch('account/getCommentboxToken')
+        store
+          .dispatch('account/getCommentboxToken')
           .then(token => onComplete(token))
           .catch(err => onError(err))
       },
@@ -66,14 +70,18 @@ function initCommentBox(dark) {
   })
 }
 
-watch(() => props.privateId, (newVal, oldVal) => {
-  clearOldCommentBox(oldVal)
-  nextTick(() => {
-    initCommentBox(darkMode.value)
-  })
-}, { immediate: true })
+watch(
+  () => props.privateId,
+  (newVal, oldVal) => {
+    clearOldCommentBox(oldVal)
+    nextTick(() => {
+      initCommentBox(darkMode.value)
+    })
+  },
+  { immediate: true }
+)
 
-watch(darkMode, (newVal) => {
+watch(darkMode, newVal => {
   clearOldCommentBox(props.privateId)
   nextTick(() => {
     initCommentBox(newVal)

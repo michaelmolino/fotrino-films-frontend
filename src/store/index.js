@@ -3,7 +3,7 @@ import createCache from 'vuex-cache'
 import account from './account'
 import channel from './channel'
 
-export default function(/* { ssrContext } */) {
+export default function (/* { ssrContext } */) {
   const Store = createStore({
     modules: {
       account,

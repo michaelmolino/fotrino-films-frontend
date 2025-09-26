@@ -53,20 +53,32 @@ const props = defineProps({
 
 const route = useRoute()
 const isPublic = computed(() => !!route.params.uuid)
-const sinceCaptured = computed(() => props.media?.resource_date ? daysSince(props.media.resource_date, false) : '')
-const sincePublished = computed(() => props.media?.created ? daysSince(props.media.created) : '')
+const sinceCaptured = computed(() =>
+  props.media?.resource_date ? daysSince(props.media.resource_date, false) : ''
+)
+const sincePublished = computed(() => (props.media?.created ? daysSince(props.media.created) : ''))
 const descriptionSafe = computed(() => sanitizeHtml(props.media?.description_unsafe || ''))
 
 function copyLink(val) {
   if (val === 'public') {
     copyToClipboard(window.location.href).then(() => {
-      Notify.create({ message: 'URL copied to clipboard', color: 'accent', icon: 'far fa-clipboard', timeout: 1000 })
+      Notify.create({
+        message: 'URL copied to clipboard',
+        color: 'accent',
+        icon: 'far fa-clipboard',
+        timeout: 1000
+      })
     })
   } else if (val === 'private') {
     const id = props.media?.private_id
     if (!id) return
     copyToClipboard(`${window.location.origin}/private/${id}`).then(() => {
-      Notify.create({ message: 'URL copied to clipboard', color: 'accent', icon: 'far fa-clipboard', timeout: 1000 })
+      Notify.create({
+        message: 'URL copied to clipboard',
+        color: 'accent',
+        icon: 'far fa-clipboard',
+        timeout: 1000
+      })
     })
   }
 }

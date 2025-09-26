@@ -16,14 +16,20 @@ const routes = [
     component: () => import('@layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('@components/channel/ChannelRoot.vue') },
-      { path: ':projectSlug([0-9a-zA-Z-]+)/:mediaSlug([0-9a-zA-Z-]+)?', component: () => import('@components/channel/ProjectRoot.vue') }
+      {
+        path: ':projectSlug([0-9a-zA-Z-]+)/:mediaSlug([0-9a-zA-Z-]+)?',
+        component: () => import('@components/channel/ProjectRoot.vue')
+      }
     ]
   },
   {
     path: '/private',
     component: () => import('@layouts/MainLayout.vue'),
     children: [
-      { path: ':privateId([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})', component: () => import('@components/channel/ProjectRoot.vue') }
+      {
+        path: ':privateId([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})',
+        component: () => import('@components/channel/ProjectRoot.vue')
+      }
     ]
   },
   {

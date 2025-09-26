@@ -12,12 +12,7 @@
 
     <q-item-section class="header-buttons">
       <div class="text-no-wrap">
-        <q-btn
-          v-if="pending"
-          dense unelevated
-          icon="fas fa-clock"
-          class="cursor-not-allowed"
-        >
+        <q-btn v-if="pending" dense unelevated icon="fas fa-clock" class="cursor-not-allowed">
           <q-tooltip>Pending</q-tooltip>
         </q-btn>
 
@@ -25,7 +20,8 @@
           v-else
           :to="link"
           target="_blank"
-          dense unelevated
+          dense
+          unelevated
           icon="link"
           color="info"
           class="q-mx-xs"
@@ -35,7 +31,8 @@
 
         <q-btn
           v-if="!pending"
-          dense unelevated
+          dense
+          unelevated
           icon="delete"
           :color="deleteColor"
           class="q-ml-xs"

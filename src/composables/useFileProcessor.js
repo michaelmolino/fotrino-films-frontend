@@ -38,7 +38,11 @@ export function useFileProcessor() {
         const idx = uploadFiles.value.findIndex(r => r.resourceType === resourceType)
         if (idx !== -1) uploadFiles.value[idx].processing = false
         console.error('Error processing file:', error)
-        Notify.create({ type: 'negative', message: 'Error processing image. Using original file.', timeout: 5000 })
+        Notify.create({
+          type: 'negative',
+          message: 'Error processing image. Using original file.',
+          timeout: 5000
+        })
         return file
       }
     } else if (resourceType === 'upload') {
@@ -91,7 +95,7 @@ export function useFileProcessor() {
           }
         }, 'image/jpeg')
       }
-      video.onerror = (e) => reject(e)
+      video.onerror = e => reject(e)
     })
   }
 

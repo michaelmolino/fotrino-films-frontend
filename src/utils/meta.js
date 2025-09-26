@@ -15,13 +15,10 @@ export function getMetaData(route, channel) {
 
   // Case: Project + optional media
   if (route?.params.projectSlug) {
-    const project = channel?.projects?.find(
-      p => p.slug === route.params.projectSlug
-    )
-    const media =
-      route?.params.mediaSlug
-        ? project?.media?.find(m => m.slug === route.params.mediaSlug)
-        : project?.media?.find(m => m.main)
+    const project = channel?.projects?.find(p => p.slug === route.params.projectSlug)
+    const media = route?.params.mediaSlug
+      ? project?.media?.find(m => m.slug === route.params.mediaSlug)
+      : project?.media?.find(m => m.main)
 
     title = media?.title || null
     description = sanitizeText(media?.description_unsafe)
@@ -46,8 +43,7 @@ export function getMetaData(route, channel) {
     description = title
   }
 
-  const ogUrl =
-    'https://films.fotrino.com' + (route?.href?.split('?')[0] || '')
+  const ogUrl = 'https://films.fotrino.com' + (route?.href?.split('?')[0] || '')
 
   return {
     title,

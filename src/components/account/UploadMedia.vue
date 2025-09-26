@@ -1,12 +1,12 @@
 <template>
   <div v-if="profile?.id" class="q-pa-md">
     <q-item class="q-pb-md">
-        <q-item-section side>
-            <q-icon name="fas fa-cloud-arrow-up" size="xl" />
-        </q-item-section>
-        <q-item-section>
-            <q-item-label class="text-h4">Upload Media</q-item-label>
-        </q-item-section>
+      <q-item-section side>
+        <q-icon name="fas fa-cloud-arrow-up" size="xl" />
+      </q-item-section>
+      <q-item-section>
+        <q-item-label class="text-h4">Upload Media</q-item-label>
+      </q-item-section>
     </q-item>
     <q-stepper
       v-model="step"
@@ -27,37 +27,49 @@
           :coverFile="coverFile"
           :coverThumb="coverThumb"
           :handleFile="handleFile"
-          @update:payload="(p) => Object.assign(payload, p)"
+          @update:payload="p => Object.assign(payload, p)"
           @update:coverFile="updateCoverFile"
         />
       </q-step>
 
-    <q-step :name="2" title="Project" icon="fas fa-film" :done="step > 2" :header-nav="step === 1 && !!next">
-      <ProjectStep
-        :payload="payload"
-        :projects="projects"
-        :project="project"
-        :posterFile="posterFile"
-        :handleFile="handleFile"
-        @update:payload="(p) => Object.assign(payload, p)"
-        @update:posterFile="updatePosterFile"
-      />
-    </q-step>
+      <q-step
+        :name="2"
+        title="Project"
+        icon="fas fa-film"
+        :done="step > 2"
+        :header-nav="step === 1 && !!next"
+      >
+        <ProjectStep
+          :payload="payload"
+          :projects="projects"
+          :project="project"
+          :posterFile="posterFile"
+          :handleFile="handleFile"
+          @update:payload="p => Object.assign(payload, p)"
+          @update:posterFile="updatePosterFile"
+        />
+      </q-step>
 
-    <q-step :name="3" title="Media" icon="fas fa-file-video" :done="step > 3" :header-nav="step === 2 && !!next">
-      <MediaStep
-        :payload="payload"
-        :media="media"
-        :mediaFile="mediaFile"
-        :previewFile="previewFile"
-        :handleFile="handleFile"
-        :previewProcessing="isPreviewProcessing"
-        @update:payload="(p) => Object.assign(payload, p)"
-        @update:mediaFile="updateMediaFile"
-        @update:previewFile="updatePreviewFile"
-        @increment:counter="incrementCounter"
-      />
-    </q-step>
+      <q-step
+        :name="3"
+        title="Media"
+        icon="fas fa-file-video"
+        :done="step > 3"
+        :header-nav="step === 2 && !!next"
+      >
+        <MediaStep
+          :payload="payload"
+          :media="media"
+          :mediaFile="mediaFile"
+          :previewFile="previewFile"
+          :handleFile="handleFile"
+          :previewProcessing="isPreviewProcessing"
+          @update:payload="p => Object.assign(payload, p)"
+          @update:mediaFile="updateMediaFile"
+          @update:previewFile="updatePreviewFile"
+          @increment:counter="incrementCounter"
+        />
+      </q-step>
 
       <q-step
         :name="4"
@@ -67,7 +79,7 @@
         :done="step > 4"
         :header-nav="step === 3 && !!next"
       >
-      <div class="text-center">
+        <div class="text-center">
           <q-circular-progress
             :indeterminate="progress === -1"
             :instant-feedback="progress < 1"
@@ -89,17 +101,29 @@
         :header-nav="step === 4 && !!next"
       >
         <div class="q-pa-sm">
-          Your media is processing and will be available shortly (you'll receive an email once it's ready). You may now close this window.
+          Your media is processing and will be available shortly (you'll receive an email once it's
+          ready). You may now close this window.
         </div>
       </q-step>
 
       <template v-slot:navigation>
         <q-stepper-navigation>
-          <q-btn v-if="step < 3" icon="fas fa-arrow-right" flat @click="$refs.stepper.next()" label="Next" :disabled="!next" />
-          <q-btn v-if="step === 3"
-            icon="fas fa-cloud-arrow-up" flat label="Upload"
+          <q-btn
+            v-if="step < 3"
+            icon="fas fa-arrow-right"
+            flat
+            @click="$refs.stepper.next()"
+            label="Next"
             :disabled="!next"
-            @click="$refs.stepper.next()" >
+          />
+          <q-btn
+            v-if="step === 3"
+            icon="fas fa-cloud-arrow-up"
+            flat
+            label="Upload"
+            :disabled="!next"
+            @click="$refs.stepper.next()"
+          >
           </q-btn>
           <q-btn v-if="step === 4" loading disabled flat label="Uploading">
             <template v-slot:loading>
@@ -116,7 +140,15 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch, onMounted, onBeforeUnmount, defineAsyncComponent } from 'vue'
+import {
+  ref,
+  reactive,
+  computed,
+  watch,
+  onMounted,
+  onBeforeUnmount,
+  defineAsyncComponent
+} from 'vue'
 import { useStore } from 'vuex'
 import { onBeforeRouteLeave } from 'vue-router'
 import ChannelStep from './UploadMedia/ChannelStep.vue'
@@ -248,7 +280,11 @@ function incrementCounter() {
   } catch (err) {
     console.error('Failed to increment counter:', err)
     // try a safe fallback
-    try { counter.value = Number(counter.value) + 1 } catch (e) { counter.value = 1 }
+    try {
+      counter.value = Number(counter.value) + 1
+    } catch (e) {
+      counter.value = 1
+    }
   }
 }
 
@@ -257,58 +293,123 @@ const profile = computed(() => store.state.account.profile)
 const channels = computed(() => store.state.channel.channels)
 
 const project = computed(() => {
-  if (!payload.project.id || (payload.project.id.value === 0 && payload.project.posterType === 'new' && !posterFile.value)) {
-    return { title: payload.project.title, subtitle: payload.project.subtitle, poster: null, media: [] }
+  if (
+    !payload.project.id ||
+    (payload.project.id.value === 0 && payload.project.posterType === 'new' && !posterFile.value)
+  ) {
+    return {
+      title: payload.project.title,
+      subtitle: payload.project.subtitle,
+      poster: null,
+      media: []
+    }
   } else if (payload.project.id && payload.project.id.value !== 0) {
     return projects.value.find(p => p.id === payload.project.id.value)
-  } else if (payload.project.id && payload.project.id.value === 0 && payload.project.posterType === 'default') {
-    return { title: payload.project.title, subtitle: payload.project.subtitle, poster: '/images/poster.png', media: [] }
-  } else if (payload.project.id && payload.project.id.value === 0 && payload.project.posterType === 'new') {
-    return { title: payload.project.title, subtitle: payload.project.subtitle, poster: posterThumb.value, media: [] }
+  } else if (
+    payload.project.id &&
+    payload.project.id.value === 0 &&
+    payload.project.posterType === 'default'
+  ) {
+    return {
+      title: payload.project.title,
+      subtitle: payload.project.subtitle,
+      poster: '/images/poster.png',
+      media: []
+    }
+  } else if (
+    payload.project.id &&
+    payload.project.id.value === 0 &&
+    payload.project.posterType === 'new'
+  ) {
+    return {
+      title: payload.project.title,
+      subtitle: payload.project.subtitle,
+      poster: posterThumb.value,
+      media: []
+    }
   }
   return {}
 })
 
 const media = computed(() => {
   if (mediaFile.value && payload.project.media.previewType === 'frame') {
-    return { title: payload.project.media.title, description: payload.project.media.description, main: payload.project.media.main, preview: previewThumbRandom.value }
+    return {
+      title: payload.project.media.title,
+      description: payload.project.media.description,
+      main: payload.project.media.main,
+      preview: previewThumbRandom.value
+    }
   } else if (previewFile.value && payload.project.media.previewType === 'new') {
-    return { title: payload.project.media.title, description: payload.project.media.description, main: payload.project.media.main, preview: previewThumb.value }
+    return {
+      title: payload.project.media.title,
+      description: payload.project.media.description,
+      main: payload.project.media.main,
+      preview: previewThumb.value
+    }
   }
-  return { title: payload.project.media.title, description: payload.project.media.description, main: payload.project.media.main }
+  return {
+    title: payload.project.media.title,
+    description: payload.project.media.description,
+    main: payload.project.media.main
+  }
 })
 
 const next = computed(() => {
   switch (step.value) {
     case 1:
-      return payload.uuid !== null && (!!payload.uuid?.value || (!!payload.title && (!!coverFile.value || payload.coverType === 'profile')))
+      return (
+        payload.uuid !== null &&
+        (!!payload.uuid?.value ||
+          (!!payload.title && (!!coverFile.value || payload.coverType === 'profile')))
+      )
     case 2:
-      return payload.project.id !== null && (!!payload.project.id?.value || (!!payload.project.title && (!!posterFile.value || payload.project.posterType === 'default')))
+      return (
+        payload.project.id !== null &&
+        (!!payload.project.id?.value ||
+          (!!payload.project.title &&
+            (!!posterFile.value || payload.project.posterType === 'default')))
+      )
     case 3:
-      return !!payload.project.media.title && !!mediaFile.value && ((payload.project.media.previewType === 'new' && !!previewFile.value) || (payload.project.media.previewType === 'frame' && !!previewThumbRandom.value))
+      return (
+        !!payload.project.media.title &&
+        !!mediaFile.value &&
+        ((payload.project.media.previewType === 'new' && !!previewFile.value) ||
+          (payload.project.media.previewType === 'frame' && !!previewThumbRandom.value))
+      )
     default:
       return false
   }
 })
 
 // watchers
-watch(channels, (ch) => {
+watch(channels, ch => {
   if (ch.length === 0 && step.value === 1) payload.uuid = { value: 0, label: 'New...' }
-  if (ch.length === 1 && step.value === 1) payload.uuid = ch.map(({ uuid, title }) => ({ value: uuid, label: title }))[0]
+  if (ch.length === 1 && step.value === 1) {
+    payload.uuid = ch.map(({ uuid, title }) => ({ value: uuid, label: title }))[0]
+  }
 })
 
-watch(projects, (p) => {
+watch(projects, p => {
   if (p.length === 0 && step.value === 2) payload.project.id = { value: 0, label: 'New...' }
-  if (p.length === 1 && step.value === 2) payload.project.id = p.map(({ id, title }) => ({ value: id, label: title }))[0]
+  if (p.length === 1 && step.value === 2) {
+    payload.project.id = p.map(({ id, title }) => ({ value: id, label: title }))[0]
+  }
 })
 
-watch(step, (s) => {
+watch(step, s => {
   if (s === 2 && payload.uuid.value !== 0) {
-    store.cache.dispatch('channel/getChannel', { uuid: payload.uuid.value, pending: true }).then(ch => {
-      projects.value = ch.projects
-      if (projects.value.length === 0) payload.project.id = { value: 0, label: 'New...' }
-      if (projects.value.length === 1) payload.project.id = projects.value.map(({ id, title }) => ({ value: id, label: title }))[0]
-    })
+    store.cache
+      .dispatch('channel/getChannel', { uuid: payload.uuid.value, pending: true })
+      .then(ch => {
+        projects.value = ch.projects
+        if (projects.value.length === 0) payload.project.id = { value: 0, label: 'New...' }
+        if (projects.value.length === 1) {
+          payload.project.id = projects.value.map(({ id, title }) => ({
+            value: id,
+            label: title
+          }))[0]
+        }
+      })
   } else {
     if (projects.value.length === 0) payload.project.id = { value: 0, label: 'New...' }
   }
@@ -316,31 +417,37 @@ watch(step, (s) => {
 })
 
 // thumbnail previews for selected files
-watch(coverFile, (file) => {
+watch(coverFile, file => {
   if (file) {
     const reader = new FileReader()
-    reader.onload = (e) => { coverThumb.value = e.target.result }
+    reader.onload = e => {
+      coverThumb.value = e.target.result
+    }
     reader.readAsDataURL(file)
   } else coverThumb.value = null
 })
 
-watch(posterFile, (file) => {
+watch(posterFile, file => {
   if (file) {
     const reader = new FileReader()
-    reader.onload = (e) => { posterThumb.value = e.target.result }
+    reader.onload = e => {
+      posterThumb.value = e.target.result
+    }
     reader.readAsDataURL(file)
   } else posterThumb.value = null
 })
 
-watch(previewFile, (file) => {
+watch(previewFile, file => {
   if (file) {
     const reader = new FileReader()
-    reader.onload = (e) => { previewThumb.value = e.target.result }
+    reader.onload = e => {
+      previewThumb.value = e.target.result
+    }
     reader.readAsDataURL(file)
   } else previewThumb.value = null
 })
 
-watch(mediaFile, (file) => {
+watch(mediaFile, file => {
   if (file) payload.project.media.filename = file.name
   else payload.project.media.filename = null
 })
@@ -359,7 +466,12 @@ watch([() => mediaFile.value, () => counter.value], async ([mf]) => {
     }
   } catch (err) {
     payload.project.media.previewType = 'new'
-    Notify.create({ type: 'negative', timeout: 0, message: 'Error extracting frames from video.', icon: 'fas fa-triangle-exclamation' })
+    Notify.create({
+      type: 'negative',
+      timeout: 0,
+      message: 'Error extracting frames from video.',
+      icon: 'fas fa-triangle-exclamation'
+    })
   } finally {
     extractingFrame.value = false
   }
@@ -421,8 +533,11 @@ async function factoryUpload() {
 // lifecycle
 onMounted(() => {
   store.dispatch('channel/getChannels')
-  const beforeUnloadHandler = (event) => {
-    if (isUploading.value) { event.preventDefault(); event.returnValue = '' }
+  const beforeUnloadHandler = event => {
+    if (isUploading.value) {
+      event.preventDefault()
+      event.returnValue = ''
+    }
   }
   window.addEventListener('beforeunload', beforeUnloadHandler)
   // cleanup reference
@@ -433,7 +548,10 @@ onMounted(() => {
 onBeforeRouteLeave((to, from, next) => {
   if (isUploading.value) {
     const answer = window.confirm('You have uploads in progress. Are you sure you want to leave?')
-    if (!answer) { next(false); return }
+    if (!answer) {
+      next(false)
+      return
+    }
   }
   next()
 })

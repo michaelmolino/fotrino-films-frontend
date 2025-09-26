@@ -11,7 +11,6 @@
       <q-skeleton type="text" width="60%" />
     </template>
   </div>
-
 </template>
 
 <script setup>
@@ -28,10 +27,15 @@ const store = useStore()
 const profile = computed(() => store.state.account.profile)
 const channels = computed(() => store.state.channel.channels || [])
 const hasChannels = computed(() => channels.value.length > 0)
-const mediaCount = computed(() => channels.value.reduce((total, ch) => {
-  const projectMediaCount = (ch.projects || []).reduce((sum, p) => sum + ((p.media || []).length), 0)
-  return total + projectMediaCount
-}, 0))
+const mediaCount = computed(() =>
+  channels.value.reduce((total, ch) => {
+    const projectMediaCount = (ch.projects || []).reduce(
+      (sum, p) => sum + (p.media || []).length,
+      0
+    )
+    return total + projectMediaCount
+  }, 0)
+)
 
 onMounted(() => {
   store.dispatch('channel/getChannels', true)

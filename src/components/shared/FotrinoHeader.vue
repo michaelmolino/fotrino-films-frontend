@@ -47,9 +47,7 @@
                 @click="removeHistory(channel.uuid)"
               />
             </div>
-            <div v-if="history.length === 0" class="row q-pa-sm">
-              No history
-            </div>
+            <div v-if="history.length === 0" class="row q-pa-sm">No history</div>
           </q-btn-dropdown>
         </template>
       </q-toolbar-title>
@@ -73,16 +71,49 @@
         no-caps
       >
         <q-separator />
-        <q-btn flat no-caps align="left" icon="far fa-sun" label="Light" size="md" class="fit" @click="setDarkMode('light')" />
+        <q-btn
+          flat
+          no-caps
+          align="left"
+          icon="far fa-sun"
+          label="Light"
+          size="md"
+          class="fit"
+          @click="setDarkMode('light')"
+        />
         <q-separator />
-        <q-btn flat no-caps align="left" icon="fas fa-circle-half-stroke" label="Auto" size="md" class="fit" @click="setDarkMode('auto')" />
+        <q-btn
+          flat
+          no-caps
+          align="left"
+          icon="fas fa-circle-half-stroke"
+          label="Auto"
+          size="md"
+          class="fit"
+          @click="setDarkMode('auto')"
+        />
         <q-separator />
-        <q-btn flat no-caps align="left" icon="far fa-moon" label="Dark" size="md" class="fit" @click="setDarkMode('dark')" />
+        <q-btn
+          flat
+          no-caps
+          align="left"
+          icon="far fa-moon"
+          label="Dark"
+          size="md"
+          class="fit"
+          @click="setDarkMode('dark')"
+        />
       </q-btn-dropdown>
 
       <!-- Auth / Account Buttons -->
       <template v-if="!profile?.id">
-        <q-btn-dropdown icon="fas fa-user" :label="$q.screen.gt.sm ? 'Sign Up/Login' : ''" flat no-caps size="md">
+        <q-btn-dropdown
+          icon="fas fa-user"
+          :label="$q.screen.gt.sm ? 'Sign Up/Login' : ''"
+          flat
+          no-caps
+          size="md"
+        >
           <template v-for="provider in oauthProviders" :key="provider.name">
             <q-separator />
             <q-btn
@@ -101,13 +132,46 @@
       </template>
 
       <template v-else>
-        <q-btn-dropdown :icon="'img:' + profile.profile_pic" :label="$q.screen.gt.sm ? 'Account' : ''" flat no-caps size="md">
+        <q-btn-dropdown
+          :icon="'img:' + profile.profile_pic"
+          :label="$q.screen.gt.sm ? 'Account' : ''"
+          flat
+          no-caps
+          size="md"
+        >
           <q-separator />
-          <q-btn to="/account/dashboard" align="left" flat no-caps icon="fas fa-chalkboard" label="Dashboard" size="md" class="fit" />
+          <q-btn
+            to="/account/dashboard"
+            align="left"
+            flat
+            no-caps
+            icon="fas fa-chalkboard"
+            label="Dashboard"
+            size="md"
+            class="fit"
+          />
           <q-separator />
-          <q-btn to="/account/upload" align="left" flat no-caps icon="fas fa-cloud-arrow-up" label="Upload Media" size="md" class="fit" />
+          <q-btn
+            to="/account/upload"
+            align="left"
+            flat
+            no-caps
+            icon="fas fa-cloud-arrow-up"
+            label="Upload Media"
+            size="md"
+            class="fit"
+          />
           <q-separator />
-          <q-btn @click="logout" align="left" flat no-caps icon="fas fa-right-from-bracket" label="Logout" size="md" class="fit" />
+          <q-btn
+            @click="logout"
+            align="left"
+            flat
+            no-caps
+            icon="fas fa-right-from-bracket"
+            label="Logout"
+            size="md"
+            class="fit"
+          />
         </q-btn-dropdown>
       </template>
     </q-toolbar>
@@ -131,12 +195,11 @@ const oauthProviders = ref([
 const profile = computed(() => store.state.account.profile)
 const history = ref(LocalStorage.getItem(HISTORY_KEY) || [])
 
-onMounted(() => {
-})
+onMounted(() => {})
 
 watch(
   () => store.state.channel.channel,
-  (newChannel) => {
+  newChannel => {
     if (newChannel && newChannel.uuid && newChannel.title && newChannel.slug) {
       addHistory(newChannel)
     }
@@ -176,7 +239,7 @@ function applyDarkMode() {
   }
 }
 
-watch(darkModePref, (val) => {
+watch(darkModePref, val => {
   LocalStorage.set(DARK_KEY, val)
   applyDarkMode()
 })
@@ -184,7 +247,7 @@ watch(darkModePref, (val) => {
 onMounted(() => {
   applyDarkMode()
   const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-  mediaQuery.addEventListener('change', (e) => {
+  mediaQuery.addEventListener('change', e => {
     systemDark.value = e.matches
     if (darkModePref.value === 'auto') applyDarkMode()
   })

@@ -9,7 +9,13 @@ export default ({ app, router, store, Vue }) => {
     const orig = EventTarget.prototype.addEventListener
     EventTarget.prototype.addEventListener = function (type, listener, options) {
       try {
-        if ((type === 'touchstart' || type === 'touchmove' || type === 'wheel' || type === 'mousewheel') && typeof options !== 'object') {
+        if (
+          (type === 'touchstart' ||
+            type === 'touchmove' ||
+            type === 'wheel' ||
+            type === 'mousewheel') &&
+          typeof options !== 'object'
+        ) {
           orig.call(this, type, listener, { passive: true })
           return
         }

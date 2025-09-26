@@ -3,9 +3,7 @@ import { api } from 'boot/axios'
 // Helpers
 
 function sortByDateDesc(items) {
-  return [...(items || [])].sort(
-    (a, b) => new Date(b.resource_date) - new Date(a.resource_date)
-  )
+  return [...(items || [])].sort((a, b) => new Date(b.resource_date) - new Date(a.resource_date))
 }
 
 function sortChannel(channel) {
@@ -56,9 +54,10 @@ export async function getPrivateMedia(context, privateId) {
 }
 
 export async function deleteResource(context, resource) {
-  const url = resource.type === 'channel'
-    ? `/channels/${resource.id}`
-    : `/channels/${resource.type}/${resource.id}`
+  const url =
+    resource.type === 'channel'
+      ? `/channels/${resource.id}`
+      : `/channels/${resource.type}/${resource.id}`
 
   try {
     await api.delete(url)
