@@ -54,17 +54,21 @@
         </template>
       </q-toolbar-title>
 
-      <!-- Dark Mode Toggle -->
-      <q-toggle
-        v-model="darkMode"
-        unchecked-icon="far fa-sun"
-        checked-icon="far fa-moon"
-        color="secondary"
-        keep-color
+      <!-- Dark Mode -->
+      <q-btn-dropdown
+        :icon="darkModeIcon"
+        :label="$q.screen.gt.sm ? 'Theme' : ''"
         size="md"
+        flat
+        no-caps
       >
-        <q-tooltip>Dark Mode</q-tooltip>
-      </q-toggle>
+        <q-separator />
+        <q-btn flat no-caps icon="far fa-sun" label="Light" size="md" class="fit" @click="setDarkMode('light')" />
+        <q-separator />
+        <q-btn flat no-caps icon="fas fa-circle-half-stroke" label="Auto" size="md" class="fit" @click="setDarkMode('auto')" />
+        <q-separator />
+        <q-btn flat no-caps icon="far fa-moon" label="Dark" size="md" class="fit" @click="setDarkMode('dark')" />
+      </q-btn-dropdown>
 
       <!-- Help Button -->
       <q-btn
@@ -160,12 +164,47 @@ function removeHistory(uuid) {
   history.value = updated
 }
 
-const darkMode = computed({
-  get: () => $q.dark.isActive,
-  set: (value) => $q.dark.set(value)
+const DARK_KEY = 'fotrino-films-darkmode'
+const darkModePref = ref(LocalStorage.getItem(DARK_KEY) || 'auto')
+const systemDark = ref(window.matchMedia('(prefers-color-scheme: dark)').matches)
+
+function applyDarkMode() {
+  if (darkModePref.value === 'auto') {
+    $q.dark.set(systemDark.value)
+  } else {
+    $q.dark.set(darkModePref.value === 'dark')
+  }
+}
+
+watch(darkModePref, (val) => {
+  LocalStorage.set(DARK_KEY, val)
+  applyDarkMode()
+})
+
+onMounted(() => {
+  applyDarkMode()
+  // Poll system setting every minute
+  setInterval(() => {
+    const newSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    if (systemDark.value !== newSystemDark) {
+      systemDark.value = newSystemDark
+      if (darkModePref.value === 'auto') applyDarkMode()
+    }
+  }, 60000)
 })
 
 function storeRedirect() {
   LocalStorage.set('postLoginRedirect', window.location.pathname)
+}
+
+const darkModeIcons = {
+  light: 'far fa-sun',
+  auto: 'fas fa-circle-half-stroke',
+  dark: 'far fa-moon'
+}
+const darkModeIcon = computed(() => darkModeIcons[darkModePref.value])
+
+function setDarkMode(mode) {
+  darkModePref.value = mode
 }
 </script>
