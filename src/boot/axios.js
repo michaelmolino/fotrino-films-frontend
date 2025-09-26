@@ -97,7 +97,6 @@ export default boot(({ app, router, store }) => {
       else if (status === 403) msg = 'Forbidden.'
       else if (status === 501) msg = 'Not yet implemented.'
 
-      console.log('API error', status, error)
       if (error.code === 'ERR_CANCELED') {
         msg = 'Request cancelled.'
       }
