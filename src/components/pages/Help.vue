@@ -227,7 +227,8 @@ function onItemHide(item) {
   // Add delay to prevent race conditions with @show events
   setTimeout(() => {
     if (route.query.item === item) {
-      const { item: _, ...otherQuery } = route.query
+      const otherQuery = { ...route.query }
+      delete otherQuery.item
       router.replace({
         query: otherQuery
       })

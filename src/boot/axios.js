@@ -25,7 +25,12 @@ axiosRetry(objectApi, { retries: 6, retryDelay: axiosRetry.exponentialDelay, ret
 export default boot(({ app, router, store }) => {
   // Track concurrent requests to avoid hiding the loader too early
   let pending = 0
-  const showLoader = () => { if (pending === 0) Loading.show(); pending++ }
+  const showLoader = () => {
+    if (pending === 0) {
+      Loading.show()
+    }
+    pending++
+  }
   const hideLoader = () => { pending = Math.max(0, pending - 1); if (pending === 0) Loading.hide() }
 
   api.interceptors.request.use(req => {

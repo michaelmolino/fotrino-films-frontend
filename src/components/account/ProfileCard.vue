@@ -44,11 +44,7 @@ const profilePic = computed(() => props.profile?.profile_pic || undefined)
 const providerIcon = computed(() => `fab fa-${props.profile?.identity_provider}`)
 const joinedText = computed(() => {
   const created = props.profile?.created
-  try {
-    return created ? _daysSince(created) : 'unknown'
-  } catch (e) {
-    return 'unknown'
-  }
+  return created ? _daysSince(created) : 'unknown'
 })
 const safeName = computed(() => props.profile?.name || '')
 const safeEmail = computed(() => props.profile?.email || '')
