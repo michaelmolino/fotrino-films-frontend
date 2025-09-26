@@ -15,7 +15,7 @@ import { ref, watch, computed, nextTick } from 'vue'
 import { useQuasar } from 'quasar'
 import { useStore } from 'vuex'
 import commentBox from 'commentbox.io'
-import { logout } from '@javascript/library.js'
+import { logout } from '@utils/auth.js'
 
 const props = defineProps({
   loggedIn: Boolean,

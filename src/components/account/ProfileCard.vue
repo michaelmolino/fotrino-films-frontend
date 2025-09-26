@@ -33,7 +33,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { daysSince as _daysSince } from '@javascript/library.js'
+import { daysSince } from '@utils/date.js'
 
 const props = defineProps({
   profile: { type: Object, default: null },
@@ -44,7 +44,7 @@ const profilePic = computed(() => props.profile?.profile_pic || undefined)
 const providerIcon = computed(() => `fab fa-${props.profile?.identity_provider}`)
 const joinedText = computed(() => {
   const created = props.profile?.created
-  return created ? _daysSince(created) : 'unknown'
+  return created ? daysSince(created) : 'unknown'
 })
 const safeName = computed(() => props.profile?.name || '')
 const safeEmail = computed(() => props.profile?.email || '')

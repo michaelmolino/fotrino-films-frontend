@@ -19,7 +19,7 @@ import { useMeta } from 'quasar'
 import { ref, watch, defineAsyncComponent, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute, useRouter } from 'vue-router'
-import { getMetaData } from '@javascript/library.js'
+import { getMetaData } from '@utils/meta.js'
 
 export default {
   name: 'App',

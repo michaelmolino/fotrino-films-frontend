@@ -1,35 +1,4 @@
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import isToday from 'dayjs/plugin/isToday'
-import isYesterday from 'dayjs/plugin/isYesterday'
-
-dayjs.extend(relativeTime)
-dayjs.extend(isToday)
-dayjs.extend(isYesterday)
-
-import DOMPurify from 'dompurify'
-
-export function sanitizeHtml(unsafe) {
-  const ALLOWED_TAGS = ['br', 'i', 'p', 'strong']
-  return DOMPurify.sanitize(unsafe, { ALLOWED_TAGS })
-}
-
-export function sanitizeText(unsafe) {
-  if (!unsafe) return ''
-  const cleaned = unsafe
-    .replace(/<br[^>]*>/gi, '\n')
-    .replace(/<\/?p[^>]*>/gi, '\n')
-  return DOMPurify.sanitize(cleaned, { ALLOWED_TAGS: [] })
-}
-
-export function daysSince(start, withTime = true) {
-  const day = dayjs(start)
-  if (!withTime) {
-    if (day.isToday()) return 'today'
-    if (day.isYesterday()) return 'yesterday'
-  }
-  return day.fromNow()
-}
+import { sanitizeText } from '@utils/text.js'
 
 export function getMetaData(route, channel) {
   let title = null
@@ -90,10 +59,4 @@ export function getMetaData(route, channel) {
       ogType: { property: 'og:type', content: type }
     }
   }
-}
-
-export function logout(store) {
-  fetch('/api/account/logout')
-    .then(() => store.dispatch('account/getProfile'))
-    .catch(err => console.error('Logout failed:', err))
 }

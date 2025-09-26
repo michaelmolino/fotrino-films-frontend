@@ -3,7 +3,7 @@
       <section class="text-right">
         <transition
           appear
-          enter-active-class="animated bounce slower delay-1s"
+          enter-active-class="animated zoomInDown slower"
         >
           <div>
             <h1 class="text-h4 q-my-none">

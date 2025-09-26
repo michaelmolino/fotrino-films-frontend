@@ -60,7 +60,15 @@ export async function deleteResource(context, resource) {
     ? `/channels/${resource.id}`
     : `/channels/${resource.type}/${resource.id}`
 
-  await api.delete(url)
+  try {
+    await api.delete(url)
+  } catch (error) {
+    // Ignore user-cancelled deletes
+    if (error && error.message === 'User cancelled delete') {
+      return
+    }
+    throw error
+  }
   const channels = context.state.channels
     .map(channel => {
       if (resource.type === 'channel' && channel.uuid === resource.id) {

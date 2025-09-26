@@ -82,7 +82,7 @@ module.exports = function(/* ctx */) {
           // Add your own alias like this
           '@layouts': path.resolve(__dirname, './src/layouts'),
           '@components': path.resolve(__dirname, './src/components'),
-          '@javascript': path.resolve(__dirname, './src/javascript'),
+          '@utils': path.resolve(__dirname, './src/utils'),
           '@deps': path.resolve(__dirname, './node_modules'),
           '@libs': path.resolve(__dirname, './src/libs')
         }
@@ -134,7 +134,7 @@ module.exports = function(/* ctx */) {
 
     // animations: 'all', // --- includes all animations
     // https://quasar.dev/options/animations
-    animations: ['bounce'],
+    animations: ['zoomInDown'],
 
     // https://quasar.dev/quasar-cli/developing-ssr/configuring-ssr
     ssr: {

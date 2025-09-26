@@ -105,7 +105,7 @@
           <q-separator />
           <q-btn to="/account/dashboard" align="left" flat no-caps icon="fas fa-chalkboard" label="Dashboard" size="md" class="fit" />
           <q-separator />
-          <q-btn href="/account/upload" align="left" flat no-caps icon="fas fa-cloud-arrow-up" label="Upload Media" size="md" class="fit" />
+          <q-btn to="/account/upload" align="left" flat no-caps icon="fas fa-cloud-arrow-up" label="Upload Media" size="md" class="fit" />
           <q-separator />
           <q-btn @click="logout" align="left" flat no-caps icon="fas fa-right-from-bracket" label="Logout" size="md" class="fit" />
         </q-btn-dropdown>
@@ -118,7 +118,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useQuasar, LocalStorage } from 'quasar'
-import { logout as sharedLogout } from '@javascript/library.js'
+import { logout as sharedLogout } from '@utils/auth.js'
 const $q = useQuasar()
 
 const store = useStore()

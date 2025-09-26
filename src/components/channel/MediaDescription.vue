@@ -44,7 +44,8 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { Notify, copyToClipboard } from 'quasar'
-import { daysSince as _daysSince, sanitizeHtml } from '@javascript/library.js'
+import { sanitizeHtml } from '@utils/text.js'
+import { daysSince } from '@utils/date.js'
 
 const props = defineProps({
   media: Object
@@ -52,8 +53,8 @@ const props = defineProps({
 
 const route = useRoute()
 const isPublic = computed(() => !!route.params.uuid)
-const sinceCaptured = computed(() => props.media?.resource_date ? _daysSince(props.media.resource_date, false) : '')
-const sincePublished = computed(() => props.media?.created ? _daysSince(props.media.created) : '')
+const sinceCaptured = computed(() => props.media?.resource_date ? daysSince(props.media.resource_date, false) : '')
+const sincePublished = computed(() => props.media?.created ? daysSince(props.media.created) : '')
 const descriptionSafe = computed(() => sanitizeHtml(props.media?.description_unsafe || ''))
 
 function copyLink(val) {
