@@ -1,6 +1,7 @@
 <template>
-  <div>
-    Redirecting...
+  <div class="absolute-center q-pa-xl">
+    <q-spinner color="primary" size="40px" class="q-mb-md" />
+    <div class="text-h6 q-mb-sm">Redirecting you to your destination...</div>
   </div>
 </template>
 

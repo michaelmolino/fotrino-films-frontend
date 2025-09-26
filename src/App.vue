@@ -1,21 +1,24 @@
 <template>
-  <q-dialog v-model="showTerms" backdrop-filter="contrast(40%)">
-      <q-card>
-        <q-card-section class="scroll terms">
-          <Terms />
-        </q-card-section>
-        <q-separator />
-        <q-card-actions align="right">
-          <q-btn flat label="OK" v-close-popup />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+  <q-dialog v-model="showTerms" @hide="onTermsClose" backdrop-filter="contrast(40%)">
+    <q-card>
+      <q-card-section class="scroll terms">
+        <Terms />
+      </q-card-section>
+      <q-separator />
+      <q-card-actions align="right">
+        <q-btn flat label="OK" v-close-popup />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
+
   <router-view />
 </template>
 
 <script>
 import { useMeta } from 'quasar'
-import { ref, defineAsyncComponent } from 'vue'
+import { ref, watch, defineAsyncComponent, onMounted } from 'vue'
+import { useStore } from 'vuex'
+import { useRoute, useRouter } from 'vue-router'
 import { getMetaData } from '@javascript/library.js'
 
 export default {
@@ -28,84 +31,71 @@ export default {
   },
 
   setup() {
+    const store = useStore()
+    const route = useRoute()
+    const router = useRouter()
+
     const metaData = ref(getMetaData(null, null))
-    useMeta(() => {
-      return metaData.value
+    const showTerms = ref(false)
+
+    useMeta(() => metaData.value)
+
+    const onRouteChange = async () => {
+      try {
+        let channel = null
+
+        if (route.params?.uuid) {
+          channel = await store.cache.dispatch('channel/getChannel', {
+            uuid: route.params.uuid,
+            pending: false
+          })
+          store.commit('channel/SET_CHANNEL', channel)
+        } else if (route.params?.privateId) {
+          channel = await store.cache.dispatch('channel/getPrivateMedia', route.params.privateId)
+          store.commit('channel/SET_CHANNEL', channel)
+        }
+
+        if (channel?.uuid) {
+          router.replace({
+            params: { channelSlug: channel.slug },
+            query: route.query
+          })
+        }
+
+        metaData.value = getMetaData(route, channel)
+      } catch {
+        metaData.value = getMetaData(null, null)
+        store.commit('channel/setChannelState', null)
+      }
+    }
+
+    onMounted(() => {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('WARNING: This is a development server and should not be exposed to the internet.')
+      }
+      store.dispatch('account/getProfile')
     })
-    return {
-      metaData
-    }
-  },
 
-  created() {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('WARNING: This is a development server and should not be exposed to the internet.')
-    }
-    this.$store.dispatch('account/getProfile')
-  },
+    watch(
+      () => route.fullPath,
+      () => {
+        showTerms.value = route.query?.showTerms === 'true'
+        onRouteChange()
+      }
+    )
 
-  computed: {
-    channel: {
-      get() {
-        if (this.$route.params?.uuid || this.$route.params.privateId) {
-          return this.$store.state.channel.channel
-        }
-        return null
-      },
-      set(value) {
-        this.$store.commit('channel/SET_CHANNEL', value)
-      }
-    },
-    showTerms: {
-      get() {
-        return this.$route.query?.showTerms === 'true'
-      },
-      set(value) {
-        if (!value) {
-          this.$router.replace({
-            query: { ...this.$route.query, showTerms: undefined },
-            params: { channelSlug: this.channel?.slug }
-          })
-        }
-      }
-    }
-  },
-
-  watch: {
-    $route(to, from) {
-      if (to.query?.showTerms) {
-        this.showTerms = true
-      }
-      if (to.params?.uuid) {
-        this.$store.cache
-          .dispatch('channel/getChannel', { uuid: to.params.uuid, pending: false })
-          .then(_channel => {
-            this.channel = _channel
-            this.metaData = getMetaData(this.$route, _channel)
-          })
-          .catch(() => {
-            this.channel = null
-          })
-      } else if (to.params?.privateId) {
-        this.$store.cache
-          .dispatch('channel/getPrivateMedia', to.params.privateId)
-          .then(_channel => {
-            this.channel = _channel
-            this.metaData = getMetaData(this.$route, _channel)
-          })
-          .catch(() => {
-            this.channel = null
-          })
-      } else {
-        this.metaData = getMetaData(this.$route, null)
-      }
-    },
-    channel(newChannel) {
-      if (newChannel?.uuid && !this.showTerms) {
-        this.$router.replace({
-          params: { channelSlug: newChannel.slug }
+    const onTermsClose = () => {
+      if (route.query?.showTerms) {
+        router.replace({
+          query: { ...route.query, showTerms: undefined }
         })
       }
+    }
+
+    return {
+      metaData,
+      showTerms,
+      onTermsClose
     }
   }
 }

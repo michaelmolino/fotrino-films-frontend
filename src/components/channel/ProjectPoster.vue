@@ -24,14 +24,10 @@
   </q-btn>
 </template>
 
-<script>
-export default {
-  name: 'ProjectPoster',
-
-  props: {
-    project: Object
-  }
-}
+<script setup>
+defineProps({
+  project: Object
+})
 </script>
 
 <style scoped>

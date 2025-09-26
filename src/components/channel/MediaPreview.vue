@@ -33,16 +33,12 @@
   </q-btn>
 </template>
 
-<script>
-export default {
-  name: 'MediaPreview',
-
-  props: {
-    media: Object,
-    project: Object,
-    detail: Boolean
-  }
-}
+<script setup>
+const { media, project, detail } = defineProps({
+  media: Object,
+  project: Object,
+  detail: Boolean
+})
 </script>
 
 <style scoped>

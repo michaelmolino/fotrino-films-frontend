@@ -1,43 +1,35 @@
 import { api } from 'boot/axios'
 
+async function fetchAndCommit(context, { url, mutation, extract }) {
+  try {
+    const { data } = await api.get(url)
+    const value = extract ? extract(data) : data
+    context.commit(mutation, value)
+    return value
+  } catch (error) {
+    context.commit(mutation, null)
+    throw error
+  }
+}
+
 export function getProfile(context) {
-  return api
-    .get('/account/profile')
-    .then(response => {
-      const profile = response.data
-      context.commit('SET_PROFILE', profile)
-      return Promise.resolve(profile)
-    })
-    .catch(error => {
-      context.commit('SET_PROFILE', null)
-      return Promise.reject(error)
-    })
+  return fetchAndCommit(context, {
+    url: '/account/profile',
+    mutation: 'SET_PROFILE'
+  })
 }
 
 export function getToken(context) {
-  return api
-    .get('/account/token')
-    .then(response => {
-      const token = response.data.token
-      context.commit('SET_TOKEN', token)
-      return Promise.resolve(token)
-    })
-    .catch(error => {
-      context.commit('SET_TOKEN', null)
-      return Promise.reject(error)
-    })
+  return fetchAndCommit(context, {
+    url: '/account/token',
+    mutation: 'SET_TOKEN',
+    extract: data => data.token
+  })
 }
 
 export function getCommentboxToken(context) {
-  return api
-    .get('/sso/commentbox')
-    .then(response => {
-      const commentbox = response.data
-      context.commit('SET_COMMENTBOX', commentbox)
-      return Promise.resolve(commentbox)
-    })
-    .catch(error => {
-      context.commit('SET_COMMENTBOX', null)
-      return Promise.reject(error)
-    })
+  return fetchAndCommit(context, {
+    url: '/sso/commentbox',
+    mutation: 'SET_COMMENTBOX'
+  })
 }

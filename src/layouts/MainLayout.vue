@@ -9,14 +9,11 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue'
+import FotrinoHeader from '@components/shared/FotrinoHeader.vue'
+import FotrinoFooter from '@components/shared/FotrinoFooter.vue'
 
 export default {
   name: 'MainLayout',
-
-  components: {
-    FotrinoHeader: defineAsyncComponent(() => import('@components/shared/FotrinoHeader.vue')),
-    FotrinoFooter: defineAsyncComponent(() => import('@components/shared/FotrinoFooter.vue'))
-  }
+  components: { FotrinoHeader, FotrinoFooter }
 }
 </script>

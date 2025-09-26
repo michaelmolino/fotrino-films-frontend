@@ -6,8 +6,8 @@
         label="What is Fotrino Films?"
         :default-opened="!$route.query.item || $route.query.item === 'about'"
         header-class="text-bold"
-        @show="this.$router.replace({query: { item: 'about' }})"
-        @hide="this.$router.replace({query: { }})"
+        @show="onItemSelect('about')"
+        @hide="() => onItemHide('about')"
       >
         <q-card>
           <q-card-section>
@@ -21,8 +21,8 @@
         label="How is it different from other video hosts?"
         header-class="text-bold"
         :default-opened="$route.query.item === 'different'"
-        @show="this.$router.replace({query: { item: 'different' }})"
-        @hide="this.$router.replace({query: { }})"
+        @show="onItemSelect('different')"
+        @hide="() => onItemHide('different')"
       >
         <q-card>
           <q-card-section>
@@ -38,8 +38,8 @@
         label="Is Fotrino Films open source?"
         header-class="text-bold"
         :default-opened="$route.query.item === 'opensource'"
-        @show="this.$router.replace({query: { item: 'opensource' }})"
-        @hide="this.$router.replace({query: { }})"
+        @show="onItemSelect('opensource')"
+        @hide="() => onItemHide('opensource')"
       >
         <q-card>
           <q-card-section>
@@ -53,8 +53,8 @@
         label="Is my content public or private?"
         header-class="text-bold"
         :default-opened="$route.query.item === 'privacy'"
-        @show="this.$router.replace({query: { item: 'privacy' }})"
-        @hide="this.$router.replace({query: { }})"
+        @show="onItemSelect('privacy')"
+        @hide="() => onItemHide('privacy')"
       >
         <q-card>
           <q-card-section>
@@ -70,8 +70,8 @@
         label="Is it ready to use?"
         header-class="text-bold"
         :default-opened="$route.query.item === 'production'"
-        @show="this.$router.replace({query: { item: 'production' }})"
-        @hide="this.$router.replace({query: { }})"
+        @show="onItemSelect('production')"
+        @hide="() => onItemHide('production')"
       >
         <q-card>
           <q-card-section>
@@ -85,8 +85,8 @@
         label="Does it work on mobile?"
         header-class="text-bold"
         :default-opened="$route.query.item === 'mobilesupport'"
-        @show="this.$router.replace({query: { item: 'mobilesupport' }})"
-        @hide="this.$router.replace({query: { }})"
+        @show="onItemSelect('mobilesupport')"
+        @hide="() => onItemHide('mobilesupport')"
       >
         <q-card>
           <q-card-section>
@@ -100,8 +100,8 @@
         label="Do videos have any DRM?  Can I download a video?"
         header-class="text-bold"
         :default-opened="$route.query.item === 'download'"
-        @show="this.$router.replace({query: { item: 'download' }})"
-        @hide="this.$router.replace({query: { }})"
+        @show="onItemSelect('download')"
+        @hide="() => onItemHide('download')"
       >
         <q-card>
           <q-card-section>
@@ -115,8 +115,8 @@
         label="What can I do if I'm experiencing buffering or poor video quality?"
         header-class="text-bold"
         :default-opened="$route.query.item === 'buffering'"
-        @show="this.$router.replace({query: { item: 'buffering' }})"
-        @hide="this.$router.replace({query: { }})"
+        @show="onItemSelect('buffering')"
+        @hide="() => onItemHide('buffering')"
       >
         <q-card>
           <q-card-section>
@@ -130,12 +130,12 @@
         label="When I share a link on Facebook, I'm not getting a preview image.  What should I do?"
         header-class="text-bold"
         :default-opened="$route.query.item === 'facebook'"
-        @show="this.$router.replace({query: { item: 'facebook' }})"
-        @hide="this.$router.replace({query: { }})"
+        @show="onItemSelect('facebook')"
+        @hide="() => onItemHide('facebook')"
       >
         <q-card>
           <q-card-section>
-            Uee the
+            Use the
             <q-btn
               flat
               dense
@@ -153,8 +153,8 @@
         label="Why can I only login with Google?"
         header-class="text-bold"
         :default-opened="$route.query.item === 'login'"
-        @show="this.$router.replace({query: { item: 'login' }})"
-        @hide="this.$router.replace({query: { }})"
+        @show="onItemSelect('login')"
+        @hide="() => onItemHide('login')"
       >
         <q-card>
           <q-card-section>
@@ -168,8 +168,8 @@
         label="Is there a file size limit for uploads?"
         header-class="text-bold"
         :default-opened="$route.query.item === 'filesize'"
-        @show="this.$router.replace({query: { item: 'filesize' }})"
-        @hide="this.$router.replace({query: { }})"
+        @show="onItemSelect('filesize')"
+        @hide="() => onItemHide('filesize')"
       >
         <q-card>
           <q-card-section>
@@ -183,8 +183,8 @@
         label="Terminology"
         header-class="text-bold"
         :default-opened="$route.query.item === 'terminology'"
-        @show="this.$router.replace({query: { item: 'terminology' }})"
-        @hide="this.$router.replace({query: { }})"
+        @show="onItemSelect('terminology')"
+        @hide="() => onItemHide('terminology')"
       >
         <q-card>
           <q-card-section>
@@ -207,8 +207,31 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'Help-Page'
+<script setup>
+import { useRoute, useRouter } from 'vue-router'
+
+defineOptions({ name: 'Help-Page' })
+const route = useRoute()
+const router = useRouter()
+
+function onItemSelect(item) {
+  router.replace({
+    query: {
+      ...route.query,
+      item
+    }
+  })
+}
+
+function onItemHide(item) {
+  // Add delay to prevent race conditions with @show events
+  setTimeout(() => {
+    if (route.query.item === item) {
+      const { item: _, ...otherQuery } = route.query
+      router.replace({
+        query: otherQuery
+      })
+    }
+  }, 100)
 }
 </script>

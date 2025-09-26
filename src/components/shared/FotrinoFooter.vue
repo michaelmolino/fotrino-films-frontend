@@ -26,18 +26,6 @@
   </q-footer>
 </template>
 
-<script>
-export default {
-  name: 'FotrinoFooter',
-
-  data() {
-    return {
-      year: 2021
-    }
-  },
-
-  created() {
-    this.year = new Date().getFullYear()
-  }
-}
+<script setup>
+const year = new Date().getFullYear()
 </script>

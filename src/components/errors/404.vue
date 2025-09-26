@@ -1,23 +1,31 @@
 <template>
-  <div class="fullscreen bg-warning text-black text-center flex flex-center">
-    <div>
-      <div class="text-h1">404</div>
-      <div class="text-h2">Not Found</div>
+  <div class="fullscreen bg-warning text-black flex flex-center">
+    <q-card flat bordered class="q-pa-xl text-center card-center" >
+      <q-icon name="sentiment_very_dissatisfied" color="warning" size="64px" class="q-mb-md" />
+      <div class="text-h1 q-mb-xs">404</div>
+      <div class="text-h5 q-mb-md">Page Not Found</div>
       <q-btn
-        class="q-py-md"
+        class="q-py-md q-mt-md"
         icon="fas fa-house"
         label="Home"
-        flat
+        color="primary"
+        unelevated
         no-caps
         size="lg"
         to="/"
       />
-    </div>
+    </q-card>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'Error-404'
-}
+<script setup>
+defineOptions({ name: 'Error-404' })
 </script>
+
+<style scoped>
+.card-center {
+  max-width: 400px;
+  margin: auto;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+</style>

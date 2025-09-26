@@ -67,14 +67,6 @@ module.exports = function(/* ctx */) {
             : '/api'
       },
 
-      vueLoaderOptions: {
-        compilerOptions: {
-          isCustomElement: (tag) => {
-            return tag.startsWith('media-')
-          }
-        }
-      },
-
       // https://quasar.dev/quasar-cli/handling-webpack
       extendWebpack(cfg) {
         cfg.module.rules.push({
@@ -142,7 +134,7 @@ module.exports = function(/* ctx */) {
 
     // animations: 'all', // --- includes all animations
     // https://quasar.dev/options/animations
-    animations: [],
+    animations: ['bounce'],
 
     // https://quasar.dev/quasar-cli/developing-ssr/configuring-ssr
     ssr: {

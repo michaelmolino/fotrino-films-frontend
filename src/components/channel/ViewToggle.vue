@@ -1,6 +1,7 @@
 <template>
     <q-btn-toggle
-        :v-model="selectedView"
+        :model-value="modelValue"
+        @update:model-value="updateModelValue"
         class="q-py-md"
         no-caps
         rounded
@@ -9,49 +10,42 @@
         color="white"
         text-color="primary"
         :options="[
-            {value: 'projects', slot: 'project'},
-            {value: 'main', slot: 'main'},
-            {value: 'all', slot: 'all'}
+            { value: 'projects', slot: 'project' },
+            { value: 'main', slot: 'main' },
+            { value: 'all', slot: 'all' }
         ]"
-        >
-        <template v-slot:project>
+    >
+        <template #project>
             <div class="row items-center no-wrap">
-            <div class="text-center">
-                Projects
-            </div>
-            <q-avatar color="accent" text-color="white" size="sm" square class="q-ml-sm">{{ projectCount }}</q-avatar>
+                <span class="text-center">Projects</span>
+                <q-avatar color="accent" text-color="white" size="sm" square class="q-ml-sm">{{ projectCount }}</q-avatar>
             </div>
         </template>
-        <template v-slot:main>
+        <template #main>
             <div class="row items-center no-wrap">
-            <div class="text-center">
-                Featured Media
-            </div>
-            <q-avatar color="accent" text-color="white" size="sm" square class="q-ml-sm">{{ mainCount }}</q-avatar>
+                <span class="text-center">Featured Media</span>
+                <q-avatar color="accent" text-color="white" size="sm" square class="q-ml-sm">{{ mainCount }}</q-avatar>
             </div>
         </template>
-        <template v-slot:all>
+        <template #all>
             <div class="row items-center no-wrap">
-            <div class="text-center">
-                All Media
-            </div>
-            <q-avatar color="accent" text-color="white" size="sm" square class="q-ml-sm">{{ allCount }}</q-avatar>
+                <span class="text-center">All Media</span>
+                <q-avatar color="accent" text-color="white" size="sm" square class="q-ml-sm">{{ allCount }}</q-avatar>
             </div>
         </template>
-        </q-btn-toggle>
+    </q-btn-toggle>
 </template>
 
-<script>
+<script setup>
+const { modelValue, projectCount, mainCount, allCount } = defineProps({
+  modelValue: String,
+  projectCount: Number,
+  mainCount: Number,
+  allCount: Number
+})
+const emit = defineEmits(['update:modelValue'])
 
-export default {
-  name: 'ViewToggle',
-
-  props: {
-    selectedView: String,
-    projectCount: Number,
-    mainCount: Number,
-    allCount: Number
-  }
-
+function updateModelValue(val) {
+  emit('update:modelValue', val)
 }
 </script>

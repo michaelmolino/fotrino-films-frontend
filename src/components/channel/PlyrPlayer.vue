@@ -15,121 +15,104 @@
     </div>
 </template>
 
-<script>
+<script setup>
+import { computed, onMounted, onBeforeUnmount, watch, ref, nextTick } from 'vue'
 import Hls from 'hls.js'
 import Plyr from 'plyr'
 import 'plyr/dist/plyr.css'
 
-export default {
-  name: 'PlyrPlayer',
-  props: {
-    media: Object,
-    artist: String
-  },
-  data() {
-    return {
-      player: {},
-      hls: {},
-      playHandler: null
-    }
-  },
-  computed: {
-    view: {
-      get() {
-        return this.media.type && this.media.type.startsWith('audio/') ? 'audio' : 'video'
-      }
-    }
-  },
-  methods: {
-    setSourceHack() {
-      this.player = new Plyr(document.getElementById('player'),
-        {
-          settings: [],
-          controls: [
-            'play-large',
-            'restart',
-            'rewind',
-            'play',
-            'fast-forward',
-            'progress',
-            'current-time',
-            'duration',
-            'mute',
-            'volume',
-            // 'captions',
-            // 'settings',
-            // 'pip',
-            'airplay',
-            // 'download',
-            'fullscreen'
-          ]
-        })
+defineOptions({ name: 'PlyrPlayer' })
 
-      if (this.view === 'video') {
-        const video = document.querySelector('video')
-        const source = this.media.src
-        if (Hls.isSupported()) {
-          this.hls = new Hls()
-          this.hls.loadSource(source)
-          this.hls.attachMedia(video)
-          window.hls = this.hls
-        } else {
-          video.src = source
-        }
-        this.player.poster = this.media.preview
-      } else {
-        const audio = document.querySelector('audio')
-        audio.src = this.media.src
-        audio.type = this.media.type
-      }
-    },
-    attachMediaSessionHandler() {
-      const el = document.getElementById('player')
-      if (!('mediaSession' in navigator) || !el) return
-      if (this.playHandler) {
-        el.removeEventListener('play', this.playHandler)
-      }
-      this.playHandler = () => {
-        navigator.mediaSession.metadata = new MediaMetadata({
-          title: this.media.title,
-          artist: this.artist,
-          artwork: [{
-            src: this.media.preview,
-            type: 'image/jpeg'
-          }]
-        })
-      }
-      el.addEventListener('play', this.playHandler, { once: true })
-    }
-  },
-  mounted() {
-    this.setSourceHack()
-    this.attachMediaSessionHandler()
-  },
-  beforeUnmount() {
-    try {
-      this.player.destroy()
-    } catch (e) {
-      //
-    }
-  },
-  updated() {
-    if (Hls.isSupported()) {
-      try {
-        this.hls.destroy()
-      } catch (e) {
-        //
-      }
-    }
-    try {
-      this.player.destroy()
-    } catch (e) {
-      //
-    }
-    this.setSourceHack()
-    this.attachMediaSessionHandler()
+const props = defineProps({
+  media: Object,
+  artist: String
+})
+
+const player = ref(null)
+const hls = ref(null)
+let playHandler = null
+
+const view = computed(() => (props.media?.type?.startsWith('audio/') ? 'audio' : 'video'))
+
+function destroyPlayers() {
+  if (Hls.isSupported() && hls.value) {
+    try { hls.value.destroy() } catch {}
+    hls.value = null
+  }
+  if (player.value) {
+    try { player.value.destroy() } catch {}
+    player.value = null
   }
 }
+
+function setSource() {
+  const el = document.getElementById('player')
+  if (!el || !props.media) return
+  player.value = new Plyr(el, {
+    settings: [],
+    controls: [
+      'play-large', 'restart', 'rewind', 'play', 'fast-forward', 'progress',
+      'current-time', 'duration', 'mute', 'volume', 'airplay', 'fullscreen'
+    ]
+  })
+
+  if (view.value === 'video') {
+    const video = el.tagName.toLowerCase() === 'video' ? el : document.querySelector('video')
+    const source = props.media.src
+    if (Hls.isSupported()) {
+      hls.value = new Hls()
+      hls.value.loadSource(source)
+      hls.value.attachMedia(video)
+      window.hls = hls.value
+    } else if (video) {
+      video.src = source
+    }
+    player.value.poster = props.media.preview
+  } else {
+    const audio = el.tagName.toLowerCase() === 'audio' ? el : document.querySelector('audio')
+    if (audio) {
+      audio.src = props.media.src
+      audio.type = props.media.type
+    }
+  }
+}
+
+function attachMediaSessionHandler() {
+  const el = document.getElementById('player')
+  if (!('mediaSession' in navigator) || !el || !props.media) return
+  if (playHandler) el.removeEventListener('play', playHandler)
+  playHandler = () => {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: props.media.title,
+      artist: props.artist,
+      artwork: [{ src: props.media.preview, type: 'image/jpeg' }]
+    })
+  }
+  el.addEventListener('play', playHandler, { once: true })
+}
+
+async function rebuild() {
+  destroyPlayers()
+  await nextTick()
+  setSource()
+  attachMediaSessionHandler()
+}
+
+onMounted(() => {
+  rebuild()
+})
+
+onBeforeUnmount(() => {
+  destroyPlayers()
+})
+
+watch(() => props.media?.id, async () => {
+  await rebuild()
+})
+
+watch(view, async () => {
+  await rebuild()
+})
 </script>
 
 <style>

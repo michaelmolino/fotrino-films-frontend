@@ -1,21 +1,21 @@
 <template>
   <div class="q-pb-md">
-    <q-card flat class="profile-card">
+    <q-card v-if="profile" flat class="profile-card">
       <q-card-section>
-        <q-img :src="profile.profile_pic" class="width250x" :ratio="1 / 1" fit="cover">
+        <q-img :src="profilePic" class="width250x" :ratio="1" fit="cover" :alt="safeName || safeEmail">
           <q-badge class="bg-accent q-pa-md" floating transparent>
-            <q-icon :name="profile.identity_provider !== 'hydra' ? 'fab fa-' + profile.identity_provider : 'fas fa-code'" />
+            <q-icon :name="providerIcon" />
           </q-badge>
           <div class="absolute-bottom text-center">
-            <div class="ellipsis">{{ profile.name }}</div>
-            <div class="ellipsis">{{ profile.email }}</div>
+            <div class="ellipsis">{{ safeName }}</div>
+            <div class="ellipsis">{{ safeEmail }}</div>
           </div>
         </q-img>
       </q-card-section>
       <q-card-section>
         <div class="flex no-wrap">
           <div class="fit">
-            <div class="ellipsis text2">Joined {{ daysSince(profile.created) }}</div>
+            <div class="ellipsis text2">Joined {{ joinedText }}</div>
             <div class="ellipsis text2">{{ mediaCount }} videos</div>
           </div>
           <div class="q-pl-sm">
@@ -26,25 +26,32 @@
         </div>
       </q-card-section>
     </q-card>
+    <q-skeleton v-else type="rect" animation="pulse" class="width250x" />
   </div>
+
 </template>
 
-<script>
-import { daysSince } from '@javascript/library.js'
+<script setup>
+import { computed } from 'vue'
+import { daysSince as _daysSince } from '@javascript/library.js'
 
-export default {
-  name: 'ProfilePhoto',
+const props = defineProps({
+  profile: { type: Object, default: null },
+  mediaCount: { type: Number, default: 0 }
+})
 
-  props: {
-    profile: Object,
-    mediaCount: Number
-  },
-  methods: {
-    daysSince(date) {
-      return daysSince(date)
-    }
+const profilePic = computed(() => props.profile?.profile_pic || undefined)
+const providerIcon = computed(() => `fab fa-${props.profile?.identity_provider}`)
+const joinedText = computed(() => {
+  const created = props.profile?.created
+  try {
+    return created ? _daysSince(created) : 'unknown'
+  } catch (e) {
+    return 'unknown'
   }
-}
+})
+const safeName = computed(() => props.profile?.name || '')
+const safeEmail = computed(() => props.profile?.email || '')
 </script>
 
 <style scoped>

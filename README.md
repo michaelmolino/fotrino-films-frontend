@@ -7,7 +7,7 @@ Fotrino Films is a video content hosting platform. It is designed for users to b
 
 This project is actively being developed and is not yet ready for use.
 
-### Tests?!
+## Tests?
 
 This project only has one developer, is not used in production, and the behaviour changes at my whim! When it is more stable I will add tests.
 

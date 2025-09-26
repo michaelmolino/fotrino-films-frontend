@@ -3,11 +3,7 @@ export function SET_CHANNELS(state, channels) {
 }
 
 export function SET_CHANNEL(state, channel) {
-  state.channel = channel
-}
-
-export function SET_HISTORY(state, history) {
-  state.history = history
+  state.channel = channel ? { ...channel } : channel
 }
 
 export function SET_UPLOAD(state, upload) {

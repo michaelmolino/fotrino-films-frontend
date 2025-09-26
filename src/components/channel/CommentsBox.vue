@@ -1,120 +1,84 @@
 <template>
   <q-card flat bordered class="comments">
     <q-card-section>
-      <div id="commentBoxContainer" class="hidden"></div>
-      <div id = "loggedOutComments" class="hidden">
-        <span v-if="commentCount === 1">This media has a comment! </span>
-        <span v-if="commentCount > 1">This media has {{ commentCount }} comments! </span>
-        You must be logged in to view or post comments.
+      <div id="commentBoxContainer" v-if="loggedIn"></div>
+      <div id="loggedOutComments" v-if="!loggedIn" class="q-pa-md text-center">
+        <q-icon name="comment" color="grey-6" size="24px" class="q-mb-sm" />
+        <div class="text-caption text-grey-7 q-mt-sm">You must be logged in to view or post comments.</div>
       </div>
     </q-card-section>
   </q-card>
 </template>
 
-<script>
+<script setup>
+const emit = defineEmits(['logout'])
+import { ref, watch, computed, nextTick } from 'vue'
+import { useQuasar } from 'quasar'
+import { useStore } from 'vuex'
 import commentBox from 'commentbox.io'
-import { mapActions } from 'vuex'
 
-export default {
-  name: 'CommentsBox',
+const props = defineProps({
+  loggedIn: Boolean,
+  privateId: String
+})
 
-  props: {
-    loggedIn: Boolean,
-    privateId: String
-  },
+const $q = useQuasar()
+const store = useStore()
+const commentCount = ref(0)
+const commentboxInstance = process.env.NODE_ENV === 'development' ? '5670497807237120-proj' : '5692452404985856-proj'
+const darkMode = computed(() => $q.dark.isActive)
 
-  data() {
-    return {
-      commentboxInstance: process.env.NODE_ENV === 'development' ? '5670497807237120-proj' : '5692452404985856-proj',
-      commentCount: 0
-    }
-  },
-
-  computed: {
-    darkMode: {
-      get() {
-        return this.$q.dark.isActive
-      }
-    }
-  },
-
-  methods: {
-    ...mapActions('account', ['getCommentboxToken']),
-
-    clearOldCommentBox(old) {
-      const div = document.getElementById(old)
-      if (div) {
-        div.remove()
-      }
-    },
-
-    initCommentBox(dark) {
-      const container = document.getElementById('commentBoxContainer')
-      container.classList.remove('hidden')
-
-      const loggedOutDiv = document.getElementById('loggedOutComments')
-      loggedOutDiv.classList.add('hidden')
-
-      const newDiv = document.createElement('div')
-      newDiv.id = this.privateId
-      newDiv.className = 'commentbox'
-      container.appendChild(newDiv)
-
-      commentBox(this.commentboxInstance, {
-        textColor: dark ? '#fff' : '#000',
-        createBoxUrl(boxId, pageLocation) {
-          pageLocation.href = window.location.origin + '/private/' + boxId
-          pageLocation.search = ''
-          return pageLocation.href
-        },
-        onCommentCount: (count) => {
-          this.commentCount = Number(count) || 0
-          if (!this.loggedIn) {
-            container.classList.add('hidden')
-            loggedOutDiv.classList.remove('hidden')
-          }
-        },
-        singleSignOn: {
-          autoSignOn: true,
-          onSignOn: (onComplete, onError) => {
-            this.getCommentboxToken()
-              .then(token => {
-                onComplete(token)
-              })
-              .catch(err => {
-                onError(err)
-              })
-          },
-          onSignOut: () => {
-            this.$emit('logout')
-          }
-        }
-      })
-    }
-  },
-
-  watch: {
-    privateId: {
-      immediate: true,
-      handler(newVal, oldVal) {
-        this.clearOldCommentBox(oldVal)
-        this.$nextTick(() => {
-          this.initCommentBox(this.darkMode)
-        })
-      }
-    },
-
-    darkMode: {
-      immediate: false,
-      handler(newVal) {
-        this.clearOldCommentBox(this.privateId)
-        this.$nextTick(() => {
-          this.initCommentBox(newVal)
-        })
-      }
-    }
-  }
+function clearOldCommentBox(old) {
+  const div = document.getElementById(old)
+  if (div) div.remove()
 }
+
+function initCommentBox(dark) {
+  const container = document.getElementById('commentBoxContainer')
+  if (!container) return
+
+  const newDiv = document.createElement('div')
+  newDiv.id = props.privateId
+  newDiv.className = 'commentbox'
+  container.appendChild(newDiv)
+
+  commentBox(commentboxInstance, {
+    textColor: dark ? '#fff' : '#000',
+    createBoxUrl(boxId, pageLocation) {
+      pageLocation.href = window.location.origin + '/private/' + boxId
+      pageLocation.search = ''
+      return pageLocation.href
+    },
+    onCommentCount: (count) => {
+      commentCount.value = Number(count) || 0
+    },
+    singleSignOn: {
+      autoSignOn: true,
+      onSignOn: (onComplete, onError) => {
+        store.dispatch('account/getCommentboxToken')
+          .then(token => onComplete(token))
+          .catch(err => onError(err))
+      },
+      onSignOut: () => {
+        emit('logout')
+      }
+    }
+  })
+}
+
+watch(() => props.privateId, (newVal, oldVal) => {
+  clearOldCommentBox(oldVal)
+  nextTick(() => {
+    initCommentBox(darkMode.value)
+  })
+}, { immediate: true })
+
+watch(darkMode, (newVal) => {
+  clearOldCommentBox(props.privateId)
+  nextTick(() => {
+    initCommentBox(newVal)
+  })
+})
 </script>
 
 <style scoped>
@@ -122,10 +86,7 @@ export default {
   width: 100%;
   max-width: 720px;
   min-width: 240px;
-}
-
-.hidden {
-  height: 0;
-  overflow: hidden;
+  background: var(--q-color-grey-1);
+  border-radius: 8px;
 }
 </style>

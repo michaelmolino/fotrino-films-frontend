@@ -1,135 +1,128 @@
 <template>
-  <div v-if="channel?.uuid === $route.params.uuid && project" class="q-pa-md">
+  <div class="q-pa-md">
+    <template v-if="channel?.uuid === route.params.uuid && project">
+      <BreadCrumbs
+        :channel="channel"
+        :project="project"
+        :media="media?.main ? null : media"
+        :private="!!route.params.privateId"
+      />
 
-    <BreadCrumbs
-      :channel="channel"
-      :project="project"
-      :media="media?.main ? null : media"
-      :private="$route.params.privateId ? true : false"
-    />
+      <NothingText v-if="!route.params.privateId && (project.media?.length || 0) === 0"></NothingText>
 
-    <NothingText v-if="project.media?.length === 0" />
+      <template v-else>
+        <PlyrPlayer
+          v-if="media"
+          :media="media"
+          :artist="channel?.ownername"
+          class="q-py-md plyrplayer"
+        />
 
-    <span v-if="project.media?.length > 0 || project.media.private_id">
-      <PlyrPlayer :media="media" :artist="channel.ownername" class="q-py-md plyrplayer" />
+        <MediaDescription v-if="media" :media="media" />
 
-      <MediaDescription :media="media" />
+        <CommentsBox
+          :loggedIn="!!profile?.id"
+          :privateId="media?.private_id"
+          class="q-my-md"
+          @logout="logout"
+        />
 
-      <CommentsBox :loggedIn="!!profile.id" :privateId="media.private_id" class="q-my-md" @logout="logout" />
-
-      <span v-if="$route.params.uuid && project.media?.filter(ch => ch.id !== media.id)?.length > 0">
-        <div class="q-pt-md text-h6">
-          Related Content
-        </div>
-        <div class="row">
-          <div
-            class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm"
-            v-for="media in project.media?.filter(ch => ch.id !== media.id)"
-            :key="media.id"
-          >
-            <MediaPreview
-              :channel="channel"
-              :project="project"
-              :media="media"
-              :to="'/' + channel.uuid + '/' + channel.slug + '/' + project.slug + '/' + media.slug"
-            />
+        <template v-if="hasRelatedContent">
+          <div class="q-pt-md text-h6">Related Content</div>
+          <div class="row">
+            <div
+              v-for="related in relatedMedia"
+              :key="related.id"
+              class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm"
+            >
+              <MediaPreview
+                :channel="channel"
+                :project="project"
+                :media="related"
+                :to="`/${channel.uuid}/${channel.slug}/${project.slug}/${related.slug}`"
+              />
+            </div>
           </div>
-        </div>
-      </span>
-    </span>
+        </template>
+      </template>
+    </template>
 
+    <template v-else>
+      <q-skeleton type="rect" class="q-mb-md skeleton-large" />
+      <q-skeleton type="text" width="60%" />
+      <q-skeleton type="text" width="40%" />
+    </template>
   </div>
 </template>
 
-<script>
-import { defineAsyncComponent } from 'vue'
+<script setup>
+import BreadCrumbs from '@components/channel/BreadCrumbs.vue'
+import MediaPreview from '@components/channel/MediaPreview.vue'
+import PlyrPlayer from '@components/channel/PlyrPlayer.vue'
+import MediaDescription from '@components/channel/MediaDescription.vue'
+import CommentsBox from '@components/channel/CommentsBox.vue'
+import { computed, watch, defineAsyncComponent, toRef } from 'vue'
+import { useStore } from 'vuex'
+import { useRoute, useRouter } from 'vue-router'
+const NothingText = defineAsyncComponent(() => import('@components/shared/NothingText.vue'))
+const store = useStore()
+const route = useRoute()
+const router = useRouter()
 
-export default {
-  name: 'ProjectRoot',
+const profile = computed(() => store.state.account.profile)
+const channel = toRef(store.state.channel, 'channel')
 
-  components: {
-    BreadCrumbs: defineAsyncComponent(() =>
-      import('@components/channel/BreadCrumbs.vue')
-    ),
-    MediaPreview: defineAsyncComponent(() =>
-      import('@components/channel/MediaPreview.vue')
-    ),
-    PlyrPlayer: defineAsyncComponent(() =>
-      import('@components/channel/PlyrPlayer.vue')
-    ),
-    MediaDescription: defineAsyncComponent(() =>
-      import('@components/channel/MediaDescription.vue')
-    ),
-    CommentsBox: defineAsyncComponent(() =>
-      import('@components/channel/CommentsBox.vue')
-    ),
-    NothingText: defineAsyncComponent(() =>
-      import('@components/shared/NothingText.vue')
-    )
-  },
-
-  computed: {
-    profile: {
-      get() {
-        return this.$store.state.account.profile
-      }
-    },
-    channel: {
-      get() {
-        return this.$store.state.channel.channel
-      }
-    },
-    project: {
-      get() {
-        let _project = null
-        if (this.$route.params.uuid) {
-          _project = this.channel?.projects.find(
-            m => m.slug === this.$route.params.projectSlug
-          )
-        } else if (this.$route.params.privateId) {
-          _project = this.channel?.project
-        }
-        if (this.channel && !_project) {
-          this.$router.replace('/404')
-        }
-        return _project
-      }
-    },
-    media: {
-      get() {
-        let _media = null
-        if (this.$route.params.uuid) {
-          if (this.$route.params.mediaSlug) {
-            _media = this.project?.media.find(
-              ch => ch.slug === this.$route.params.mediaSlug
-            )
-          } else {
-            _media = this.project?.media.find(ch => ch.main) || this.project?.media[0]
-            this.$router.replace({
-              params: { mediaSlug: _media?.slug }
-            })
-          }
-        } else if (this.$route.params.privateId) {
-          _media = this.channel.project.media
-        }
-        if (this.channel && this.project && this.project.media.length > 0 && !_media) {
-          this.$router.replace('/404')
-        }
-        return _media
-      }
-    }
-  },
-  methods: {
-    logout() {
-      fetch('/api/account/logout', {
-        method: 'GET'
-      })
-        .then(() => {
-          this.$store.dispatch('account/getProfile')
-        })
-    }
+const project = computed(() => {
+  // Find project by slug if uuid is present
+  if (route.params.uuid) {
+    return channel.value?.projects?.find(p => p.slug === route.params.projectSlug) || null
   }
+  // For privateId, use channel.project
+  if (route.params.privateId && channel.value) {
+    return channel.value?.project || null
+  }
+  return null
+})
+
+const media = computed(() => {
+  const p = project.value
+  if (!p) return null
+  if (route.params.privateId) return p.media || null
+  if (route.params.mediaSlug) {
+    return p.media?.find(m => m.slug === route.params.mediaSlug) || null
+  }
+  // Default: main media or first
+  return p.media?.find(m => m.main) || p.media?.[0] || null
+})
+
+const relatedMedia = computed(() => {
+  return (project.value?.media || []).filter(m => m.id !== media.value?.id)
+})
+const hasRelatedContent = computed(() => !!route.params.uuid && relatedMedia.value.length > 0)
+
+function redirect(pathOrObj) {
+  setTimeout(() => router.replace(pathOrObj), 0)
 }
+
+function logout() {
+  fetch('/api/account/logout')
+    .then(() => store.dispatch('account/getProfile'))
+    .catch(err => console.error('Logout failed:', err))
+}
+
+watch(project, (newProject) => {
+  if (channel.value && !newProject && route.params.uuid) {
+    redirect('/404')
+  }
+}, { immediate: true })
+
+watch(media, (newMedia) => {
+  if (channel.value && project.value && (project.value.media?.length || 0) > 0 && !newMedia) {
+    redirect('/404')
+  } else if (newMedia && !route.params.mediaSlug) {
+    redirect({ params: { ...route.params, mediaSlug: newMedia.slug } })
+  }
+}, { immediate: true })
 </script>
 
 <style scoped>
@@ -137,5 +130,11 @@ export default {
   width: 100%;
   max-width: 720px;
   min-width: 240px;
+}
+
+.skeleton-large {
+  width: 100%;
+  max-width: 720px;
+  height: 406px;
 }
 </style>

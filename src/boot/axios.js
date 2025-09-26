@@ -3,30 +3,43 @@ import axios from 'axios'
 import axiosRetry from 'axios-retry'
 import { Notify, Loading } from 'quasar'
 
-const api = axios.create({ baseURL: process.env.API })
-axiosRetry(api, {
-  retries: 6,
-  retryDelay: axiosRetry.exponentialDelay,
-  retryCondition: (error) => {
-    return ![400, 401, 402, 403, 404, 409, 500, 501].includes(error.response.status)
+const shouldRetryApi = (error) => {
+  const status = error?.response?.status
+  if (status == null) {
+    return axiosRetry.isNetworkOrIdempotentRequestError(error)
   }
-})
+  return ![400, 401, 402, 403, 404, 409, 500, 501].includes(status)
+}
+
+const shouldRetryObjects = (error) => {
+  const status = error?.response?.status
+  return axiosRetry.isNetworkOrIdempotentRequestError(error) || status === 408
+}
+
+const api = axios.create({ baseURL: process.env.API })
+axiosRetry(api, { retries: 6, retryDelay: axiosRetry.exponentialDelay, retryCondition: shouldRetryApi })
 
 const objectApi = axios.create()
-axiosRetry(objectApi, {
-  retries: 6,
-  retryDelay: axiosRetry.exponentialDelay,
-  retryCondition: (error) => {
-    return axiosRetry.isNetworkOrIdempotentRequestError(error) || error.response.status === 408
-  }
-})
+axiosRetry(objectApi, { retries: 6, retryDelay: axiosRetry.exponentialDelay, retryCondition: shouldRetryObjects })
 
 export default boot(({ app, router, store }) => {
+  // Track concurrent requests to avoid hiding the loader too early
+  let pending = 0
+  const showLoader = () => { if (pending === 0) Loading.show(); pending++ }
+  const hideLoader = () => { pending = Math.max(0, pending - 1); if (pending === 0) Loading.hide() }
+
   api.interceptors.request.use(req => {
-    if (['post', 'put', 'delete'].includes(req.method)) {
-      req.headers['X-CSRFToken'] = store.state.account.profile.csrf_token
+    const method = (req.method || '').toLowerCase()
+    // Attach CSRF only when available and required
+    if (['post', 'put', 'delete'].includes(method)) {
+      const token = store?.state?.account?.profile?.csrf_token
+      if (token) {
+        req.headers['X-CSRFToken'] = token
+      }
     }
-    if (req.method === 'delete') {
+
+    if (method === 'delete') {
+      // Confirm destructive action, optionally cancel the request
       return new Promise((resolve, reject) => {
         Notify.create({
           type: 'negative',
@@ -36,64 +49,60 @@ export default boot(({ app, router, store }) => {
           icon: 'fas fa-info',
           multiLine: true,
           actions: [
-            { icon: 'fas fa-circle-exclamation', label: 'Confirm delete', color: 'white', handler: () => { Loading.show(); resolve(req) } },
-            { icon: 'fas fa-rotate-left', label: 'Go Back', color: 'white', handler: () => { /* Do Nothing */ } }
+            { icon: 'fas fa-circle-exclamation', label: 'Confirm delete', color: 'white', handler: () => { showLoader(); resolve(req) } },
+            { icon: 'fas fa-rotate-left', label: 'Go Back', color: 'white', handler: () => { reject(new axios.Cancel('User cancelled delete')) } }
           ]
         })
       })
-    } else {
-      Loading.show()
-      return req
     }
+
+    showLoader()
+    return req
   })
 
   api.interceptors.response.use(
-    function(response) {
-      Loading.hide()
+    (response) => {
+      hideLoader()
       return response
     },
+    (error) => {
+      hideLoader()
 
-    function(error) {
-      Loading.hide()
+      const status = error?.response?.status
+      const url = error?.response?.config?.url
+
+      // Special case: allow SSO (commentbox) to handle 401 itself
+      if (status === 401 && url?.endsWith('/sso/commentbox')) {
+        return Promise.resolve(error.response)
+      }
+
+      if (status === 404) {
+        router.replace('/404')
+        return Promise.reject(error)
+      }
+      if (status === 409) {
+        router.replace('/409')
+        return Promise.reject(error)
+      }
 
       let msg = 'Something went wrong!'
-      const actions = [{ label: 'Dismiss', color: 'white' }]
-      switch (error.response?.status) {
-        case 400:
-          msg = error.response.data
-          break
-        case 401:
-          if (error.response.config.url.endsWith('/sso/commentbox')) {
-            return error.response
-          }
-          msg = 'Unauthorised.  Please login.'
-          router.replace('/')
-          break
-        case 402:
-          msg = 'You have exceeded a limit for your account type.'
-          break
-        case 403:
-          msg = 'Forbidden.'
-          break
-        case 404:
-          router.replace('/404')
-          return Promise.reject(error)
-        case 409:
-          router.replace('/409')
-          return Promise.reject(error)
-        case 501:
-          msg = 'Not yet implemented.'
-          break
-      }
+      if (status === 400) msg = error?.response?.data || msg
+      else if (status === 401) msg = 'Unauthorised. Please login.'
+      else if (status === 402) msg = 'You have exceeded a limit for your account type.'
+      else if (status === 403) msg = 'Forbidden.'
+      else if (status === 501) msg = 'Not yet implemented.'
 
       Notify.create({
         type: 'negative',
         timeout: 0,
         message: msg,
         icon: 'fas fa-triangle-exclamation',
-        multiLine: false,
-        actions: actions
+        actions: [{ label: 'Dismiss', color: 'white' }]
       })
+
+      if (status === 401) {
+        router.replace('/')
+      }
 
       return Promise.reject(error)
     }
