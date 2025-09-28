@@ -92,15 +92,15 @@ module.exports = function (/* ctx */) {
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
     devServer: {
       https: true,
-      host: 'fotrino.app',
-      port: 8081,
+      host: 'fotrino.example.com',
+      port: 8080,
       open: true, // opens browser window automatically
 
       // backend
       proxy: [
         {
           context: ['/api'],
-          target: 'https://127.0.0.1:65443/',
+          target: 'https://fotrino.example.com:65443/',
           secure: false
         }
       ]
