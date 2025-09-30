@@ -87,7 +87,7 @@
           no-caps
           align="left"
           icon="fas fa-circle-half-stroke"
-          label="Auto"
+          label="System"
           size="md"
           class="fit"
           @click="setDarkMode('auto')"

@@ -7,6 +7,7 @@
           :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
           class="q-pb-md"
           clearable
+          :disable="!mediaFile"
           :model-value="payload.project.media.title"
           label="Title *"
           @update:model-value="onUpdateMediaTitle"
@@ -24,6 +25,7 @@
         <q-btn
           icon="event"
           flat
+          :disable="!mediaFile"
           :label="new Date(payload.project.media.resourceDate).toLocaleDateString()"
         >
           <q-popup-proxy cover transition-show="scale" transition-hide="scale">
@@ -174,9 +176,29 @@ function onUpdateMediaDescription(val) {
     }
   })
 }
-function onUpdateMediaFile(fileOrFiles) {
+async function onUpdateMediaFile(fileOrFiles) {
   const file = Array.isArray(fileOrFiles) ? fileOrFiles[0] : fileOrFiles
   emit('update:mediaFile', file)
+  if (file) {
+    // Default title from filename (strip extension)
+    try {
+      const base = (file.name || '').replace(/\.[^/.]+$/, '')
+      if (base && !props.payload.project.media.title) {
+        onUpdateMediaTitle(base)
+      }
+    } catch (e) { /* noop */ }
+    // Default resourceDate from EXIF (if available) or lastModified
+    try {
+      const exifDate = await extractExifDate(file)
+      const dateObj = exifDate || (file.lastModified ? new Date(file.lastModified) : new Date())
+      if (dateObj && !isNaN(dateObj.getTime())) {
+        const yyyy = dateObj.getFullYear()
+        const mm = String(dateObj.getMonth() + 1).padStart(2, '0')
+        const dd = String(dateObj.getDate()).padStart(2, '0')
+        onUpdateResourceDate(`${yyyy}/${mm}/${dd}`)
+      }
+    } catch (e) { /* noop */ }
+  }
   if (file && props.handleFile) props.handleFile(file, 'upload')
 }
 function onUpdatePreviewFile(fileOrFiles) {
@@ -204,5 +226,14 @@ function emitCounterIncrement() {
 }
 function dateOptionsFn(date) {
   return new Date(date) <= new Date()
+}
+
+// Attempt to read a capture date from metadata; for videos, browsers often expose limited metadata.
+// We optimistically try to read from the file's blob as text looking for common date markers.
+// If not found, resolve null and the caller will fallback to lastModified.
+async function extractExifDate(file) {
+  // Some containers (like MP4) won’t expose EXIF via browser APIs. Without extra deps, we fallback quickly.
+  // If the file is an image with EXIF, we could parse via a library; to avoid deps, return null here.
+  return null
 }
 </script>

@@ -19,43 +19,13 @@
       :vertical="$q.screen.lt.md"
       header-nav
     >
-      <q-step :name="1" title="Channel" icon="fas fa-video" :done="step > 1" :header-nav="false">
-        <ChannelStep
-          :payload="payload"
-          :channels="channels"
-          :profile="profile"
-          :coverFile="coverFile"
-          :coverThumb="coverThumb"
-          :handleFile="handleFile"
-          @update:payload="p => Object.assign(payload, p)"
-          @update:coverFile="updateCoverFile"
-        />
-      </q-step>
-
+      <!-- Step 1: Media first -->
       <q-step
-        :name="2"
-        title="Project"
-        icon="fas fa-film"
-        :done="step > 2"
-        :header-nav="step === 1 && !!next"
-      >
-        <ProjectStep
-          :payload="payload"
-          :projects="projects"
-          :project="project"
-          :posterFile="posterFile"
-          :handleFile="handleFile"
-          @update:payload="p => Object.assign(payload, p)"
-          @update:posterFile="updatePosterFile"
-        />
-      </q-step>
-
-      <q-step
-        :name="3"
+        :name="1"
         title="Media"
         icon="fas fa-file-video"
-        :done="step > 3"
-        :header-nav="step === 2 && !!next"
+        :done="step > 1"
+        :header-nav="false"
       >
         <MediaStep
           :payload="payload"
@@ -68,6 +38,39 @@
           @update:mediaFile="updateMediaFile"
           @update:previewFile="updatePreviewFile"
           @increment:counter="incrementCounter"
+        />
+      </q-step>
+
+      <!-- Step 2: Channel -->
+      <q-step :name="2" title="Channel" icon="fas fa-video" :done="step > 2" :header-nav="step === 1 && !!next">
+        <ChannelStep
+          :payload="payload"
+          :channels="channels"
+          :profile="profile"
+          :coverFile="coverFile"
+          :coverThumb="coverThumb"
+          :handleFile="handleFile"
+          @update:payload="p => Object.assign(payload, p)"
+          @update:coverFile="updateCoverFile"
+        />
+      </q-step>
+
+      <!-- Step 3: Project -->
+      <q-step
+        :name="3"
+        title="Project"
+        icon="fas fa-film"
+        :done="step > 3"
+        :header-nav="step === 2 && !!next"
+      >
+        <ProjectStep
+          :payload="payload"
+          :projects="projects"
+          :project="project"
+          :posterFile="posterFile"
+          :handleFile="handleFile"
+          @update:payload="p => Object.assign(payload, p)"
+          @update:posterFile="updatePosterFile"
         />
       </q-step>
 
@@ -109,6 +112,14 @@
       <template v-slot:navigation>
         <q-stepper-navigation>
           <q-btn
+            v-if="step === 1 && quickUploadAvailable"
+            icon="fas fa-bolt"
+            flat
+            label="Quick Upload"
+            @click="quickUpload"
+            :disabled="!next"
+          />
+          <q-btn
             v-if="step < 3"
             icon="fas fa-arrow-right"
             flat
@@ -134,21 +145,16 @@
       </template>
     </q-stepper>
   </div>
-  <div v-else>
-    <NothingText text="You must be logged in to see this page" />
+  <div v-else class="q-pa-md">
+    <q-skeleton type="rect" class="q-mb-md" height="56px" />
+    <q-skeleton type="rect" class="q-mb-md" height="300px" />
+    <q-skeleton type="text" width="70%" />
+    <q-skeleton type="text" width="50%" />
   </div>
 </template>
 
 <script setup>
-import {
-  ref,
-  reactive,
-  computed,
-  watch,
-  onMounted,
-  onBeforeUnmount,
-  defineAsyncComponent
-} from 'vue'
+import { ref, reactive, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useStore } from 'vuex'
 import { onBeforeRouteLeave } from 'vue-router'
 import ChannelStep from './UploadMedia/ChannelStep.vue'
@@ -156,7 +162,6 @@ import ProjectStep from './UploadMedia/ProjectStep.vue'
 import MediaStep from './UploadMedia/MediaStep.vue'
 import { Notify } from 'quasar'
 import { objectApi } from 'boot/axios'
-const NothingText = defineAsyncComponent(() => import('@components/shared/NothingText.vue'))
 import { useFileProcessor } from '@composables/useFileProcessor.js'
 
 // refs & reactive state
@@ -356,62 +361,107 @@ const media = computed(() => {
 
 const next = computed(() => {
   switch (step.value) {
-    case 1:
+    case 1: // Media
+      return (
+        !!payload.project?.media?.title &&
+        !!mediaFile.value &&
+        ((payload.project.media.previewType === 'new' && !!previewFile.value) ||
+          (payload.project.media.previewType === 'frame' && !!previewThumbRandom.value))
+      )
+    case 2: // Channel
       return (
         payload.uuid !== null &&
         (!!payload.uuid?.value ||
           (!!payload.title && (!!coverFile.value || payload.coverType === 'profile')))
       )
-    case 2:
+    case 3: // Project
       return (
         payload.project.id !== null &&
         (!!payload.project.id?.value ||
           (!!payload.project.title &&
             (!!posterFile.value || payload.project.posterType === 'default')))
       )
-    case 3:
-      return (
-        !!payload.project.media.title &&
-        !!mediaFile.value &&
-        ((payload.project.media.previewType === 'new' && !!previewFile.value) ||
-          (payload.project.media.previewType === 'frame' && !!previewThumbRandom.value))
-      )
     default:
       return false
   }
 })
 
+const quickUploadAvailable = computed(() => {
+  const ch = channels.value || []
+  if (ch.length === 0) return true
+  if (ch.length === 1) {
+    const p = projects.value || []
+    return p.length <= 1
+  }
+  return false
+})
+
+async function quickUpload() {
+  try {
+    // Ensure media step is valid (we only show button when on step 1)
+    if (!next.value) return
+    // Resolve channel selection: use the single existing or set to New (0)
+    const ch = channels.value || []
+    if (ch.length === 1) {
+      payload.uuid = { value: ch[0].uuid, label: ch[0].title }
+    } else if (ch.length === 0) {
+      payload.uuid = { value: 0, label: 'New...' }
+    }
+    // Resolve projects if channel exists
+    projects.value = []
+    if (payload.uuid && payload.uuid.value && payload.uuid.value !== 0) {
+      const chan = await store.cache.dispatch('channel/getChannel', { uuid: payload.uuid.value, pending: true })
+      projects.value = chan.projects || []
+    }
+    // Select or create project
+    if (projects.value.length === 1) {
+      const p = projects.value[0]
+      payload.project.id = { value: p.id, label: p.title }
+    } else {
+      payload.project.id = { value: 0, label: 'New...' }
+    }
+    // Jump directly to Upload step (4)
+    step.value = 4
+  } catch (err) {
+    console.error('Quick upload setup failed:', err)
+    Notify.create({ type: 'negative', message: 'Quick upload failed to initialize.' })
+  }
+}
+
 // watchers
 watch(channels, ch => {
-  if (ch.length === 0 && step.value === 1) payload.uuid = { value: 0, label: 'New...' }
-  if (ch.length === 1 && step.value === 1) {
+  if (ch.length === 0 && step.value === 2) payload.uuid = { value: 0, label: 'New...' }
+  if (ch.length === 1 && step.value === 2) {
     payload.uuid = ch.map(({ uuid, title }) => ({ value: uuid, label: title }))[0]
+  }
+  // Keep projects in sync for quick upload checks
+  if (ch.length === 1) {
+    loadProjectsForChannelUuid(ch[0].uuid)
+  } else {
+    projects.value = []
   }
 })
 
 watch(projects, p => {
-  if (p.length === 0 && step.value === 2) payload.project.id = { value: 0, label: 'New...' }
-  if (p.length === 1 && step.value === 2) {
+  if (p.length === 0 && step.value === 3) payload.project.id = { value: 0, label: 'New...' }
+  if (p.length === 1 && step.value === 3) {
     payload.project.id = p.map(({ id, title }) => ({ value: id, label: title }))[0]
   }
 })
 
 watch(step, s => {
-  if (s === 2 && payload.uuid.value !== 0) {
+  if (s === 3 && payload.uuid?.value !== 0 && payload.uuid?.value) {
     store.cache
       .dispatch('channel/getChannel', { uuid: payload.uuid.value, pending: true })
       .then(ch => {
         projects.value = ch.projects
         if (projects.value.length === 0) payload.project.id = { value: 0, label: 'New...' }
         if (projects.value.length === 1) {
-          payload.project.id = projects.value.map(({ id, title }) => ({
-            value: id,
-            label: title
-          }))[0]
+          payload.project.id = projects.value.map(({ id, title }) => ({ value: id, label: title }))[0]
         }
       })
   } else {
-    if (projects.value.length === 0) payload.project.id = { value: 0, label: 'New...' }
+    if (projects.value.length === 0 && s === 3) payload.project.id = { value: 0, label: 'New...' }
   }
   if (s === 4) factoryUpload()
 })
@@ -531,18 +581,35 @@ async function factoryUpload() {
 // Step-specific helpers live in the step components now
 
 // lifecycle
-onMounted(() => {
-  store.dispatch('channel/getChannels')
-  const beforeUnloadHandler = event => {
-    if (isUploading.value) {
-      event.preventDefault()
-      event.returnValue = ''
-    }
+async function loadProjectsForChannelUuid(uuid) {
+  try {
+    const chan = await store.cache.dispatch('channel/getChannel', { uuid, pending: true })
+    projects.value = chan?.projects || []
+  } catch (err) {
+    console.error('Failed to load channel projects:', err)
+    projects.value = []
+  }
+}
+
+const beforeUnloadHandler = event => {
+  if (isUploading.value) {
+    event.preventDefault()
+    event.returnValue = ''
+  }
+}
+
+onMounted(async () => {
+  await store.dispatch('channel/getChannels')
+  const list = store.state.channel.channels || []
+  if (list.length === 1) {
+    await loadProjectsForChannelUuid(list[0].uuid)
+  } else {
+    projects.value = []
   }
   window.addEventListener('beforeunload', beforeUnloadHandler)
-  // cleanup reference
-  onBeforeUnmount(() => window.removeEventListener('beforeunload', beforeUnloadHandler))
 })
+
+onBeforeUnmount(() => window.removeEventListener('beforeunload', beforeUnloadHandler))
 
 // route guard
 onBeforeRouteLeave((to, from, next) => {

@@ -70,26 +70,31 @@ const profile = computed(() => store.state.account.profile)
 const channel = toRef(store.state.channel, 'channel')
 
 const project = computed(() => {
+  let p
   // Find project by slug if uuid is present
   if (route.params.uuid) {
-    return channel.value?.projects?.find(p => p.slug === route.params.projectSlug) || null
+    p = channel.value?.projects?.find(p => p.slug === route.params.projectSlug) || null
   }
   // For privateId, use channel.project
   if (route.params.privateId && channel.value) {
-    return channel.value?.project || null
+    p = channel.value?.project || null
   }
-  return null
+  if (!p && channel.value) redirect('/404')
+  return p
 })
 
 const media = computed(() => {
   const p = project.value
   if (!p) return null
-  if (route.params.privateId) return p.media || null
-  if (route.params.mediaSlug) {
-    return p.media?.find(m => m.slug === route.params.mediaSlug) || null
+  let m
+  if (route.params.privateId) m = p.media || null
+  else if (route.params.mediaSlug) {
+    m = p.media?.find(m => m.slug === route.params.mediaSlug) || null
+  } else {
+    m = p.media?.find(m => m.main) || p.media?.[0] || null
   }
-  // Default: main media or first
-  return p.media?.find(m => m.main) || p.media?.[0] || null
+  if (!m) redirect('/404')
+  return m
 })
 
 const relatedMedia = computed(() => {

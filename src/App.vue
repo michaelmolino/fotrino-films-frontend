@@ -63,7 +63,7 @@ export default {
         metaData.value = getMetaData(route, channel)
       } catch {
         metaData.value = getMetaData(null, null)
-        store.commit('channel/setChannelState', null)
+        store.commit('channel/SET_CHANNEL', null)
       }
     }
 
