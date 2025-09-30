@@ -2,6 +2,22 @@
   <div>
     <div class="row">
       <div class="col-xs-12 col-md-6 q-pa-sm">
+        <q-file
+          label="Media (Video) *"
+          outlined
+          :model-value="mediaFile"
+          accept="video/*"
+          max-file-size="5368709120"
+          class="q-pb-md"
+          color="accent"
+          @update:model-value="onUpdateMediaFile">
+          <template v-slot:prepend>
+            <q-icon name="movie" @click.stop.prevent />
+          </template>
+          <template v-slot:append>
+            <q-icon name="close" @click.stop.prevent="emitUpdateMediaNull" class="cursor-pointer" />
+          </template>
+        </q-file>
         <q-input
           outlined
           :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
@@ -10,8 +26,7 @@
           :disable="!mediaFile"
           :model-value="payload.project.media.title"
           label="Title *"
-          @update:model-value="onUpdateMediaTitle"
-        />
+          @update:model-value="onUpdateMediaTitle" />
         <q-input
           outlined
           autogrow
@@ -20,21 +35,18 @@
           clearable
           :model-value="payload.project.media.description"
           label="Description - p, br, strong, and i tags allowed"
-          @update:model-value="onUpdateMediaDescription"
-        />
+          @update:model-value="onUpdateMediaDescription" />
         <q-btn
           icon="event"
           flat
           :disable="!mediaFile"
-          :label="new Date(payload.project.media.resourceDate).toLocaleDateString()"
-        >
+          :label="new Date(payload.project.media.resourceDate).toLocaleDateString()">
           <q-popup-proxy cover transition-show="scale" transition-hide="scale">
             <q-date
               :model-value="payload.project.media.resourceDate"
               subtitle="Capture Date"
               :options="dateOptionsFn"
-              @update:model-value="onUpdateResourceDate"
-            >
+              @update:model-value="onUpdateResourceDate">
               <div class="row items-center justify-end q-gutter-sm">
                 <q-btn label="Cancel" flat v-close-popup />
                 <q-btn label="OK" flat v-close-popup />
@@ -44,6 +56,38 @@
           <q-tooltip>Capture Date</q-tooltip> </q-btn
         ><br />
         <q-checkbox outlined v-model="localMain" label="Featured" class="q-pb-md q-pl-sm" />
+        <br />
+        <q-radio
+          class="q-pl-sm"
+          v-model="localPreviewType"
+          val="frame"
+          label="Video Frame"
+          color="accent" /><br />
+        <q-radio
+          class="q-pl-sm"
+          v-model="localPreviewType"
+          val="new"
+          label="Upload Photo"
+          color="accent" />
+        <q-file
+          v-if="localPreviewType === 'new'"
+          label="Media Preview (Image)"
+          outlined
+          :model-value="previewFile"
+          accept="image/*"
+          class="q-pb-md"
+          color="accent"
+          @update:model-value="onUpdatePreviewFile">
+          <template v-slot:prepend>
+            <q-icon name="image" @click.stop.prevent />
+          </template>
+          <template v-slot:append>
+            <q-icon
+              name="close"
+              @click.stop.prevent="emitUpdatePreviewNull"
+              class="cursor-pointer" />
+          </template>
+        </q-file>
         <div class="row">
           <div class="width250x">
             <MediaPreview :media="media" />
@@ -56,67 +100,12 @@
               icon="fas fa-arrows-rotate"
               flat
               size="xl"
-              @click="emitCounterIncrement"
-            />
+              @click="emitCounterIncrement" />
             <span v-if="payload.project.media.previewType === 'frame' && mediaFile"
-              >refresh thumbnail</span
+              >Refresh Thumbnail</span
             >
           </div>
         </div>
-      </div>
-      <div class="col-xs-12 col-md-6 q-pa-sm">
-        <q-file
-          label="Media (Video) *"
-          outlined
-          :model-value="mediaFile"
-          accept="video/*"
-          max-file-size="5368709120"
-          class="q-pb-md"
-          color="accent"
-          @update:model-value="onUpdateMediaFile"
-        >
-          <template v-slot:prepend>
-            <q-icon name="movie" @click.stop.prevent />
-          </template>
-          <template v-slot:append>
-            <q-icon name="close" @click.stop.prevent="emitUpdateMediaNull" class="cursor-pointer" />
-          </template>
-        </q-file>
-        <q-radio
-          class="q-pl-sm"
-          v-model="localPreviewType"
-          val="frame"
-          label="Video Frame"
-          color="accent"
-        /><br />
-        <q-radio
-          class="q-pl-sm"
-          v-model="localPreviewType"
-          val="new"
-          label="Upload Photo"
-          color="accent"
-        />
-        <q-file
-          v-if="localPreviewType === 'new'"
-          label="Media Preview (Image)"
-          outlined
-          :model-value="previewFile"
-          accept="image/*"
-          class="q-pb-md"
-          color="accent"
-          @update:model-value="onUpdatePreviewFile"
-        >
-          <template v-slot:prepend>
-            <q-icon name="image" @click.stop.prevent />
-          </template>
-          <template v-slot:append>
-            <q-icon
-              name="close"
-              @click.stop.prevent="emitUpdatePreviewNull"
-              class="cursor-pointer"
-            />
-          </template>
-        </q-file>
       </div>
     </div>
   </div>
@@ -183,10 +172,12 @@ async function onUpdateMediaFile(fileOrFiles) {
     // Default title from filename (strip extension)
     try {
       const base = (file.name || '').replace(/\.[^/.]+$/, '')
-      if (base && !props.payload.project.media.title) {
+      if (base) {
         onUpdateMediaTitle(base)
       }
-    } catch (e) { /* noop */ }
+    } catch (e) {
+      /* noop */
+    }
     // Default resourceDate from EXIF (if available) or lastModified
     try {
       const exifDate = await extractExifDate(file)
@@ -197,7 +188,9 @@ async function onUpdateMediaFile(fileOrFiles) {
         const dd = String(dateObj.getDate()).padStart(2, '0')
         onUpdateResourceDate(`${yyyy}/${mm}/${dd}`)
       }
-    } catch (e) { /* noop */ }
+    } catch (e) {
+      /* noop */
+    }
   }
   if (file && props.handleFile) props.handleFile(file, 'upload')
 }

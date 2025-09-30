@@ -10,8 +10,7 @@
             flat
             no-caps
             size="lg"
-            to="/"
-          />
+            to="/" />
         </template>
         <template v-else>
           <q-btn-dropdown
@@ -23,8 +22,7 @@
             to="/"
             flat
             no-caps
-            size="lg"
-          >
+            size="lg">
             <div v-for="channel in history" :key="channel.uuid" class="row items-center">
               <q-btn
                 icon="fas fa-clapperboard"
@@ -35,8 +33,7 @@
                 class="col-xs-10"
                 :label="channel.title"
                 size="md"
-                :to="`/${channel.uuid}/${channel.slug}`"
-              />
+                :to="`/${channel.uuid}/${channel.slug}`" />
               <q-btn
                 icon="fas fa-circle-minus"
                 flat
@@ -44,8 +41,7 @@
                 no-wrap
                 class="col-xs-2"
                 size="md"
-                @click="removeHistory(channel.uuid)"
-              />
+                @click="removeHistory(channel.uuid)" />
             </div>
             <div v-if="history.length === 0" class="row q-pa-sm">No history</div>
           </q-btn-dropdown>
@@ -59,8 +55,7 @@
         flat
         no-caps
         size="md"
-        to="/help"
-      />
+        to="/help" />
 
       <!-- Dark Mode -->
       <q-btn-dropdown
@@ -68,8 +63,7 @@
         :label="$q.screen.gt.sm ? 'Theme' : ''"
         size="md"
         flat
-        no-caps
-      >
+        no-caps>
         <q-separator />
         <q-btn
           flat
@@ -79,8 +73,7 @@
           label="Light"
           size="md"
           class="fit"
-          @click="setDarkMode('light')"
-        />
+          @click="setDarkMode('light')" />
         <q-separator />
         <q-btn
           flat
@@ -90,8 +83,7 @@
           label="System"
           size="md"
           class="fit"
-          @click="setDarkMode('auto')"
-        />
+          @click="setDarkMode('auto')" />
         <q-separator />
         <q-btn
           flat
@@ -101,8 +93,7 @@
           label="Dark"
           size="md"
           class="fit"
-          @click="setDarkMode('dark')"
-        />
+          @click="setDarkMode('dark')" />
       </q-btn-dropdown>
 
       <!-- Auth / Account Buttons -->
@@ -112,8 +103,7 @@
           :label="$q.screen.gt.sm ? 'Sign Up/Login' : ''"
           flat
           no-caps
-          size="md"
-        >
+          size="md">
           <template v-for="provider in oauthProviders" :key="provider.name">
             <q-separator />
             <q-btn
@@ -125,8 +115,7 @@
               :label="provider.name"
               size="md"
               class="fit"
-              @click="storeRedirect"
-            />
+              @click="storeRedirect" />
           </template>
         </q-btn-dropdown>
       </template>
@@ -137,8 +126,7 @@
           :label="$q.screen.gt.sm ? 'Account' : ''"
           flat
           no-caps
-          size="md"
-        >
+          size="md">
           <q-separator />
           <q-btn
             to="/account/dashboard"
@@ -148,8 +136,7 @@
             icon="fas fa-chalkboard"
             label="Dashboard"
             size="md"
-            class="fit"
-          />
+            class="fit" />
           <q-separator />
           <q-btn
             to="/account/upload"
@@ -159,8 +146,7 @@
             icon="fas fa-cloud-arrow-up"
             label="Upload Media"
             size="md"
-            class="fit"
-          />
+            class="fit" />
           <q-separator />
           <q-btn
             @click="logout"
@@ -170,8 +156,7 @@
             icon="fas fa-right-from-bracket"
             label="Logout"
             size="md"
-            class="fit"
-          />
+            class="fit" />
         </q-btn-dropdown>
       </template>
     </q-toolbar>

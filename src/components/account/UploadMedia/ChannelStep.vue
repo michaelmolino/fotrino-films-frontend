@@ -23,8 +23,7 @@
               .map(({ uuid, title }) => ({ value: uuid, label: title }))
               .concat({ value: 0, label: 'New...' })
           "
-          class="q-pb-lg"
-        />
+          class="q-pb-lg" />
         <q-avatar size="150px" class="q-pl-lg">
           <q-skeleton
             v-if="
@@ -35,22 +34,19 @@
                 !coverFile)
             "
             class="cursor-not-allowed width250x height250x"
-            animation="none"
-          />
+            animation="none" />
           <q-img
             v-if="payload.uuid && payload.uuid.value !== 0"
             :src="channels.find(ch => ch.uuid === payload.uuid.value).cover"
             class="width250x"
             :ratio="1 / 1"
-            fit="cover"
-          />
+            fit="cover" />
           <q-img
             v-if="payload.uuid && payload.uuid.value === 0"
             :src="payload.coverType === 'profile' ? profile.profile_pic : coverThumb"
             class="width250x"
             :ratio="1 / 1"
-            fit="cover"
-          />
+            fit="cover" />
         </q-avatar>
       </div>
       <div class="col-xs-12 col-md-6 q-pa-sm">
@@ -64,21 +60,18 @@
             clearable
             @focus="clearDefaultChannelTitle"
             @blur="restoreDefaultChannelTitle"
-            @update:model-value="onUpdateTitle"
-          />
+            @update:model-value="onUpdateTitle" />
           <q-radio
             v-model="localCoverType"
             val="profile"
             label="Profile Photo"
-            color="accent"
-          /><br />
+            color="accent" /><br />
           <q-radio
             v-model="localCoverType"
             val="new"
             label="Upload Photo"
             color="accent"
-            class="q-pb-md"
-          /><br />
+            class="q-pb-md" /><br />
           <q-file
             v-if="localCoverType === 'new'"
             label="Channel Cover (Image)"
@@ -86,8 +79,7 @@
             :model-value="coverFile"
             accept="image/*"
             color="accent"
-            @update:model-value="onUpdateCoverFile"
-          >
+            @update:model-value="onUpdateCoverFile">
             <template v-slot:prepend>
               <q-icon name="image" @click.stop.prevent />
             </template>
@@ -95,8 +87,7 @@
               <q-icon
                 name="close"
                 @click.stop.prevent="emitUpdateCoverNull"
-                class="cursor-pointer"
-              />
+                class="cursor-pointer" />
             </template>
           </q-file>
         </span>

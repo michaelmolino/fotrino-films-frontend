@@ -7,8 +7,7 @@
           class="width250x"
           :ratio="1"
           fit="cover"
-          :alt="safeName || safeEmail"
-        >
+          :alt="safeName || safeEmail">
           <q-badge class="bg-accent q-pa-md" floating transparent>
             <q-icon :name="providerIcon" />
           </q-badge>

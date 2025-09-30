@@ -13,8 +13,7 @@
               .map(({ id, title }) => ({ value: id, label: title }))
               .concat({ value: 0, label: 'New...' })
           "
-          class="q-pb-md"
-        />
+          class="q-pb-md" />
         <div class="width250x">
           <ProjectPoster :project="project" />
         </div>
@@ -30,8 +29,7 @@
             label="Project Title *"
             @update:model-value="onUpdateProjectTitle"
             @focus="clearDefaultProjectTitle"
-            @blur="restoreDefaultProjectTitle"
-          />
+            @blur="restoreDefaultProjectTitle" />
           <q-input
             outlined
             :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
@@ -39,8 +37,7 @@
             clearable
             :model-value="payload.project.subtitle"
             label="Project SubTitle"
-            @update:model-value="onUpdateProjectSubtitle"
-          />
+            @update:model-value="onUpdateProjectSubtitle" />
           <q-radio v-model="localPosterType" val="default" label="Default" color="accent" /><br />
           <q-radio v-model="localPosterType" val="new" label="Upload Photo" color="accent" />
           <q-file
@@ -51,8 +48,7 @@
             accept="image/*"
             class="q-py-md"
             color="accent"
-            @update:model-value="onUpdatePosterFile"
-          >
+            @update:model-value="onUpdatePosterFile">
             <template v-slot:prepend>
               <q-icon name="image" @click.stop.prevent />
             </template>
@@ -60,8 +56,7 @@
               <q-icon
                 name="close"
                 @click.stop.prevent="emitUpdatePosterNull"
-                class="cursor-pointer"
-              />
+                class="cursor-pointer" />
             </template>
           </q-file>
         </span>

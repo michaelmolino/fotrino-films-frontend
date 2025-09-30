@@ -5,16 +5,14 @@
     expand-icon-toggle
     expand-separator
     switch-toggle-side
-    :disable="channel.pending"
-  >
+    :disable="channel.pending">
     <template #header>
       <ResourceActions
         :title="channel.title"
         :image="channel.cover"
         :pending="channel.pending"
         :link="getMediaLink('channel', channel.id)"
-        @delete="$emit('deleteChannel', channel.uuid)"
-      />
+        @delete="$emit('deleteChannel', channel.uuid)" />
     </template>
 
     <ProjectItem
@@ -24,8 +22,7 @@
       :channel="channel"
       @deleteProject="$emit('deleteProject', $event)"
       @deleteMedia="$emit('deleteMedia', $event)"
-      :getMediaLink="getMediaLink"
-    />
+      :getMediaLink="getMediaLink" />
   </q-expansion-item>
 </template>
 

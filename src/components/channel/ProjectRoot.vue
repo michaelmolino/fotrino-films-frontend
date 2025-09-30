@@ -5,20 +5,17 @@
         :channel="channel"
         :project="project"
         :media="media?.main ? null : media"
-        :private="!!route.params.privateId"
-      />
+        :private="!!route.params.privateId" />
 
       <NothingText
-        v-if="!route.params.privateId && (project.media?.length || 0) === 0"
-      ></NothingText>
+        v-if="!route.params.privateId && (project.media?.length || 0) === 0"></NothingText>
 
       <template v-else>
         <PlyrPlayer
           v-if="media"
           :media="media"
           :artist="channel?.ownername"
-          class="q-py-md plyrplayer"
-        />
+          class="q-py-md plyrplayer" />
 
         <MediaDescription v-if="media" :media="media" />
 
@@ -30,14 +27,12 @@
             <div
               v-for="related in relatedMedia"
               :key="related.id"
-              class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm"
-            >
+              class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm">
               <MediaPreview
                 :channel="channel"
                 :project="project"
                 :media="related"
-                :to="`/${channel.uuid}/${channel.slug}/${project.slug}/${related.slug}`"
-              />
+                :to="`/${channel.uuid}/${channel.slug}/${project.slug}/${related.slug}`" />
             </div>
           </div>
         </template>

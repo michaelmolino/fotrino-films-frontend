@@ -18,8 +18,7 @@
         unelevated
         no-caps
         size="lg"
-        to="/"
-      />
+        to="/" />
     </q-card>
   </div>
 </template>

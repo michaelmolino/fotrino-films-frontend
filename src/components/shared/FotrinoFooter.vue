@@ -6,22 +6,19 @@
         icon="far fa-copyright"
         :label="$q.screen.gt.xs ? year + ' Michael Molino' : year"
         :ripple="false"
-        class="no-pointer-events"
-      />
+        class="no-pointer-events" />
       <q-space />
       <q-btn
         flat
         icon="fas fa-shield-halved"
         :label="$q.screen.gt.xs ? 'Terms/Privacy' : ''"
-        to="/terms"
-      />
+        to="/terms" />
       <q-btn
         flat
         icon="fab fa-github"
         :label="$q.screen.gt.xs ? 'GitHub' : ''"
         href="https://github.com/michaelmolino/fotrino-films-frontend"
-        target="_blank"
-      />
+        target="_blank" />
     </div>
   </q-footer>
 </template>

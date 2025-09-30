@@ -9,20 +9,17 @@
             v-model="selectedView"
             :projectCount="projectCount"
             :mainCount="mainCount"
-            :allCount="allCount"
-          />
+            :allCount="allCount" />
         </div>
 
         <div class="row" v-if="selectedView === 'projects'">
           <div
             class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
             v-for="project in projects"
-            :key="project.id"
-          >
+            :key="project.id">
             <ProjectPoster
               :project="project"
-              :to="`/${channel.uuid}/${channel.slug}/${project.slug}`"
-            />
+              :to="`/${channel.uuid}/${channel.slug}/${project.slug}`" />
           </div>
           <NothingText v-if="projects.length === 0" text="No content available." />
         </div>
@@ -31,15 +28,13 @@
           <div
             class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm text-center"
             v-for="item in sortedMedia"
-            :key="item.media.id"
-          >
+            :key="item.media.id">
             <MediaPreview
               :channel="channel"
               :project="item.project"
               :media="item.media"
               :to="`/${channel.uuid}/${channel.slug}/${item.project.slug}/${item.media.slug}`"
-              :detail="true"
-            />
+              :detail="true" />
           </div>
           <NothingText v-if="sortedMedia.length === 0" text="No content available." />
         </div>

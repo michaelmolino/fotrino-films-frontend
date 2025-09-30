@@ -23,8 +23,7 @@
     <q-skeleton
       v-if="!project.poster"
       class="cursor-not-allowed project-skeleton"
-      animation="none"
-    />
+      animation="none" />
   </q-btn>
 </template>
 

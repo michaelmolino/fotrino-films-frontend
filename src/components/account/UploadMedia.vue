@@ -17,16 +17,9 @@
       :inactive-color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
       done-color="positive"
       :vertical="$q.screen.lt.md"
-      header-nav
-    >
+      header-nav>
       <!-- Step 1: Media first -->
-      <q-step
-        :name="1"
-        title="Media"
-        icon="fas fa-file-video"
-        :done="step > 1"
-        :header-nav="false"
-      >
+      <q-step :name="1" title="Media" icon="fas fa-file-video" :done="step > 1" :header-nav="false">
         <MediaStep
           :payload="payload"
           :media="media"
@@ -37,12 +30,16 @@
           @update:payload="p => Object.assign(payload, p)"
           @update:mediaFile="updateMediaFile"
           @update:previewFile="updatePreviewFile"
-          @increment:counter="incrementCounter"
-        />
+          @increment:counter="incrementCounter" />
       </q-step>
 
       <!-- Step 2: Channel -->
-      <q-step :name="2" title="Channel" icon="fas fa-video" :done="step > 2" :header-nav="step === 1 && !!next">
+      <q-step
+        :name="2"
+        title="Channel"
+        icon="fas fa-video"
+        :done="step > 2"
+        :header-nav="step === 1 && !!next">
         <ChannelStep
           :payload="payload"
           :channels="channels"
@@ -51,8 +48,7 @@
           :coverThumb="coverThumb"
           :handleFile="handleFile"
           @update:payload="p => Object.assign(payload, p)"
-          @update:coverFile="updateCoverFile"
-        />
+          @update:coverFile="updateCoverFile" />
       </q-step>
 
       <!-- Step 3: Project -->
@@ -61,8 +57,7 @@
         title="Project"
         icon="fas fa-film"
         :done="step > 3"
-        :header-nav="step === 2 && !!next"
-      >
+        :header-nav="step === 2 && !!next">
         <ProjectStep
           :payload="payload"
           :projects="projects"
@@ -70,8 +65,7 @@
           :posterFile="posterFile"
           :handleFile="handleFile"
           @update:payload="p => Object.assign(payload, p)"
-          @update:posterFile="updatePosterFile"
-        />
+          @update:posterFile="updatePosterFile" />
       </q-step>
 
       <q-step
@@ -80,8 +74,7 @@
         icon="fas fa-cloud-arrow-up"
         active-icon="fas fa-cloud-arrow-up"
         :done="step > 4"
-        :header-nav="step === 3 && !!next"
-      >
+        :header-nav="step === 3 && !!next">
         <div class="text-center">
           <q-circular-progress
             :indeterminate="progress === -1"
@@ -90,8 +83,7 @@
             size="50px"
             color="accent"
             class="q-ma-xl"
-            show-value
-          /><br />
+            show-value /><br />
           {{ statusText }}
         </div>
       </q-step>
@@ -101,8 +93,7 @@
         title="Processing"
         icon="fa fa-gears"
         active-icon="fa fa-gears"
-        :header-nav="step === 4 && !!next"
-      >
+        :header-nav="step === 4 && !!next">
         <div class="q-pa-sm">
           Your media is processing and will be available shortly (you'll receive an email once it's
           ready). You may now close this window.
@@ -117,24 +108,21 @@
             flat
             label="Quick Upload"
             @click="quickUpload"
-            :disabled="!next"
-          />
+            :disabled="!next" />
           <q-btn
             v-if="step < 3"
             icon="fas fa-arrow-right"
             flat
             @click="$refs.stepper.next()"
             label="Next"
-            :disabled="!next"
-          />
+            :disabled="!next" />
           <q-btn
             v-if="step === 3"
             icon="fas fa-cloud-arrow-up"
             flat
             label="Upload"
             :disabled="!next"
-            @click="$refs.stepper.next()"
-          >
+            @click="$refs.stepper.next()">
           </q-btn>
           <q-btn v-if="step === 4" loading disabled flat label="Uploading">
             <template v-slot:loading>
@@ -410,7 +398,10 @@ async function quickUpload() {
     // Resolve projects if channel exists
     projects.value = []
     if (payload.uuid && payload.uuid.value && payload.uuid.value !== 0) {
-      const chan = await store.cache.dispatch('channel/getChannel', { uuid: payload.uuid.value, pending: true })
+      const chan = await store.cache.dispatch('channel/getChannel', {
+        uuid: payload.uuid.value,
+        pending: true
+      })
       projects.value = chan.projects || []
     }
     // Select or create project
@@ -457,7 +448,10 @@ watch(step, s => {
         projects.value = ch.projects
         if (projects.value.length === 0) payload.project.id = { value: 0, label: 'New...' }
         if (projects.value.length === 1) {
-          payload.project.id = projects.value.map(({ id, title }) => ({ value: id, label: title }))[0]
+          payload.project.id = projects.value.map(({ id, title }) => ({
+            value: id,
+            label: title
+          }))[0]
         }
       })
   } else {

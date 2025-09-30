@@ -100,8 +100,7 @@
               dense
               :icon="'img:' + 'https://commentbox.io/favicon-32x32.png'"
               label="commentbox.io"
-              href="https://commentbox.io/"
-            />
+              href="https://commentbox.io/" />
             ) comment system. We share your name, email address, and profile photo with CommentBox
             to enable commenting functionality. Please review CommentBox’s own privacy policy for
             details on how they handle your information.

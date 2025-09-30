@@ -16,8 +16,7 @@
             :class="$q.screen.gt.xs ? 'text-h5' : 'text-h6'"
             :key="location.id"
             :label="location.label"
-            :to="location.to"
-          />
+            :to="location.to" />
         </q-breadcrumbs>
         <q-item-label caption>By {{ channel.ownername }}</q-item-label>
       </q-item-section>

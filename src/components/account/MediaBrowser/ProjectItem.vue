@@ -7,16 +7,14 @@
     expand-icon-toggle
     expand-separator
     switch-toggle-side
-    :disable="project.pending"
-  >
+    :disable="project.pending">
     <template #header>
       <ResourceActions
         :title="project.title"
         :image="project.poster"
         :pending="project.pending"
         :link="getMediaLink('project', project.id)"
-        @delete="$emit('deleteProject', project.id)"
-      />
+        @delete="$emit('deleteProject', project.id)" />
     </template>
 
     <MediaItem
@@ -26,8 +24,7 @@
       :project="project"
       :channel="channel"
       :getMediaLink="getMediaLink"
-      @deleteMedia="$emit('deleteMedia', $event)"
-    />
+      @deleteMedia="$emit('deleteMedia', $event)" />
   </q-expansion-item>
 </template>
 

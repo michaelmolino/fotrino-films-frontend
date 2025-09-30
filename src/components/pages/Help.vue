@@ -7,8 +7,7 @@
         :default-opened="!$route.query.item || $route.query.item === 'about'"
         header-class="text-bold"
         @show="onItemSelect('about')"
-        @hide="() => onItemHide('about')"
-      >
+        @hide="() => onItemHide('about')">
         <q-card>
           <q-card-section>
             Fotrino Films is a platform for hosting video content, allowing users to upload media
@@ -23,8 +22,7 @@
         header-class="text-bold"
         :default-opened="$route.query.item === 'different'"
         @show="onItemSelect('different')"
-        @hide="() => onItemHide('different')"
-      >
+        @hide="() => onItemHide('different')">
         <q-card>
           <q-card-section>
             <div>
@@ -43,8 +41,7 @@
         header-class="text-bold"
         :default-opened="$route.query.item === 'opensource'"
         @show="onItemSelect('opensource')"
-        @hide="() => onItemHide('opensource')"
-      >
+        @hide="() => onItemHide('opensource')">
         <q-card>
           <q-card-section>
             The frontend of Fotrino Films is open source. The backend might be open-sourced in the
@@ -59,8 +56,7 @@
         header-class="text-bold"
         :default-opened="$route.query.item === 'privacy'"
         @show="onItemSelect('privacy')"
-        @hide="() => onItemHide('privacy')"
-      >
+        @hide="() => onItemHide('privacy')">
         <q-card>
           <q-card-section>
             <div>
@@ -80,8 +76,7 @@
         header-class="text-bold"
         :default-opened="$route.query.item === 'production'"
         @show="onItemSelect('production')"
-        @hide="() => onItemHide('production')"
-      >
+        @hide="() => onItemHide('production')">
         <q-card>
           <q-card-section>
             At the moment, it's mostly a personal project for me and my family.
@@ -95,8 +90,7 @@
         header-class="text-bold"
         :default-opened="$route.query.item === 'mobilesupport'"
         @show="onItemSelect('mobilesupport')"
-        @hide="() => onItemHide('mobilesupport')"
-      >
+        @hide="() => onItemHide('mobilesupport')">
         <q-card>
           <q-card-section> Yes! </q-card-section>
         </q-card>
@@ -108,8 +102,7 @@
         header-class="text-bold"
         :default-opened="$route.query.item === 'download'"
         @show="onItemSelect('download')"
-        @hide="() => onItemHide('download')"
-      >
+        @hide="() => onItemHide('download')">
         <q-card>
           <q-card-section>
             Videos on Fotrino Films are not protected by DRM. While downloading videos is not
@@ -125,8 +118,7 @@
         header-class="text-bold"
         :default-opened="$route.query.item === 'buffering'"
         @show="onItemSelect('buffering')"
-        @hide="() => onItemHide('buffering')"
-      >
+        @hide="() => onItemHide('buffering')">
         <q-card>
           <q-card-section>
             Fotrino Films uses a global CDN and adaptive bitrate streaming to optimize video quality
@@ -143,8 +135,7 @@
         header-class="text-bold"
         :default-opened="$route.query.item === 'facebook'"
         @show="onItemSelect('facebook')"
-        @hide="() => onItemHide('facebook')"
-      >
+        @hide="() => onItemHide('facebook')">
         <q-card>
           <q-card-section>
             Use the
@@ -153,8 +144,7 @@
               dense
               icon="fab fa-facebook"
               label="Facebook Link Debugger"
-              href="https://developers.facebook.com/tools/debug/"
-            />
+              href="https://developers.facebook.com/tools/debug/" />
             to check and manage how your link appears on Facebook. This tool lets you confirm the
             preview image and other metadata before sharing your link.
           </q-card-section>
@@ -167,8 +157,7 @@
         header-class="text-bold"
         :default-opened="$route.query.item === 'login'"
         @show="onItemSelect('login')"
-        @hide="() => onItemHide('login')"
-      >
+        @hide="() => onItemHide('login')">
         <q-card>
           <q-card-section>
             Third-party identity providers, such as Google, enhance security by protecting you from
@@ -185,8 +174,7 @@
         header-class="text-bold"
         :default-opened="$route.query.item === 'filesize'"
         @show="onItemSelect('filesize')"
-        @hide="() => onItemHide('filesize')"
-      >
+        @hide="() => onItemHide('filesize')">
         <q-card>
           <q-card-section>
             There is a 5GB file size limit for uploads; this is enough for about two hours of 1080p
@@ -201,8 +189,7 @@
         header-class="text-bold"
         :default-opened="$route.query.item === 'terminology'"
         @show="onItemSelect('terminology')"
-        @hide="() => onItemHide('terminology')"
-      >
+        @hide="() => onItemHide('terminology')">
         <q-card>
           <q-card-section>
             <ul>

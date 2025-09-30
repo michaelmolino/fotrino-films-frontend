@@ -4,14 +4,12 @@
     dense
     no-caps
     padding="8px"
-    :class="media.main ? 'fit bg-accent width720' : 'fit width720'"
-  >
+    :class="media.main ? 'fit bg-accent width720' : 'fit width720'">
     <q-badge
       v-if="media.type?.startsWith('audio/')"
       class="bg-accent q-pa-md z-top"
       floating
-      transparent
-    >
+      transparent>
       <span class="text-bold">Audio</span>
     </q-badge>
     <q-img v-if="media.preview" :src="media.preview" :ratio="16 / 9" fit="cover">
@@ -38,8 +36,7 @@
     <q-skeleton
       v-if="!media.preview"
       class="cursor-not-allowed preview-skeleton"
-      animation="none"
-    />
+      animation="none" />
   </q-btn>
 </template>
 

@@ -13,8 +13,7 @@
       { value: 'projects', slot: 'project' },
       { value: 'main', slot: 'main' },
       { value: 'all', slot: 'all' }
-    ]"
-  >
+    ]">
     <template #project>
       <div class="row items-center no-wrap">
         <span class="text-center">Projects</span>

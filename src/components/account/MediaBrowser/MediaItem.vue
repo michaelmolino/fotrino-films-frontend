@@ -7,8 +7,7 @@
       :link="getMediaLink('media', media.id)"
       delete-color="warning"
       @delete="$emit('deleteMedia', media.id)"
-      square
-    />
+      square />
   </div>
 </template>
 

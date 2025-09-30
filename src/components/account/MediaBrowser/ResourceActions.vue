@@ -24,8 +24,7 @@
           unelevated
           icon="link"
           color="info"
-          class="q-mx-xs"
-        >
+          class="q-mx-xs">
           <q-tooltip>Link</q-tooltip>
         </q-btn>
 
@@ -36,8 +35,7 @@
           icon="delete"
           :color="deleteColor"
           class="q-ml-xs"
-          @click="$emit('delete')"
-        >
+          @click="$emit('delete')">
           <q-tooltip>Delete</q-tooltip>
         </q-btn>
       </div>

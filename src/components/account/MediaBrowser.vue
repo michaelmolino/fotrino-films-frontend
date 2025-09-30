@@ -8,8 +8,7 @@
         :getMediaLink="getMediaLink"
         @deleteChannel="deleteResource('channel', $event)"
         @deleteProject="deleteResource('project', $event)"
-        @deleteMedia="deleteResource('media', $event)"
-      />
+        @deleteMedia="deleteResource('media', $event)" />
     </q-list>
   </div>
 </template>
