@@ -170,6 +170,7 @@ import { useQuasar, LocalStorage } from 'quasar'
 import { logout as sharedLogout } from '@utils/auth.js'
 const $q = useQuasar()
 
+// Vuex store is provided by Quasar app init; available during setup
 const store = useStore()
 const HISTORY_KEY = 'fotrino-films-history'
 const showHistory = ref(false)
@@ -177,7 +178,7 @@ const oauthProviders = ref([
   { name: 'Google', icon: 'fab fa-google', login: process.env.API + '/account/login/google' }
 ])
 
-const profile = computed(() => store.state.account.profile)
+const profile = computed(() => store.state.account?.profile || null)
 const history = ref(LocalStorage.getItem(HISTORY_KEY) || [])
 
 onMounted(() => {})

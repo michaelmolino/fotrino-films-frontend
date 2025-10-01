@@ -1,4 +1,6 @@
-export default ({ app, router, store, Vue }) => {
+import { boot } from 'quasar/wrappers'
+
+export default boot(() => {
   // Try to make touch/wheel listeners passive by default where safe to improve
   // scroll performance. This monkey-patch wraps addEventListener and, when the
   // event is touchstart/touchmove/wheel, sets { passive: true } unless the
@@ -30,4 +32,4 @@ export default ({ app, router, store, Vue }) => {
     // eslint-disable-next-line no-console
     console.warn('passive-events boot: could not patch addEventListener', err)
   }
-}
+})

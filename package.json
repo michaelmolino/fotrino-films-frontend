@@ -12,7 +12,6 @@
   "resolutions": {
     "glob-parent": "^6.0.1",
     "nth-check": "^2.0.1",
-    "webpack": "^5.76.0",
     "yaml": "^2.2.2"
   },
   "dependencies": {
@@ -25,7 +24,7 @@
     "dompurify": "^3.2.4",
     "hls.js": "^1.5.20",
     "plyr": "^3.7.8",
-    "quasar": "2.17.7",
+    "quasar": "2.18.5",
     "underscore": "^1.13.2",
     "vue": "^3.2.47",
     "vue-router": "^4.0.0",
@@ -35,13 +34,12 @@
   "devDependencies": {
     "@babel/core": "^7.26.10",
     "@babel/eslint-parser": "^7.26.10",
-    "@quasar/app-webpack": "^3.15.1",
+    "@quasar/app-webpack": "^4.2.7",
     "autoprefixer": "^10.4.16",
     "babel-loader": "^9.1.2",
     "eslint": "^7.14.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-config-standard": "^16.0.2",
-    "eslint-loader": "^4.0.2",
     "eslint-plugin-import": "^2.19.1",
     "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-prettier": "^5.5.4",
@@ -51,8 +49,7 @@
     "eslint-webpack-plugin": "^3.1.1",
     "postcss": "^8.5.3",
     "prettier": "^3.6.2",
-    "sass": "^1.93.0",
-    "webpack": "^5.76.0"
+    "sass": "^1.93.0"
   },
   "browserslist": [
     "last 10 Chrome versions",

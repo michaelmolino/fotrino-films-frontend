@@ -68,5 +68,22 @@ module.exports = {
 
     // allow debugger during development only
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
-  }
+  },
+
+  // File-specific overrides
+  overrides: [
+    {
+      files: ['quasar.config.js'],
+      env: { node: true },
+      rules: {
+        indent: 'off'
+      }
+    },
+    {
+      files: ['src/boot/*.js'],
+      rules: {
+        indent: 'off'
+      }
+    }
+  ]
 }
