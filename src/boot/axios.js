@@ -31,6 +31,8 @@ axiosRetry(objectApi, {
 })
 
 export default boot(({ app, router, store }) => {
+  // Access the store reliably even if not passed in boot context
+  const getStore = () => app?.config?.globalProperties?.$store || store
   // Track concurrent requests to avoid hiding the loader too early
   let pending = 0
   const showLoader = () => {
@@ -48,7 +50,9 @@ export default boot(({ app, router, store }) => {
     const method = (req.method || '').toLowerCase()
     // Attach CSRF only when available and required
     if (['post', 'put', 'delete'].includes(method)) {
-      const token = store?.state?.account?.profile?.csrf_token
+      const s = getStore()
+      console.log('Attaching CSRF token to request', s?.state?.account?.profile)
+      const token = s?.state?.account?.profile?.csrf_token
       if (token) {
         req.headers['X-CSRFToken'] = token
       }
