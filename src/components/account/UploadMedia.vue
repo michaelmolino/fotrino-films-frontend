@@ -166,7 +166,8 @@ const payload = reactive({
     posterType: 'default',
     title: 'My Videos',
     media: {
-      main: true,
+      main: false,
+      commentsEnabled: false,
       previewType: 'frame',
       resourceDate: new Date().toISOString().split('T')[0].replace(/-/g, '/')
     }

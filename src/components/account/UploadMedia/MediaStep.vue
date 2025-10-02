@@ -55,7 +55,15 @@
           </q-popup-proxy>
           <q-tooltip>Capture Date</q-tooltip> </q-btn
         ><br />
-        <q-checkbox outlined v-model="localMain" label="Featured" class="q-pb-md q-pl-sm" />
+        <div class="row items-center q-pl-sm q-pb-sm">
+          <q-checkbox outlined v-model="localMain" label="Featured" class="q-pr-lg" />
+          <q-checkbox
+            outlined
+            :model-value="localCommentsEnabled"
+            label="Enable comments"
+            @update:model-value="onToggleComments"
+          />
+        </div>
         <br />
         <q-radio
           class="q-pl-sm"
@@ -113,6 +121,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useQuasar } from 'quasar'
 import MediaPreview from '@components/channel/MediaPreview.vue'
 const props = defineProps({
   payload: Object,
@@ -128,6 +137,8 @@ const emit = defineEmits([
   'update:previewFile',
   'increment:counter'
 ])
+
+const $q = useQuasar()
 
 const localPreviewType = computed({
   get: () => props.payload.project.media.previewType,
@@ -149,6 +160,50 @@ const localMain = computed({
       project: { ...props.payload.project, media: { ...props.payload.project.media, main: v } }
     })
 })
+
+const localCommentsEnabled = computed(() => !!props.payload.project.media.commentsEnabled)
+
+function onToggleComments(nextVal) {
+  // If turning off, apply immediately
+  if (!nextVal) {
+    emit('update:payload', {
+      ...props.payload,
+      project: {
+        ...props.payload.project,
+        media: { ...props.payload.project.media, commentsEnabled: false }
+      }
+    })
+    return
+  }
+
+  // Confirm before enabling
+  $q.dialog({
+    title: 'Enable comments',
+    message:
+      'Warning: Enabling comments will make your media discoverable by other users.',
+    cancel: true,
+    ok: 'OK'
+  })
+    .onOk(() => {
+      emit('update:payload', {
+        ...props.payload,
+        project: {
+          ...props.payload.project,
+          media: { ...props.payload.project.media, commentsEnabled: true }
+        }
+      })
+    })
+    .onCancel(() => {
+      // leave unchecked
+      emit('update:payload', {
+        ...props.payload,
+        project: {
+          ...props.payload.project,
+          media: { ...props.payload.project.media, commentsEnabled: false }
+        }
+      })
+    })
+}
 
 function onUpdateMediaTitle(val) {
   emit('update:payload', {

@@ -19,7 +19,12 @@
 
         <MediaDescription v-if="media" :media="media" />
 
-        <CommentsBox :loggedIn="!!profile?.id" :privateId="media?.private_id" class="q-my-md" />
+        <CommentsBox
+          v-if="media?.comments_enabled"
+          :loggedIn="!!profile?.id"
+          :privateId="media?.private_id"
+          class="q-my-md"
+        />
 
         <template v-if="hasRelatedContent">
           <div class="q-pt-md text-h6">Related Content</div>
