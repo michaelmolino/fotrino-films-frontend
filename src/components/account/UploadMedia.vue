@@ -421,6 +421,40 @@ async function quickUpload() {
 }
 
 // watchers
+// Keep projects in sync with the selected channel. If 'New...' is selected, there are no projects.
+watch(
+  () => payload.uuid?.value,
+  async newUuid => {
+    try {
+      if (!newUuid || newUuid === 0) {
+        projects.value = []
+        // Ensure the Project step defaults to creating a new project
+        if (!payload.project?.id || payload.project.id.value !== 0) {
+          payload.project.id = { value: 0, label: 'New...' }
+        }
+        return
+      }
+
+      await loadProjectsForChannelUuid(newUuid)
+      // If the previously selected project isn't part of this channel, reset selection
+      const currentId = payload.project?.id?.value
+      const found = currentId && projects.value.some(p => p.id === currentId)
+      if (!found) {
+        if (projects.value.length === 1) {
+          const p = projects.value[0]
+          payload.project.id = { value: p.id, label: p.title }
+        } else {
+          payload.project.id = { value: 0, label: 'New...' }
+        }
+      }
+    } catch (err) {
+      console.error('Failed syncing projects with channel selection:', err)
+      projects.value = []
+      payload.project.id = { value: 0, label: 'New...' }
+    }
+  }
+)
+
 watch(channels, ch => {
   if (ch.length === 0 && step.value === 2) payload.uuid = { value: 0, label: 'New...' }
   if (ch.length === 1 && step.value === 2) {

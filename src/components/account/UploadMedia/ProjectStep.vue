@@ -8,11 +8,7 @@
           label="Project *"
           :model-value="payload.project.id"
           @update:model-value="onUpdateProjectId"
-          :options="
-            projects
-              .map(({ id, title }) => ({ value: id, label: title }))
-              .concat({ value: 0, label: 'New...' })
-          "
+          :options="filteredOptions"
           class="q-pb-md" />
         <div class="width250x">
           <ProjectPoster :project="project" />
@@ -76,6 +72,13 @@ const props = defineProps({
   handleFile: Function
 })
 const emit = defineEmits(['update:payload', 'update:posterFile'])
+
+// Filter projects that are eligible for the currently selected channel.
+// Parent now syncs projects per-channel, but keep this defensive.
+const filteredOptions = computed(() => {
+  const list = Array.isArray(props.projects) ? props.projects : []
+  return list.map(({ id, title }) => ({ value: id, label: title })).concat({ value: 0, label: 'New...' })
+})
 
 const localPosterType = computed({
   get: () => props.payload.project.posterType,
