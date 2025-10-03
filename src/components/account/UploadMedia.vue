@@ -1,11 +1,8 @@
 <template>
   <div v-if="profile?.id" class="q-pa-md">
     <q-item class="q-pb-md">
-      <q-item-section side>
-        <q-icon name="fas fa-cloud-arrow-up" size="xl" />
-      </q-item-section>
       <q-item-section>
-        <q-item-label class="text-h4">Upload Media</q-item-label>
+        <q-item-label class="text-h5">Upload Media</q-item-label>
       </q-item-section>
     </q-item>
     <q-stepper

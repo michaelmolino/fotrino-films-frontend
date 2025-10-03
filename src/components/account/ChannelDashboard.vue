@@ -1,7 +1,11 @@
 <template>
   <div class="q-pa-md">
+    <div class="text-h5 text-weight-bold q-mb-md">Dashboard</div>
+
     <template v-if="profile?.id">
+      <div class="text-h6 text-weight-bold q-mb-sm">Profile</div>
       <ProfileCard :profile="profile" :mediaCount="mediaCount" />
+      <div v-if="hasChannels" class="text-h6 text-weight-bold q-mt-md q-mb-sm">Media Browser</div>
       <MediaBrowser v-if="hasChannels" :channels="channels" />
       <NothingText v-else text="Your media will appear here (once you have some)." />
     </template>
@@ -11,6 +15,7 @@
       <q-skeleton type="text" width="60%" />
     </template>
   </div>
+
 </template>
 
 <script setup>
@@ -48,7 +53,9 @@ onMounted(() => {
   height: 250px;
 }
 
-.terms {
-  max-height: 50vh;
+.card-dashboard {
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
 }
 </style>
