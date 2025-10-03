@@ -16,15 +16,7 @@
           <q-tooltip>Pending</q-tooltip>
         </q-btn>
 
-        <q-btn
-          v-else
-          :to="link"
-          target="_blank"
-          dense
-          unelevated
-          icon="link"
-          color="info"
-          class="q-mx-xs">
+        <q-btn v-else :to="link" dense unelevated icon="link" color="info" class="q-mx-xs">
           <q-tooltip>Link</q-tooltip>
         </q-btn>
 

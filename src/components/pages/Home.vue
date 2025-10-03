@@ -5,7 +5,7 @@
         <transition appear enter-active-class="animated zoomInDown slower">
           <h1 class="text-h4 q-my-none">
             <span :class="darkClass">Fotrino </span>
-            <span class="text-accent">Films</span>
+            <span class="text-accent">Films </span>
           </h1>
         </transition>
         <transition appear enter-active-class="animated zoomInDown slower delay-1s">

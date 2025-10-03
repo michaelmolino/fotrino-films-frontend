@@ -5,8 +5,8 @@ import createStore from 'src/store'
 // This feels like a hack; ideally Quasar should do this
 let appStore
 export default boot(({ app }) => {
-    if (!appStore) {
-        appStore = createStore()
-    }
-    app.use(appStore)
+  if (!appStore) {
+    appStore = createStore()
+  }
+  app.use(appStore)
 })

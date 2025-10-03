@@ -1,62 +1,53 @@
 <template>
   <div>
-    <div class="row">
-      <div class="col-xs-12 col-md-6 q-pa-sm">
-        <q-select
-          outlined
-          :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
-          label="Project *"
-          :model-value="payload.project.id"
-          @update:model-value="onUpdateProjectId"
-          :options="filteredOptions"
-          class="q-pb-md" />
-        <div class="width250x">
-          <ProjectPoster :project="project" />
-        </div>
-      </div>
-      <div class="col-xs-12 col-md-6 q-pa-sm">
-        <span v-if="payload.project.id?.value === 0">
-          <q-input
-            outlined
-            :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
-            class="q-pb-md"
-            clearable
-            :model-value="payload.project.title"
-            label="Project Title *"
-            @update:model-value="onUpdateProjectTitle"
-            @focus="clearDefaultProjectTitle"
-            @blur="restoreDefaultProjectTitle" />
-          <q-input
-            outlined
-            :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
-            class="q-pb-md"
-            clearable
-            :model-value="payload.project.subtitle"
-            label="Project SubTitle"
-            @update:model-value="onUpdateProjectSubtitle" />
-          <q-radio v-model="localPosterType" val="default" label="Default" color="accent" /><br />
-          <q-radio v-model="localPosterType" val="new" label="Upload Photo" color="accent" />
-          <q-file
-            v-if="localPosterType === 'new'"
-            label="Profile Poster (Image)"
-            outlined
-            :model-value="posterFile"
-            accept="image/*"
-            class="q-py-md"
-            color="accent"
-            @update:model-value="onUpdatePosterFile">
-            <template v-slot:prepend>
-              <q-icon name="image" @click.stop.prevent />
-            </template>
-            <template v-slot:append>
-              <q-icon
-                name="close"
-                @click.stop.prevent="emitUpdatePosterNull"
-                class="cursor-pointer" />
-            </template>
-          </q-file>
-        </span>
-      </div>
+    <q-select
+      outlined
+      :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
+      label="Project *"
+      :model-value="payload.project.id"
+      @update:model-value="onUpdateProjectId"
+      :options="filteredOptions"
+      class="q-pb-md" />
+    <span v-if="payload.project.id?.value === 0">
+      <q-input
+        outlined
+        :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
+        class="q-pb-md"
+        clearable
+        :model-value="payload.project.title"
+        label="Project Title *"
+        @update:model-value="onUpdateProjectTitle"
+        @focus="clearDefaultProjectTitle"
+        @blur="restoreDefaultProjectTitle" />
+      <q-input
+        outlined
+        :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
+        class="q-pb-md"
+        clearable
+        :model-value="payload.project.subtitle"
+        label="Project SubTitle"
+        @update:model-value="onUpdateProjectSubtitle" />
+      <q-radio v-model="localPosterType" val="default" label="Default" color="accent" /><br />
+      <q-radio v-model="localPosterType" val="new" label="Upload Photo" color="accent" />
+    </span>
+    <q-file
+      v-if="localPosterType === 'new'"
+      label="Profile Poster (Image)"
+      outlined
+      :model-value="posterFile"
+      accept="image/*"
+      class="q-py-md"
+      color="accent"
+      @update:model-value="onUpdatePosterFile">
+      <template v-slot:prepend>
+        <q-icon name="image" @click.stop.prevent />
+      </template>
+      <template v-slot:append>
+        <q-icon name="close" @click.stop.prevent="emitUpdatePosterNull" class="cursor-pointer" />
+      </template>
+    </q-file>
+    <div class="width250x">
+      <ProjectPoster :project="project" />
     </div>
   </div>
 </template>
@@ -77,7 +68,9 @@ const emit = defineEmits(['update:payload', 'update:posterFile'])
 // Parent now syncs projects per-channel, but keep this defensive.
 const filteredOptions = computed(() => {
   const list = Array.isArray(props.projects) ? props.projects : []
-  return list.map(({ id, title }) => ({ value: id, label: title })).concat({ value: 0, label: 'New...' })
+  return list
+    .map(({ id, title }) => ({ value: id, label: title }))
+    .concat({ value: 0, label: 'New...' })
 })
 
 const localPosterType = computed({

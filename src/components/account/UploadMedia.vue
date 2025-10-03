@@ -19,8 +19,14 @@
       :vertical="$q.screen.lt.md"
       header-nav>
       <!-- Step 1: Media first -->
-      <q-step :name="1" title="Media" icon="fas fa-file-video" :done="step > 1" :header-nav="false">
+      <q-step
+        :name="1"
+        :title="step > 1 ? media.title : 'Media'"
+        icon="fas fa-file-video"
+        :done="step > 1"
+        :header-nav="false">
         <MediaStep
+          class="step"
           :payload="payload"
           :media="media"
           :mediaFile="mediaFile"
@@ -36,11 +42,12 @@
       <!-- Step 2: Channel -->
       <q-step
         :name="2"
-        title="Channel"
+        :title="step > 2 ? payload.title : 'Channel'"
         icon="fas fa-video"
         :done="step > 2"
         :header-nav="step === 1 && !!next">
         <ChannelStep
+          class="step"
           :payload="payload"
           :channels="channels"
           :profile="profile"
@@ -54,11 +61,12 @@
       <!-- Step 3: Project -->
       <q-step
         :name="3"
-        title="Project"
+        :title="step > 3 ? project.title : 'Project'"
         icon="fas fa-film"
         :done="step > 3"
         :header-nav="step === 2 && !!next">
         <ProjectStep
+          class="step"
           :payload="payload"
           :projects="projects"
           :project="project"
@@ -652,3 +660,11 @@ onBeforeRouteLeave((to, from, next) => {
   next()
 })
 </script>
+
+<style scoped>
+.step {
+  width: 100%;
+  max-width: 720px;
+  min-width: 240px;
+}
+</style>

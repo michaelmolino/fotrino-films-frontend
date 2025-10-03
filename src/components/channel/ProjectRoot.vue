@@ -23,8 +23,7 @@
           v-if="media?.comments_enabled"
           :loggedIn="!!profile?.id"
           :privateId="media?.private_id"
-          class="q-my-md"
-        />
+          class="q-my-md" />
 
         <template v-if="hasRelatedContent">
           <div class="q-pt-md text-h6">Related Content</div>
