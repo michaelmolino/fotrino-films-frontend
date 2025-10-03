@@ -5,55 +5,88 @@ import imageCompression from 'browser-image-compression'
 export function useFileProcessor() {
   const uploadFiles = ref([])
 
-  async function handleFile(file, resourceType) {
-    if (!file) return
+  // helpers to reduce complexity and clarify intent
+  const IMAGE_TYPES = new Set(['cover', 'poster', 'preview'])
 
-    if (['cover', 'poster', 'preview'].includes(resourceType)) {
-      // add placeholder entry immediately so uploads see a file exists
-      const indexExisting = uploadFiles.value.findIndex(r => r.resourceType === resourceType)
-      if (indexExisting === -1) {
-        uploadFiles.value.push({ resourceType, file, processing: true })
-      } else {
-        uploadFiles.value[indexExisting] = { resourceType, file, processing: true }
-      }
+  function findIndex(resourceType) {
+    return uploadFiles.value.findIndex(r => r.resourceType === resourceType)
+  }
 
-      // compress in background and replace placeholder when done
-      try {
-        const options = {
-          fileType: 'image/jpeg',
-          maxWidthOrHeight: 720,
-          useWebWorker: true
-        }
-        const compressedFile = await imageCompression(file, options)
-        const idx = uploadFiles.value.findIndex(r => r.resourceType === resourceType)
-        if (idx !== -1) {
-          uploadFiles.value[idx].file = compressedFile
-          uploadFiles.value[idx].processing = false
-        } else {
-          uploadFiles.value.push({ resourceType, file: compressedFile, processing: false })
-        }
-        return compressedFile
-      } catch (error) {
-        // keep original file but mark processing false and notify user
-        const idx = uploadFiles.value.findIndex(r => r.resourceType === resourceType)
-        if (idx !== -1) uploadFiles.value[idx].processing = false
-        console.error('Error processing file:', error)
-        Notify.create({
-          type: 'negative',
-          message: 'Error processing image. Using original file.',
-          timeout: 5000
-        })
-        return file
-      }
-    } else if (resourceType === 'upload') {
-      const index = uploadFiles.value.findIndex(r => r.resourceType === resourceType)
-      if (index !== -1) {
-        uploadFiles.value[index].file = file
-      } else {
-        uploadFiles.value.push({ resourceType: resourceType, file: file })
-      }
+  function upsertEntry(resourceType, file, processing) {
+    const idx = findIndex(resourceType)
+    const entry = { resourceType, file, ...(processing !== undefined ? { processing } : {}) }
+    if (idx === -1) uploadFiles.value.push(entry)
+    else uploadFiles.value[idx] = { ...uploadFiles.value[idx], ...entry }
+  }
+
+  function markProcessing(resourceType, processing) {
+    const idx = findIndex(resourceType)
+    if (idx !== -1) uploadFiles.value[idx].processing = processing
+  }
+
+  async function compressImage(file) {
+    const options = { fileType: 'image/jpeg', maxWidthOrHeight: 720, useWebWorker: true }
+    return imageCompression(file, options)
+  }
+
+  async function handleImageResource(file, resourceType) {
+    // add placeholder immediately so other flows see a file
+    upsertEntry(resourceType, file, true)
+    try {
+      const compressed = await compressImage(file)
+      upsertEntry(resourceType, compressed, false)
+      return compressed
+    } catch (error) {
+      // keep original file but mark processing false and notify user
+      markProcessing(resourceType, false)
+      console.error('Error processing file:', error)
+      Notify.create({
+        type: 'negative',
+        message: 'Error processing image. Using original file.',
+        timeout: 5000
+      })
       return file
     }
+  }
+
+  function handleUploadResource(file) {
+    upsertEntry('upload', file)
+    return file
+  }
+
+  async function handleFile(file, resourceType) {
+    if (!file) return
+    if (IMAGE_TYPES.has(resourceType)) return handleImageResource(file, resourceType)
+    if (resourceType === 'upload') return handleUploadResource(file)
+  }
+
+  // helpers for async event and canvas operations to reduce nesting
+  function waitForVideoEvent(video, eventName) {
+    return new Promise((resolve, reject) => {
+      const onEvent = () => {
+        cleanup()
+        resolve()
+      }
+      const onError = e => {
+        cleanup()
+        reject(e)
+      }
+      const cleanup = () => {
+        video.removeEventListener(eventName, onEvent)
+        video.removeEventListener('error', onError)
+      }
+      video.addEventListener(eventName, onEvent, { once: true })
+      video.addEventListener('error', onError, { once: true })
+    })
+  }
+
+  function toBlobAsync(canvas, type) {
+    return new Promise((resolve, reject) => {
+      canvas.toBlob(blob => {
+        if (blob) resolve(blob)
+        else reject(new Error('Failed to create blob from canvas'))
+      }, type)
+    })
   }
 
   // Extract a random frame from a video File and return an object URL
@@ -63,40 +96,37 @@ export function useFileProcessor() {
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
 
-    video.src = URL.createObjectURL(file)
+    const srcUrl = URL.createObjectURL(file)
+    video.src = srcUrl
     video.muted = true
     video.playsInline = true
 
     // attempt to autoplay then pause (iOS hack)
     const playPromise = video.play()
     if (playPromise !== undefined) {
-      playPromise.then(() => video.pause()).catch(() => {})
+      try {
+        await playPromise
+        video.pause()
+      } catch (_) {
+        // ignore autoplay errors
+      }
     }
 
-    return new Promise((resolve, reject) => {
-      video.onloadedmetadata = () => {
-        // pick a random frame
-        video.currentTime = Math.random() * video.duration
-      }
-      video.onseeked = () => {
-        canvas.width = video.videoWidth
-        canvas.height = video.videoHeight
-        ctx.drawImage(video, 0, 0)
-        canvas.toBlob(blob => {
-          if (!blob) {
-            reject(new Error('Failed to create blob from canvas'))
-            return
-          }
-          try {
-            const url = URL.createObjectURL(blob)
-            resolve({ url, blob })
-          } catch (e) {
-            reject(e)
-          }
-        }, 'image/jpeg')
-      }
-      video.onerror = e => reject(e)
-    })
+    try {
+      await waitForVideoEvent(video, 'loadedmetadata')
+      // pick a random frame
+      video.currentTime = Math.random() * video.duration
+      await waitForVideoEvent(video, 'seeked')
+
+      canvas.width = video.videoWidth
+      canvas.height = video.videoHeight
+      ctx.drawImage(video, 0, 0)
+      const blob = await toBlobAsync(canvas, 'image/jpeg')
+      const url = URL.createObjectURL(blob)
+      return { url, blob }
+    } finally {
+      URL.revokeObjectURL(srcUrl)
+    }
   }
 
   return {

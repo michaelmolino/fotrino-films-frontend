@@ -611,7 +611,7 @@ async function factoryUpload() {
     isUploading.value = false
     progress.value = -1
     statusText.value = 'Something went wrong!'
-    return Promise.reject(err)
+    throw err
   }
 }
 
