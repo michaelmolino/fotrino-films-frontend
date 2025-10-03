@@ -31,7 +31,7 @@
     "@babel/eslint-parser": "^7.28.4",
     "@quasar/app-webpack": "^4.2.7",
     "autoprefixer": "^10.4.21",
-    "babel-loader": "^9.1.2",
+    "babel-loader": "^10.0.0",
     "eslint": "^7.14.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-config-standard": "^16.0.2",
