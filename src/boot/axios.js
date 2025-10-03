@@ -51,7 +51,6 @@ export default boot(({ app, router, store }) => {
     // Attach CSRF only when available and required
     if (['post', 'put', 'delete'].includes(method)) {
       const s = getStore()
-      console.log('Attaching CSRF token to request', s?.state?.account?.profile)
       const token = s?.state?.account?.profile?.csrf_token
       if (token) {
         req.headers['X-CSRFToken'] = token
