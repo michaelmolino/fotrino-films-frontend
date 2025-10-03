@@ -1,7 +1,10 @@
 <template>
-  <div class="q-py-md flex items-center">
-    <q-icon :name="icon" class="q-px-sm" />
-    <span>{{ text }}</span>
+  <div class="q-my-md full-width flex flex-center">
+    <div class="row items-center no-wrap">
+      <q-icon :name="icon" size="sm" color="grey-5" class="q-mr-sm" />
+      <span class="text-subtitle2 text-grey-6">{{ text }}</span>
+      <slot />
+    </div>
   </div>
 </template>
 
