@@ -13,8 +13,6 @@
 <script setup>
 import { computed, onMounted, onBeforeUnmount, watch, ref, nextTick } from 'vue'
 import Hls from 'hls.js'
-import Plyr from 'plyr'
-import 'plyr/dist/plyr.css'
 
 defineOptions({ name: 'PlyrPlayer' })
 
@@ -47,7 +45,9 @@ function destroyPlayers() {
 function setSource() {
   const el = document.getElementById('player')
   if (!el || !props.media) return
-  player.value = new Plyr(el, {
+  const PlyrCtor = window.Plyr
+  if (!PlyrCtor) return
+  player.value = new PlyrCtor(el, {
     settings: [],
     controls: [
       'play-large',
