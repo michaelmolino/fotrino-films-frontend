@@ -26,7 +26,7 @@
           class="q-my-md" />
 
         <template v-if="hasRelatedContent">
-          <div class="q-pt-md text-h6">Related Content</div>
+          <div class="q-pt-md text-h6">{{ project.title }}</div>
           <div class="row">
             <div
               v-for="related in relatedMedia"
