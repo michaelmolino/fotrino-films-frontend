@@ -2,7 +2,7 @@
   <div class="q-pa-md">
     <template v-if="channel?.uuid">
       <div :key="channel?.uuid || route.fullPath">
-        <div class="row">
+        <div class="row items-center q-mb-sm">
           <BreadCrumbs :channel="channel" :project="null" :media="null" />
           <q-space />
           <ViewToggle
@@ -11,33 +11,38 @@
             :mainCount="mainCount"
             :allCount="allCount" />
         </div>
+        <q-separator spaced />
 
-        <div class="row" v-if="selectedView === 'projects'">
-          <div
-            class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
-            v-for="project in projects"
-            :key="project.id">
-            <ProjectPoster
-              :project="project"
-              :to="`/${channel.uuid}/${channel.slug}/${project.slug}`" />
+        <template v-if="selectedView === 'projects'">
+          <div class="row q-mt-sm">
+            <div
+              class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
+              v-for="project in projects"
+              :key="project.id">
+              <ProjectPoster
+                :project="project"
+                :to="`/${channel.uuid}/${channel.slug}/${project.slug}`" />
+            </div>
+            <NothingText v-if="projects.length === 0" text="No content available." />
           </div>
-          <NothingText v-if="projects.length === 0" text="No content available." />
-        </div>
-
-        <div class="row q-pt-md" v-else>
-          <div
-            class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm text-center"
-            v-for="item in sortedMedia"
-            :key="item.media.id">
-            <MediaPreview
-              :channel="channel"
-              :project="item.project"
-              :media="item.media"
-              :to="`/${channel.uuid}/${channel.slug}/${item.project.slug}/${item.media.slug}`"
-              :detail="true" />
+        </template>
+        <template v-else>
+          <div class="row q-pt-md">
+            <div
+              class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm text-center"
+              v-for="item in sortedMedia"
+              :key="item.media.id">
+              <MediaPreview
+                :channel="channel"
+                :project="item.project"
+                :media="item.media"
+                :to="`/${channel.uuid}/${channel.slug}/${item.project.slug}/${item.media.slug}`"
+                :detail="true"
+                :showMainAccent="selectedView !== 'main'" />
+            </div>
+            <NothingText v-if="sortedMedia.length === 0" text="No content available." />
           </div>
-          <NothingText v-if="sortedMedia.length === 0" text="No content available." />
-        </div>
+        </template>
       </div>
     </template>
 

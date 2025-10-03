@@ -4,7 +4,7 @@
     dense
     no-caps
     padding="8px"
-    :class="media.main ? 'fit bg-accent width720' : 'fit width720'">
+    :class="['fit', 'width720', { 'bg-accent': media.main && showMainAccent }]">
     <q-badge
       v-if="media.type?.startsWith('audio/')"
       class="bg-accent q-pa-md z-top"
@@ -41,10 +41,11 @@
 </template>
 
 <script setup>
-const { media, project, detail } = defineProps({
+const { media, project, detail, showMainAccent } = defineProps({
   media: Object,
   project: Object,
-  detail: Boolean
+  detail: Boolean,
+  showMainAccent: { type: Boolean, default: true }
 })
 </script>
 

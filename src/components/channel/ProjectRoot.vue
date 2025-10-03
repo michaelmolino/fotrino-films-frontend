@@ -17,16 +17,18 @@
           :artist="channel?.ownername"
           class="q-py-md plyrplayer" />
 
-        <MediaDescription v-if="media" :media="media" />
-
-        <CommentsBox
-          v-if="media?.comments_enabled"
-          :loggedIn="!!profile?.id"
-          :privateId="media?.private_id"
-          class="q-my-md" />
+        <div v-if="media" class="plyrplayer">
+          <MediaDescription :media="media" />
+          <CommentsBox
+            v-if="media?.comments_enabled"
+            :loggedIn="!!profile?.id"
+            :privateId="media?.private_id"
+            class="q-my-md" />
+        </div>
 
         <template v-if="hasRelatedContent">
-          <div class="q-pt-md text-h6">{{ project.title }}</div>
+          <div class="q-pt-md text-h6">More from {{ project.title }}</div>
+          <q-separator spaced />
           <div class="row">
             <div
               v-for="related in relatedMedia"
