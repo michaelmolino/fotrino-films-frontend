@@ -89,6 +89,33 @@ export function useFileProcessor() {
     })
   }
 
+  function ensureMetadata(video) {
+    // HAVE_METADATA = 1
+    if (video.readyState >= 1) return Promise.resolve()
+    return waitForVideoEvent(video, 'loadedmetadata')
+  }
+
+  function waitForSeek(video, time) {
+    return new Promise((resolve, reject) => {
+      const onSeeked = () => {
+        cleanup()
+        resolve()
+      }
+      const onError = e => {
+        cleanup()
+        reject(e)
+      }
+      const cleanup = () => {
+        video.removeEventListener('seeked', onSeeked)
+        video.removeEventListener('error', onError)
+      }
+      video.addEventListener('seeked', onSeeked, { once: true })
+      video.addEventListener('error', onError, { once: true })
+      // trigger seek after listeners are attached to avoid missing the event
+      video.currentTime = time
+    })
+  }
+
   // Extract a random frame from a video File and return an object URL
   async function getRandomFrameFromFile(file) {
     if (!file) return null
@@ -113,10 +140,14 @@ export function useFileProcessor() {
     }
 
     try {
-      await waitForVideoEvent(video, 'loadedmetadata')
-      // pick a random frame
-      video.currentTime = Math.random() * video.duration
-      await waitForVideoEvent(video, 'seeked')
+      await ensureMetadata(video)
+      // pick a random frame (avoid exact end) and wait for seek to complete
+      const epsilon = 0.05
+      const target = Math.max(
+        0.01,
+        Math.min(video.duration - epsilon, Math.random() * video.duration)
+      )
+      await waitForSeek(video, target)
 
       canvas.width = video.videoWidth
       canvas.height = video.videoHeight
