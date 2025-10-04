@@ -2,7 +2,12 @@
   <div class="header-content">
     <q-item-section avatar>
       <q-avatar :square="square">
-        <q-img :src="image" class="cover" />
+        <template v-if="image">
+          <q-img :src="image" class="cover" />
+        </template>
+        <template v-else>
+          <div class="cover avatar-fill" :style="{ backgroundColor: color || '#000000' }" />
+        </template>
       </q-avatar>
     </q-item-section>
 
@@ -41,6 +46,7 @@ defineOptions({ name: 'ResourceHeader' })
 defineProps({
   title: String,
   image: String,
+  color: String,
   pending: Boolean,
   link: String,
   square: Boolean,
@@ -74,5 +80,9 @@ defineEmits(['delete'])
 }
 .cover {
   object-fit: cover;
+}
+.avatar-fill {
+  width: 100%;
+  height: 100%;
 }
 </style>

@@ -10,6 +10,8 @@ function sortChannel(channel) {
   if (!channel) return channel
   const projects = sortByDateDesc(channel.projects).map(project => ({
     ...project,
+    // Normalize backend snake_case to camelCase for frontend components
+    posterColor: project.posterColor || project.poster_color || null,
     media: sortByDateDesc(project.media)
   }))
   return { ...channel, projects }

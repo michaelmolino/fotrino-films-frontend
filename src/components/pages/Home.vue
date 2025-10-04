@@ -21,10 +21,14 @@
       </div>
       <div class="row justify-center q-gutter-sm q-mt-md">
         <div class="col-auto">
-          <q-btn color="accent" unelevated rounded size="md"
-                 icon="far fa-circle-play"
-                 label="Explore Sample Channel"
-                 to="/9944fa03-8a73-4e52-84bc-e8a514bd1271/Sample-Channel" />
+          <q-btn
+            color="accent"
+            unelevated
+            rounded
+            size="md"
+            icon="far fa-circle-play"
+            label="Explore Sample Channel"
+            to="/9944fa03-8a73-4e52-84bc-e8a514bd1271/Sample-Channel" />
         </div>
       </div>
     </section>
@@ -38,14 +42,14 @@ import { useQuasar } from 'quasar'
 defineOptions({ name: 'Home-Page' })
 const $q = useQuasar()
 const darkClass = computed(() => ($q.dark.isActive ? 'text-white' : 'text-secondary'))
-const heroBgClass = computed(() => ($q.dark.isActive && 'bg-hero-dark'))
+const heroBgClass = computed(() => $q.dark.isActive && 'bg-hero-dark')
 </script>
 
 <style scoped>
 .bg-hero-dark {
   background:
-    radial-gradient(1000px 480px at 85% 20%, rgba(2, 123, 227, 0.28), rgba(2, 123, 227, 0.00) 68%),
-    radial-gradient(780px 360px at 10% 88%, rgba(2, 123, 227, 0.14), rgba(2, 123, 227, 0.00) 62%),
-    linear-gradient(180deg, rgba(2, 123, 227, 0.08) 0%, rgba(2, 123, 227, 0.00) 45%);
+    radial-gradient(1000px 480px at 85% 20%, rgba(2, 123, 227, 0.28), rgba(2, 123, 227, 0) 68%),
+    radial-gradient(780px 360px at 10% 88%, rgba(2, 123, 227, 0.14), rgba(2, 123, 227, 0) 62%),
+    linear-gradient(180deg, rgba(2, 123, 227, 0.08) 0%, rgba(2, 123, 227, 0) 45%);
 }
 </style>

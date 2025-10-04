@@ -38,4 +38,4 @@ yarn global add @quasar/cli
 quasar dev
 ```
 
-Note: You'll need to proxy the backend somewhere in `quasar.conf.js`.
+Note: You'll need to proxy the backend somewhere in `quasar.config.js`.

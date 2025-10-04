@@ -15,7 +15,6 @@
       <q-skeleton type="text" width="60%" />
     </template>
   </div>
-
 </template>
 
 <script setup>

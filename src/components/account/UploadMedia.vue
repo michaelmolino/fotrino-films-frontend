@@ -312,7 +312,7 @@ const project = computed(() => {
     return {
       title: payload.project.title,
       subtitle: payload.project.subtitle,
-      poster: '/images/poster.png',
+      poster: null,
       media: []
     }
   } else if (
