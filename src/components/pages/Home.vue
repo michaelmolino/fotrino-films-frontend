@@ -5,13 +5,13 @@
         <transition appear enter-active-class="animated zoomInDown slower">
           <h1 class="text-h4 q-my-none">
             <span :class="darkClass">Fotrino </span>
-            <span class="text-accent text-glow">Films </span>
+            <span class="text-accent">Films </span>
           </h1>
         </transition>
         <transition appear enter-active-class="animated zoomInDown slower delay-1s">
           <h2 class="text-h4 q-my-none">
             <span :class="darkClass">The </span>
-            <span class="text-accent text-glow">Transparent </span>
+            <span class="text-accent">Transparent </span>
             <span :class="darkClass">Video Host</span>
           </h2>
         </transition>
@@ -42,10 +42,6 @@ const heroBgClass = computed(() => ($q.dark.isActive && 'bg-hero-dark'))
 </script>
 
 <style scoped>
-.text-glow {
-  text-shadow: 0 0 12px rgba(2, 123, 227, 0.35);
-}
-
 .bg-hero-dark {
   background:
     radial-gradient(1000px 480px at 85% 20%, rgba(2, 123, 227, 0.28), rgba(2, 123, 227, 0.00) 68%),
