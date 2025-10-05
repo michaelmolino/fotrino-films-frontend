@@ -3,7 +3,11 @@
     <q-card-section vertical>
       <q-icon :name="isPublic ? 'public' : 'public_off'" size="md" class="q-pr-sm" />
       <span class="text-h6">{{ media?.title || '' }}</span>
-      <q-btn-dropdown dropdown-icon="fas fa-share-nodes" class="q-pa-md float-right" data-cy="share-button" flat>
+      <q-btn-dropdown
+        dropdown-icon="fas fa-share-nodes"
+        class="q-pa-md float-right"
+        data-cy="share-button"
+        flat>
         <q-list>
           <q-item v-if="isPublic" clickable v-close-popup @click="copyLink('public')">
             <q-item-section avatar>

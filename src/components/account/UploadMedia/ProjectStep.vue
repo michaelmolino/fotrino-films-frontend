@@ -30,7 +30,7 @@
       @update:model-value="onUpdateProjectSubtitle" />
     <q-card flat bordered class="q-pb-md">
       <q-card-section>
-        <div class="text-overline">Project Poster</div>
+        <div class="text-overline q-mb-md">Project Poster</div>
         <div class="row items-center q-gutter-sm">
           <q-radio
             v-if="payload.project.id?.value === 0"
@@ -74,7 +74,12 @@
           </template>
         </q-file>
         <div class="width250x">
-          <ProjectPoster :project="displayProject" />
+          <ProjectPoster v-if="displayProject" :project="displayProject" />
+          <q-skeleton
+            v-else
+            class="cursor-not-allowed"
+            style="width: 250px; height: 375px"
+            animation="none" />
         </div>
       </q-card-section>
     </q-card>
@@ -100,7 +105,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import ProjectPoster from '@components/channel/ProjectPoster.vue'
 const props = defineProps({
   payload: Object,
@@ -135,7 +140,14 @@ const localPosterType = computed({
 // otherwise use the existing project prop. This ensures posterColor updates
 // are reflected in the live preview.
 const displayProject = computed(() => {
-  const isNew = props.payload?.project?.id?.value === 0
+  const currentId = props.payload?.project?.id
+
+  // If id is undefined (no selection made), return null to show skeleton
+  if (currentId === undefined) {
+    return null
+  }
+
+  const isNew = currentId?.value === 0
   const base = isNew ? props.payload.project || {} : props.project || {}
   const parentProject = props.project || {}
   return {
@@ -197,4 +209,47 @@ function restoreDefaultProjectTitle() {
     })
   }
 }
+
+// Default selection behavior based on available projects:
+// - 0 projects: default to New... (value 0)
+// - 1 project: default to that project
+// - >1 projects: leave blank to force explicit selection
+function ensureDefaultProjectSelection() {
+  const list = Array.isArray(props.projects) ? props.projects : []
+  const current = props.payload?.project?.id
+
+  if (list.length === 0) {
+    // No projects available, default to New...
+    if (!current || current.value !== 0) {
+      emit('update:payload', {
+        ...props.payload,
+        project: { ...props.payload.project, id: { value: 0, label: 'New...' } }
+      })
+    }
+  } else if (list.length === 1) {
+    // Only one project, auto-select it
+    const { id, title } = list[0]
+    if (!current || current.value !== id) {
+      emit('update:payload', {
+        ...props.payload,
+        project: { ...props.payload.project, id: { value: id, label: title } }
+      })
+    }
+  } else {
+    // Multiple projects, force blank selection unless user has made a valid choice
+    const hasValidSelection = current && list.some(p => p.id === current.value)
+    if (!hasValidSelection && (!current || current.value === 0)) {
+      emit('update:payload', {
+        ...props.payload,
+        project: { ...props.payload.project, id: undefined }
+      })
+    }
+  }
+}
+
+onMounted(() => ensureDefaultProjectSelection())
+watch(
+  () => (props.projects || []).length,
+  () => ensureDefaultProjectSelection()
+)
 </script>
