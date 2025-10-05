@@ -21,7 +21,7 @@ Feel free to use this live demo as a playground. It is always the most up to dat
 
 ## Backend
 
-The backend is written in Python. I may make the source code available in the future, but currently it is private.
+The backend is written in Python and is in a private repo.
 
 ## Development
 
