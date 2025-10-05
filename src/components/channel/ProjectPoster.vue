@@ -1,5 +1,5 @@
 <template>
-  <q-btn flat dense no-caps class="fit" padding="16px" :to="to">
+  <q-btn flat dense no-caps class="fit" padding="16px" data-cy="project-poster" :to="to">
     <q-badge class="bg-accent q-pa-md z-top" floating transparent>
       <span class="text-bold">{{ project.media.length }}</span>
     </q-badge>

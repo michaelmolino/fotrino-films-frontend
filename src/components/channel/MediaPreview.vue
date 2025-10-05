@@ -4,6 +4,7 @@
     dense
     no-caps
     padding="8px"
+    data-cy="media-preview"
     :class="['fit', 'width720', { 'bg-accent': media.main && showMainAccent }]">
     <q-badge
       v-if="media.type?.startsWith('audio/')"
