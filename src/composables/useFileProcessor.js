@@ -5,7 +5,6 @@ import imageCompression from 'browser-image-compression'
 export function useFileProcessor() {
   const uploadFiles = ref([])
 
-  // helpers to reduce complexity and clarify intent
   const IMAGE_TYPES = new Set(['cover', 'poster', 'preview'])
 
   function findIndex(resourceType) {
@@ -60,7 +59,6 @@ export function useFileProcessor() {
     if (resourceType === 'upload') return handleUploadResource(file)
   }
 
-  // helpers for async event and canvas operations to reduce nesting
   function waitForVideoEvent(video, eventName) {
     return new Promise((resolve, reject) => {
       const onEvent = () => {
@@ -90,7 +88,6 @@ export function useFileProcessor() {
   }
 
   function ensureMetadata(video) {
-    // HAVE_METADATA = 1
     if (video.readyState >= 1) return Promise.resolve()
     return waitForVideoEvent(video, 'loadedmetadata')
   }

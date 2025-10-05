@@ -4,7 +4,7 @@
       <q-card-section>
         <q-img
           :src="profilePic"
-          class="width250x"
+          class="width250"
           :ratio="1"
           fit="cover"
           :alt="safeName || safeEmail">
@@ -31,7 +31,7 @@
         </div>
       </q-card-section>
     </q-card>
-    <q-skeleton v-else type="rect" animation="pulse" class="width250x" />
+    <q-skeleton v-else type="rect" animation="pulse" class="width250" />
   </div>
 </template>
 

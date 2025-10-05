@@ -23,7 +23,7 @@ export function getMetaData(route, channel) {
     title = media?.title || null
     description = sanitizeText(media?.description_unsafe)
     image = media?.preview || null
-    type = 'video.other'
+    type = 'video'
   }
 
   // Case: Private media
@@ -32,7 +32,7 @@ export function getMetaData(route, channel) {
     title = media?.title || null
     description = sanitizeText(media?.description_unsafe)
     image = media?.preview || null
-    type = 'video.other'
+    type = 'video'
   }
 
   // Branding
@@ -48,11 +48,25 @@ export function getMetaData(route, channel) {
   return {
     title,
     meta: {
+      description: { name: 'description', content: description },
+      // Open Graph
       ogUrl: { property: 'og:url', content: ogUrl },
       ogTitle: { property: 'og:title', content: title },
       ogDescription: { property: 'og:description', content: description },
       ogImage: { property: 'og:image', content: image },
-      ogType: { property: 'og:type', content: type }
+      ogImageAlt: { property: 'og:image:alt', content: title },
+      ogType: { property: 'og:type', content: type },
+      ogSiteName: { property: 'og:site_name', content: 'Fotrino Films' },
+
+      // Twitter Cards
+      twitterCard: { name: 'twitter:card', content: type === 'video' ? 'player' : 'summary_large_image' },
+      twitterTitle: { name: 'twitter:title', content: title },
+      twitterDescription: { name: 'twitter:description', content: description },
+      twitterImage: { name: 'twitter:image', content: image },
+      twitterImageAlt: { name: 'twitter:image:alt', content: title },
+      ...(type === 'video' && {
+        twitterPlayer: { name: 'twitter:player', content: ogUrl }
+      })
     }
   }
 }

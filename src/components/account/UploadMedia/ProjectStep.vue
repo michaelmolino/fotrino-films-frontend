@@ -73,7 +73,7 @@
               class="cursor-pointer" />
           </template>
         </q-file>
-        <div class="width250x">
+        <div class="width250">
           <ProjectPoster v-if="displayProject" :project="displayProject" />
           <q-skeleton
             v-else
@@ -91,7 +91,7 @@
         <q-card-section>
           <q-color
             class="q-mt-sm"
-            :model-value="payload.project.posterColor || defaultColor"
+            :model-value="payload.project.poster_color || defaultColor"
             @update:model-value="onUpdatePosterColor"
             format="hex"
             default-view="palette" />
@@ -137,7 +137,7 @@ const localPosterType = computed({
 })
 
 // Use payload.project for preview when creating a new project (id === 0),
-// otherwise use the existing project prop. This ensures posterColor updates
+// otherwise use the existing project prop. This ensures poster_color updates
 // are reflected in the live preview.
 const displayProject = computed(() => {
   const currentId = props.payload?.project?.id
@@ -159,7 +159,7 @@ const displayProject = computed(() => {
     title: base.title || parentProject.title || '',
     subtitle: base.subtitle || parentProject.subtitle || '',
     // Use the selected color from payload for default posters
-    posterColor: props.payload?.project?.posterColor || defaultColor
+    poster_color: props.payload?.project?.poster_color || defaultColor
   }
 })
 
@@ -187,7 +187,7 @@ function onUpdatePosterColor(val) {
   }
   emit('update:payload', {
     ...props.payload,
-    project: { ...props.payload.project, posterColor: color }
+    project: { ...props.payload.project, poster_color: color }
   })
 }
 function onUpdatePosterFile(fileOrFiles) {

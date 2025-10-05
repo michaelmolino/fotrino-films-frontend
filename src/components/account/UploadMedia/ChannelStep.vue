@@ -68,18 +68,18 @@
                   payload.coverType === 'new' &&
                   !coverFile)
               "
-              class="cursor-not-allowed width250x height250x"
+              class="cursor-not-allowed width250 height250"
               animation="none" />
             <q-img
               v-if="payload.uuid && payload.uuid.value !== 0"
               :src="channels.find(ch => ch.uuid === payload.uuid.value).cover"
-              class="width250x"
+              class="width250"
               :ratio="1 / 1"
               fit="cover" />
             <q-img
               v-if="payload.uuid && payload.uuid.value === 0"
               :src="payload.coverType === 'profile' ? profile.profile_pic : coverThumb"
-              class="width250x"
+              class="width250"
               :ratio="1 / 1"
               fit="cover" />
           </q-avatar>

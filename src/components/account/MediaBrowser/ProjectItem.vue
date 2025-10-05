@@ -12,7 +12,7 @@
       <ResourceActions
         :title="project.title"
         :image="project.poster"
-        :color="project.posterColor || project.poster_color || '#000000'"
+        :color="project.poster_color || '#000000'"
         :pending="project.pending"
         :link="getMediaLink('project', project.id)"
         @delete="$emit('deleteProject', project.id)" />

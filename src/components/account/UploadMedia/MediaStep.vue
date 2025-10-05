@@ -70,7 +70,7 @@
           </q-file>
           <div class="row items-center q-gutter-sm">
             <div class="col-auto">
-              <div class="width250x">
+              <div class="width250">
                 <MediaPreview :media="media" />
               </div>
             </div>

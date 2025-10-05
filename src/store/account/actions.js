@@ -1,5 +1,7 @@
 import { api } from 'boot/axios'
 
+// Helpers
+
 async function fetchAndCommit(context, { url, mutation, extract }) {
   try {
     const { data } = await api.get(url)
@@ -11,6 +13,8 @@ async function fetchAndCommit(context, { url, mutation, extract }) {
     throw error
   }
 }
+
+// Actions
 
 export function getProfile(context) {
   return fetchAndCommit(context, {

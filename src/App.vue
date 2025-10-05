@@ -10,7 +10,6 @@
       </q-card-actions>
     </q-card>
   </q-dialog>
-
   <router-view />
 </template>
 
@@ -41,7 +40,6 @@ export default {
     const onRouteChange = async () => {
       try {
         let channel = null
-
         if (route.params?.uuid) {
           channel = await store.cache.dispatch('channel/getChannel', {
             uuid: route.params.uuid,
@@ -52,14 +50,12 @@ export default {
           channel = await store.cache.dispatch('channel/getPrivateMedia', route.params.privateId)
           store.commit('channel/SET_CHANNEL', channel)
         }
-
         if (channel?.uuid) {
           router.replace({
             params: { channelSlug: channel.slug },
             query: route.query
           })
         }
-
         metaData.value = getMetaData(route, channel)
       } catch {
         metaData.value = getMetaData(null, null)

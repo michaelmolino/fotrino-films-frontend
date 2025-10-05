@@ -32,8 +32,9 @@ axiosRetry(objectApi, {
 
 export default boot(({ app, router, store }) => {
   // Access the store reliably even if not passed in boot context
+  // This feels like a hack; ideally Quasar should do this
   const getStore = () => app?.config?.globalProperties?.$store || store
-  // Track concurrent requests to avoid hiding the loader too early
+
   let pending = 0
   const showLoader = () => {
     if (pending === 0) {
