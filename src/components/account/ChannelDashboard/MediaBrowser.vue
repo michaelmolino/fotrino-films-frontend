@@ -17,8 +17,6 @@
 import { useStore } from 'vuex'
 import ChannelItem from './MediaBrowser/ChannelItem.vue'
 
-defineOptions({ name: 'MediaBrowser' })
-
 const store = useStore()
 const props = defineProps({
   channels: { type: Array, default: () => [] }

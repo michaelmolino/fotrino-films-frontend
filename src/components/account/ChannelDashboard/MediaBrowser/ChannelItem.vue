@@ -30,8 +30,6 @@
 import ResourceActions from './ResourceActions.vue'
 import ProjectItem from './ProjectItem.vue'
 
-defineOptions({ name: 'ChannelItem' })
-
 defineProps({
   channel: Object,
   getMediaLink: Function

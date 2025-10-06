@@ -41,8 +41,6 @@
 </template>
 
 <script setup>
-defineOptions({ name: 'ResourceHeader' })
-
 defineProps({
   title: String,
   image: String,

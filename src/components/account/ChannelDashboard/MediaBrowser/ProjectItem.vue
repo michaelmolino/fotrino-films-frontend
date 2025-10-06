@@ -33,8 +33,6 @@
 import ResourceActions from './ResourceActions.vue'
 import MediaItem from './MediaItem.vue'
 
-defineOptions({ name: 'ProjectItem' })
-
 defineProps({
   project: Object,
   channel: Object,

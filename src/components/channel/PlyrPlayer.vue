@@ -14,8 +14,6 @@
 import { computed, onMounted, onBeforeUnmount, watch, ref, nextTick } from 'vue'
 import Hls from 'hls.js'
 
-defineOptions({ name: 'PlyrPlayer' })
-
 const props = defineProps({
   media: Object,
   artist: String

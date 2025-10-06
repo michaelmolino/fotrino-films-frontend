@@ -9,8 +9,6 @@
 </template>
 
 <script setup>
-defineOptions({ name: 'NothingText' })
-
 defineProps({
   icon: { type: String, default: 'fas fa-circle-info' },
   text: { type: String, default: 'Nothing to see here.' }

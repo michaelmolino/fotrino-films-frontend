@@ -1,7 +1,6 @@
 <template>
   <div class="q-pa-md">
     <div class="text-h5 text-weight-bold q-mb-md">Dashboard</div>
-
     <template v-if="profile?.id">
       <div class="text-h6 text-weight-bold q-mb-sm">Profile</div>
       <ProfileCard :profile="profile" :mediaCount="mediaCount" />
@@ -20,11 +19,9 @@
 <script setup>
 import { computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
-import ProfileCard from '@components/account/ProfileCard.vue'
-import MediaBrowser from '@components/account/MediaBrowser.vue'
+import ProfileCard from '@components/account/ChannelDashboard/ProfileCard.vue'
+import MediaBrowser from '@components/account/ChannelDashboard/MediaBrowser.vue'
 import NothingText from '@components/shared/NothingText.vue'
-
-defineOptions({ name: 'ChannelDashboard' })
 
 const store = useStore()
 

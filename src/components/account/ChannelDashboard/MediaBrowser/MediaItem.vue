@@ -14,8 +14,6 @@
 <script setup>
 import ResourceActions from './ResourceActions.vue'
 
-defineOptions({ name: 'MediaItem' })
-
 defineProps({
   media: Object,
   project: Object,
