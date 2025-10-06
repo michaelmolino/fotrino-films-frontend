@@ -70,15 +70,11 @@ export default {
         )
       }
       store.dispatch('account/getProfile')
+      showTerms.value = route.query?.showTerms === 'true'
+      onRouteChange()
     })
 
-    watch(
-      () => route.fullPath,
-      () => {
-        showTerms.value = route.query?.showTerms === 'true'
-        onRouteChange()
-      }
-    )
+    watch(() => route.fullPath, onRouteChange)
 
     const onTermsClose = () => {
       if (route.query?.showTerms) {

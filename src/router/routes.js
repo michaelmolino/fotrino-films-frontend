@@ -7,8 +7,7 @@ const routes = [
       { path: 'redirect', component: () => import('@components/pages/RedirectPage.vue') },
       { path: 'help', component: () => import('@components/pages/Help.vue') },
       { path: 'terms', component: () => import('@components/pages/Terms.vue') },
-      { path: '404', component: () => import('@components/errors/404.vue') },
-      { path: '409', component: () => import('@components/errors/409.vue') }
+      { path: '404', component: () => import('@components/errors/404.vue') }
     ]
   },
   {

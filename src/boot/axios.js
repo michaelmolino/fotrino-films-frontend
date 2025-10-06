@@ -115,10 +115,6 @@ export default boot(({ app, router, store }) => {
         router.replace('/404')
         return Promise.reject(error)
       }
-      if (status === 409) {
-        router.replace('/409')
-        return Promise.reject(error)
-      }
 
       let msg = 'Something went wrong!'
       if (status === 400) msg = error?.response?.data || msg

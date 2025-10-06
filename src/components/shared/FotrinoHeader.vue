@@ -96,7 +96,7 @@
           @click="setDarkMode('dark')" />
       </q-btn-dropdown>
 
-      <!-- Auth / Account Buttons -->
+      <!-- Login Buttons -->
       <template v-if="!profile?.id">
         <q-btn-dropdown
           icon="fas fa-user"
@@ -120,6 +120,7 @@
         </q-btn-dropdown>
       </template>
 
+      <!-- Account Buttons -->
       <template v-else>
         <q-btn-dropdown
           :icon="'img:' + profile.profile_pic"
@@ -149,7 +150,7 @@
             class="fit" />
           <q-separator />
           <q-btn
-            @click="logout"
+            @click="logout(store)"
             align="left"
             flat
             no-caps
@@ -164,93 +165,25 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
-import { useQuasar, LocalStorage } from 'quasar'
-import { logout as sharedLogout } from '@utils/auth.js'
-const $q = useQuasar()
+import { useQuasar } from 'quasar'
+import { logout, storeRedirect } from '@utils/auth.js'
+import { history, removeHistory, watchChannelHistory } from '@utils/history.js'
+import { useDarkMode, darkModeIcons, setDarkMode } from '@utils/dark.js'
 
-// Vuex store is provided by Quasar app init; available during setup
+const $q = useQuasar()
 const store = useStore()
-const HISTORY_KEY = 'fotrino-films-history'
-const showHistory = ref(false)
+
 const oauthProviders = ref([
   { name: 'Google', icon: 'fab fa-google', login: process.env.API + '/account/login/google' }
 ])
 
-const profile = computed(() => store.state.account?.profile || null)
-const history = ref(LocalStorage.getItem(HISTORY_KEY) || [])
+const profile = store.state.account?.profile
 
-onMounted(() => {})
+const showHistory = ref(false)
+watchChannelHistory(store)
 
-watch(
-  () => store.state.channel.channel,
-  newChannel => {
-    if (newChannel && newChannel.uuid && newChannel.title && newChannel.slug) {
-      addHistory(newChannel)
-    }
-  },
-  { immediate: true }
-)
-
-function logout() {
-  sharedLogout(store)
-}
-
-function addHistory(channel) {
-  const current = LocalStorage.getItem(HISTORY_KEY) || []
-  if (!current.some(c => c.uuid === channel.uuid)) {
-    const updated = [...current, { uuid: channel.uuid, title: channel.title, slug: channel.slug }]
-    LocalStorage.set(HISTORY_KEY, updated)
-    history.value = updated
-  }
-}
-
-function removeHistory(uuid) {
-  const current = LocalStorage.getItem(HISTORY_KEY) || []
-  const updated = current.filter(u => u.uuid !== uuid)
-  LocalStorage.set(HISTORY_KEY, updated)
-  history.value = updated
-}
-
-const DARK_KEY = 'fotrino-films-darkmode'
-const darkModePref = ref(LocalStorage.getItem(DARK_KEY) || 'auto')
-const systemDark = ref(window.matchMedia('(prefers-color-scheme: dark)').matches)
-
-function applyDarkMode() {
-  if (darkModePref.value === 'auto') {
-    $q.dark.set(systemDark.value)
-  } else {
-    $q.dark.set(darkModePref.value === 'dark')
-  }
-}
-
-watch(darkModePref, val => {
-  LocalStorage.set(DARK_KEY, val)
-  applyDarkMode()
-})
-
-onMounted(() => {
-  applyDarkMode()
-  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-  mediaQuery.addEventListener('change', e => {
-    systemDark.value = e.matches
-    if (darkModePref.value === 'auto') applyDarkMode()
-  })
-})
-
-function storeRedirect() {
-  LocalStorage.set('postLoginRedirect', window.location.pathname)
-}
-
-const darkModeIcons = {
-  light: 'far fa-sun',
-  auto: 'fas fa-circle-half-stroke',
-  dark: 'far fa-moon'
-}
+const { darkModePref } = useDarkMode($q)
 const darkModeIcon = computed(() => darkModeIcons[darkModePref.value])
-
-function setDarkMode(mode) {
-  darkModePref.value = mode
-}
 </script>
