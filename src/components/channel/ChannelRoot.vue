@@ -64,7 +64,7 @@ import { useStore } from 'vuex'
 import { LocalStorage } from 'quasar'
 import { useRoute } from 'vue-router'
 
-import BreadCrumbs from '@components/channel/BreadCrumbs.vue'
+import BreadCrumbs from '@components/shared/BreadCrumbs.vue'
 import ProjectPoster from '@components/channel/ProjectPoster.vue'
 import MediaPreview from '@components/channel/MediaPreview.vue'
 import ViewToggle from '@components/channel/ViewToggle.vue'

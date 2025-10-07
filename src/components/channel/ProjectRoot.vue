@@ -54,7 +54,7 @@
 </template>
 
 <script setup>
-import BreadCrumbs from '@components/channel/BreadCrumbs.vue'
+import BreadCrumbs from '@components/shared/BreadCrumbs.vue'
 import MediaPreview from '@components/channel/MediaPreview.vue'
 import PlyrPlayer from '@components/channel/PlyrPlayer.vue'
 import MediaDescription from '@components/channel/MediaDescription.vue'
