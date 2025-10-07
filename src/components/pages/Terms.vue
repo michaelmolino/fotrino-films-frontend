@@ -98,7 +98,7 @@
             <q-btn
               flat
               dense
-              :icon="'img:' + 'https://commentbox.io/favicon-32x32.png'"
+              :icon="'img:' + '/images/commentbox-32x32.png'"
               label="commentbox.io"
               href="https://commentbox.io/" />
             ) comment system. We share your name, email address, and profile photo with CommentBox
