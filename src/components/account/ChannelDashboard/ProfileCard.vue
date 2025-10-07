@@ -21,10 +21,10 @@
         <div class="flex no-wrap">
           <div class="fit">
             <div class="ellipsis text2">Joined {{ joinedText }}</div>
-            <div class="ellipsis text2">{{ mediaCount }} videos</div>
+            <div class="ellipsis text2" data-cy="video-count">{{ mediaCount }} videos</div>
           </div>
           <div class="q-pl-sm">
-            <q-btn to="/account/upload" flat no-caps icon="fas fa-cloud-arrow-up">
+            <q-btn to="/account/upload" flat no-caps icon="fas fa-cloud-arrow-up" data-cy="upload-button">
               <q-tooltip>Upload Media</q-tooltip>
             </q-btn>
           </div>

@@ -20,6 +20,7 @@
       :key="project.id"
       :project="project"
       :channel="channel"
+      data-cy="project-item"
       @deleteProject="$emit('deleteProject', $event)"
       @deleteMedia="$emit('deleteMedia', $event)"
       :getMediaLink="getMediaLink" />

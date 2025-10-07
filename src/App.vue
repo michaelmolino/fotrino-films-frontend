@@ -63,13 +63,17 @@ export default {
       }
     }
 
-    onMounted(() => {
+    onMounted(async () => {
       if (process.env.NODE_ENV === 'development') {
         console.warn(
           'WARNING: This is a development server and should not be exposed to the internet.'
         )
       }
-      store.dispatch('account/getProfile')
+      try {
+        await store.dispatch('account/getProfile')
+      } catch (error) {
+        console.debug('Profile fetch failed:', error.response?.status)
+      }
       showTerms.value = route.query?.showTerms === 'true'
       onRouteChange()
     })

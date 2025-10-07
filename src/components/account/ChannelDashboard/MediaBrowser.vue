@@ -6,6 +6,7 @@
         :key="channel.uuid"
         :channel="channel"
         :getMediaLink="getMediaLink"
+        data-cy="channel-item"
         @deleteChannel="deleteResource('channel', $event)"
         @deleteProject="deleteResource('project', $event)"
         @deleteMedia="deleteResource('media', $event)" />

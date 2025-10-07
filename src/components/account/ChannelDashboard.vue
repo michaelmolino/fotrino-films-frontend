@@ -1,11 +1,11 @@
 <template>
-  <div class="q-pa-md">
+  <div class="q-pa-md" data-cy="dashboard">
     <div class="text-h5 text-weight-bold q-mb-md">Dashboard</div>
     <template v-if="profile?.id">
       <div class="text-h6 text-weight-bold q-mb-sm">Profile</div>
-      <ProfileCard :profile="profile" :mediaCount="mediaCount" />
+      <ProfileCard :profile="profile" :mediaCount="mediaCount" data-cy="profile-card" />
       <div v-if="hasChannels" class="text-h6 text-weight-bold q-mt-md q-mb-sm">Media Browser</div>
-      <MediaBrowser v-if="hasChannels" :channels="channels" />
+      <MediaBrowser v-if="hasChannels" :channels="channels" data-cy="media-browser" />
       <NothingText v-else text="Your media will appear here (once you have some)." />
     </template>
     <template v-else>
@@ -38,8 +38,12 @@ const mediaCount = computed(() =>
   }, 0)
 )
 
-onMounted(() => {
-  store.dispatch('channel/getChannels', true)
+onMounted(async () => {
+  try {
+    await store.dispatch('channel/getChannels', true)
+  } catch (error) {
+    console.debug('Dashboard API call failed:', error.response?.status)
+  }
 })
 </script>
 

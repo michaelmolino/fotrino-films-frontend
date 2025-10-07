@@ -24,6 +24,7 @@
       :media="media"
       :project="project"
       :channel="channel"
+      data-cy="media-item"
       :getMediaLink="getMediaLink"
       @deleteMedia="$emit('deleteMedia', $event)" />
   </q-expansion-item>
