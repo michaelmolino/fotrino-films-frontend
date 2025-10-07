@@ -119,7 +119,7 @@
             icon="fas fa-arrow-right"
             flat
             @click="$refs.stepper.next()"
-            label="Next"
+            :label="step === 1 && quickUploadAvailable ? 'More Options' : 'Next'"
             :disabled="!next" />
           <q-btn
             v-if="step === 3"
