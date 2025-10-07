@@ -179,7 +179,7 @@ const oauthProviders = ref([
   { name: 'Google', icon: 'fab fa-google', login: process.env.API + '/account/login/google' }
 ])
 
-const profile = store.state.account?.profile
+const profile = computed(() => store.state.account?.profile)
 
 const showHistory = ref(false)
 watchChannelHistory(store)
