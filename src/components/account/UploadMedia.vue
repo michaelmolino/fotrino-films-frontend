@@ -107,6 +107,14 @@
 
       <template v-slot:navigation>
         <q-stepper-navigation>
+          <!-- Back button for steps 2 and 3 -->
+          <q-btn
+            v-if="step === 2 || step === 3"
+            icon="fas fa-arrow-left"
+            flat
+            label="Back"
+            @click="goBack" />
+
           <q-btn
             v-if="step === 1 && quickUploadAvailable"
             icon="fas fa-bolt"
@@ -118,7 +126,7 @@
             v-if="step < 3"
             icon="fas fa-arrow-right"
             flat
-            @click="$refs.stepper.next()"
+            @click="goNext"
             :label="step === 1 && quickUploadAvailable ? 'More Options' : 'Next'"
             :disabled="!next" />
           <q-btn
@@ -127,7 +135,7 @@
             flat
             label="Upload"
             :disabled="!next"
-            @click="$refs.stepper.next()">
+            @click="goNext">
           </q-btn>
           <q-btn v-if="step === 4" loading disabled flat label="Uploading">
             <template v-slot:loading>
@@ -285,6 +293,44 @@ function incrementCounter() {
       counter.value = 1
     }
   }
+}
+
+function goNext() {
+  stepper.value.next()
+}
+
+function goBack() {
+  if (step.value === 2) {
+    // Going back from step 2 (Channel) to step 1 (Media)
+    // Clear channel-related state
+    payload.uuid = null
+    payload.coverType = 'profile'
+    payload.title = 'My Channel'
+    coverFile.value = null
+    coverThumb.value = null
+
+    // Clear any uploaded cover files from the upload processor
+    const coverIndex = uploadFiles.value.findIndex(f => f.resourceType === 'cover')
+    if (coverIndex !== -1) {
+      uploadFiles.value.splice(coverIndex, 1)
+    }
+  } else if (step.value === 3) {
+    // Going back from step 3 (Project) to step 2 (Channel)
+    // Clear project-related state
+    payload.project.id = null
+    payload.project.posterType = 'default'
+    payload.project.title = 'My Videos'
+    posterFile.value = null
+    posterThumb.value = null
+
+    // Clear any uploaded poster files from the upload processor
+    const posterIndex = uploadFiles.value.findIndex(f => f.resourceType === 'poster')
+    if (posterIndex !== -1) {
+      uploadFiles.value.splice(posterIndex, 1)
+    }
+  }
+
+  stepper.value.previous()
 }
 
 // computed
