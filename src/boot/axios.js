@@ -123,16 +123,18 @@ export default boot(({ app, router, store }) => {
       else if (status === 403) msg = 'Forbidden.'
       else if (status === 501) msg = 'Not yet implemented.'
 
+      let timeout = 0
       if (error.code === 'ERR_CANCELED') {
         msg = 'Request cancelled.'
+        timeout = 3000
       }
 
       Notify.create({
         type: 'negative',
-        timeout: 0,
+        timeout: timeout,
         message: msg,
         icon: 'fas fa-triangle-exclamation',
-        actions: [{ label: 'Dismiss', color: 'white' }]
+        actions: timeout === 0 ? [{ label: 'Dismiss', color: 'white' }] : []
       })
 
       if (status === 401) {

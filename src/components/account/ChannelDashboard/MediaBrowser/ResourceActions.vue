@@ -29,6 +29,17 @@
           v-if="!pending"
           dense
           unelevated
+          icon="edit"
+          color="accent"
+          class="q-mx-xs"
+          @click="showEditNotification">
+          <q-tooltip>Edit</q-tooltip>
+        </q-btn>
+
+        <q-btn
+          v-if="!pending"
+          dense
+          unelevated
           icon="delete"
           :color="deleteColor"
           class="q-ml-xs"
@@ -41,6 +52,8 @@
 </template>
 
 <script setup>
+import { Notify } from 'quasar'
+
 defineProps({
   title: String,
   image: String,
@@ -55,6 +68,16 @@ defineProps({
 })
 
 defineEmits(['delete'])
+
+function showEditNotification() {
+  Notify.create({
+    type: 'info',
+    message: 'Edit functionality is not yet implemented.',
+    icon: 'fas fa-info-circle',
+    position: 'bottom',
+    timeout: 3000
+  })
+}
 </script>
 
 <style scoped>
