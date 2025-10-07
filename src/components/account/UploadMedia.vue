@@ -81,15 +81,34 @@
         :done="step > 4"
         :header-nav="step === 3 && !!next">
         <div class="text-center">
-          <q-circular-progress
-            :indeterminate="progress === -1"
-            :instant-feedback="progress < 1"
-            :value="progress"
-            size="50px"
-            color="accent"
-            class="q-ma-xl"
-            show-value /><br />
-          {{ statusText }}
+          <div class="upload-preview-container">
+            <!-- Preview image/video background -->
+            <div
+              v-if="media.preview"
+              class="upload-preview-background"
+              :style="{ backgroundImage: `url(${media.preview})` }">
+            </div>
+            <!-- Progress overlay -->
+            <div class="upload-progress-overlay">
+              <q-circular-progress
+                :indeterminate="progress === -1"
+                :instant-feedback="progress < 1"
+                :value="progress"
+                size="80px"
+                color="accent"
+                track-color="transparent"
+                show-value
+                class="upload-progress-spinner" />
+              <!-- Media title -->
+              <div class="upload-media-title q-mt-md">
+                {{ media.title || 'Untitled Media' }}
+              </div>
+              <!-- Status text -->
+              <div class="upload-status-text q-mt-sm">
+                {{ statusText }}
+              </div>
+            </div>
+          </div>
         </div>
       </q-step>
 
@@ -99,9 +118,26 @@
         icon="fa fa-gears"
         active-icon="fa fa-gears"
         :header-nav="step === 4 && !!next">
-        <div class="q-pa-sm">
-          Your media is processing and will be available shortly (you'll receive an email once it's
-          ready). You may now close this window.
+        <div class="text-center">
+          <div class="q-mb-md">
+            <MediaPreview
+              :media="media"
+              :project="project"
+              :detail="false"
+              :showMainAccent="false"
+              class="processing-preview" />
+          </div>
+          <div class="processing-status">
+            <q-icon name="fa fa-gears" size="24px" color="accent" class="q-mr-sm rotating-gears" />
+            <span class="text-h6">Processing...</span>
+          </div>
+          <div class="q-pa-md text-body2">
+            Your media <strong>{{ media.title || 'Untitled Media' }}</strong> is processing and will be available shortly.
+            You'll receive an email once it's ready.
+          </div>
+          <div class="q-pt-md text-caption text-grey-6">
+            You may now close this window.
+          </div>
         </div>
       </q-step>
 
@@ -161,6 +197,7 @@ import { onBeforeRouteLeave } from 'vue-router'
 import ChannelStep from './UploadMedia/ChannelStep.vue'
 import ProjectStep from './UploadMedia/ProjectStep.vue'
 import MediaStep from './UploadMedia/MediaStep.vue'
+import MediaPreview from '@components/channel/MediaPreview.vue'
 import { Notify } from 'quasar'
 import { objectApi } from 'boot/axios'
 import { useFileProcessor } from '@composables/useFileProcessor.js'
@@ -615,11 +652,11 @@ function onUploadProgress(progressEvent) {
   progress.value = Math.round((progressEvent.loaded * 100) / progressEvent.total)
 }
 
-async function uploadSingle(u) {
+async function uploadSingle(u, current, total) {
   const item = uploadFiles.value.find(f => f.resourceType === u.resourceType)
   const file = item?.file
   if (!file) throw new Error(`Missing file for ${u.resourceType}`)
-  statusText.value = `Uploading file (${u.resourceType}). Do not navigate away from this page!`
+  statusText.value = `Uploading file ${current} of ${total}. Do not navigate away from this page!`
   await objectApi.put(u.url, file, { headers: { 'Content-Type': file.type }, onUploadProgress })
   return u.resourceType === 'upload' ? u.reference : null
 }
@@ -633,9 +670,8 @@ async function factoryUpload() {
     let mediaRef = null
     for (const u of upload) {
       progress.value = 0
-      statusText.value = `Uploading file (${u.resourceType}) ${counterLocal} of ${total}. Do not navigate away from this page!`
       try {
-        const maybeMedia = await uploadSingle(u)
+        const maybeMedia = await uploadSingle(u, counterLocal, total)
         if (maybeMedia) mediaRef = maybeMedia
       } catch (err) {
         progress.value = -1
@@ -709,5 +745,86 @@ onBeforeRouteLeave((to, from, next) => {
   width: 100%;
   max-width: 720px;
   min-width: 240px;
+}
+
+.upload-preview-container {
+  position: relative;
+  width: 320px;
+  height: 240px;
+  margin: 0 auto;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.upload-preview-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: brightness(0.7);
+}
+
+.upload-progress-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+}
+
+.upload-progress-spinner {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  padding: 8px;
+}
+
+.upload-media-title {
+  font-weight: 600;
+  font-size: 1.1em;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.upload-status-text {
+  font-size: 0.9em;
+  text-align: center;
+  opacity: 0.9;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.processing-preview {
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.processing-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.rotating-gears {
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 </style>
