@@ -150,6 +150,13 @@ const displayProject = computed(() => {
   const isNew = currentId?.value === 0
   const base = isNew ? props.payload.project || {} : props.project || {}
   const parentProject = props.project || {}
+
+  // For new projects, poster_color should come from payload
+  // For existing projects, poster_color should come from the project data
+  const posterColor = isNew
+    ? (props.payload?.project?.poster_color || defaultColor)
+    : (parentProject.poster_color || defaultColor)
+
   return {
     // Prefer parent-computed media array (reflects current poster/media counts)
     media: Array.isArray(parentProject.media) ? parentProject.media : [],
@@ -158,8 +165,8 @@ const displayProject = computed(() => {
     // Live title/subtitle from payload when creating new, fallback to parent when needed
     title: base.title || parentProject.title || '',
     subtitle: base.subtitle || parentProject.subtitle || '',
-    // Use the selected color from payload for default posters
-    poster_color: props.payload?.project?.poster_color || defaultColor
+    // Use the appropriate poster color based on whether it's a new or existing project
+    poster_color: posterColor
   }
 })
 
