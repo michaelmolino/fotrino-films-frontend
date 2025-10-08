@@ -59,7 +59,10 @@ export function getMetaData(route, channel) {
       ogSiteName: { property: 'og:site_name', content: 'Fotrino Films' },
 
       // Twitter Cards
-      twitterCard: { name: 'twitter:card', content: type === 'video' ? 'player' : 'summary_large_image' },
+      twitterCard: {
+        name: 'twitter:card',
+        content: type === 'video' ? 'player' : 'summary_large_image'
+      },
       twitterTitle: { name: 'twitter:title', content: title },
       twitterDescription: { name: 'twitter:description', content: description },
       twitterImage: { name: 'twitter:image', content: image },

@@ -42,6 +42,7 @@
           unelevated
           icon="delete"
           :color="deleteColor"
+          :disable="!canDelete"
           class="q-ml-xs"
           @click="$emit('delete')">
           <q-tooltip>Delete</q-tooltip>
@@ -52,13 +53,15 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { Notify } from 'quasar'
 
-defineProps({
+const props = defineProps({
   title: String,
   image: String,
   color: String,
   pending: Boolean,
+  hasPendingChildren: Boolean,
   link: String,
   square: Boolean,
   deleteColor: {
@@ -68,6 +71,7 @@ defineProps({
 })
 
 defineEmits(['delete'])
+const canDelete = computed(() => !props.pending && !props.hasPendingChildren)
 
 function showEditNotification() {
   Notify.create({

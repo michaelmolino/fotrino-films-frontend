@@ -14,6 +14,7 @@
         :image="project.poster"
         :color="project.poster_color || '#000000'"
         :pending="project.pending"
+        :has-pending-children="hasPendingChildren"
         :link="getMediaLink('project', project.id)"
         @delete="$emit('deleteProject', project.id)" />
     </template>
@@ -31,14 +32,19 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import ResourceActions from './ResourceActions.vue'
 import MediaItem from './MediaItem.vue'
 
-defineProps({
+const props = defineProps({
   project: Object,
   channel: Object,
   getMediaLink: Function
 })
 
 defineEmits(['deleteProject', 'deleteMedia'])
+
+const hasPendingChildren = computed(() => {
+  return props.project.media?.some(media => media.pending) || false
+})
 </script>

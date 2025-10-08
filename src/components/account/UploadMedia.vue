@@ -86,8 +86,7 @@
             <div
               v-if="media.preview"
               class="upload-preview-background"
-              :style="{ backgroundImage: `url(${media.preview})` }">
-            </div>
+              :style="{ backgroundImage: `url(${media.preview})` }"></div>
             <!-- Progress overlay -->
             <div class="upload-progress-overlay">
               <q-circular-progress
@@ -132,12 +131,10 @@
             <span class="text-h6">Processing...</span>
           </div>
           <div class="q-pa-md text-body2">
-            Your media <strong>{{ media.title || 'Untitled Media' }}</strong> is processing and will be available shortly.
-            You'll receive an email once it's ready.
+            Your media <strong>{{ media.title || 'Untitled Media' }}</strong> is processing and will
+            be available shortly. You'll receive an email once it's ready.
           </div>
-          <div class="q-pt-md text-caption text-grey-6">
-            You may now close this window.
-          </div>
+          <div class="q-pt-md text-caption text-grey-6">You may now close this window.</div>
         </div>
       </q-step>
 
@@ -850,7 +847,11 @@ onBeforeRouteLeave((to, from, next) => {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

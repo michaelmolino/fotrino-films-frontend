@@ -10,11 +10,14 @@ export function addHistory(channel) {
 
   const current = LocalStorage.getItem(HISTORY_KEY) || []
   if (!current.some(c => c.uuid === channel.uuid)) {
-    const updated = [...current, {
-      uuid: channel.uuid,
-      title: channel.title,
-      slug: channel.slug
-    }]
+    const updated = [
+      ...current,
+      {
+        uuid: channel.uuid,
+        title: channel.title,
+        slug: channel.slug
+      }
+    ]
     LocalStorage.set(HISTORY_KEY, updated)
     history.value = updated
   }
