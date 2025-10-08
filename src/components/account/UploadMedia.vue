@@ -749,12 +749,23 @@ onBeforeRouteLeave((to, from, next) => {
 
 .upload-preview-container {
   position: relative;
-  width: 320px;
+  width: 100%;
+  max-width: 320px;
   height: 240px;
   margin: 0 auto;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 360px) {
+  .upload-preview-container {
+    width: calc(100vw - 32px);
+    max-width: none;
+    height: calc((100vw - 32px) * 0.75);
+    margin: 0 auto;
+  }
 }
 
 .upload-preview-background {
@@ -798,6 +809,7 @@ onBeforeRouteLeave((to, from, next) => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  padding: 0 8px;
 }
 
 .upload-status-text {
@@ -805,6 +817,20 @@ onBeforeRouteLeave((to, from, next) => {
   text-align: center;
   opacity: 0.9;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  padding: 0 8px;
+}
+
+/* Mobile text adjustments */
+@media (max-width: 360px) {
+  .upload-media-title {
+    font-size: 1em;
+    max-width: calc(100vw - 48px);
+  }
+
+  .upload-status-text {
+    font-size: 0.8em;
+    line-height: 1.2;
+  }
 }
 
 .processing-preview {
