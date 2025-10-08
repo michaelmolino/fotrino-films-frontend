@@ -124,27 +124,52 @@ export function useFileProcessor() {
     video.src = srcUrl
     video.muted = true
     video.playsInline = true
-
-    // attempt to autoplay then pause (iOS hack)
-    const playPromise = video.play()
-    if (playPromise !== undefined) {
-      try {
-        await playPromise
-        video.pause()
-      } catch (_) {
-        // ignore autoplay errors
-      }
-    }
+    video.preload = 'metadata'
 
     try {
-      await ensureMetadata(video)
+      // Add timeout to prevent hanging on iOS
+      const metadataPromise = ensureMetadata(video)
+      const timeoutPromise = new Promise((resolve, reject) => {
+        setTimeout(() => reject(new Error('Metadata loading timeout')), 10000)
+      })
+
+      await Promise.race([metadataPromise, timeoutPromise])
+
+      // Additional iOS Safari compatibility check
+      if (video.duration === 0 || !isFinite(video.duration)) {
+        throw new Error('Invalid video duration')
+      }
+
+      // attempt to autoplay then pause (iOS hack) - but only after metadata is loaded
+      const playPromise = video.play()
+      if (playPromise !== undefined) {
+        try {
+          await playPromise
+          video.pause()
+        } catch (_) {
+          // ignore autoplay errors
+        }
+      }
+
       // pick a random frame (avoid exact end) and wait for seek to complete
       const epsilon = 0.05
       const target = Math.max(
         0.01,
         Math.min(video.duration - epsilon, Math.random() * video.duration)
       )
-      await waitForSeek(video, target)
+
+      // Add timeout for seek operation
+      const seekPromise = waitForSeek(video, target)
+      const seekTimeoutPromise = new Promise((resolve, reject) => {
+        setTimeout(() => reject(new Error('Seek operation timeout')), 5000)
+      })
+
+      await Promise.race([seekPromise, seekTimeoutPromise])
+
+      // Ensure video has valid dimensions
+      if (video.videoWidth === 0 || video.videoHeight === 0) {
+        throw new Error('Invalid video dimensions')
+      }
 
       canvas.width = video.videoWidth
       canvas.height = video.videoHeight
