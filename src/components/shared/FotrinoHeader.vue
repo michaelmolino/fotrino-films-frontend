@@ -177,6 +177,7 @@ const store = useStore()
 
 const oauthProviders = ref([
   { name: 'Google', icon: 'fab fa-google', login: process.env.API + '/account/login/google' }
+  // { name: 'Facebook', icon: 'fab fa-facebook', login: process.env.API + '/account/login/facebook' }
 ])
 
 const profile = computed(() => store.state.account?.profile)
