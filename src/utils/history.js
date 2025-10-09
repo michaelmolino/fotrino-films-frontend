@@ -15,7 +15,8 @@ export function addHistory(channel) {
       {
         uuid: channel.uuid,
         title: channel.title,
-        slug: channel.slug
+        slug: channel.slug,
+        cover: channel.cover
       }
     ]
     LocalStorage.set(HISTORY_KEY, updated)

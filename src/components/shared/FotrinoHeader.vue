@@ -25,7 +25,7 @@
             size="lg">
             <div v-for="channel in history" :key="channel.uuid" class="row items-center">
               <q-btn
-                icon="fas fa-clapperboard"
+                :icon="channel.cover ? 'img:' + channel.cover : 'fas fa-clapperboard'"
                 align="left"
                 flat
                 no-caps
