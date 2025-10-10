@@ -6,12 +6,12 @@
       <ol class="q-pl-md">
         <li class="q-mb-lg">
           <div class="text-h6 text-primary q-mb-xs">Introduction</div>
-          <div>
+          <div class="q-mb-md">
             Fotrino Films is currently under active development and is not ready for public use. The
             database, all accounts, and any associated content (including images and videos) are
             regularly deleted. You should have no expectation that this site is fit for any purpose.
           </div>
-          <div>
+          <div class="q-mb-md">
             We respect your privacy and are committed to protecting any personal information we
             collect. This policy outlines what data we collect, how we use it, and your rights
             regarding your information.
@@ -30,16 +30,20 @@
             <li>Profile photo (used for account identification and in shared content previews)</li>
             <li>Country (determined via IP address for localization and compliance purposes)</li>
           </ul>
-          <div>
+          <div class="q-mb-md">
             Additionally, whenever you interact with Fotrino Films, we log basic request details,
             including the time, date, and your IP address. These logs are retained for up to 30 days
             and used solely for debugging and system improvement.
           </div>
         </li>
+        <div class="text-primary q-my-md">Information Received from Facebook Login</div>
+        <div>If you sign up or log in using Facebook, we receive your name, email address, and profile photo from Facebook to create and manage your account on Fotrino Films. This information is used solely for authentication, display, and communication purposes, and is subject to the same data deletion and privacy rights described in this policy.</div>
+        <div class="text-primary q-my-md">Information Received from Google Login</div>
+        <div>If you sign up or log in using Google, we receive your name, email address, and profile photo from Google to create and manage your account on Fotrino Films. This information is used solely for authentication, display, and communication purposes, and is subject to the same data deletion and privacy rights described in this policy.</div>
         <q-separator />
         <li class="q-mb-lg">
           <div class="text-h6 text-primary q-mb-xs">Content Ownership & Responsibility</div>
-          <div>
+          <div class="q-mb-md">
             You retain ownership of any content you upload. However, by uploading content, you
             affirm that:
           </div>
@@ -51,7 +55,7 @@
               4).
             </li>
           </ul>
-          <div>
+          <div class="q-mb-md">
             All uploaded content is stored on servers operated by Fotrino Films. We do not claim
             ownership over your content but reserve the right to remove any material that violates
             our policies.
@@ -72,7 +76,7 @@
             </li>
             <li>Violates copyright, trademarks, or intellectual property laws</li>
           </ul>
-          <div>
+          <div class="q-mb-md">
             This list may be updated at our discretion. If you encounter content that violates these
             guidelines, please report it to michael@fotrino.com.
           </div>
@@ -80,7 +84,7 @@
         <q-separator />
         <li class="q-mb-lg">
           <div class="text-h6 text-primary q-mb-xs">Data Security</div>
-          <div>
+          <div class="q-mb-md">
             We take commercially reasonable measures to protect your data from unauthorized access,
             loss, disclosure, or modification.
           </div>
@@ -88,12 +92,12 @@
         <q-separator />
         <li class="q-mb-lg">
           <div class="text-h6 text-primary q-mb-xs">Third-Party Services</div>
-          <div>
+          <div class="q-mb-md">
             Fotrino Films may contain links to third-party websites or services. We do not control
             or assume responsibility for their privacy practices, terms, or content. We encourage
             users to review the privacy policies of any third-party services they interact with.
           </div>
-          <div>
+          <div class="q-mb-md">
             We also integrate with the CommentBox (
             <q-btn
               flat
@@ -109,7 +113,7 @@
         <q-separator />
         <li class="q-mb-lg">
           <div class="text-h6 text-primary q-mb-xs">Data Sharing & Legal Compliance</div>
-          <div>
+          <div class="q-mb-md">
             We do not share personally identifiable information with third parties, except in the
             following circumstances:
           </div>
@@ -129,13 +133,13 @@
         <q-separator />
         <li class="q-mb-lg">
           <div class="text-h6 text-primary q-mb-xs">Data Retention & Account Deletion</div>
-          <div>
+          <div class="q-mb-md">
             If you wish to delete your account and associated data, please email
             michael@fotrino.com. Your request must include the email address linked to your account.
             If the request comes from a different email address, additional verification will be
             required.
           </div>
-          <div>
+          <div class="q-mb-md">
             Upon deletion, your personal information and content will be permanently removed from
             our systems, except for data stored in system logs, which may be retained for up to 30
             days for security and compliance purposes.
@@ -143,6 +147,14 @@
           <div>
             If you need to export your data, contact us at the same email address, and we will
             provide a downloadable file containing the information we hold about you.
+          </div>
+          <div class="text-primary q-my-md">Information Received from Facebook Login</div>
+          <div>
+            Requests to delete accounts created via <span class="text-primary">Facebook Login</span> will also result in permanent deletion of all data received from Facebook and Google.
+          </div>
+          <div class="text-primary q-my-md">Information Received from Google Login</div>
+          <div>
+            Requests to delete accounts created via <span class="text-primary">Google Login</span> will also result in permanent deletion of all data received from Facebook and Google.
           </div>
         </li>
         <q-separator />

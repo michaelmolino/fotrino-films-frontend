@@ -175,10 +175,11 @@ import { useDarkMode, darkModeIcons, setDarkMode } from '@utils/dark.js'
 const $q = useQuasar()
 const store = useStore()
 
-const oauthProviders = ref([
-  { name: 'Google', icon: 'fab fa-google', login: process.env.API + '/account/login/google' }
-  // { name: 'Facebook', icon: 'fab fa-facebook', login: process.env.API + '/account/login/facebook' }
-])
+const oauthProviders = ref([])
+oauthProviders.value.push({ name: 'Google', icon: 'fab fa-google', login: process.env.API + '/account/login/google' })
+if (process.env.NODE_ENV === 'development') {
+  oauthProviders.value.push({ name: 'Facebook', icon: 'fab fa-facebook', login: process.env.API + '/account/login/facebook' })
+}
 
 const profile = computed(() => store.state.account?.profile)
 
