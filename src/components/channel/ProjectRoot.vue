@@ -56,9 +56,9 @@
 <script setup>
 import BreadCrumbs from '@components/shared/BreadCrumbs.vue'
 import MediaPreview from '@components/channel/MediaPreview.vue'
-import PlyrPlayer from '@components/channel/PlyrPlayer.vue'
-import MediaDescription from '@components/channel/MediaDescription.vue'
-import CommentsBox from '@components/channel/CommentsBox.vue'
+import PlyrPlayer from '@components/channel/ProjectRoot/PlyrPlayer.vue'
+import MediaDescription from '@components/channel/ProjectRoot/MediaDescription.vue'
+import CommentsBox from '@components/channel/ProjectRoot/CommentsBox.vue'
 import { computed, watch, defineAsyncComponent, toRef } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute, useRouter } from 'vue-router'

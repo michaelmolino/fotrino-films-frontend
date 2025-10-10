@@ -178,7 +178,11 @@ const store = useStore()
 const oauthProviders = ref([])
 oauthProviders.value.push({ name: 'Google', icon: 'fab fa-google', login: process.env.API + '/account/login/google' })
 if (process.env.NODE_ENV === 'development') {
+  oauthProviders.value.push({ name: 'Apple', icon: 'fab fa-apple', login: process.env.API + '/account/login/apple' })
   oauthProviders.value.push({ name: 'Facebook', icon: 'fab fa-facebook', login: process.env.API + '/account/login/facebook' })
+  oauthProviders.value.push({ name: 'Github', icon: 'fab fa-github', login: process.env.API + '/account/login/github' })
+  oauthProviders.value.push({ name: 'Microsoft', icon: 'fab fa-microsoft', login: process.env.API + '/account/login/microsoft' })
+  oauthProviders.value.push({ name: 'Yahoo', icon: 'fab fa-yahoo', login: process.env.API + '/account/login/yahoo' })
 }
 
 const profile = computed(() => store.state.account?.profile)

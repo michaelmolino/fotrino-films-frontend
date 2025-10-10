@@ -63,7 +63,7 @@ export function getChannels(context, deep = false) {
   })
 }
 
-export function getChannel(context, { uuid, pending }) {
+export function getChannel(context, { uuid, pending = false }) {
   const url = `/channels/${uuid}${pending ? '?pending=true' : ''}`
   return fetchAndCommit(context, {
     url,

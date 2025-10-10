@@ -23,14 +23,6 @@ export function getProfile(context) {
   })
 }
 
-export function getToken(context) {
-  return fetchAndCommit(context, {
-    url: '/account/token',
-    mutation: 'SET_TOKEN',
-    extract: data => data.token
-  })
-}
-
 export function getCommentboxToken(context) {
   return fetchAndCommit(context, {
     url: '/sso/commentbox',

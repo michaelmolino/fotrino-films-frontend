@@ -67,7 +67,7 @@ import { useRoute } from 'vue-router'
 import BreadCrumbs from '@components/shared/BreadCrumbs.vue'
 import ProjectPoster from '@components/channel/ProjectPoster.vue'
 import MediaPreview from '@components/channel/MediaPreview.vue'
-import ViewToggle from '@components/channel/ViewToggle.vue'
+import ViewToggle from '@components/channel/ChannelRoot/ViewToggle.vue'
 const NothingText = defineAsyncComponent(() => import('@components/shared/NothingText.vue'))
 
 const store = useStore()
