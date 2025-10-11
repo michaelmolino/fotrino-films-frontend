@@ -8,11 +8,11 @@
       <MediaBrowser v-if="hasChannels" :channels="channels" data-cy="media-browser" />
       <NothingText v-else text="Your media will appear here (once you have some)." />
     </template>
-    <template v-else>
-      <q-skeleton type="rect" class="q-mb-md skeleton-square" />
-      <q-skeleton type="text" width="40%" />
-      <q-skeleton type="text" width="60%" />
-    </template>
+    <AuthRequired
+      v-else
+      type="login"
+      message="Please log in to access your dashboard"
+    />
   </div>
 </template>
 
@@ -22,6 +22,7 @@ import { useStore } from 'vuex'
 import ProfileCard from '@components/account/ChannelDashboard/ProfileCard.vue'
 import MediaBrowser from '@components/account/ChannelDashboard/MediaBrowser.vue'
 import NothingText from '@components/shared/NothingText.vue'
+import AuthRequired from '@components/shared/AuthRequired.vue'
 
 const store = useStore()
 

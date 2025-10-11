@@ -130,6 +130,17 @@
           size="md">
           <q-separator />
           <q-btn
+            v-if="profile?.is_admin"
+            to="/admin"
+            align="left"
+            flat
+            no-caps
+            icon="fas fa-user-shield"
+            label="Admin"
+            size="md"
+            class="fit" />
+          <q-separator v-if="profile?.is_admin"/>
+          <q-btn
             to="/account/dashboard"
             align="left"
             flat

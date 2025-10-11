@@ -179,12 +179,11 @@
       </template>
     </q-stepper>
   </div>
-  <div v-else class="q-pa-md">
-    <q-skeleton type="rect" class="q-mb-md" height="56px" />
-    <q-skeleton type="rect" class="q-mb-md" height="300px" />
-    <q-skeleton type="text" width="70%" />
-    <q-skeleton type="text" width="50%" />
-  </div>
+  <AuthRequired
+    v-else
+    type = "login"
+    message="Please log in to upload media."
+  />
 </template>
 
 <script setup>
@@ -195,6 +194,7 @@ import ChannelStep from './UploadMedia/ChannelStep.vue'
 import ProjectStep from './UploadMedia/ProjectStep.vue'
 import MediaStep from './UploadMedia/MediaStep.vue'
 import MediaPreview from '@components/channel/MediaPreview.vue'
+import AuthRequired from 'src/components/shared/AuthRequired.vue'
 import { Notify } from 'quasar'
 import { objectApi } from 'boot/axios'
 import { useFileProcessor } from '@composables/useFileProcessor.js'
