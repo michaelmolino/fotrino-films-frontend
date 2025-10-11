@@ -1,5 +1,6 @@
 <template>
-  <div class="media-browser">
+  <div class="media-browser admin-tree q-pa-md">
+    <div class="text-h5 text-weight-bold q-mb-md">Your Channels & Media</div>
     <q-list bordered class="rounded-borders">
       <ChannelItem
         v-for="channel in channels"
@@ -11,6 +12,7 @@
         @deleteProject="deleteResource('project', $event)"
         @deleteMedia="deleteResource('media', $event)" />
     </q-list>
+    <div v-if="channels.length === 0" class="q-pa-md text-grey-6 text-center">No channels found</div>
   </div>
 </template>
 
@@ -72,8 +74,8 @@ function deleteResource(type, id) {
 </script>
 
 <style scoped>
-.media-browser {
-  max-width: 480px;
+.media-browser.admin-tree {
+  max-width: 800px;
   width: 100%;
   overflow-x: hidden;
 }

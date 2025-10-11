@@ -8,14 +8,17 @@
     expand-separator
     switch-toggle-side
     :disable="project.pending">
+
     <template #header>
       <ResourceActions
         :title="project.title"
         :image="project.poster"
         :color="project.poster_color || '#000000'"
         :pending="project.pending"
-        :has-pending-children="hasPendingChildren"
+        :hasPending-children="hasPendingChildren"
         :link="getMediaLink('project', project.id)"
+        :avatarSize="'40px'"
+        :subtitle="project.created ? `Created: ${daysSince(project.created, true)}` : ''"
         @delete="$emit('deleteProject', project.id)" />
     </template>
 
@@ -35,6 +38,7 @@
 import { computed } from 'vue'
 import ResourceActions from './ResourceActions.vue'
 import MediaItem from './MediaItem.vue'
+import { daysSince } from '@utils/date.js'
 
 const props = defineProps({
   project: Object,

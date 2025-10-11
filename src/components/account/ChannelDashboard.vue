@@ -1,10 +1,7 @@
 <template>
-  <div class="q-pa-md" data-cy="dashboard">
-    <div class="text-h5 text-weight-bold q-mb-md">Dashboard</div>
+  <div class="dashboard-page q-pa-md" data-cy="dashboard">
     <template v-if="profile?.id">
-      <div class="text-h6 text-weight-bold q-mb-sm">Profile</div>
       <ProfileCard :profile="profile" :mediaCount="mediaCount" data-cy="profile-card" />
-      <div v-if="hasChannels" class="text-h6 text-weight-bold q-mt-md q-mb-sm">Media Browser</div>
       <MediaBrowser v-if="hasChannels" :channels="channels" data-cy="media-browser" />
       <NothingText v-else text="Your media will appear here (once you have some)." />
     </template>
@@ -49,14 +46,11 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.dashboard-page {
+  max-width: 1200px;
+}
 .skeleton-square {
   width: 250px;
   height: 250px;
-}
-
-.card-dashboard {
-  max-width: 1100px;
-  width: 100%;
-  margin: 0 auto;
 }
 </style>

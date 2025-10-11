@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md">
+  <div class="admin-dashboard-page q-pa-md">
     <div class="text-h5 text-weight-bold q-mb-md">Admin: All Users</div>
     <div class="admin-tree">
       <template v-if="loading">
@@ -230,24 +230,23 @@ watch(profile, (newProfile) => {
 </script>
 
 <style scoped>
+.admin-dashboard-page {
+  max-width: 1200px;
+}
 .admin-tree {
   overflow-x: hidden;
   max-width: 800px;
 }
-
 .user-avatar {
   min-width: 64px;
 }
-
 .channel-item {
   border-left: 2px solid var(--q-primary);
   margin-left: 1rem;
 }
-
 .admin-badge {
   z-index: 1;
 }
-
 @media (max-width: 600px) {
   .channel-item {
     margin-left: 0.5rem;

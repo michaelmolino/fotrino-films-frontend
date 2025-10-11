@@ -1,40 +1,36 @@
 <template>
-  <div class="q-pb-md">
-    <q-card v-if="profile" flat class="profile-card">
-      <q-card-section>
-        <q-img
-          :src="profilePic"
-          class="width250"
-          :ratio="1"
-          fit="cover"
-          :alt="safeName || safeEmail">
-          <q-badge class="bg-accent q-pa-md" floating transparent>
+  <div>
+    <q-card v-if="profile" flat class="profile-card modern-profile-card">
+      <div class="text-h5 text-weight-bold">Profile</div>
+      <div class="profile-row">
+        <q-avatar size="80px" class="profile-avatar">
+          <img :src="profilePic" :alt="safeName || safeEmail" />
+          <q-badge class="bg-accent" floating>
             <q-icon :name="providerIcon" />
           </q-badge>
-          <div class="absolute-bottom text-center">
-            <div class="ellipsis">{{ safeName }}</div>
-            <div class="ellipsis">{{ safeEmail }}</div>
-          </div>
-        </q-img>
-      </q-card-section>
-      <q-card-section>
-        <div class="flex no-wrap">
-          <div class="fit">
-            <div class="ellipsis text2">Joined {{ joinedText }}</div>
-            <div class="ellipsis text2" data-cy="video-count">{{ mediaCount }} videos</div>
-          </div>
-          <div class="q-pl-sm">
+        </q-avatar>
+        <div class="profile-info">
+          <div class="profile-title-row">
+            <span class="text-weight-medium text-h6 ellipsis">{{ safeName }}</span>
             <q-btn
               to="/account/upload"
               flat
-              no-caps
+              dense
+              size="sm"
               icon="fas fa-cloud-arrow-up"
-              data-cy="upload-button">
+              color="primary"
+              class="q-ml-xs"
+              data-cy="upload-button"
+              :title="'Upload Media'"
+            >
               <q-tooltip>Upload Media</q-tooltip>
             </q-btn>
           </div>
+          <div class="text-grey-6 text-caption ellipsis">{{ safeEmail }}</div>
+          <div class="text-grey-6 text-caption q-mt-xs">Joined {{ joinedText }}</div>
+          <div class="text-grey-6 text-caption q-mt-xs" data-cy="video-count">{{ mediaCount }} videos</div>
         </div>
-      </q-card-section>
+      </div>
     </q-card>
     <q-skeleton v-else type="rect" animation="pulse" class="width250" />
   </div>
@@ -60,8 +56,30 @@ const safeEmail = computed(() => props.profile?.email || '')
 </script>
 
 <style scoped>
-.profile-card {
-  display: inline-block;
-  width: auto;
+.profile-card.modern-profile-card {
+  max-width: 800px;
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  text-align: left;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+.profile-row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.profile-avatar {
+  position: relative;
+}
+.profile-info {
+  flex: 1;
+  min-width: 0;
+}
+.profile-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 </style>

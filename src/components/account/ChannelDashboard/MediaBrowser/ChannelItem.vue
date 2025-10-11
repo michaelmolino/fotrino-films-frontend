@@ -6,13 +6,18 @@
     expand-separator
     switch-toggle-side
     :disable="channel.pending">
+
     <template #header>
       <ResourceActions
         :title="channel.title"
         :image="channel.cover"
         :pending="channel.pending"
-        :has-pending-children="hasPendingChildren"
+        :hasPending-children="hasPendingChildren"
         :link="getMediaLink('channel', channel.id)"
+        :avatarSize="'48px'"
+        :badge="channel.is_admin"
+        badgeIcon="fas fa-user-shield"
+        :subtitle="channel.created ? `Created: ${daysSince(channel.created, true)}` : ''"
         @delete="$emit('deleteChannel', channel.uuid)" />
     </template>
 
@@ -32,6 +37,7 @@
 import { computed } from 'vue'
 import ResourceActions from './ResourceActions.vue'
 import ProjectItem from './ProjectItem.vue'
+import { daysSince } from '@utils/date.js'
 
 const props = defineProps({
   channel: Object,

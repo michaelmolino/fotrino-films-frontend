@@ -1,54 +1,87 @@
+
 <template>
   <div class="header-content">
+
     <q-item-section avatar>
-      <q-avatar :square="square">
-        <template v-if="image">
-          <q-img :src="image" class="cover" />
-        </template>
-        <template v-else>
-          <div class="cover avatar-fill" :style="{ backgroundColor: color || '#000000' }" />
-        </template>
-      </q-avatar>
+      <div class="relative-position" style="display: flex; align-items: center; gap: 8px;">
+        <q-avatar :square="square" :size="avatarSize">
+          <template v-if="image">
+            <q-img :src="image" class="cover" />
+          </template>
+          <template v-else>
+            <div class="cover avatar-fill" :style="{ backgroundColor: color || '#000000' }" />
+          </template>
+        </q-avatar>
+        <q-badge
+          v-if="badge"
+          floating
+          color="accent"
+          text-color="white"
+          class="admin-badge"
+        >
+          <q-icon :name="badgeIcon" size="12px" />
+        </q-badge>
+        <span class="action-btns-inline">
+          <q-btn
+            v-if="!pending && link"
+            flat
+            dense
+            size="sm"
+            icon="fas fa-external-link-alt"
+            color="primary"
+            class="q-ml-xs"
+            :to="link"
+            :title="`Visit ${title}`"
+          >
+            <q-tooltip>Visit</q-tooltip>
+          </q-btn>
+          <q-btn
+            v-if="pending"
+            flat
+            dense
+            size="sm"
+            icon="fas fa-clock"
+            color="grey-6"
+            class="q-ml-xs cursor-not-allowed"
+          >
+            <q-tooltip>Pending</q-tooltip>
+          </q-btn>
+          <q-btn
+            v-if="!pending && false"
+            flat
+            dense
+            size="sm"
+            icon="edit"
+            color="accent"
+            class="q-ml-xs"
+            @click="showEditNotification"
+          >
+            <q-tooltip>Edit</q-tooltip>
+          </q-btn>
+          <q-btn
+            v-if="!pending"
+            flat
+            dense
+            size="sm"
+            icon="delete"
+            :color="deleteColor"
+            :disable="!canDelete"
+            class="q-ml-xs"
+            @click="$emit('delete')"
+          >
+            <q-tooltip>Delete</q-tooltip>
+          </q-btn>
+        </span>
+      </div>
     </q-item-section>
 
     <q-item-section class="text-no-wrap ellipsis fit-to-width">
-      {{ title }}
-    </q-item-section>
-
-    <q-item-section class="header-buttons">
-      <div class="text-no-wrap">
-        <q-btn v-if="pending" dense unelevated icon="fas fa-clock" class="cursor-not-allowed">
-          <q-tooltip>Pending</q-tooltip>
-        </q-btn>
-
-        <q-btn v-else :to="link" dense unelevated icon="link" color="info" class="q-mx-xs">
-          <q-tooltip>Link</q-tooltip>
-        </q-btn>
-
-        <q-btn
-          v-if="!pending"
-          dense
-          unelevated
-          icon="edit"
-          color="accent"
-          class="q-mx-xs"
-          @click="showEditNotification">
-          <q-tooltip>Edit</q-tooltip>
-        </q-btn>
-
-        <q-btn
-          v-if="!pending"
-          dense
-          unelevated
-          icon="delete"
-          :color="deleteColor"
-          :disable="!canDelete"
-          class="q-ml-xs"
-          @click="$emit('delete')">
-          <q-tooltip>Delete</q-tooltip>
-        </q-btn>
+      <div class="title-row">
+        <span class="text-weight-medium">{{ title }}</span>
       </div>
+      <div v-if="subtitle" class="text-grey-6 text-caption q-mt-xs">{{ subtitle }}</div>
     </q-item-section>
+
   </div>
 </template>
 
@@ -67,6 +100,13 @@ const props = defineProps({
   deleteColor: {
     type: String,
     default: 'negative'
+  },
+  badge: Boolean,
+  badgeIcon: String,
+  subtitle: String,
+  avatarSize: {
+    type: String,
+    default: '48px'
   }
 })
 
@@ -93,12 +133,16 @@ function showEditNotification() {
   width: 100%;
 }
 
-.header-buttons {
+.title-row {
   display: flex;
-  gap: 4px;
-  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
 }
-
+.action-btns-inline {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
 .fit-to-width {
   min-width: 0;
   display: inline-block;
@@ -109,5 +153,8 @@ function showEditNotification() {
 .avatar-fill {
   width: 100%;
   height: 100%;
+}
+.admin-badge {
+  z-index: 1;
 }
 </style>

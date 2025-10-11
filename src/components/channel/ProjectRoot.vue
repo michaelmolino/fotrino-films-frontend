@@ -1,6 +1,11 @@
 <template>
   <div class="q-pa-md">
-    <template v-if="channel?.uuid === route.params.uuid && project">
+    <template v-if="loading">
+      <q-skeleton type="rect" class="q-mb-md skeleton-large" />
+      <q-skeleton type="text" width="60%" />
+      <q-skeleton type="text" width="40%" />
+    </template>
+    <template v-else-if="channel?.uuid === route.params.uuid && project">
       <BreadCrumbs
         :channel="channel"
         :project="project"
@@ -59,7 +64,7 @@ import MediaPreview from '@components/channel/MediaPreview.vue'
 import PlyrPlayer from '@components/channel/ProjectRoot/PlyrPlayer.vue'
 import MediaDescription from '@components/channel/ProjectRoot/MediaDescription.vue'
 import CommentsBox from '@components/channel/ProjectRoot/CommentsBox.vue'
-import { computed, watch, defineAsyncComponent, toRef } from 'vue'
+import { computed, watch, defineAsyncComponent, toRef, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute, useRouter } from 'vue-router'
 const NothingText = defineAsyncComponent(() => import('@components/shared/NothingText.vue'))
@@ -69,18 +74,30 @@ const router = useRouter()
 
 const profile = computed(() => store.state.account.profile)
 const channel = toRef(store.state.channel, 'channel')
+const loading = ref(true)
+
+watch(
+  [channel, () => route.params.uuid],
+  () => {
+    if (channel.value && channel.value.uuid === route.params.uuid) {
+      loading.value = false
+    } else {
+      loading.value = true
+    }
+  },
+  { immediate: true }
+)
 
 const project = computed(() => {
   let p
-  // Find project by slug if uuid is present
   if (route.params.uuid) {
     p = channel.value?.projects?.find(p => p.slug === route.params.projectSlug) || null
   }
-  // For privateId, use channel.project
   if (route.params.privateId && channel.value) {
     p = channel.value?.project || null
   }
-  if (!p && channel.value) redirect('/404')
+  // Only redirect if not loading and channel is loaded and matches route
+  if (!p && channel.value && !loading.value && channel.value.uuid === route.params.uuid) redirect('/404')
   return p
 })
 
@@ -94,7 +111,8 @@ const media = computed(() => {
   } else {
     m = p.media?.find(m => m.main) || p.media?.[0] || null
   }
-  if (!m) redirect('/404')
+  // Only redirect if not loading and channel is loaded and matches route
+  if (!m && !loading.value && channel.value && channel.value.uuid === route.params.uuid) redirect('/404')
   return m
 })
 
@@ -110,7 +128,7 @@ function redirect(pathOrObj) {
 watch(
   project,
   newProject => {
-    if (channel.value && !newProject && route.params.uuid) {
+    if (channel.value && !newProject && route.params.uuid && !loading.value) {
       redirect('/404')
     }
   },
@@ -120,7 +138,7 @@ watch(
 watch(
   media,
   newMedia => {
-    if (channel.value && project.value && (project.value.media?.length || 0) > 0 && !newMedia) {
+    if (channel.value && project.value && (project.value.media?.length || 0) > 0 && !newMedia && !loading.value) {
       redirect('/404')
     } else if (newMedia && !route.params.mediaSlug) {
       redirect({ params: { ...route.params, mediaSlug: newMedia.slug } })

@@ -5,6 +5,7 @@
       :image="media.preview"
       :pending="media.pending"
       :link="getMediaLink('media', media.id)"
+      :subtitle="media.created ? `Created: ${daysSince(media.created, true)}` : ''"
       delete-color="warning"
       @delete="$emit('deleteMedia', media.id)"
       square />
@@ -13,6 +14,7 @@
 
 <script setup>
 import ResourceActions from './ResourceActions.vue'
+import { daysSince } from '@utils/date.js'
 
 defineProps({
   media: Object,
