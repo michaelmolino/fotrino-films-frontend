@@ -2,7 +2,7 @@
   <div class="q-pa-md flex flex-center">
     <q-card flat bordered class="q-pa-xl card-terms">
       <div class="text-h4 text-center q-mb-md">Privacy Policy & Terms of Use</div>
-      <div class="text-caption text-center q-mb-lg">Last updated: <i>2025-09-23</i></div>
+      <div class="text-caption text-center q-mb-lg">Last updated: <i>2025-10-11</i></div>
       <ol class="q-pl-md">
         <li class="q-mb-lg">
           <div class="text-h6 text-primary q-mb-xs">Introduction</div>
@@ -36,10 +36,10 @@
             and used solely for debugging and system improvement.
           </div>
         </li>
-        <div class="text-primary q-my-md">Information Received from Facebook Login</div>
-        <div>If you sign up or log in using Facebook, we receive your name, email address, and profile photo from Facebook to create and manage your account on Fotrino Films. This information is used solely for authentication, display, and communication purposes, and is subject to the same data deletion and privacy rights described in this policy.</div>
-        <div class="text-primary q-my-md">Information Received from Google Login</div>
-        <div>If you sign up or log in using Google, we receive your name, email address, and profile photo from Google to create and manage your account on Fotrino Films. This information is used solely for authentication, display, and communication purposes, and is subject to the same data deletion and privacy rights described in this policy.</div>
+        <div v-for="provider in oAuthProviders" :key="provider">
+          <div class="text-primary q-my-md">Information Received from {{ provider.toUpperCase() }} Login</div>
+          <div>If you sign up or log in using {{ provider.toUpperCase() }}, we receive your name, email address, and profile photo from {{ provider.toUpperCase() }} to create and manage your account on Fotrino Films. This information is used solely for authentication, display, and communication purposes, and is subject to the same data deletion and privacy rights described in this policy.</div>
+        </div>
         <q-separator />
         <li class="q-mb-lg">
           <div class="text-h6 text-primary q-mb-xs">Content Ownership & Responsibility</div>
@@ -148,13 +148,11 @@
             If you need to export your data, contact us at the same email address, and we will
             provide a downloadable file containing the information we hold about you.
           </div>
-          <div class="text-primary q-my-md">Information Received from Facebook Login</div>
-          <div>
-            Requests to delete accounts created via <span class="text-primary">Facebook Login</span> will also result in permanent deletion of all data received from Facebook and Google.
-          </div>
-          <div class="text-primary q-my-md">Information Received from Google Login</div>
-          <div>
-            Requests to delete accounts created via <span class="text-primary">Google Login</span> will also result in permanent deletion of all data received from Facebook and Google.
+          <div v-for="provider in oAuthProviders" :key="provider">
+            <div class="text-primary q-my-md">Information Received from {{ provider.toUpperCase() }} Login</div>
+            <div>
+              Requests to delete accounts created via {{ provider.toUpperCase() }} Login will also result in permanent deletion of all data received from {{ provider.toUpperCase() }}.
+            </div>
           </div>
         </li>
         <q-separator />
@@ -192,6 +190,19 @@
 
 <script setup>
 defineOptions({ name: 'Terms-Page' })
+
+import { ref, onMounted } from 'vue'
+import { useStore } from 'vuex'
+
+const store = useStore()
+
+const oAuthProviders = ref([])
+
+onMounted(async () => {
+  const providers = await store.cache.dispatch('account/getProviders')
+  store.commit('account/SET_PROVIDERS', providers)
+  oAuthProviders.value = providers
+})
 </script>
 
 <style scoped>

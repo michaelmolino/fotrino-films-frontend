@@ -185,18 +185,17 @@ watchChannelHistory(store)
 const { darkModePref } = useDarkMode($q)
 const darkModeIcon = computed(() => darkModeIcons[darkModePref.value])
 
-onMounted(() => {
-  store.dispatch('account/getProviders').catch(() => {}).then(() => {
-    const providers = store.state.account.providers || []
-    const providerMap = {
-      google: { name: 'Google', icon: 'fab fa-google', login: process.env.API + '/account/login/google' },
-      microsoft: { name: 'Microsoft', icon: 'fab fa-microsoft', login: process.env.API + '/account/login/microsoft' },
-      apple: { name: 'Apple', icon: 'fab fa-apple', login: process.env.API + '/account/login/apple' },
-      facebook: { name: 'Facebook', icon: 'fab fa-facebook', login: process.env.API + '/account/login/facebook' },
-      github: { name: 'Github', icon: 'fab fa-github', login: process.env.API + '/account/login/github' },
-      yahoo: { name: 'Yahoo', icon: 'fab fa-yahoo', login: process.env.API + '/account/login/yahoo' }
-    }
-    oauthProviders.value = providers.map(p => providerMap[p]).filter(p => p)
-  })
+onMounted(async () => {
+  const providers = await store.cache.dispatch('account/getProviders')
+  store.commit('account/SET_PROVIDERS', providers)
+  const providerMap = {
+    google: { name: 'Google', icon: 'fab fa-google', login: process.env.API + '/account/login/google' },
+    microsoft: { name: 'Microsoft', icon: 'fab fa-microsoft', login: process.env.API + '/account/login/microsoft' },
+    apple: { name: 'Apple', icon: 'fab fa-apple', login: process.env.API + '/account/login/apple' },
+    facebook: { name: 'Facebook', icon: 'fab fa-facebook', login: process.env.API + '/account/login/facebook' },
+    github: { name: 'Github', icon: 'fab fa-github', login: process.env.API + '/account/login/github' },
+    yahoo: { name: 'Yahoo', icon: 'fab fa-yahoo', login: process.env.API + '/account/login/yahoo' }
+  }
+  oauthProviders.value = providers.map(p => providerMap[p]).filter(p => p)
 })
 </script>
