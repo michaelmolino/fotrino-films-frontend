@@ -23,6 +23,14 @@ export function getProfile(context) {
   })
 }
 
+export function getProviders(context) {
+  return fetchAndCommit(context, {
+    url: '/account/providers',
+    mutation: 'SET_PROVIDERS',
+    extract: (data) => data.providers
+  })
+}
+
 export function getCommentboxToken(context) {
   return fetchAndCommit(context, {
     url: '/sso/commentbox',

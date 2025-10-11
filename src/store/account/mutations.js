@@ -5,6 +5,10 @@ export function SET_PROFILE(state, profile) {
   state.profile = profile
 }
 
+export function SET_PROVIDERS(state, providers) {
+  state.providers = providers
+}
+
 export function SET_COMMENTBOX(state, commentbox) {
   state.commentbox = commentbox
 }
