@@ -42,15 +42,29 @@
 </template>
 
 <script setup>
-const { modelValue, projectCount, mainCount, allCount } = defineProps({
-  modelValue: String,
+import { ref, computed } from 'vue'
+import { LocalStorage } from 'quasar'
+
+const { projectCount, mainCount, allCount } = defineProps({
   projectCount: Number,
   mainCount: Number,
   allCount: Number
 })
+
 const emit = defineEmits(['update:modelValue'])
 
+const internalValue = ref(LocalStorage.getItem('last-selected-view') || 'all')
+
+const modelValue = computed({
+  get: () => internalValue.value,
+  set: val => {
+    LocalStorage.set('last-selected-view', val)
+    internalValue.value = val
+    emit('update:modelValue', val)
+  }
+})
+
 function updateModelValue(val) {
-  emit('update:modelValue', val)
+  modelValue.value = val
 }
 </script>

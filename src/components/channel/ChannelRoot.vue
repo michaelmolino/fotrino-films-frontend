@@ -1,6 +1,16 @@
 <template>
   <div class="q-pa-md">
-    <template v-if="channel?.uuid">
+    <template v-if="loading">
+      <div class="row items-start q-col-gutter-md">
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-for="n in 6" :key="n">
+          <q-skeleton type="rect" class="q-mb-sm skeleton-medium" />
+          <q-skeleton type="text" width="80%" />
+          <q-skeleton type="text" width="60%" />
+        </div>
+      </div>
+    </template>
+
+    <template v-else-if="channel?.uuid === route.params.uuid">
       <div :key="channel?.uuid || route.fullPath">
         <div class="row items-center q-mb-sm">
           <BreadCrumbs :channel="channel" :project="null" :media="null" />
@@ -11,6 +21,7 @@
             :mainCount="mainCount"
             :allCount="allCount" />
         </div>
+
         <q-separator spaced />
 
         <template v-if="selectedView === 'projects'">
@@ -26,6 +37,7 @@
             <NothingText v-if="projects.length === 0" text="No content available." />
           </div>
         </template>
+
         <template v-else>
           <div class="row q-pt-md">
             <div
@@ -47,59 +59,66 @@
     </template>
 
     <template v-else>
-      <div class="row items-start q-col-gutter-md">
-        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-for="n in 6" :key="n">
-          <q-skeleton type="rect" class="q-mb-sm skeleton-medium" />
-          <q-skeleton type="text" width="80%" />
-          <q-skeleton type="text" width="60%" />
-        </div>
-      </div>
+      <NothingText text="Channel not found or unavailable." />
     </template>
   </div>
 </template>
 
 <script setup>
-import { ref, toRef, computed, defineAsyncComponent } from 'vue'
+import { ref, toRef, computed, defineAsyncComponent, watch } from 'vue'
 import { useStore } from 'vuex'
-import { LocalStorage } from 'quasar'
 import { useRoute } from 'vue-router'
+import { sortBy } from '@utils/sort.js'
 
 import BreadCrumbs from '@components/shared/BreadCrumbs.vue'
 import ProjectPoster from '@components/channel/ProjectPoster.vue'
 import MediaPreview from '@components/channel/MediaPreview.vue'
-import ViewToggle from '@components/channel/ChannelRoot/ViewToggle.vue'
+import ViewToggle from './ChannelRoot/ViewToggle.vue'
 const NothingText = defineAsyncComponent(() => import('@components/shared/NothingText.vue'))
 
 const store = useStore()
 const route = useRoute()
-const view = ref(LocalStorage.getItem('last-selected-view') || 'all')
-const selectedView = computed({
-  get: () => view.value,
-  set: val => {
-    LocalStorage.set('last-selected-view', val)
-    view.value = val
-  }
-})
-
+const selectedView = ref('all')
+const loading = ref(true)
 const channel = toRef(store.state.channel, 'channel')
 
+watch(
+  [channel, () => route.params.uuid],
+  ([newChannel, newUuid]) => {
+    // If we have a route UUID but no matching channel, we're still loading
+    if (newUuid && (!newChannel || newChannel.uuid !== newUuid)) {
+      loading.value = true
+    } else if (newChannel?.uuid === newUuid) {
+      // Channel matches route, we're done loading
+      loading.value = false
+    } else if (!newUuid) {
+      loading.value = false
+    }
+  },
+  { immediate: true }
+)
+
 const projects = computed(() => {
-  const list = channel.value?.projects || []
-  return Array.isArray(list) ? list.slice() : []
+  if (loading.value || !channel.value) return []
+  return channel.value.projects || []
 })
 
 const allMedia = computed(() => {
-  if (!channel.value) return []
+  if (loading.value || !channel.value) return []
   return (channel.value.projects || []).flatMap(project =>
     (project.media || []).map(media => ({ media, project }))
   )
 })
-const mainMedia = computed(() => allMedia.value.filter(f => f.media?.main))
+
+const mainMedia = computed(() => {
+  if (loading.value) return []
+  return allMedia.value.filter(f => f.media?.main)
+})
+
 const sortedMedia = computed(() => {
+  if (loading.value) return []
   const arr = selectedView.value === 'main' ? mainMedia.value : allMedia.value
-  return arr
-    .slice()
-    .sort((a, b) => (b.media?.resource_date || '').localeCompare(a.media?.resource_date || ''))
+  return sortBy(arr, 'media.resource_date', 'desc')
 })
 
 const projectCount = computed(() => projects.value.length)
