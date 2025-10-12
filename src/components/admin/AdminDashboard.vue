@@ -125,7 +125,9 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import { useStore } from 'vuex'
 import AuthRequired from '@components/shared/AuthRequired.vue'
+
 import { daysSince } from '@utils/date.js'
+import { getCountry } from '@utils/countries.js'
 
 const store = useStore()
 const loading = ref(true)
@@ -143,55 +145,6 @@ const providerIcons = {
   github: 'fab fa-github',
   apple: 'fab fa-apple',
   yahoo: 'fab fa-yahoo'
-}
-
-const countries = {
-  US: { flag: '🇺🇸', name: 'United States' },
-  GB: { flag: '🇬🇧', name: 'United Kingdom' },
-  CA: { flag: '🇨🇦', name: 'Canada' },
-  DE: { flag: '🇩🇪', name: 'Germany' },
-  FR: { flag: '🇫🇷', name: 'France' },
-  IT: { flag: '🇮🇹', name: 'Italy' },
-  ES: { flag: '🇪🇸', name: 'Spain' },
-  NL: { flag: '🇳🇱', name: 'Netherlands' },
-  BE: { flag: '🇧🇪', name: 'Belgium' },
-  CH: { flag: '🇨🇭', name: 'Switzerland' },
-  AT: { flag: '🇦🇹', name: 'Austria' },
-  SE: { flag: '🇸🇪', name: 'Sweden' },
-  NO: { flag: '🇳🇴', name: 'Norway' },
-  DK: { flag: '🇩🇰', name: 'Denmark' },
-  FI: { flag: '🇫🇮', name: 'Finland' },
-  PL: { flag: '🇵🇱', name: 'Poland' },
-  CZ: { flag: '🇨🇿', name: 'Czech Republic' },
-  HU: { flag: '🇭🇺', name: 'Hungary' },
-  RO: { flag: '🇷🇴', name: 'Romania' },
-  BG: { flag: '🇧🇬', name: 'Bulgaria' },
-  GR: { flag: '🇬🇷', name: 'Greece' },
-  PT: { flag: '🇵🇹', name: 'Portugal' },
-  IE: { flag: '🇮🇪', name: 'Ireland' },
-  AU: { flag: '🇦🇺', name: 'Australia' },
-  NZ: { flag: '🇳🇿', name: 'New Zealand' },
-  JP: { flag: '🇯🇵', name: 'Japan' },
-  KR: { flag: '🇰🇷', name: 'South Korea' },
-  CN: { flag: '🇨🇳', name: 'China' },
-  IN: { flag: '🇮🇳', name: 'India' },
-  BR: { flag: '🇧🇷', name: 'Brazil' },
-  MX: { flag: '🇲🇽', name: 'Mexico' },
-  AR: { flag: '🇦🇷', name: 'Argentina' },
-  CL: { flag: '🇨🇱', name: 'Chile' },
-  CO: { flag: '🇨🇴', name: 'Colombia' },
-  PE: { flag: '🇵🇪', name: 'Peru' },
-  ZA: { flag: '🇿🇦', name: 'South Africa' },
-  EG: { flag: '🇪🇬', name: 'Egypt' },
-  NG: { flag: '🇳🇬', name: 'Nigeria' },
-  KE: { flag: '🇰🇪', name: 'Kenya' },
-  RU: { flag: '🇷🇺', name: 'Russia' },
-  UA: { flag: '🇺🇦', name: 'Ukraine' },
-  TR: { flag: '🇹🇷', name: 'Turkey' }
-}
-
-function getCountry(countryCode) {
-  return countries[countryCode?.toUpperCase()] || { flag: '🏳️', name: 'Unknown' }
 }
 
 async function fetchUsers() {
