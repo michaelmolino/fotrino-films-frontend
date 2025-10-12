@@ -42,9 +42,7 @@ const routes = [
   {
     path: '/admin',
     component: () => import('@layouts/MainLayout.vue'),
-    children: [
-      { path: '', component: () => import('@components/admin/AdminDashboard.vue') }
-    ]
+    children: [{ path: '', component: () => import('@components/admin/AdminDashboard.vue') }]
   },
   {
     path: '/:catchAll(.*)',

@@ -6,7 +6,6 @@
     expand-separator
     switch-toggle-side
     :disable="channel.pending">
-
     <template #header>
       <ResourceActions
         :title="channel.title"

@@ -21,14 +21,15 @@
               color="primary"
               class="q-ml-xs"
               data-cy="upload-button"
-              :title="'Upload Media'"
-            >
+              :title="'Upload Media'">
               <q-tooltip>Upload Media</q-tooltip>
             </q-btn>
           </div>
           <div class="text-grey-6 text-caption ellipsis">{{ safeEmail }}</div>
           <div class="text-grey-6 text-caption q-mt-xs">Joined {{ joinedText }}</div>
-          <div class="text-grey-6 text-caption q-mt-xs" data-cy="video-count">{{ mediaCount }} videos</div>
+          <div class="text-grey-6 text-caption q-mt-xs" data-cy="video-count">
+            {{ mediaCount }} videos
+          </div>
         </div>
       </div>
     </q-card>

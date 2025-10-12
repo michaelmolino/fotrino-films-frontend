@@ -12,7 +12,9 @@
         @deleteProject="deleteResource('project', $event)"
         @deleteMedia="deleteResource('media', $event)" />
     </q-list>
-    <div v-if="channels.length === 0" class="q-pa-md text-grey-6 text-center">No channels found</div>
+    <div v-if="channels.length === 0" class="q-pa-md text-grey-6 text-center">
+      No channels found
+    </div>
   </div>
 </template>
 

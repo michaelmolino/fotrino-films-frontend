@@ -154,8 +154,8 @@ const displayProject = computed(() => {
   // For new projects, poster_color should come from payload
   // For existing projects, poster_color should come from the project data
   const posterColor = isNew
-    ? (props.payload?.project?.poster_color || defaultColor)
-    : (parentProject.poster_color || defaultColor)
+    ? props.payload?.project?.poster_color || defaultColor
+    : parentProject.poster_color || defaultColor
 
   return {
     // Prefer parent-computed media array (reflects current poster/media counts)

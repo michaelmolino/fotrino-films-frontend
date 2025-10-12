@@ -5,11 +5,7 @@
       <MediaBrowser v-if="hasChannels" :channels="channels" data-cy="media-browser" />
       <NothingText v-else text="Your media will appear here (once you have some)." />
     </template>
-    <AuthRequired
-      v-else
-      type="login"
-      message="Please log in to access your dashboard"
-    />
+    <AuthRequired v-else type="login" message="Please log in to access your dashboard" />
   </div>
 </template>
 

@@ -27,7 +27,7 @@ export function getProviders(context) {
   return fetchAndCommit(context, {
     url: '/account/providers',
     mutation: 'SET_PROVIDERS',
-    extract: (data) => data.providers
+    extract: data => data.providers
   })
 }
 

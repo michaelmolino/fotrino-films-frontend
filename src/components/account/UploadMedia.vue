@@ -179,11 +179,7 @@
       </template>
     </q-stepper>
   </div>
-  <AuthRequired
-    v-else
-    type = "login"
-    message="Please log in to upload media."
-  />
+  <AuthRequired v-else type="login" message="Please log in to upload media." />
 </template>
 
 <script setup>

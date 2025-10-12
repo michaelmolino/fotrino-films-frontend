@@ -31,6 +31,6 @@ export function getAllUsers(context) {
   return fetchAndCommit(context, {
     url: '/admin/all-users',
     mutation: 'SET_USERS',
-    extract: (data) => sortUsers(data.users)
+    extract: data => sortUsers(data.users)
   })
 }

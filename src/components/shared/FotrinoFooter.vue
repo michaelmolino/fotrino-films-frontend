@@ -10,7 +10,7 @@
       <q-space />
       <q-btn
         flat
-        icon="fas fa-shield-halved"
+        icon="fas fa-file-contract"
         :label="$q.screen.gt.xs ? 'Terms/Privacy' : ''"
         to="/terms" />
       <q-btn

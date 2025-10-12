@@ -97,7 +97,9 @@ const project = computed(() => {
     p = channel.value?.project || null
   }
   // Only redirect if not loading and channel is loaded and matches route
-  if (!p && channel.value && !loading.value && channel.value.uuid === route.params.uuid) redirect('/404')
+  if (!p && channel.value && !loading.value && channel.value.uuid === route.params.uuid) {
+    redirect('/404')
+  }
   return p
 })
 
@@ -112,7 +114,9 @@ const media = computed(() => {
     m = p.media?.find(m => m.main) || p.media?.[0] || null
   }
   // Only redirect if not loading and channel is loaded and matches route
-  if (!m && !loading.value && channel.value && channel.value.uuid === route.params.uuid) redirect('/404')
+  if (!m && !loading.value && channel.value && channel.value.uuid === route.params.uuid) {
+    redirect('/404')
+  }
   return m
 })
 
@@ -138,7 +142,13 @@ watch(
 watch(
   media,
   newMedia => {
-    if (channel.value && project.value && (project.value.media?.length || 0) > 0 && !newMedia && !loading.value) {
+    if (
+      channel.value &&
+      project.value &&
+      (project.value.media?.length || 0) > 0 &&
+      !newMedia &&
+      !loading.value
+    ) {
       redirect('/404')
     } else if (newMedia && !route.params.mediaSlug) {
       redirect({ params: { ...route.params, mediaSlug: newMedia.slug } })

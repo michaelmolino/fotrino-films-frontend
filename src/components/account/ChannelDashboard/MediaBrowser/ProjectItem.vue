@@ -8,7 +8,6 @@
     expand-separator
     switch-toggle-side
     :disable="project.pending">
-
     <template #header>
       <ResourceActions
         :title="project.title"

@@ -19,7 +19,10 @@
         </div>
       </template>
       <template v-else>
-        <AuthRequired v-if="!isAuthenticated" type="login" message="Please log in to access the admin dashboard." />
+        <AuthRequired
+          v-if="!isAuthenticated"
+          type="login"
+          message="Please log in to access the admin dashboard." />
         <AuthRequired v-else-if="!isAdmin" type="admin" />
         <q-list v-else bordered class="rounded-borders">
           <q-expansion-item
@@ -64,8 +67,7 @@
                       :name="providerIcons[provider.provider]"
                       size="16px"
                       :title="provider.provider"
-                      class="text-primary q-ml-xs"
-                    />
+                      class="text-primary q-ml-xs" />
                   </span>
                   <span>{{ user.email }}</span>
                 </q-item-label>
@@ -97,8 +99,7 @@
                       dense
                       size="sm"
                       color="primary"
-                      :title="`Visit ${channel.title}`"
-                    />
+                      :title="`Visit ${channel.title}`" />
                   </q-item-section>
                   <q-item-section>
                     <q-item-label>{{ channel.title }}</q-item-label>
@@ -109,12 +110,12 @@
                 </q-item>
               </q-list>
             </div>
-            <div v-else class="q-pa-md text-grey-6 text-center">
-              No channels
-            </div>
+            <div v-else class="q-pa-md text-grey-6 text-center">No channels</div>
           </q-expansion-item>
         </q-list>
-        <div v-if="isAdmin && users.length === 0" class="q-pa-md text-grey-6 text-center">No users found</div>
+        <div v-if="isAdmin && users.length === 0" class="q-pa-md text-grey-6 text-center">
+          No users found
+        </div>
       </template>
     </div>
   </div>
@@ -222,11 +223,15 @@ onMounted(() => {
 })
 
 // Watch for profile changes and fetch when it becomes available
-watch(profile, (newProfile) => {
-  if (newProfile !== undefined && !hasFetched.value) {
-    fetchUsers()
-  }
-}, { immediate: true })
+watch(
+  profile,
+  newProfile => {
+    if (newProfile !== undefined && !hasFetched.value) {
+      fetchUsers()
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <style scoped>

@@ -37,8 +37,16 @@
           </div>
         </li>
         <div v-for="provider in oAuthProviders" :key="provider">
-          <div class="text-primary q-my-md">Information Received from {{ provider.toUpperCase() }} Login</div>
-          <div>If you sign up or log in using {{ provider.toUpperCase() }}, we receive your name, email address, and profile photo from {{ provider.toUpperCase() }} to create and manage your account on Fotrino Films. This information is used solely for authentication, display, and communication purposes, and is subject to the same data deletion and privacy rights described in this policy.</div>
+          <div class="text-primary q-my-md">
+            Information Received from {{ provider.toUpperCase() }} Login
+          </div>
+          <div>
+            If you sign up or log in using {{ provider.toUpperCase() }}, we receive your name, email
+            address, and profile photo from {{ provider.toUpperCase() }} to create and manage your
+            account on Fotrino Films. This information is used solely for authentication, display,
+            and communication purposes, and is subject to the same data deletion and privacy rights
+            described in this policy.
+          </div>
         </div>
         <q-separator />
         <li class="q-mb-lg">
@@ -149,9 +157,12 @@
             provide a downloadable file containing the information we hold about you.
           </div>
           <div v-for="provider in oAuthProviders" :key="provider">
-            <div class="text-primary q-my-md">Information Received from {{ provider.toUpperCase() }} Login</div>
+            <div class="text-primary q-my-md">
+              Information Received from {{ provider.toUpperCase() }} Login
+            </div>
             <div>
-              Requests to delete accounts created via {{ provider.toUpperCase() }} Login will also result in permanent deletion of all data received from {{ provider.toUpperCase() }}.
+              Requests to delete accounts created via {{ provider.toUpperCase() }} Login will also
+              result in permanent deletion of all data received from {{ provider.toUpperCase() }}.
             </div>
           </div>
         </li>

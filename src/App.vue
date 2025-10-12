@@ -42,8 +42,7 @@ export default {
         let channel = null
         if (route.params?.uuid) {
           channel = await store.cache.dispatch('channel/getChannel', {
-            uuid: route.params.uuid,
-            pending: false
+            uuid: route.params.uuid
           })
           store.commit('channel/SET_CHANNEL', channel)
         } else if (route.params?.privateId) {

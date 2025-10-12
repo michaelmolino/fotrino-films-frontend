@@ -13,7 +13,7 @@ const props = defineProps({
   type: {
     type: String,
     default: 'login',
-    validator: (value) => ['login', 'admin', 'custom'].includes(value)
+    validator: value => ['login', 'admin', 'custom'].includes(value)
   },
   title: {
     type: String,
