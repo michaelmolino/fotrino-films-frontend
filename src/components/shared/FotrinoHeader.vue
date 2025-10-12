@@ -4,15 +4,6 @@
       <q-toolbar-title>
         <LogoBranding />
       </q-toolbar-title>
-
-      <q-btn
-        icon="fas fa-circle-question"
-        :label="$q.screen.gt.sm ? 'Help' : ''"
-        flat
-        no-caps
-        size="md"
-        to="/help" />
-
       <HistoryDropdown />
       <DarkModeDropdown />
       <LoginDropdown v-if="!profile?.id" />

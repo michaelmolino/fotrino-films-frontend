@@ -14,6 +14,13 @@
         :label="$q.screen.gt.xs ? 'Terms/Privacy' : ''"
         to="/terms" />
       <q-btn
+        icon="fas fa-circle-question"
+        :label="$q.screen.gt.sm ? 'Help' : ''"
+        flat
+        no-caps
+        size="md"
+        to="/help" />
+      <q-btn
         flat
         icon="fab fa-github"
         :label="$q.screen.gt.xs ? 'GitHub' : ''"

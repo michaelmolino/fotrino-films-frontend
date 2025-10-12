@@ -6,17 +6,18 @@
     no-caps
     size="md">
     <template v-for="provider in oauthProviders" :key="provider.name">
-      <q-separator />
-      <q-btn
-        :href="provider.login"
-        align="left"
-        flat
-        no-caps
-        :icon="provider.icon"
-        :label="provider.name"
-        size="md"
-        class="fit"
-        @click="storeRedirect" />
+      <div style="max-width:220px; margin: 0 auto; width: 100%;">
+        <q-btn
+          :href="provider.login"
+          align="left"
+          flat
+          no-caps
+          :icon="provider.icon"
+          :label="provider.name"
+          size="md"
+          @click="storeRedirect"
+        />
+      </div>
     </template>
   </q-btn-dropdown>
 </template>

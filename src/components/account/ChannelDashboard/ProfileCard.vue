@@ -12,12 +12,12 @@
         <div class="profile-info">
           <div class="profile-title-row">
             <span class="text-weight-medium text-h6 ellipsis">{{ safeName }}</span>
-              <span
-                v-if="profile.country"
-                class="flag-emoji q-ml-sm"
-                :title="getCountry(profile.country).name">
-                {{ getCountry(profile.country).flag }}
-              </span>
+            <span
+              v-if="profile.country"
+              class="flag-emoji q-ml-sm"
+              :title="getCountry(profile.country).name">
+              {{ getCountry(profile.country).flag }}
+            </span>
           </div>
           <div class="text-grey-6 text-caption ellipsis">{{ safeEmail }}</div>
           <div class="text-grey-6 text-caption q-mt-xs">Joined {{ joinedText }}</div>

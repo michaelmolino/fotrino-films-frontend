@@ -1,12 +1,12 @@
 <template>
   <q-btn-dropdown
     v-if="history && history.length > 0"
-    icon="history"
+    icon="fas fa-clock-rotate-left"
     :label="$q.screen.gt.sm ? 'History' : ''"
     flat
     no-caps
     size="md">
-    <div v-for="channel in history" :key="channel.uuid" class="row items-center">
+    <div v-for="channel in history" :key="channel.uuid" class="row">
       <q-btn
         :icon="channel.cover ? 'img:' + channel.cover : 'fas fa-clapperboard'"
         align="left"

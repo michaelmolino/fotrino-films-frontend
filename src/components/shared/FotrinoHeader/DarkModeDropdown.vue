@@ -5,36 +5,39 @@
     size="md"
     flat
     no-caps>
-    <q-separator />
-    <q-btn
-      flat
-      no-caps
-      align="left"
-      icon="far fa-sun"
-      label="Light"
-      size="md"
-      class="fit"
-      @click="setDarkMode('light')" />
-    <q-separator />
-    <q-btn
-      flat
-      no-caps
-      align="left"
-      icon="fas fa-circle-half-stroke"
-      label="System"
-      size="md"
-      class="fit"
-      @click="setDarkMode('auto')" />
-    <q-separator />
-    <q-btn
-      flat
-      no-caps
-      align="left"
-      icon="far fa-moon"
-      label="Dark"
-      size="md"
-      class="fit"
-      @click="setDarkMode('dark')" />
+    <div style="max-width:220px; margin: 0 auto; width: 100%;">
+      <q-btn
+        flat
+        no-caps
+        align="left"
+        icon="far fa-sun"
+        label="Light"
+        size="md"
+        @click="setDarkMode('light')"
+      />
+    </div>
+    <div style="max-width:220px; margin: 0 auto; width: 100%;">
+      <q-btn
+        flat
+        no-caps
+        align="left"
+        icon="fas fa-circle-half-stroke"
+        label="System"
+        size="md"
+        @click="setDarkMode('auto')"
+      />
+    </div>
+    <div style="max-width:220px; margin: 0 auto; width: 100%;">
+      <q-btn
+        flat
+        no-caps
+        align="left"
+        icon="far fa-moon"
+        label="Dark"
+        size="md"
+        @click="setDarkMode('dark')"
+      />
+    </div>
   </q-btn-dropdown>
 </template>
 
