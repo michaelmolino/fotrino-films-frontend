@@ -64,7 +64,7 @@ export default boot(({ app, router, store }) => {
         Notify.create({
           type: 'negative',
           timeout: 0,
-          message: 'Resources will be immediately deleted; this action cannot be undone!',
+          message: 'Your media will become unavailable instantly; files will be removed in 30 days.',
           position: 'center',
           icon: 'fas fa-info',
           multiLine: true,
