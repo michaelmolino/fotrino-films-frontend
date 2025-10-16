@@ -5,7 +5,8 @@
     :label="$q.screen.gt.sm ? 'History' : ''"
     flat
     no-caps
-    size="md">
+    size="md"
+    content-class="my-history-dropdown-menu">
     <div v-for="channel in history" :key="channel.uuid" class="row">
       <q-btn
         :icon="channel.cover ? 'img:' + channel.cover : 'fas fa-clapperboard'"
