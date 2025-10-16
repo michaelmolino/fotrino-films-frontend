@@ -8,3 +8,7 @@ export function SET_USERS(state, users) {
   }
   state.users = users
 }
+
+export function SET_OUTBOX_DEAD(state, payload) {
+  state.outboxDead = Array.isArray(payload) ? payload : []
+}

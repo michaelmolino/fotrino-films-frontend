@@ -14,6 +14,7 @@
         :image="project.poster"
         :color="project.poster_color || '#000000'"
         :pending="project.pending"
+        :deleted="project.deleted"
         :hasPending-children="hasPendingChildren"
         :link="getMediaLink('project', project.id)"
         :avatarSize="'40px'"

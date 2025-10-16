@@ -34,3 +34,10 @@ export function getAllUsers(context) {
     extract: data => sortUsers(data.users)
   })
 }
+
+export function getDeadOutbox(context) {
+  return fetchAndCommit(context, {
+    url: '/admin/outbox/dead',
+    mutation: 'SET_OUTBOX_DEAD'
+  })
+}

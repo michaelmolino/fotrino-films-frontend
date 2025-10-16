@@ -11,6 +11,7 @@
         :title="channel.title"
         :image="channel.cover"
         :pending="channel.pending"
+        :deleted="channel.deleted"
         :hasPending-children="hasPendingChildren"
         :link="getMediaLink('channel', channel.id)"
         :avatarSize="'48px'"

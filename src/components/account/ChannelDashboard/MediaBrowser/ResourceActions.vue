@@ -15,7 +15,7 @@
         </q-badge>
         <span class="action-btns-inline">
           <q-btn
-            v-if="!pending && link"
+            v-if="!pending && !deleted && link"
             flat
             dense
             size="sm"
@@ -25,6 +25,18 @@
             :to="link"
             :title="`Visit ${title}`">
             <q-tooltip>Visit</q-tooltip>
+          </q-btn>
+          <q-btn
+            v-if="!pending && deleted"
+            flat
+            dense
+            size="sm"
+            icon="delete"
+            color="grey-6"
+            class="q-ml-xs"
+            disable
+            :title="'Resource pending deletion.'">
+            <q-tooltip>Resource pending deletion.</q-tooltip>
           </q-btn>
           <q-btn
             v-if="pending"
@@ -48,7 +60,7 @@
             <q-tooltip>Edit</q-tooltip>
           </q-btn>
           <q-btn
-            v-if="!pending"
+            v-if="!pending && !deleted"
             flat
             dense
             size="sm"
@@ -81,6 +93,7 @@ const props = defineProps({
   image: String,
   color: String,
   pending: Boolean,
+  deleted: Boolean,
   hasPendingChildren: Boolean,
   link: String,
   square: Boolean,
