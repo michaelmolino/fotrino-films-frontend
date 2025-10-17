@@ -31,10 +31,6 @@ axiosRetry(objectApi, {
 })
 
 export default boot(({ app, router, store }) => {
-  // Access the store reliably even if not passed in boot context
-  // This feels like a hack; ideally Quasar should do this
-  const getStore = () => app?.config?.globalProperties?.$store || store
-
   let pending = 0
   const showLoader = () => {
     if (pending === 0) {
@@ -51,8 +47,7 @@ export default boot(({ app, router, store }) => {
     const method = (req.method || '').toLowerCase()
     // Attach CSRF only when available and required
     if (['post', 'put', 'delete'].includes(method)) {
-      const s = getStore()
-      const token = s?.state?.account?.profile?.csrf_token
+      const token = store?.state?.account?.profile?.csrf_token
       if (token) {
         req.headers['X-CSRFToken'] = token
       }

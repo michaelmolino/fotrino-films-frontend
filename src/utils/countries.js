@@ -11,8 +11,7 @@ export function getFlagEmoji(code) {
 
 export function getCountry(code) {
   if (!code || code.toUpperCase() === 'XX') return { flag: '🏳️', name: 'Unknown' }
-  const upper = code.toUpperCase()
-  const name = isoCountries.getName(upper, 'en') || 'Unknown'
-  const flag = getFlagEmoji(upper)
+  const name = isoCountries.getName(code.toUpperCase(), 'en') || 'Unknown'
+  const flag = getFlagEmoji(code.toUpperCase())
   return { flag, name }
 }

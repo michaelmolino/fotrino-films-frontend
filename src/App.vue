@@ -1,7 +1,7 @@
 <template>
   <q-dialog v-model="showTerms" @hide="onTermsClose" backdrop-filter="contrast(40%)">
     <q-card>
-      <q-card-section class="scroll terms">
+      <q-card-section class="scroll">
         <Terms />
       </q-card-section>
       <q-separator />
@@ -14,11 +14,10 @@
 </template>
 
 <script>
-import { useMeta } from 'quasar'
 import { ref, watch, defineAsyncComponent, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute, useRouter } from 'vue-router'
-import { getMetaData } from '@utils/meta.js'
+import { useChannelLoader } from '@composables/useChannelLoader.js'
 
 export default {
   name: 'App',
@@ -31,36 +30,9 @@ export default {
     const store = useStore()
     const route = useRoute()
     const router = useRouter()
+    const { loadChannel } = useChannelLoader()
 
-    const metaData = ref(getMetaData(null, null))
     const showTerms = ref(false)
-
-    useMeta(() => metaData.value)
-
-    const onRouteChange = async () => {
-      try {
-        let channel = null
-        if (route.params?.uuid) {
-          channel = await store.cache.dispatch('channel/getChannel', {
-            uuid: route.params.uuid
-          })
-          store.commit('channel/SET_CHANNEL', channel)
-        } else if (route.params?.privateId) {
-          channel = await store.cache.dispatch('channel/getPrivateMedia', route.params.privateId)
-          store.commit('channel/SET_CHANNEL', channel)
-        }
-        if (channel?.uuid) {
-          router.replace({
-            params: { channelSlug: channel.slug },
-            query: route.query
-          })
-        }
-        metaData.value = getMetaData(route, channel)
-      } catch {
-        metaData.value = getMetaData(null, null)
-        store.commit('channel/SET_CHANNEL', null)
-      }
-    }
 
     onMounted(async () => {
       if (process.env.NODE_ENV === 'development') {
@@ -73,11 +45,16 @@ export default {
       } catch (error) {
         console.debug('Profile fetch failed:', error.response?.status)
       }
-      showTerms.value = route.query?.showTerms === 'true'
-      onRouteChange()
+      showTerms.value = route.query?.showTerms?.toLowerCase() === 'true'
+      await loadChannel(route)
     })
 
-    watch(() => route.fullPath, onRouteChange)
+    watch(
+      () => route.fullPath,
+      async () => {
+        await loadChannel(route)
+      }
+    )
 
     const onTermsClose = () => {
       if (route.query?.showTerms) {
@@ -88,7 +65,6 @@ export default {
     }
 
     return {
-      metaData,
       showTerms,
       onTermsClose
     }
