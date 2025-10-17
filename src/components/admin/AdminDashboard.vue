@@ -95,7 +95,7 @@
                   <q-item-section side>
                     <q-btn
                       :to="`/${channel.uuid}/${channel.slug}`"
-                      icon="fas fa-external-link-alt"
+                      icon="fas fa-link"
                       flat
                       dense
                       size="sm"

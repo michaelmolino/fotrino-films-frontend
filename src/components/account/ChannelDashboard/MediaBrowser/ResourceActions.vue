@@ -19,7 +19,7 @@
             flat
             dense
             size="sm"
-            icon="fas fa-external-link-alt"
+            icon="fas fa-link"
             color="primary"
             class="q-ml-xs"
             :to="link"
