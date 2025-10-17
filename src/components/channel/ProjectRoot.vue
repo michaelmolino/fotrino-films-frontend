@@ -1,6 +1,6 @@
 <template>
   <div class="q-pa-md">
-    <template v-if="loading || !channel?.uuid || !project">
+    <template v-if="loading || !channel || !project">
       <q-skeleton type="rect" class="q-mb-md skeleton-large" />
       <q-skeleton type="text" width="60%" />
       <q-skeleton type="text" width="40%" />
