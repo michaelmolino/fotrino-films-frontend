@@ -9,7 +9,9 @@
         icon="flag"
         color="warning"
         data-cy="report-button"
-        @click="openReportDialog" />
+        @click="openReportDialog">
+        <q-tooltip>Report</q-tooltip>
+      </q-btn>
       <q-btn-dropdown
         dropdown-icon="fas fa-share-nodes"
         class="q-pa-sm float-right"
