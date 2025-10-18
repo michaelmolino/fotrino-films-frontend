@@ -128,36 +128,48 @@
             :rows="outboxDead"
             :columns="outboxColumns"
             row-key="id"
+            dense
           >
             <template #body-cell-created="props">
               <q-td :props="props">{{ daysSince(props.row.created, true) }}</q-td>
             </template>
-            <template #body-cell-type="props">
-              <q-td :props="props"><code>{{ props.row.type }}</code></q-td>
-            </template>
             <template #body-cell-payload="props">
               <q-td :props="props">
-                <q-expansion-item dense expand-separator label="Payload">
-                  <pre class="q-ma-none" style="white-space: pre-wrap">{{ pretty(props.row.payload) }}</pre>
+                <q-expansion-item dense expand-separator label="Show Payload">
+                  <pre style="white-space: pre-wrap">{{ pretty(props.row.payload) }}</pre>
                 </q-expansion-item>
-              </q-td>
-            </template>
-            <template #body-cell-last_error="props">
-              <q-td :props="props">
-                <q-expansion-item
-                  v-if="props.row.last_error"
-                  dense
-                  expand-separator
-                  :label="props.row.last_error.substring(0, 50) + (props.row.last_error.length > 50 ? '...' : '')">
-                  <pre class="q-ma-none" style="white-space: pre-wrap">{{ props.row.last_error }}</pre>
-                </q-expansion-item>
-                <span v-else class="text-grey-6">—</span>
               </q-td>
             </template>
             <template #body-cell-actions="props">
               <q-td :props="props">
                 <q-btn dense size="sm" flat color="accent" icon="refresh" @click="requeue(props.row.id)">
                   <q-tooltip>Requeue</q-tooltip>
+                </q-btn>
+              </q-td>
+            </template>
+          </q-table>
+        </div>
+
+        <!-- Reported Media Section -->
+        <div v-if="isAdmin" class="q-mt-xl">
+          <div class="text-h6 text-weight-bold">Admin: Reported Media</div>
+          <div class="text-caption text-grey-7 q-mb-md">All media that has been reported by users.</div>
+          <q-table
+            flat
+            bordered
+            :rows="flattenedReportedMediaRows"
+            :columns="reportedMediaColumns"
+            row-key="rowKey"
+            separator="cell"
+            dense
+          >
+            <template #body-cell-created_at="props">
+              <q-td :props="props">{{ daysSince(props.row.created_at, true) }}</q-td>
+            </template>
+            <template #body-cell-actions="props">
+              <q-td :props="props">
+                <q-btn dense size="sm" flat color="negative" icon="delete" @click="deleteMedia(props.row.private_id)">
+                  <q-tooltip>Delete Media</q-tooltip>
                 </q-btn>
               </q-td>
             </template>
@@ -171,6 +183,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useStore } from 'vuex'
+import { useQuasar } from 'quasar'
 import AuthRequired from '@components/shared/AuthRequired.vue'
 import { api } from 'boot/axios'
 
@@ -237,7 +250,6 @@ watch(
 )
 
 const outboxColumns = [
-  { name: 'id', label: 'ID', field: 'id', align: 'left', sortable: true },
   { name: 'created', label: 'Created', field: 'created', align: 'left', sortable: true },
   { name: 'type', label: 'Type', field: 'type', align: 'left' },
   { name: 'attempts', label: 'Attempts', field: 'attempts', align: 'right' },
@@ -259,6 +271,62 @@ async function requeue(eventId) {
     console.debug('Requeue failed', e)
   }
 }
+const $q = useQuasar()
+const reportedMediaRows = ref([])
+const reportedMediaColumns = [
+  { name: 'title', label: 'Media', field: 'title', align: 'left' },
+  { name: 'reporter', label: 'Reporter', field: 'reporter', align: 'left' },
+  { name: 'reason', label: 'Reason', field: 'reason', align: 'left' },
+  { name: 'created_at', label: 'Reported', field: 'created_at', align: 'left' },
+  { name: 'actions', label: 'Actions', field: 'actions', align: 'center' }
+]
+
+const flattenedReportedMediaRows = computed(() => {
+  const rows = []
+  for (const media of reportedMediaRows.value) {
+    const reports = media.reports || []
+    reports.forEach((report, idx) => {
+      rows.push({
+        rowKey: media.media_id,
+        media_id: media.media_id,
+        private_id: media.private_id,
+        title: media.title,
+        reporter: report.reporter,
+        reason: report.reason,
+        created_at: report.created_at,
+        actions: media.media_id // used for delete button
+      })
+    })
+  }
+  return rows
+})
+
+async function fetchReportedMedia() {
+  try {
+    const resp = await api.get('/admin/reported-media')
+    reportedMediaRows.value = resp.data
+  } catch (err) {
+    $q.notify({ type: 'negative', message: 'Failed to fetch reported media.' })
+  }
+}
+
+function deleteMedia(mediaId) {
+  api.delete(`/admin/media/${mediaId}`)
+    .catch(() => {
+      // do nothing
+    })
+}
+
+// Fetch reported media when admin profile loads
+watch(
+  profile,
+  newProfile => {
+    if (newProfile?.is_admin) {
+      fetchReportedMedia()
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <style scoped>
