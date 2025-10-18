@@ -120,7 +120,7 @@
 
         <!-- Dead Outbox Section -->
         <div v-if="isAdmin" class="q-mt-xl">
-          <div class="text-h6 text-weight-bold">Admin: Dead Outbox Events</div>
+          <div class="text-h6 text-weight-bold">Admin: Dead Letter Queue</div>
           <div class="text-caption text-grey-7 q-mb-md">Events that exhausted retries or were marked dead.</div>
           <q-table
             flat
