@@ -17,6 +17,7 @@ const shouldRetryObjects = error => {
 }
 
 const api = axios.create({ baseURL: process.env.API })
+
 axiosRetry(api, {
   retries: 6,
   retryDelay: axiosRetry.exponentialDelay,
@@ -24,6 +25,7 @@ axiosRetry(api, {
 })
 
 const objectApi = axios.create()
+
 axiosRetry(objectApi, {
   retries: 6,
   retryDelay: axiosRetry.exponentialDelay,
@@ -49,6 +51,7 @@ export default boot(({ app, router, store }) => {
 
   api.interceptors.request.use(req => {
     const method = (req.method || '').toLowerCase()
+
     // Attach CSRF only when available and required
     if (['post', 'put', 'delete'].includes(method)) {
       const s = getStore()
@@ -58,8 +61,8 @@ export default boot(({ app, router, store }) => {
       }
     }
 
+    // Confirm destructive action
     if (method === 'delete') {
-      // Confirm destructive action, optionally cancel the request
       return new Promise((resolve, reject) => {
         Notify.create({
           type: 'negative',

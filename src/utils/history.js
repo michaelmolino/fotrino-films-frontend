@@ -2,7 +2,6 @@ import { ref, watch } from 'vue'
 import { LocalStorage } from 'quasar'
 
 const HISTORY_KEY = 'fotrino-films-history'
-
 export const history = ref(LocalStorage.getItem(HISTORY_KEY) || [])
 
 export function addHistory(channel) {

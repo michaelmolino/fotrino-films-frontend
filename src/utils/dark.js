@@ -2,7 +2,6 @@ import { ref, watch, onMounted } from 'vue'
 import { LocalStorage } from 'quasar'
 
 const DARK_KEY = 'fotrino-films-darkmode'
-
 export const darkModePref = ref(LocalStorage.getItem(DARK_KEY) || 'auto')
 export const systemDark = ref(window.matchMedia('(prefers-color-scheme: dark)').matches)
 

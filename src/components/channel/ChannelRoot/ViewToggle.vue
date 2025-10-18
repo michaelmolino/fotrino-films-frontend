@@ -45,6 +45,9 @@
 import { ref, computed } from 'vue'
 import { LocalStorage } from 'quasar'
 
+const VIEW_KEY = 'fotrino-films-view'
+const internalValue = ref(LocalStorage.getItem(VIEW_KEY) || 'all')
+
 const { projectCount, mainCount, allCount } = defineProps({
   projectCount: Number,
   mainCount: Number,
@@ -53,12 +56,10 @@ const { projectCount, mainCount, allCount } = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
-const internalValue = ref(LocalStorage.getItem('last-selected-view') || 'all')
-
 const modelValue = computed({
   get: () => internalValue.value,
   set: val => {
-    LocalStorage.set('last-selected-view', val)
+    LocalStorage.set(VIEW_KEY, val)
     internalValue.value = val
     emit('update:modelValue', val)
   }
