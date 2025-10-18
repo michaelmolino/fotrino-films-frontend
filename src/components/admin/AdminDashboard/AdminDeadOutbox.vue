@@ -46,7 +46,7 @@ const outboxColumns = [
   { name: 'attempts', label: 'Attempts', field: 'attempts', align: 'right' },
   { name: 'payload', label: 'Payload', field: 'payload', align: 'left' },
   { name: 'last_error', label: 'Last Error', field: 'last_error', align: 'left' },
-  { name: 'actions', label: 'Actions', field: 'actions', align: 'right' }
+  { name: 'actions', label: 'Actions', field: 'actions', align: 'center' }
 ]
 function pretty(obj) {
   try { return JSON.stringify(obj, null, 2) } catch { return String(obj) }

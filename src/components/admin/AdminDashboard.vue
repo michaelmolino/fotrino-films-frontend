@@ -9,7 +9,7 @@
 </template>
 
 <script setup>
-import AdminUserList from './AdminUserList.vue'
-import AdminDeadOutbox from './AdminDeadOutbox.vue'
-import AdminReportedMedia from './AdminReportedMedia.vue'
+import AdminUserList from './AdminDashboard/AdminUserList.vue'
+import AdminDeadOutbox from './AdminDashboard/AdminDeadOutbox.vue'
+import AdminReportedMedia from './AdminDashboard/AdminReportedMedia.vue'
 </script>
