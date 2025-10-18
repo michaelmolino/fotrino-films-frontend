@@ -2,7 +2,13 @@
   <div>
     <div class="text-h6 text-weight-bold">Admin: Reported Media</div>
     <div class="text-caption text-grey-7 q-mb-md">All media that has been reported by users.</div>
+    <div v-if="loading">
+      <q-skeleton type="rect" height="40px" class="q-mb-sm" />
+      <q-skeleton type="rect" height="40px" class="q-mb-sm" />
+      <q-skeleton type="rect" height="40px" class="q-mb-sm" />
+    </div>
     <q-table
+      v-else
       flat
       bordered
       :rows="flattenedReportedMediaRows"
@@ -44,6 +50,7 @@ import { api } from 'boot/axios'
 import { daysSince } from '@utils/date.js'
 
 const $q = useQuasar()
+const loading = ref(true)
 const reportedMediaRows = ref([])
 const reportedMediaColumns = [
   { name: 'created_at', label: 'Reported', field: 'created_at', align: 'left' },
@@ -72,10 +79,16 @@ const flattenedReportedMediaRows = computed(() => {
   return rows
 })
 
-function fetchReportedMedia() {
-  api.get('/admin/reported-media')
-    .then(resp => { reportedMediaRows.value = resp.data })
-    .catch(() => { $q.notify({ type: 'negative', message: 'Failed to fetch reported media.' }) })
+async function fetchReportedMedia() {
+  loading.value = true
+  try {
+    const resp = await api.get('/admin/reported-media')
+    reportedMediaRows.value = resp.data
+  } catch {
+    $q.notify({ type: 'negative', message: 'Failed to fetch reported media.' })
+  } finally {
+    loading.value = false
+  }
 }
 function deleteMedia(privateId) {
   api.delete(`/admin/media/${privateId}`)

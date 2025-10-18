@@ -2,7 +2,13 @@
   <div>
     <div class="text-h6 text-weight-bold">Admin: Dead Outbox Events</div>
     <div class="text-caption text-grey-7 q-mb-md">Events that exhausted retries or were marked dead.</div>
+    <div v-if="loading">
+      <q-skeleton type="rect" height="40px" class="q-mb-sm" />
+      <q-skeleton type="rect" height="40px" class="q-mb-sm" />
+      <q-skeleton type="rect" height="40px" class="q-mb-sm" />
+    </div>
     <q-table
+      v-else
       flat
       bordered
       :rows="outboxDead"
@@ -34,11 +40,12 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
 import { daysSince } from '@utils/date.js'
 
 const store = useStore()
+const loading = ref(true)
 const outboxDead = computed(() => store.state.admin.outboxDead || [])
 const outboxColumns = [
   { name: 'created', label: 'Created', field: 'created', align: 'left' },
@@ -55,7 +62,12 @@ function requeue(eventId) {
   store.dispatch('admin/requeueOutbox', eventId)
 }
 
-onMounted(() => {
-  store.dispatch('admin/getDeadOutbox')
+onMounted(async () => {
+  loading.value = true
+  try {
+    await store.dispatch('admin/getDeadOutbox')
+  } finally {
+    loading.value = false
+  }
 })
 </script>

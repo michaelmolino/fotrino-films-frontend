@@ -1,6 +1,11 @@
 <template>
   <div>
-    <q-list bordered class="rounded-borders">
+    <div v-if="loading">
+      <q-skeleton type="rect" height="48px" class="q-mb-sm" />
+      <q-skeleton type="rect" height="48px" class="q-mb-sm" />
+      <q-skeleton type="rect" height="48px" class="q-mb-sm" />
+    </div>
+    <q-list v-else bordered class="rounded-borders">
       <q-expansion-item
         v-for="user in users"
         :key="user.id"
@@ -88,19 +93,20 @@
         <div v-else class="q-pa-md text-grey-6 text-center">No channels</div>
       </q-expansion-item>
     </q-list>
-    <div v-if="users.length === 0" class="q-pa-md text-grey-6 text-center">
+    <div v-if="!loading && users.length === 0" class="q-pa-md text-grey-6 text-center">
       No users found
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
 import { daysSince } from '@utils/date.js'
 import { getCountry } from '@utils/countries.js'
 
 const store = useStore()
+const loading = ref(true)
 const users = computed(() => store.state.admin.users || [])
 const providerIcons = {
   google: 'fab fa-google',
@@ -111,8 +117,13 @@ const providerIcons = {
   yahoo: 'fab fa-yahoo'
 }
 
-onMounted(() => {
-  store.dispatch('admin/getAllUsers')
+onMounted(async () => {
+  loading.value = true
+  try {
+    await store.dispatch('admin/getAllUsers')
+  } finally {
+    loading.value = false
+  }
 })
 </script>
 
