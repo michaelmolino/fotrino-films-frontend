@@ -8,7 +8,8 @@ dayjs.extend(isToday)
 dayjs.extend(isYesterday)
 
 export function daysSince(start, withTime = true) {
-  const day = dayjs(start)
+  // This implicitly converts from server UTC time to local time
+  const day = dayjs(new Date(start))
   if (!withTime) {
     if (day.isToday()) return 'today'
     if (day.isYesterday()) return 'yesterday'
