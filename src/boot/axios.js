@@ -31,6 +31,10 @@ axiosRetry(objectApi, {
 })
 
 export default boot(({ app, router, store }) => {
+  // Access the store reliably even if not passed in boot context
+  // This feels like a hack; ideally Quasar should do this
+  const getStore = () => app?.config?.globalProperties?.$store || store
+
   let pending = 0
   const showLoader = () => {
     if (pending === 0) {
@@ -47,7 +51,8 @@ export default boot(({ app, router, store }) => {
     const method = (req.method || '').toLowerCase()
     // Attach CSRF only when available and required
     if (['post', 'put', 'delete'].includes(method)) {
-      const token = store?.state?.account?.profile?.csrf_token
+      const s = getStore()
+      const token = s?.state?.account?.profile?.csrf_token
       if (token) {
         req.headers['X-CSRFToken'] = token
       }
@@ -112,7 +117,7 @@ export default boot(({ app, router, store }) => {
       }
 
       let msg = 'Something went wrong!'
-      if (status === 400) msg = error?.response?.data || msg
+      if (status === 400) msg = error?.message || error?.response?.data || msg
       else if (status === 401) msg = 'Unauthorised. Please login.'
       else if (status === 402) msg = 'You have exceeded a limit for your account type.'
       else if (status === 403) msg = 'Forbidden.'
