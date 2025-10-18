@@ -41,7 +41,7 @@ import { daysSince } from '@utils/date.js'
 const store = useStore()
 const outboxDead = computed(() => store.state.admin.outboxDead || [])
 const outboxColumns = [
-  { name: 'created', label: 'Created', field: 'created', align: 'left', sortable: true },
+  { name: 'created', label: 'Created', field: 'created', align: 'left' },
   { name: 'type', label: 'Type', field: 'type', align: 'left' },
   { name: 'attempts', label: 'Attempts', field: 'attempts', align: 'right' },
   { name: 'payload', label: 'Payload', field: 'payload', align: 'left' },
