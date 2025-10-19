@@ -60,7 +60,11 @@ export default defineConfig(() => ({
 
   animations: ['zoomInDown'],
 
-  ssr: { pwa: false },
+  ssr: {
+    pwa: false,
+    middlewares: ['render'],
+    csp: false
+  },
 
   pwa: {
     workboxPluginMode: 'GenerateSW',

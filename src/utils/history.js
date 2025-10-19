@@ -2,10 +2,15 @@ import { ref, watch } from 'vue'
 import { LocalStorage } from 'quasar'
 
 const HISTORY_KEY = 'fotrino-films-history'
-export const history = ref(LocalStorage.getItem(HISTORY_KEY) || [])
+export const history = ref(
+  typeof LocalStorage !== 'undefined' && LocalStorage.getItem(HISTORY_KEY)
+    ? LocalStorage.getItem(HISTORY_KEY)
+    : []
+)
 
 export function addHistory(channel) {
   if (!channel?.uuid || !channel?.title || !channel?.slug) return
+  if (typeof LocalStorage === 'undefined') return
 
   const current = LocalStorage.getItem(HISTORY_KEY) || []
   if (!current.some(c => c.uuid === channel.uuid)) {
@@ -24,6 +29,7 @@ export function addHistory(channel) {
 }
 
 export function removeHistory(uuid) {
+  if (typeof LocalStorage === 'undefined') return
   const current = LocalStorage.getItem(HISTORY_KEY) || []
   const updated = current.filter(u => u.uuid !== uuid)
   LocalStorage.set(HISTORY_KEY, updated)

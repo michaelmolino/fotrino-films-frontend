@@ -1,6 +1,6 @@
 <template>
   <q-btn-dropdown
-    v-if="history && history.length > 0"
+    v-if="isClient && history && history.length > 0"
     icon="fas fa-clock-rotate-left"
     :label="$q.screen.gt.sm ? 'History' : ''"
     flat
@@ -31,9 +31,15 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { history, watchChannelHistory, removeHistory } from '@utils/history.js'
 
+const isClient = ref(false)
 const $store = useStore()
-watchChannelHistory($store)
+
+onMounted(() => {
+  isClient.value = true
+  watchChannelHistory($store)
+})
 </script>
