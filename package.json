@@ -28,7 +28,7 @@
     "vuex-cache": "^3.4.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.28.4",
+    "@babel/core": "^7.28.5",
     "@babel/eslint-parser": "^7.28.4",
     "@quasar/app-webpack": "^4.2.7",
     "autoprefixer": "^10.4.21",
