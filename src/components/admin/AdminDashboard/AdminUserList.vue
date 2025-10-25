@@ -17,7 +17,7 @@
         <template #header>
           <q-item-section avatar>
             <div class="relative-position">
-              <q-avatar size="48px">
+              <q-avatar size="48px" :class="{ 'deleted-user': user.deleted }">
                 <img :src="user.profile_pic" />
               </q-avatar>
               <q-badge
@@ -28,10 +28,18 @@
                 class="admin-badge">
                 <q-icon name="fas fa-user-shield" size="12px" />
               </q-badge>
+              <q-badge
+                v-if="user.deleted"
+                floating
+                color="negative"
+                text-color="white"
+                class="deleted-badge">
+                <q-icon name="fas fa-trash" size="12px" />
+              </q-badge>
             </div>
           </q-item-section>
           <q-item-section>
-            <q-item-label class="text-weight-medium">
+            <q-item-label class="text-weight-medium" :class="{ 'deleted-user': user.deleted }">
               <span>{{ user.name }}</span>
               <span
                 v-if="user.country"
@@ -39,8 +47,30 @@
                 :title="getCountry(user.country).name">
                 {{ getCountry(user.country).flag }}
               </span>
+              <q-btn
+                v-if="!user.deleted"
+                icon="fas fa-trash"
+                flat
+                dense
+                round
+                size="sm"
+                color="negative"
+                class="q-ml-sm"
+                @click.stop="deleteUser(user)"
+                :title="`Delete ${user.name}`" />
+              <q-btn
+                v-else
+                icon="fas fa-trash"
+                flat
+                dense
+                round
+                size="sm"
+                color="grey-5"
+                class="q-ml-sm"
+                disable
+                :title="`${user.name} is already deleted`" />
             </q-item-label>
-            <q-item-label caption>
+            <q-item-label caption :class="{ 'deleted-user': user.deleted }">
               <span class="q-mr-sm">
                 <q-icon
                   v-for="provider in user.providers"
@@ -52,10 +82,10 @@
               </span>
               <span>{{ user.email }}</span>
             </q-item-label>
-            <q-item-label caption class="text-grey-7 q-mt-xs" v-if="user.last_login">
+            <q-item-label caption class="text-grey-7 q-mt-xs" v-if="user.last_login" :class="{ 'deleted-user': user.deleted }">
               Last login: {{ daysSince(user.last_login, true) }}
             </q-item-label>
-            <q-item-label caption class="text-grey-7 q-mt-xs" v-else>
+            <q-item-label caption class="text-grey-7 q-mt-xs" v-else :class="{ 'deleted-user': user.deleted }">
               Never logged in
             </q-item-label>
           </q-item-section>
@@ -102,10 +132,12 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
+import { useQuasar } from 'quasar'
 import { daysSince } from '@utils/date.js'
 import { getCountry } from '@utils/countries.js'
 
 const store = useStore()
+const $q = useQuasar()
 const loading = ref(true)
 const users = computed(() => store.state.admin.users || [])
 const providerIcons = {
@@ -115,6 +147,18 @@ const providerIcons = {
   github: 'fab fa-github',
   apple: 'fab fa-apple',
   yahoo: 'fab fa-yahoo'
+}
+
+const deleteUser = async (user) => {
+  try {
+    await store.dispatch('admin/deleteUser', user.id)
+    $q.notify({
+      type: 'positive',
+      message: `User "${user.name}" has been deleted successfully.`
+    })
+  } catch (error) {
+    console.error(error)
+  }
 }
 
 onMounted(async () => {
@@ -137,6 +181,16 @@ onMounted(async () => {
 }
 .admin-badge {
   z-index: 1;
+}
+.deleted-badge {
+  z-index: 2;
+}
+.deleted-user {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+.deleted-user img {
+  filter: grayscale(100%);
 }
 @media (max-width: 600px) {
   .channel-item {

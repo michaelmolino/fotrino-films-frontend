@@ -41,3 +41,14 @@ export function getDeadOutbox(context) {
     mutation: 'SET_OUTBOX_DEAD'
   })
 }
+
+export function deleteUser(context, userId) {
+  return api.delete(`/admin/users/${userId}`)
+    .then(() => {
+      // Update user's deleted status instead of removing from list
+      const users = context.state.users.map(user =>
+        user.id === userId ? { ...user, deleted: true } : user
+      )
+      context.commit('SET_USERS', users)
+    })
+}

@@ -67,7 +67,7 @@ export default boot(({ app, router, store }) => {
         Notify.create({
           type: 'negative',
           timeout: 0,
-          message: 'Your media will become unavailable instantly; files will be removed in 30 days.',
+          message: 'This is a destructive action. Are you sure you want to continue?',
           position: 'center',
           icon: 'fas fa-info',
           multiLine: true,
