@@ -12,6 +12,7 @@
 
 <script setup>
 import { computed, onMounted, onBeforeUnmount, watch, ref, nextTick } from 'vue'
+import { useStore } from 'vuex'
 import Hls from 'hls.js'
 
 const props = defineProps({
@@ -19,11 +20,17 @@ const props = defineProps({
   artist: String
 })
 
+const store = useStore()
 const player = ref(null)
 const hls = ref(null)
 let playHandler = null
 
 const view = computed(() => (props.media?.type?.startsWith('audio/') ? 'audio' : 'video'))
+
+async function fetchMediaToken() {
+  if (!props.media?.private_id) return null
+  return await store.dispatch('channel/getMediaToken', props.media.private_id)
+}
 
 function destroyPlayers() {
   if (Hls.isSupported() && hls.value) {
@@ -40,7 +47,7 @@ function destroyPlayers() {
   }
 }
 
-function setSource() {
+async function setSource() {
   const el = document.getElementById('player')
   if (!el || !props.media) return
   const PlyrCtor = window.Plyr
@@ -63,16 +70,45 @@ function setSource() {
     ]
   })
 
+  // Fetch JWT token for secure media access
+  const token = await fetchMediaToken()
+
   if (view.value === 'video') {
     const video = el.tagName.toLowerCase() === 'video' ? el : document.querySelector('video')
     const source = props.media.src
+    const queryParams = token ? `token=${token}` : null
+
     if (Hls.isSupported()) {
-      hls.value = new Hls()
+      let currentQueryParams = queryParams
+      hls.value = new Hls({
+        xhrSetup: function (xhr, url) {
+          // Append query parameters to all segment and playlist requests
+          if (currentQueryParams) {
+            xhr.open('GET', url + '?' + currentQueryParams, true)
+          }
+        }
+      })
       hls.value.loadSource(source)
       hls.value.attachMedia(video)
       window.hls = hls.value
+
+      // Intercept 403 errors and retry with a fresh token
+      hls.value.on(Hls.Events.ERROR, async function (event, data) {
+        if (data.response && data.response.code === 403) {
+          const newToken = await fetchMediaToken()
+          if (newToken) {
+            currentQueryParams = `token=${newToken}`
+            hls.value.loadSource(source)
+            hls.value.attachMedia(video)
+          } else {
+            // Show error to user only if token refresh fails
+            player.value && player.value.destroy()
+            alert('Unable to refresh video token. Please try again later.')
+          }
+        }
+      })
     } else if (video) {
-      video.src = source
+      video.src = queryParams ? source + '?' + queryParams : source
     }
     player.value.poster = props.media.preview
   } else {

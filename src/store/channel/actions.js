@@ -50,6 +50,16 @@ export function getPrivateMedia(context, privateId) {
   })
 }
 
+export async function getMediaToken(context, privateId) {
+  try {
+    const { data } = await api.get(`/channels/media/token/${privateId}`)
+    return data.token
+  } catch (error) {
+    console.error('Failed to fetch media token:', error)
+    return null
+  }
+}
+
 export async function deleteResource(context, resource) {
   const url =
     resource.type === 'channel'
