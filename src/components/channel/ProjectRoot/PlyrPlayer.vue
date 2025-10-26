@@ -98,10 +98,19 @@ async function setSource() {
           const newToken = await fetchMediaToken()
           if (newToken) {
             currentQueryParams = `token=${newToken}`
+            const currentTime = video.currentTime
             hls.value.loadSource(source)
             hls.value.attachMedia(video)
+            const restorePlayback = () => {
+              if (Math.abs(video.currentTime - currentTime) > 0.5 && currentTime > 0) {
+                video.currentTime = currentTime
+              }
+              video.play()
+              video.removeEventListener('loadedmetadata', restorePlayback)
+            }
+            video.addEventListener('loadedmetadata', restorePlayback)
+            hls.value.once(Hls.Events.MANIFEST_PARSED, restorePlayback)
           } else {
-            // Show error to user only if token refresh fails
             player.value && player.value.destroy()
             alert('Unable to refresh video token. Please try again later.')
           }
@@ -114,7 +123,7 @@ async function setSource() {
   } else {
     const audio = el.tagName.toLowerCase() === 'audio' ? el : document.querySelector('audio')
     if (audio) {
-      audio.src = props.media.src
+      audio.src = props.media.src + `?token=${token}`
       audio.type = props.media.type
     }
   }
