@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.16.17",
-    "axios": "^1.12.2",
+    "axios": "^1.13.1",
     "axios-retry": "^4.5.0",
     "browser-image-compression": "^2.0.2",
     "commentbox.io": "^2.1.0",
