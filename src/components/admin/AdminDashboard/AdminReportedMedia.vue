@@ -15,8 +15,7 @@
       :columns="reportedMediaColumns"
       row-key="rowKey"
       separator="cell"
-      dense
-    >
+      dense>
       <template #body-cell-title="props">
         <q-td :props="props">
           <q-btn
@@ -25,8 +24,7 @@
             icon="fas fa-link"
             flat
             dense
-            size="sm"
-          />
+            size="sm" />
         </q-td>
       </template>
       <template #body-cell-created_at="props">
@@ -34,7 +32,13 @@
       </template>
       <template #body-cell-actions="props">
         <q-td :props="props">
-          <q-btn dense size="sm" flat color="negative" icon="delete" @click="deleteMedia(props.row.private_id)">
+          <q-btn
+            dense
+            size="sm"
+            flat
+            color="negative"
+            icon="delete"
+            @click="deleteMedia(props.row.private_id)">
             <q-tooltip>Delete Media</q-tooltip>
           </q-btn>
         </q-td>
@@ -91,7 +95,8 @@ async function fetchReportedMedia() {
   }
 }
 function deleteMedia(privateId) {
-  api.delete(`/admin/media/${privateId}`)
+  api
+    .delete(`/admin/media/${privateId}`)
     .then(() => {
       fetchReportedMedia()
       $q.notify({ type: 'positive', message: 'Media deleted.' })
@@ -103,7 +108,9 @@ function deleteMedia(privateId) {
 
 watch(
   () => true,
-  () => { fetchReportedMedia() },
+  () => {
+    fetchReportedMedia()
+  },
   { immediate: true }
 )
 </script>

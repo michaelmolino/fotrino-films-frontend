@@ -18,11 +18,11 @@ export function useChannelLoader() {
   useMeta(() => metaData.value)
 
   /**
-     * Load channel data from route params and update store/router/metadata
-     * @param {Object} route - Vue Router route object
-     * @returns {Promise<Object|null>} - Channel object or null
-     */
-  const loadChannel = async (route) => {
+   * Load channel data from route params and update store/router/metadata
+   * @param {Object} route - Vue Router route object
+   * @returns {Promise<Object|null>} - Channel object or null
+   */
+  const loadChannel = async route => {
     try {
       let channel = null
 
@@ -48,6 +48,7 @@ export function useChannelLoader() {
     } catch (error) {
       store.commit('channel/SET_CHANNEL', null)
       metaData.value = getMetaData(null, null)
+      console.error('Failed to load channel:', error)
       return null
     }
   }

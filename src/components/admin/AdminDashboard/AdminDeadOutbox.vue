@@ -1,7 +1,9 @@
 <template>
   <div>
-    <div class="text-h6 text-weight-bold">Admin: Dead Outbox Events</div>
-    <div class="text-caption text-grey-7 q-mb-md">Events that exhausted retries or were marked dead.</div>
+    <div class="text-h6 text-weight-bold">Admin: Dead Letter Queue</div>
+    <div class="text-caption text-grey-7 q-mb-md">
+      Events that exhausted retries or were marked dead.
+    </div>
     <div v-if="loading">
       <q-skeleton type="rect" height="40px" class="q-mb-sm" />
       <q-skeleton type="rect" height="40px" class="q-mb-sm" />
@@ -16,8 +18,7 @@
       row-key="id"
       separator="cell"
       dense
-      :pagination="{ rowsPerPage: 0 }"
-    >
+      :pagination="{ rowsPerPage: 0 }">
       <template #body-cell-created="props">
         <q-td :props="props">{{ daysSince(props.row.created, true) }}</q-td>
       </template>
@@ -56,7 +57,11 @@ const outboxColumns = [
   { name: 'actions', label: 'Actions', field: 'actions', align: 'center' }
 ]
 function pretty(obj) {
-  try { return JSON.stringify(obj, null, 2) } catch { return String(obj) }
+  try {
+    return JSON.stringify(obj, null, 2)
+  } catch {
+    return String(obj)
+  }
 }
 function requeue(eventId) {
   store.dispatch('admin/requeueOutbox', eventId)

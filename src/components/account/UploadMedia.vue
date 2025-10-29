@@ -190,7 +190,7 @@ import ChannelStep from './UploadMedia/ChannelStep.vue'
 import ProjectStep from './UploadMedia/ProjectStep.vue'
 import MediaStep from './UploadMedia/MediaStep.vue'
 import MediaPreview from '@components/channel/MediaPreview.vue'
-import AuthRequired from 'src/components/shared/AuthRequired.vue'
+import AuthRequired from '@components/shared/AuthRequired.vue'
 import { Notify } from 'quasar'
 import { objectApi } from 'boot/axios'
 import { useFileProcessor } from '@composables/useFileProcessor.js'
@@ -320,6 +320,7 @@ function incrementCounter() {
     try {
       counter.value = Number(counter.value) + 1
     } catch (e) {
+      console.error(e)
       counter.value = 1
     }
   }
@@ -625,6 +626,7 @@ watch([() => mediaFile.value, () => counter.value], async ([mf]) => {
       await processFile(file, 'preview')
     }
   } catch (err) {
+    console.error(err)
     payload.project.media.previewType = 'new'
     Notify.create({
       type: 'negative',

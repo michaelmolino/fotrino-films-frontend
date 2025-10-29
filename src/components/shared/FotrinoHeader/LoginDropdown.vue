@@ -6,7 +6,7 @@
     no-caps
     size="md">
     <template v-for="provider in oauthProviders" :key="provider.name">
-      <div style="max-width:220px; margin: 0 auto; width: 100%;" class="row">
+      <div style="max-width: 220px; margin: 0 auto; width: 100%" class="row">
         <q-btn
           :href="provider.login"
           align="left"
@@ -16,8 +16,7 @@
           :label="provider.name"
           size="md"
           class="col-xs-12"
-          @click="storeRedirect"
-        />
+          @click="storeRedirect" />
       </div>
     </template>
   </q-btn-dropdown>

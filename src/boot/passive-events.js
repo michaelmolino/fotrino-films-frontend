@@ -22,6 +22,7 @@ export default boot(() => {
           return
         }
       } catch (e) {
+        console.error(e)
         // fallback to original
       }
       orig.call(this, type, listener, options)
@@ -29,7 +30,6 @@ export default boot(() => {
   } catch (err) {
     // if monkey-patching is forbidden by the environment, silently ignore
     // - this keeps the app functional without altering behavior
-    // eslint-disable-next-line no-console
     console.warn('passive-events boot: could not patch addEventListener', err)
   }
 })
