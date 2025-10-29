@@ -36,13 +36,17 @@ function destroyPlayers() {
   if (Hls.isSupported() && hls.value) {
     try {
       hls.value.destroy()
-    } catch {}
+    } catch (e) {
+      console.debug(e)
+    }
     hls.value = null
   }
   if (player.value) {
     try {
       player.value.destroy()
-    } catch {}
+    } catch (e) {
+      console.debug(e)
+    }
     player.value = null
   }
 }

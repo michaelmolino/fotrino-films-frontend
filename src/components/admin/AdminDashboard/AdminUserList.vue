@@ -82,10 +82,18 @@
               </span>
               <span>{{ user.email }}</span>
             </q-item-label>
-            <q-item-label caption class="text-grey-7 q-mt-xs" v-if="user.last_login" :class="{ 'deleted-user': user.deleted }">
+            <q-item-label
+              caption
+              class="text-grey-7 q-mt-xs"
+              v-if="user.last_login"
+              :class="{ 'deleted-user': user.deleted }">
               Last login: {{ daysSince(user.last_login, true) }}
             </q-item-label>
-            <q-item-label caption class="text-grey-7 q-mt-xs" v-else :class="{ 'deleted-user': user.deleted }">
+            <q-item-label
+              caption
+              class="text-grey-7 q-mt-xs"
+              v-else
+              :class="{ 'deleted-user': user.deleted }">
               Never logged in
             </q-item-label>
           </q-item-section>
@@ -149,7 +157,7 @@ const providerIcons = {
   yahoo: 'fab fa-yahoo'
 }
 
-const deleteUser = async (user) => {
+const deleteUser = async user => {
   try {
     await store.dispatch('admin/deleteUser', user.id)
     $q.notify({

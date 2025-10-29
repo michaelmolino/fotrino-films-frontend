@@ -5,7 +5,7 @@
     size="md"
     flat
     no-caps>
-    <div style="max-width:220px; margin: 0 auto; width: 100%;" class="row">
+    <div style="max-width: 220px; margin: 0 auto; width: 100%" class="row">
       <q-btn
         flat
         no-caps
@@ -14,10 +14,9 @@
         label="Light"
         size="md"
         class="col-xs-12"
-        @click="setDarkMode('light')"
-      />
+        @click="setDarkMode('light')" />
     </div>
-    <div style="max-width:220px; margin: 0 auto; width: 100%;" class="row">
+    <div style="max-width: 220px; margin: 0 auto; width: 100%" class="row">
       <q-btn
         flat
         no-caps
@@ -26,10 +25,9 @@
         label="System"
         size="md"
         class="col-xs-12"
-        @click="setDarkMode('auto')"
-      />
+        @click="setDarkMode('auto')" />
     </div>
-    <div style="max-width:220px; margin: 0 auto; width: 100%;" class="row">
+    <div style="max-width: 220px; margin: 0 auto; width: 100%" class="row">
       <q-btn
         flat
         no-caps
@@ -38,8 +36,7 @@
         label="Dark"
         size="md"
         class="col-xs-12"
-        @click="setDarkMode('dark')"
-      />
+        @click="setDarkMode('dark')" />
     </div>
   </q-btn-dropdown>
 </template>

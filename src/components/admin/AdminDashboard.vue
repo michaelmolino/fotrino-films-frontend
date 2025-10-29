@@ -1,4 +1,3 @@
-
 <template>
   <div class="admin-dashboard-page q-pa-md" data-cy="admin-dashboard">
     <template v-if="isAdmin">

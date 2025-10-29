@@ -236,6 +236,7 @@ async function onUpdateMediaFile(fileOrFiles) {
       }
     } catch (e) {
       /* noop */
+      console.debug(e)
     }
     // Default resourceDate from EXIF (if available) or lastModified
     try {
@@ -249,6 +250,7 @@ async function onUpdateMediaFile(fileOrFiles) {
       }
     } catch (e) {
       /* noop */
+      console.debug(e)
     }
   }
   if (file && props.handleFile) props.handleFile(file, 'upload')
@@ -286,6 +288,7 @@ function dateOptionsFn(date) {
 async function extractExifDate(file) {
   // Some containers (like MP4) won’t expose EXIF via browser APIs. Without extra deps, we fallback quickly.
   // If the file is an image with EXIF, we could parse via a library; to avoid deps, return null here.
+  console.debug(file)
   return null
 }
 </script>

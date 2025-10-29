@@ -71,7 +71,12 @@
         </q-card-section>
         <q-card-actions align="right">
           <q-btn flat label="Cancel" color="primary" :disable="submitting" v-close-popup />
-          <q-btn unelevated label="Submit" color="negative" :loading="submitting" @click="submitReport" />
+          <q-btn
+            unelevated
+            label="Submit"
+            color="negative"
+            :loading="submitting"
+            @click="submitReport" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -132,6 +137,7 @@ async function submitReport() {
     reason.value = ''
   } catch (e) {
     // Errors are handled by interceptor; just keep dialog open for user to retry/cancel
+    console.debug(e)
   } finally {
     submitting.value = false
   }

@@ -146,8 +146,9 @@ export function useFileProcessor() {
         try {
           await playPromise
           video.pause()
-        } catch (_) {
+        } catch (e) {
           // ignore autoplay errors
+          console.debug(e)
         }
       }
 
