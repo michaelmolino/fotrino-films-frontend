@@ -31,8 +31,16 @@ export default defineConfig(() => ({
         '@utils': path.resolve(__dirname, 'src/utils'),
         '@libs': path.resolve(__dirname, 'src/libs'),
         '@deps': path.resolve(__dirname, 'node_modules')
-      }
-      console.debug('Final aliases in use:', viteConf.resolve.alias)
+      },
+        viteConf.resolve.alias['commentbox.io'] = path.resolve(
+          __dirname,
+          'node_modules/commentbox.io/dist/commentbox.min.js'
+        );
+      viteConf.optimizeDeps = viteConf.optimizeDeps || {};
+      viteConf.optimizeDeps.include = [
+        ...(viteConf.optimizeDeps.include || []),
+        'commentbox.io',
+      ];
     }
   },
 
