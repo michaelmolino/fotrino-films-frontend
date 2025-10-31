@@ -16,7 +16,7 @@
     "axios-retry": "^4.5.0",
     "browser-image-compression": "^2.0.2",
     "commentbox.io": "^2.1.0",
-    "dayjs": "^1.11.18",
+    "dayjs": "^1.11.19",
     "dompurify": "^3.3.0",
     "hls.js": "^1.6.13",
     "i18n-iso-countries": "^7.14.0",
