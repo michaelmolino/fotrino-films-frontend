@@ -11,7 +11,7 @@ function addLinkOnce(rel, href, attrs = {}) {
         for (const [k, v] of Object.entries(attrs)) {
             if (v !== undefined && v !== null && v !== false) link.setAttribute(k, String(v))
         }
-        document.head && document.head.appendChild(link)
+        document.head?.appendChild(link)
     } catch {
         // ignore
     }
