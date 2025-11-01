@@ -5,7 +5,7 @@ export default boot(() => {
   // scroll performance. This monkey-patch wraps addEventListener and, when the
   // event is touchstart/touchmove/wheel, sets { passive: true } unless the
   // caller explicitly supplies options.
-  if (typeof globalThis.window === 'undefined' || !globalThis.window.addEventListener) return
+  if (!globalThis.window?.addEventListener) return
 
   try {
     const orig = EventTarget.prototype.addEventListener

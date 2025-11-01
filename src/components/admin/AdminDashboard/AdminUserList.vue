@@ -106,7 +106,9 @@
               class="channel-item q-pl-lg">
               <q-item-section avatar>
                 <q-avatar size="32px">
-                  <img :src="channel.cover || '/images/channel.png'" :alt="`${channel.title} cover`" />
+                  <img
+                    :src="channel.cover || '/images/channel.png'"
+                    :alt="`${channel.title} cover`" />
                 </q-avatar>
               </q-item-section>
               <q-item-section side>

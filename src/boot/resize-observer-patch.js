@@ -1,7 +1,7 @@
 import { boot } from 'quasar/wrappers'
 
 export default boot(() => {
-  if (typeof globalThis.window === 'undefined') return
+  if (globalThis.window === undefined) return
   if (process.env.NODE_ENV !== 'development') return
 
   const roError = /ResizeObserver loop (limit exceeded|completed with undelivered notifications)/

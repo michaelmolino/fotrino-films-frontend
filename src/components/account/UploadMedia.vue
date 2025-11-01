@@ -373,13 +373,13 @@ const project = computed(() => {
   if (payload.project.id?.value && payload.project.id.value !== 0) {
     return projects.value.find(p => p.id === payload.project.id.value)
   }
-  
+
   // Creating a new project - determine poster
-  const poster = 
+  const poster =
     payload.project.id?.value === 0 && payload.project.posterType === 'new'
       ? posterThumb.value
       : null
-  
+
   // Return new project structure
   return {
     title: payload.project.title,
@@ -707,7 +707,9 @@ onBeforeUnmount(() => globalThis.removeEventListener('beforeunload', beforeUnloa
 // route guard
 onBeforeRouteLeave((to, from, next) => {
   if (isUploading.value) {
-    const answer = globalThis.confirm('You have uploads in progress. Are you sure you want to leave?')
+    const answer = globalThis.confirm(
+      'You have uploads in progress. Are you sure you want to leave?'
+    )
     if (!answer) {
       next(false)
       return

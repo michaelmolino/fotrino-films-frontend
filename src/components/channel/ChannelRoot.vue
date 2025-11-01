@@ -99,7 +99,7 @@ watch(
   { immediate: true }
 )
 
-watch(selectedView, (val) => {
+watch(selectedView, val => {
   setViewPreference(val)
 })
 

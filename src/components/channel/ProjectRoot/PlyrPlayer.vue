@@ -94,7 +94,7 @@ async function setSource() {
       })
       hls.value.loadSource(source)
       hls.value.attachMedia(video)
-  globalThis.hls = hls.value
+      globalThis.hls = hls.value
 
       // Intercept 403 errors and retry with a fresh token
       hls.value.on(Hls.Events.ERROR, async function (event, data) {

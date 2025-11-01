@@ -144,7 +144,8 @@ export function useFileProcessor() {
 
   function upsertEntry(resourceType, file, processing) {
     const idx = findIndex(resourceType)
-    const entry = { resourceType, file, ...(processing !== undefined ? { processing } : {}) }
+    const entry =
+      processing !== undefined ? { resourceType, file, processing } : { resourceType, file }
     if (idx === -1) uploadFiles.value.push(entry)
     else uploadFiles.value[idx] = { ...uploadFiles.value[idx], ...entry }
   }
@@ -184,8 +185,6 @@ export function useFileProcessor() {
     if (IMAGE_TYPES.has(resourceType)) return handleImageResource(file, resourceType)
     if (resourceType === 'upload') return handleUploadResource(file)
   }
-
-
 
   return {
     uploadFiles,
