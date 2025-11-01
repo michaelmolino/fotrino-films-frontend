@@ -3,7 +3,7 @@ import { LocalStorage } from 'quasar'
 
 const DARK_KEY = 'fotrino-films-darkmode'
 export const darkModePref = ref(LocalStorage.getItem(DARK_KEY) || 'auto')
-export const systemDark = ref(window.matchMedia('(prefers-color-scheme: dark)').matches)
+export const systemDark = ref(globalThis.matchMedia('(prefers-color-scheme: dark)').matches)
 
 export const darkModeIcons = {
   light: 'far fa-sun',
@@ -31,7 +31,7 @@ export function useDarkMode($q) {
 
   onMounted(() => {
     applyDarkMode($q)
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const mediaQuery = globalThis.matchMedia('(prefers-color-scheme: dark)')
     mediaQuery.addEventListener('change', e => {
       systemDark.value = e.matches
       if (darkModePref.value === 'auto') applyDarkMode($q)

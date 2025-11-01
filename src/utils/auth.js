@@ -7,7 +7,7 @@ export async function logout(store) {
 }
 
 export function storeRedirect() {
-  LocalStorage.set(REDIRECT_KEY, window.location.pathname)
+  LocalStorage.set(REDIRECT_KEY, globalThis.location.pathname)
 }
 
 export function getRedirect(route) {

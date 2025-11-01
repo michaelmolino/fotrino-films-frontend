@@ -145,7 +145,7 @@ async function submitReport() {
 
 function copyLink(val) {
   if (val === 'public') {
-    copyToClipboard(window.location.href).then(() => {
+    copyToClipboard(globalThis.location.href).then(() => {
       Notify.create({
         message: 'URL copied to clipboard',
         color: 'accent',
@@ -156,7 +156,7 @@ function copyLink(val) {
   } else if (val === 'private') {
     const id = props.media?.private_id
     if (!id) return
-    copyToClipboard(`${window.location.origin}/private/${id}`).then(() => {
+    copyToClipboard(`${globalThis.location.origin}/private/${id}`).then(() => {
       Notify.create({
         message: 'URL copied to clipboard',
         color: 'accent',

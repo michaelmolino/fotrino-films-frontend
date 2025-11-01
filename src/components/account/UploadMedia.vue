@@ -699,15 +699,15 @@ onMounted(async () => {
   } else {
     projects.value = []
   }
-  window.addEventListener('beforeunload', beforeUnloadHandler)
+  globalThis.addEventListener('beforeunload', beforeUnloadHandler)
 })
 
-onBeforeUnmount(() => window.removeEventListener('beforeunload', beforeUnloadHandler))
+onBeforeUnmount(() => globalThis.removeEventListener('beforeunload', beforeUnloadHandler))
 
 // route guard
 onBeforeRouteLeave((to, from, next) => {
   if (isUploading.value) {
-    const answer = window.confirm('You have uploads in progress. Are you sure you want to leave?')
+    const answer = globalThis.confirm('You have uploads in progress. Are you sure you want to leave?')
     if (!answer) {
       next(false)
       return

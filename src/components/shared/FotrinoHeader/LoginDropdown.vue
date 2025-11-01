@@ -59,6 +59,6 @@ onMounted(async () => {
     },
     yahoo: { name: 'Yahoo', icon: 'fab fa-yahoo', login: process.env.API + '/account/login/yahoo' }
   }
-  oauthProviders.value = providers.map(p => providerMap[p]).filter(p => p)
+  oauthProviders.value = providers.map(p => providerMap[p]).filter(Boolean)
 })
 </script>

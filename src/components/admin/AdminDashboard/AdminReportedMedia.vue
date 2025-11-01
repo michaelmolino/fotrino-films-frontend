@@ -66,7 +66,8 @@ const flattenedReportedMediaRows = computed(() => {
   const reported = store.state.admin.reportedMedia || []
   for (const media of reported) {
     const reports = media.reports || []
-    reports.forEach((report, idx) => {
+    let idx = 0
+    for (const report of reports) {
       rows.push({
         rowKey: media.media_id + '-' + idx,
         media_id: media.media_id,
@@ -77,7 +78,8 @@ const flattenedReportedMediaRows = computed(() => {
         created_at: report.created_at,
         actions: media.media_id
       })
-    })
+      idx++
+    }
   }
   return rows
 })

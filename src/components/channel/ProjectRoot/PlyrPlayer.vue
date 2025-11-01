@@ -54,7 +54,7 @@ function destroyPlayers() {
 async function setSource() {
   const el = document.getElementById(view.value === 'video' ? 'video-player' : 'audio-player')
   if (!el || !props.media) return
-  const PlyrCtor = window.Plyr
+  const PlyrCtor = globalThis.Plyr
   if (!PlyrCtor) return
   player.value = new PlyrCtor(el, {
     settings: [],
@@ -94,7 +94,7 @@ async function setSource() {
       })
       hls.value.loadSource(source)
       hls.value.attachMedia(video)
-      window.hls = hls.value
+  globalThis.hls = hls.value
 
       // Intercept 403 errors and retry with a fresh token
       hls.value.on(Hls.Events.ERROR, async function (event, data) {
@@ -116,7 +116,7 @@ async function setSource() {
             hls.value.once(Hls.Events.MANIFEST_PARSED, restorePlayback)
           } else {
             player.value && player.value.destroy()
-            alert('Unable to refresh video token. Please try again later.')
+            globalThis.alert('Unable to refresh video token. Please try again later.')
           }
         }
       })

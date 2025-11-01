@@ -4,7 +4,7 @@ import account from './account'
 import admin from './admin'
 import channel from './channel'
 
-export default function (/* { ssrContext } */) {
+export default function createStoreInstance(/* { ssrContext } */) {
   const Store = createStore({
     modules: {
       account,

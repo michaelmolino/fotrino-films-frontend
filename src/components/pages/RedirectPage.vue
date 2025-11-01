@@ -13,6 +13,6 @@ import { getRedirect } from '@utils/auth'
 const route = useRoute()
 
 onMounted(() => {
-  window.location.href = getRedirect(route)
+  globalThis.location.href = getRedirect(route)
 })
 </script>

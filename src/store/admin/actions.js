@@ -5,11 +5,11 @@ import { sortBy } from '@utils/sort.js'
 
 function sortUsers(users) {
   const sortedUsers = sortBy(users, 'last_login', 'desc')
-  sortedUsers.forEach(user => {
+  for (const user of sortedUsers) {
     if (Array.isArray(user.channels)) {
       user.channels = sortBy(user.channels, 'created', 'desc')
     }
-  })
+  }
   return sortedUsers
 }
 

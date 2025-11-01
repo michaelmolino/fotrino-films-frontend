@@ -23,8 +23,9 @@ export default defineConfig(() => ({
     sourcemap: true,
     extendViteConf(viteConf) {
       viteConf.resolve = viteConf.resolve || {}
+      viteConf.resolve.alias = viteConf.resolve.alias || {}
       viteConf.resolve.alias = {
-        ...(viteConf.resolve.alias || {}),
+        ...viteConf.resolve.alias,
         '@layouts': path.resolve(__dirname, 'src/layouts'),
         '@components': path.resolve(__dirname, 'src/components'),
         '@composables': path.resolve(__dirname, 'src/composables'),

@@ -48,7 +48,7 @@ function initCommentBox(dark) {
   commentBox(commentboxInstance, {
     textColor: dark ? '#fff' : '#000',
     createBoxUrl(boxId, pageLocation) {
-      pageLocation.href = window.location.origin + '/private/' + boxId
+      pageLocation.href = globalThis.location.origin + '/private/' + boxId
       pageLocation.search = ''
       return pageLocation.href
     },

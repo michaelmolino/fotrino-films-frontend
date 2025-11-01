@@ -1,4 +1,4 @@
-export default function () {
+export default function createChannelState() {
   return {
     channels: [],
     channel: null,
