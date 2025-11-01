@@ -75,13 +75,17 @@
               :src="channels.find(ch => ch.uuid === payload.uuid.value).cover"
               class="width250"
               :ratio="1 / 1"
-              fit="cover" />
+              fit="cover"
+              loading="lazy"
+              decoding="async" />
             <q-img
               v-if="payload.uuid && payload.uuid.value === 0"
               :src="payload.coverType === 'profile' ? profile.profile_pic : coverThumb"
               class="width250"
               :ratio="1 / 1"
-              fit="cover" />
+              fit="cover"
+              loading="lazy"
+              decoding="async" />
           </q-avatar>
         </q-card-section>
       </q-card>

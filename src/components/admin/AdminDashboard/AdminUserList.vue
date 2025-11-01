@@ -18,7 +18,7 @@
           <q-item-section avatar>
             <div class="relative-position">
               <q-avatar size="48px" :class="{ 'deleted-user': user.deleted }">
-                <img :src="user.profile_pic" :alt="`${user.name}'s avatar`" />
+                <img :src="user.profile_pic" :alt="`${user.name}'s avatar`" loading="lazy" decoding="async" />
               </q-avatar>
               <q-badge
                 v-if="user.is_admin"
@@ -108,7 +108,9 @@
                 <q-avatar size="32px">
                   <img
                     :src="channel.cover || '/images/channel.png'"
-                    :alt="`${channel.title} cover`" />
+                    :alt="`${channel.title} cover`"
+                    loading="lazy"
+                    decoding="async" />
                 </q-avatar>
               </q-item-section>
               <q-item-section side>

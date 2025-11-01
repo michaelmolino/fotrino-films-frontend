@@ -14,6 +14,7 @@
 import { computed, onMounted, onBeforeUnmount, watch, ref, nextTick } from 'vue'
 import { useStore } from 'vuex'
 import Hls from 'hls.js'
+import { addPreconnectForUrl } from '@utils/preconnect'
 
 const props = defineProps({
   media: Object,
@@ -82,6 +83,9 @@ async function setSource() {
     const source = props.media.src
     const queryParams = token ? `token=${token}` : null
 
+    // Preconnect to HLS segment origin
+    addPreconnectForUrl(source)
+
     if (Hls.isSupported()) {
       let currentQueryParams = queryParams
       hls.value = new Hls({
@@ -130,6 +134,7 @@ async function setSource() {
       audio.src = props.media.src + `?token=${token}`
       audio.type = props.media.type
     }
+    addPreconnectForUrl(props.media.src)
   }
 }
 
