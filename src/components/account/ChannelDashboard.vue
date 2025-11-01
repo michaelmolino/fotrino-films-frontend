@@ -36,7 +36,7 @@ onMounted(async () => {
   try {
     await store.dispatch('channel/getChannels', true)
   } catch (error) {
-    console.debug('Dashboard API call failed:', error.response?.status)
+    console.debug('Dashboard API call failed:', error?.response?.status)
   }
 })
 </script>

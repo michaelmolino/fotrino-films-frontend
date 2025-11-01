@@ -4,7 +4,7 @@
       <div class="text-h6 text-weight-bold">Admin: All Users</div>
       <div class="text-caption text-grey-7 q-mb-md">All registered users.</div>
       <AdminUserList class="q-mb-xl" />
-      <AdminDeadOutbox class="q-mb-xl" />
+      <AdminDLQ class="q-mb-xl" />
       <AdminReportedMedia />
     </template>
     <AuthRequired v-else :type="isAuthenticated ? 'admin' : 'login'" />
@@ -15,7 +15,7 @@
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import AdminUserList from './AdminDashboard/AdminUserList.vue'
-import AdminDeadOutbox from './AdminDashboard/AdminDeadOutbox.vue'
+import AdminDLQ from './AdminDashboard/AdminDLQ.vue'
 import AdminReportedMedia from './AdminDashboard/AdminReportedMedia.vue'
 import AuthRequired from '@components/shared/AuthRequired.vue'
 

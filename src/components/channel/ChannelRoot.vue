@@ -66,6 +66,7 @@
 
 <script setup>
 import { ref, toRef, computed, defineAsyncComponent, watch } from 'vue'
+import { getViewPreference, setViewPreference } from '@utils/viewPreference.js'
 import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
 import { sortBy } from '@utils/sort.js'
@@ -78,7 +79,7 @@ const NothingText = defineAsyncComponent(() => import('@components/shared/Nothin
 
 const store = useStore()
 const route = useRoute()
-const selectedView = ref('all')
+const selectedView = ref(getViewPreference('all'))
 const loading = ref(true)
 const channel = toRef(store.state.channel, 'channel')
 
@@ -97,6 +98,10 @@ watch(
   },
   { immediate: true }
 )
+
+watch(selectedView, (val) => {
+  setViewPreference(val)
+})
 
 const projects = computed(() => {
   if (loading.value || !channel.value) return []

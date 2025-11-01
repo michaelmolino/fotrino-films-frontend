@@ -50,14 +50,12 @@ export function getPrivateMedia(context, privateId) {
   })
 }
 
-export async function getMediaToken(context, privateId) {
-  try {
-    const { data } = await api.get(`/channels/media/token/${privateId}`)
-    return data.token
-  } catch (error) {
-    console.error('Failed to fetch media token:', error)
-    return null
-  }
+export function getMediaToken(context, privateId) {
+  return fetchAndCommit(context, {
+    url: `/channels/media/token/${privateId}`,
+    mutation: 'SET_MEDIA_TOKEN',
+    extract: data => data.token
+  })
 }
 
 export async function deleteResource(context, resource) {

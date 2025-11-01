@@ -140,12 +140,10 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
-import { useQuasar } from 'quasar'
 import { daysSince } from '@utils/date.js'
 import { getCountry } from '@utils/countries.js'
 
 const store = useStore()
-const $q = useQuasar()
 const loading = ref(true)
 const users = computed(() => store.state.admin.users || [])
 const providerIcons = {
@@ -158,15 +156,7 @@ const providerIcons = {
 }
 
 const deleteUser = async user => {
-  try {
-    await store.dispatch('admin/deleteUser', user.id)
-    $q.notify({
-      type: 'positive',
-      message: `User "${user.name}" has been deleted successfully.`
-    })
-  } catch (error) {
-    console.error(error)
-  }
+  await store.dispatch('admin/deleteUser', user.id)
 }
 
 onMounted(async () => {

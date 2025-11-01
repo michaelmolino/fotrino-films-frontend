@@ -9,3 +9,7 @@ export function SET_CHANNEL(state, channel) {
 export function SET_UPLOAD(state, upload) {
   state.upload = upload
 }
+
+export function SET_MEDIA_TOKEN(state, token) {
+  state.mediaToken = token
+}

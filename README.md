@@ -3,13 +3,9 @@
 ![GitHub](https://img.shields.io/github/license/michaelmolino/fotrino-films-frontend?style=for-the-badge)
 [![Sonar Violations (short format)](https://img.shields.io/sonar/violations/michaelmolino_fotrino-films-frontend?label=sonar%20violations&server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge)](https://sonarcloud.io/dashboard?id=michaelmolino_fotrino-films-frontend)
 
-Fotrino Films is a video content hosting platform. It is designed for users to be able to upload content and share it easily with family and friends.
+Fotrino Films is a video content hosting platform. It is designed for users to be able to upload content and share it easily with family and friends. It is not designed for monetisation or content discovery.
 
 This project is actively being developed and is not yet ready for use.
-
-## Tests
-
-Cypress tests are in a private repo.
 
 ## [Demo Site](https://films.fotrino.com/)
 
@@ -17,7 +13,11 @@ Cypress tests are in a private repo.
 [![SSL Labs SSL Server Test](https://img.shields.io/badge/SSL%20LABS-A%2B-brightgreen?style=for-the-badge)](https://www.ssllabs.com/ssltest/analyze.html?d=films.fotrino.com)
 [![Mozilla HTTP Observatory Grade](https://img.shields.io/mozilla-observatory/grade/films.fotrino.com?publish&style=for-the-badge)](https://observatory.mozilla.org/analyze/films.fotrino.com)
 
-Feel free to use this live demo as a playground. It is always the most up to date version of the code. Note that I regularly delete the DB and content so don't use it to actually store anything important!
+Note that I regularly delete the DB and content so please don't upload important files.
+
+## Tests
+
+Cypress tests are in a private repo.
 
 ## Backend
 

@@ -49,13 +49,11 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { useQuasar } from 'quasar'
-import { api } from 'boot/axios'
+import { useStore } from 'vuex'
 import { daysSince } from '@utils/date.js'
 
-const $q = useQuasar()
+const store = useStore()
 const loading = ref(true)
-const reportedMediaRows = ref([])
 const reportedMediaColumns = [
   { name: 'created_at', label: 'Reported', field: 'created_at', align: 'left' },
   { name: 'title', label: 'Media', field: 'title', align: 'left' },
@@ -65,7 +63,8 @@ const reportedMediaColumns = [
 ]
 const flattenedReportedMediaRows = computed(() => {
   const rows = []
-  for (const media of reportedMediaRows.value) {
+  const reported = store.state.admin.reportedMedia || []
+  for (const media of reported) {
     const reports = media.reports || []
     reports.forEach((report, idx) => {
       rows.push({
@@ -76,7 +75,7 @@ const flattenedReportedMediaRows = computed(() => {
         reporter: report.reporter,
         reason: report.reason,
         created_at: report.created_at,
-        actions: media.media_id // used for delete button
+        actions: media.media_id
       })
     })
   }
@@ -86,24 +85,14 @@ const flattenedReportedMediaRows = computed(() => {
 async function fetchReportedMedia() {
   loading.value = true
   try {
-    const resp = await api.get('/admin/reported-media')
-    reportedMediaRows.value = resp.data
-  } catch {
-    $q.notify({ type: 'negative', message: 'Failed to fetch reported media.' })
+    await store.dispatch('admin/getReportedMedia')
   } finally {
     loading.value = false
   }
 }
+
 function deleteMedia(privateId) {
-  api
-    .delete(`/admin/media/${privateId}`)
-    .then(() => {
-      fetchReportedMedia()
-      $q.notify({ type: 'positive', message: 'Media deleted.' })
-    })
-    .catch(() => {
-      $q.notify({ type: 'negative', message: 'Failed to delete media.' })
-    })
+  store.dispatch('admin/deleteMedia', privateId)
 }
 
 watch(

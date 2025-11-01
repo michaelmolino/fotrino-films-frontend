@@ -29,25 +29,49 @@ async function fetchAndCommit(context, { url, mutation, extract }) {
 
 export function getAllUsers(context) {
   return fetchAndCommit(context, {
-    url: '/admin/all-users',
+    url: '/admin/users',
     mutation: 'SET_USERS',
     extract: data => sortUsers(data.users)
   })
 }
 
-export function getDeadOutbox(context) {
+export function getDLQ(context) {
   return fetchAndCommit(context, {
-    url: '/admin/outbox/dead',
-    mutation: 'SET_OUTBOX_DEAD'
+    url: '/admin/outbox/dlq',
+    mutation: 'SET_OUTBOX_DLQ'
   })
 }
 
-export function deleteUser(context, userId) {
-  return api.delete(`/admin/users/${userId}`).then(() => {
-    // Update user's deleted status instead of removing from list
-    const users = context.state.users.map(user =>
-      user.id === userId ? { ...user, deleted: true } : user
-    )
-    context.commit('SET_USERS', users)
+export async function requeueDLQItem(context, eventId) {
+  await api.post(`/admin/outbox/requeue/${eventId}`)
+  getDLQ(context)
+}
+
+export async function deleteUser(context, userId) {
+  try {
+    await api.delete(`/admin/users/${userId}`)
+  } catch (error) {
+    //Ignore user-cancelled deletes
+    if (error && error.message === 'User cancelled delete') {
+      return
+    }
+    throw error
+  }
+  // Refresh users from backend - clear first to ensure reactivity
+  context.commit('SET_USERS', [])
+  await getAllUsers(context)
+}
+
+export function getReportedMedia(context) {
+  return fetchAndCommit(context, {
+    url: '/admin/media/reported',
+    mutation: 'SET_REPORTED_MEDIA'
   })
+}
+
+export async function deleteMedia(context, privateId) {
+  await api.delete(`/admin/media/${privateId}`)
+  // Refresh reported media list
+  context.commit('SET_REPORTED_MEDIA', [])
+  await getReportedMedia(context)
 }

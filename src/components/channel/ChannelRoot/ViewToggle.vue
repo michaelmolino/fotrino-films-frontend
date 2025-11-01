@@ -1,6 +1,6 @@
 <template>
   <q-btn-toggle
-    :model-value="modelValue"
+    :model-value="model"
     @update:model-value="updateModelValue"
     class="q-py-md"
     no-caps
@@ -42,13 +42,10 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { LocalStorage } from 'quasar'
+import { computed } from 'vue'
 
-const VIEW_KEY = 'fotrino-films-view'
-const internalValue = ref(LocalStorage.getItem(VIEW_KEY) || 'all')
-
-const { projectCount, mainCount, allCount } = defineProps({
+const props = defineProps({
+  modelValue: { type: String, default: 'all' },
   projectCount: Number,
   mainCount: Number,
   allCount: Number
@@ -56,16 +53,12 @@ const { projectCount, mainCount, allCount } = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
-const modelValue = computed({
-  get: () => internalValue.value,
-  set: val => {
-    LocalStorage.set(VIEW_KEY, val)
-    internalValue.value = val
-    emit('update:modelValue', val)
-  }
+const model = computed({
+  get: () => props.modelValue,
+  set: (val) => emit('update:modelValue', val)
 })
 
 function updateModelValue(val) {
-  modelValue.value = val
+  model.value = val
 }
 </script>

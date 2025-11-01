@@ -9,3 +9,7 @@ export function channel(state) {
 export function upload(state) {
   return state.upload
 }
+
+export function mediaToken(state) {
+  return state.mediaToken
+}

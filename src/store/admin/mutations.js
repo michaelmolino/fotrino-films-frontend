@@ -9,6 +9,10 @@ export function SET_USERS(state, users) {
   state.users = users
 }
 
-export function SET_OUTBOX_DEAD(state, payload) {
-  state.outboxDead = Array.isArray(payload) ? payload : []
+export function SET_OUTBOX_DLQ(state, payload) {
+  state.outboxDLQ = Array.isArray(payload) ? payload : []
+}
+
+export function SET_REPORTED_MEDIA(state, payload) {
+  state.reportedMedia = Array.isArray(payload) ? payload : []
 }

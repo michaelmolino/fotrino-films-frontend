@@ -40,11 +40,7 @@ export default {
           'WARNING: This is a development server and should not be exposed to the internet.'
         )
       }
-      try {
-        await store.dispatch('account/getProfile')
-      } catch (error) {
-        console.debug('Profile fetch failed:', error.response?.status)
-      }
+      await store.dispatch('account/getProfile')
       showTerms.value = route.query?.showTerms?.toLowerCase() === 'true'
       await loadChannel(route)
     })

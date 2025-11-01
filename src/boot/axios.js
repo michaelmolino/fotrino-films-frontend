@@ -39,9 +39,7 @@ export default boot(({ app, router, store }) => {
 
   let pending = 0
   const showLoader = () => {
-    if (pending === 0) {
-      Loading.show()
-    }
+    if (pending === 0) Loading.show()
     pending++
   }
   const hideLoader = () => {

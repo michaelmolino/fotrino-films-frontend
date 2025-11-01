@@ -13,7 +13,7 @@
       v-else
       flat
       bordered
-      :rows="outboxDead"
+      :rows="outboxDLQ"
       :columns="outboxColumns"
       row-key="id"
       separator="cell"
@@ -47,7 +47,7 @@ import { daysSince } from '@utils/date.js'
 
 const store = useStore()
 const loading = ref(true)
-const outboxDead = computed(() => store.state.admin.outboxDead || [])
+const outboxDLQ = computed(() => store.state.admin.outboxDLQ || [])
 const outboxColumns = [
   { name: 'created', label: 'Created', field: 'created', align: 'left' },
   { name: 'type', label: 'Type', field: 'type', align: 'left' },
@@ -64,13 +64,13 @@ function pretty(obj) {
   }
 }
 function requeue(eventId) {
-  store.dispatch('admin/requeueOutbox', eventId)
+  store.dispatch('admin/requeueDLQItem', eventId)
 }
 
 onMounted(async () => {
   loading.value = true
   try {
-    await store.dispatch('admin/getDeadOutbox')
+    await store.dispatch('admin/getDLQ')
   } finally {
     loading.value = false
   }

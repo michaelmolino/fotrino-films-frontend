@@ -37,3 +37,9 @@ export function getCommentboxToken(context) {
     mutation: 'SET_COMMENTBOX'
   })
 }
+
+export async function logout(context) {
+  await api.get('/account/logout')
+  context.commit('SET_PROFILE', null)
+  return true
+}
