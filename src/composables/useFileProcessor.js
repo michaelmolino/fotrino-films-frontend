@@ -56,6 +56,11 @@ function waitForSeek(video, time) {
   })
 }
 
+function ensureMetadata(video) {
+  if (video.readyState >= 1) return Promise.resolve()
+  return waitForVideoEvent(video, 'loadedmetadata')
+}
+
 export function useFileProcessor() {
   const uploadFiles = ref([])
 
@@ -106,11 +111,6 @@ export function useFileProcessor() {
     if (!file) return
     if (IMAGE_TYPES.has(resourceType)) return handleImageResource(file, resourceType)
     if (resourceType === 'upload') return handleUploadResource(file)
-  }
-
-  function ensureMetadata(video) {
-    if (video.readyState >= 1) return Promise.resolve()
-    return waitForVideoEvent(video, 'loadedmetadata')
   }
 
   // Extract a random frame from a video File and return an object URL
