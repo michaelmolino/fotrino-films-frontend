@@ -1,7 +1,6 @@
-// Preload font separately in index.html for better control
-// Font will be loaded via preconnect + link preload
+// Use a fast, system font stack to avoid render-blocking external stylesheets
 body
-	font-family: 'Quicksand', sans-serif
+	font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif
 
 .width250
 	width: 250px

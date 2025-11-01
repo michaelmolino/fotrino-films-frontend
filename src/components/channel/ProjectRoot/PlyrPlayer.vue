@@ -14,7 +14,7 @@
 import { computed, onMounted, onBeforeUnmount, watch, ref, nextTick } from 'vue'
 import { useStore } from 'vuex'
 import Hls from 'hls.js'
-import { addPreconnectForUrl } from '@utils/preconnect'
+import { addPreconnectForUrl, addPreloadImageOnce } from '@utils/preconnect'
 
 const props = defineProps({
   media: Object,
@@ -25,6 +25,7 @@ const store = useStore()
 const player = ref(null)
 const hls = ref(null)
 let playHandler = null
+let PlyrCtor = null
 
 const view = computed(() => (props.media?.type?.startsWith('audio/') ? 'audio' : 'video'))
 
@@ -55,8 +56,12 @@ function destroyPlayers() {
 async function setSource() {
   const el = document.getElementById(view.value === 'video' ? 'video-player' : 'audio-player')
   if (!el || !props.media) return
-  const PlyrCtor = globalThis.Plyr
-  if (!PlyrCtor) return
+  // Lazy-load Plyr JS and CSS only when needed
+  if (!PlyrCtor) {
+    const mod = await import('plyr')
+    PlyrCtor = mod.default
+    await import('plyr/dist/plyr.css')
+  }
   player.value = new PlyrCtor(el, {
     settings: [],
     controls: [
@@ -82,6 +87,9 @@ async function setSource() {
     const video = el.tagName.toLowerCase() === 'video' ? el : document.querySelector('video')
     const source = props.media.src
     const queryParams = token ? `token=${token}` : null
+
+    // Preload poster (LCP candidate) with high priority
+    if (props.media.preview) addPreloadImageOnce(props.media.preview, 'high')
 
     // Preconnect to HLS segment origin
     addPreconnectForUrl(source)

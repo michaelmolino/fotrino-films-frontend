@@ -47,36 +47,25 @@ export default defineConfig(() => ({
         'vuex',
         'quasar',
         'axios',
-        'hls.js'
+        'hls.js',
+        'plyr',
+        'dompurify',
+        'dayjs',
+        'i18n-iso-countries',
+        'commentbox.io'
       ]
 
-      // Optimize asset handling
+      // Optimize build for production
       viteConf.build = viteConf.build || {}
-      viteConf.build.assetsInlineLimit = 4096 // Inline assets < 4kb
-      viteConf.build.cssCodeSplit = true // Split CSS per route
-      viteConf.build.minify = 'terser' // Use terser for better compression
-      viteConf.build.terserOptions = {
-        compress: {
-          drop_console: process.env.NODE_ENV === 'production',
-          drop_debugger: true,
-          pure_funcs: process.env.NODE_ENV === 'production' ? ['console.log', 'console.debug'] : []
-        }
-      }
-
-      // Reduce number of chunks in production by grouping vendor code
       viteConf.build.rollupOptions = viteConf.build.rollupOptions || {}
-      viteConf.build.chunkSizeWarningLimit = 500 // Warn for chunks > 500kb
+      viteConf.build.chunkSizeWarningLimit = 600 // Warn for chunks > 600kb
+
+      // Single vendor chunk for better HTTP/2 performance
       const currentOutput = viteConf.build.rollupOptions.output || {}
       viteConf.build.rollupOptions.output = {
         ...currentOutput,
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            // Split vendor code into smaller chunks for better caching
-            if (id.includes('quasar')) return 'quasar'
-            if (id.includes('vue') || id.includes('vuex') || id.includes('vue-router'))
-              return 'vue-core'
-            if (id.includes('hls.js')) return 'hls'
-            if (id.includes('axios')) return 'axios'
             return 'vendor'
           }
         }

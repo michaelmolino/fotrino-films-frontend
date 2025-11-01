@@ -46,3 +46,21 @@ export function addPreconnectForOrigin(origin) {
         // ignore
     }
 }
+
+// Preload an image once (optionally with high fetch priority)
+export function addPreloadImageOnce(src, priority = 'high') {
+    try {
+        if (!src) return
+        const href = String(src)
+        const selector = `link[rel="preload"][as="image"][href="${href}"]`
+        if (document.querySelector(selector)) return
+        const link = document.createElement('link')
+        link.rel = 'preload'
+        link.as = 'image'
+        link.href = href
+        if (priority) link.setAttribute('fetchpriority', priority)
+        document.head?.appendChild(link)
+    } catch {
+        // ignore
+    }
+}
