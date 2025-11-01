@@ -87,6 +87,19 @@ watch(darkMode, newVal => {
     initCommentBox(newVal)
   })
 })
+
+watch(
+  () => props.loggedIn,
+  (loggedIn) => {
+    if (loggedIn) {
+      nextTick(() => {
+        initCommentBox(darkMode.value)
+      })
+    } else {
+      clearOldCommentBox(props.privateId)
+    }
+  }
+)
 </script>
 
 <style scoped>
