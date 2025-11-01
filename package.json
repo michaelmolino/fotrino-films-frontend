@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.38.0",
-    "@quasar/app-vite": "^2.0.0",
+    "@quasar/app-vite": "^2.4.0",
     "@vue/eslint-config-prettier": "^10.2.0",
     "autoprefixer": "^10.4.21",
     "eslint": "9",
@@ -44,7 +44,7 @@
     "postcss": "^8.5.6",
     "prettier": "3",
     "sass": "^1.93.3",
-    "vite": "^5.4.21",
+    "vite": "^7.1.12",
     "vite-plugin-checker": "^0.11.0",
     "vue-eslint-parser": "^10.2.0"
   },
