@@ -369,42 +369,24 @@ const profile = computed(() => store.state.account.profile)
 const channels = computed(() => store.state.channel.channels)
 
 const project = computed(() => {
-  if (
-    !payload.project.id ||
-    (payload.project.id.value === 0 && payload.project.posterType === 'new' && !posterFile.value)
-  ) {
-    return {
-      title: payload.project.title,
-      subtitle: payload.project.subtitle,
-      poster: null,
-      media: []
-    }
-  } else if (payload.project.id && payload.project.id.value !== 0) {
+  // If selecting an existing project, return it from the list
+  if (payload.project.id?.value && payload.project.id.value !== 0) {
     return projects.value.find(p => p.id === payload.project.id.value)
-  } else if (
-    payload.project.id &&
-    payload.project.id.value === 0 &&
-    payload.project.posterType === 'default'
-  ) {
-    return {
-      title: payload.project.title,
-      subtitle: payload.project.subtitle,
-      poster: null,
-      media: []
-    }
-  } else if (
-    payload.project.id &&
-    payload.project.id.value === 0 &&
-    payload.project.posterType === 'new'
-  ) {
-    return {
-      title: payload.project.title,
-      subtitle: payload.project.subtitle,
-      poster: posterThumb.value,
-      media: []
-    }
   }
-  return {}
+  
+  // Creating a new project - determine poster
+  const poster = 
+    payload.project.id?.value === 0 && payload.project.posterType === 'new'
+      ? posterThumb.value
+      : null
+  
+  // Return new project structure
+  return {
+    title: payload.project.title,
+    subtitle: payload.project.subtitle,
+    poster,
+    media: []
+  }
 })
 
 const media = computed(() => {
@@ -571,8 +553,8 @@ watch(step, s => {
           }))[0]
         }
       })
-  } else {
-    if (projects.value.length === 0 && s === 3) payload.project.id = { value: 0, label: 'New...' }
+  } else if (projects.value.length === 0 && s === 3) {
+    payload.project.id = { value: 0, label: 'New...' }
   }
   if (s === 4) factoryUpload()
 })

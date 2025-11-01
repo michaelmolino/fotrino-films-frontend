@@ -190,7 +190,11 @@ function onUpdatePosterColor(val) {
   } else if (val && typeof val === 'object') {
     // Quasar may emit an object depending on format; prefer hex
     const hex = val.hex || ''
-    color = hex ? (hex.startsWith('#') ? hex : `#${hex}`) : defaultColor
+    if (hex) {
+      color = hex.startsWith('#') ? hex : `#${hex}`
+    } else {
+      color = defaultColor
+    }
   }
   emit('update:payload', {
     ...props.payload,

@@ -12,8 +12,8 @@ export function sortBy(items, field, direction = 'desc') {
     // Check if values are dates by trying to parse them
     const aDate = new Date(aValue)
     const bDate = new Date(bValue)
-    const aIsValidDate = !isNaN(aDate.getTime())
-    const bIsValidDate = !isNaN(bDate.getTime())
+    const aIsValidDate = !Number.isNaN(aDate.getTime())
+    const bIsValidDate = !Number.isNaN(bDate.getTime())
 
     // Sort dates
     if (aIsValidDate && bIsValidDate) {
@@ -22,9 +22,13 @@ export function sortBy(items, field, direction = 'desc') {
 
     // Sort strings/numbers
     if (direction === 'desc') {
-      return bValue > aValue ? 1 : bValue < aValue ? -1 : 0
+      if (bValue > aValue) return 1
+      if (bValue < aValue) return -1
+      return 0
     } else {
-      return aValue > bValue ? 1 : aValue < bValue ? -1 : 0
+      if (aValue > bValue) return 1
+      if (aValue < bValue) return -1
+      return 0
     }
   })
 }

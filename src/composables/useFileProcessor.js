@@ -2,6 +2,60 @@ import { ref } from 'vue'
 import { Notify } from 'quasar'
 import imageCompression from 'browser-image-compression'
 
+async function compressImage(file) {
+  const options = { fileType: 'image/jpeg', maxWidthOrHeight: 720, useWebWorker: true }
+  return imageCompression(file, options)
+}
+
+function waitForVideoEvent(video, eventName) {
+  return new Promise((resolve, reject) => {
+    const onEvent = () => {
+      cleanup()
+      resolve()
+    }
+    const onError = e => {
+      cleanup()
+      reject(e)
+    }
+    const cleanup = () => {
+      video.removeEventListener(eventName, onEvent)
+      video.removeEventListener('error', onError)
+    }
+    video.addEventListener(eventName, onEvent, { once: true })
+    video.addEventListener('error', onError, { once: true })
+  })
+}
+
+function toBlobAsync(canvas, type) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(blob => {
+      if (blob) resolve(blob)
+      else reject(new Error('Failed to create blob from canvas'))
+    }, type)
+  })
+}
+
+function waitForSeek(video, time) {
+  return new Promise((resolve, reject) => {
+    const onSeeked = () => {
+      cleanup()
+      resolve()
+    }
+    const onError = e => {
+      cleanup()
+      reject(e)
+    }
+    const cleanup = () => {
+      video.removeEventListener('seeked', onSeeked)
+      video.removeEventListener('error', onError)
+    }
+    video.addEventListener('seeked', onSeeked, { once: true })
+    video.addEventListener('error', onError, { once: true })
+    // trigger seek after listeners are attached to avoid missing the event
+    video.currentTime = time
+  })
+}
+
 export function useFileProcessor() {
   const uploadFiles = ref([])
 
@@ -21,11 +75,6 @@ export function useFileProcessor() {
   function markProcessing(resourceType, processing) {
     const idx = findIndex(resourceType)
     if (idx !== -1) uploadFiles.value[idx].processing = processing
-  }
-
-  async function compressImage(file) {
-    const options = { fileType: 'image/jpeg', maxWidthOrHeight: 720, useWebWorker: true }
-    return imageCompression(file, options)
   }
 
   async function handleImageResource(file, resourceType) {
@@ -59,58 +108,9 @@ export function useFileProcessor() {
     if (resourceType === 'upload') return handleUploadResource(file)
   }
 
-  function waitForVideoEvent(video, eventName) {
-    return new Promise((resolve, reject) => {
-      const onEvent = () => {
-        cleanup()
-        resolve()
-      }
-      const onError = e => {
-        cleanup()
-        reject(e)
-      }
-      const cleanup = () => {
-        video.removeEventListener(eventName, onEvent)
-        video.removeEventListener('error', onError)
-      }
-      video.addEventListener(eventName, onEvent, { once: true })
-      video.addEventListener('error', onError, { once: true })
-    })
-  }
-
-  function toBlobAsync(canvas, type) {
-    return new Promise((resolve, reject) => {
-      canvas.toBlob(blob => {
-        if (blob) resolve(blob)
-        else reject(new Error('Failed to create blob from canvas'))
-      }, type)
-    })
-  }
-
   function ensureMetadata(video) {
     if (video.readyState >= 1) return Promise.resolve()
     return waitForVideoEvent(video, 'loadedmetadata')
-  }
-
-  function waitForSeek(video, time) {
-    return new Promise((resolve, reject) => {
-      const onSeeked = () => {
-        cleanup()
-        resolve()
-      }
-      const onError = e => {
-        cleanup()
-        reject(e)
-      }
-      const cleanup = () => {
-        video.removeEventListener('seeked', onSeeked)
-        video.removeEventListener('error', onError)
-      }
-      video.addEventListener('seeked', onSeeked, { once: true })
-      video.addEventListener('error', onError, { once: true })
-      // trigger seek after listeners are attached to avoid missing the event
-      video.currentTime = time
-    })
   }
 
   // Extract a random frame from a video File and return an object URL
@@ -136,7 +136,7 @@ export function useFileProcessor() {
       await Promise.race([metadataPromise, timeoutPromise])
 
       // Additional iOS Safari compatibility check
-      if (video.duration === 0 || !isFinite(video.duration)) {
+      if (video.duration === 0 || !Number.isFinite(video.duration)) {
         throw new Error('Invalid video duration')
       }
 

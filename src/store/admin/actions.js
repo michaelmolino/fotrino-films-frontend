@@ -52,7 +52,7 @@ export async function deleteUser(context, userId) {
     await api.delete(`/admin/users/${userId}`)
   } catch (error) {
     //Ignore user-cancelled deletes
-    if (error && error.message === 'User cancelled delete') {
+    if (error?.message === 'User cancelled delete') {
       return
     }
     throw error

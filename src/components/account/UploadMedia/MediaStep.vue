@@ -242,7 +242,7 @@ async function onUpdateMediaFile(fileOrFiles) {
     try {
       const exifDate = await extractExifDate(file)
       const dateObj = exifDate || (file.lastModified ? new Date(file.lastModified) : new Date())
-      if (dateObj && !isNaN(dateObj.getTime())) {
+      if (dateObj && !Number.isNaN(dateObj.getTime())) {
         const yyyy = dateObj.getFullYear()
         const mm = String(dateObj.getMonth() + 1).padStart(2, '0')
         const dd = String(dateObj.getDate()).padStart(2, '0')

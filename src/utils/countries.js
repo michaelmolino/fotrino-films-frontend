@@ -4,7 +4,7 @@ import enLocale from 'i18n-iso-countries/langs/en.json'
 isoCountries.registerLocale(enLocale)
 
 export function getFlagEmoji(code) {
-  if (!code || code.length !== 2) return '🏳️'
+  if (code?.length !== 2) return '🏳️'
   const codePoints = [...code.toUpperCase()].map(c => 127397 + c.charCodeAt(0))
   return String.fromCodePoint(...codePoints)
 }

@@ -1,11 +1,11 @@
 <template>
   <div>
     <div v-if="view == 'video'">
-      <video id="player" controls :key="media.id" class="videoEl" />
+      <video id="video-player" controls :key="media.id" class="videoEl"></video>
     </div>
     <div v-else>
       <q-img :src="media.preview" :ratio="16 / 9" fit="cover" class="full-width" />
-      <audio id="player" controls :key="media.id" class="audioEl"></audio>
+      <audio id="audio-player" controls :key="media.id" class="audioEl"></audio>
     </div>
   </div>
 </template>
@@ -52,7 +52,7 @@ function destroyPlayers() {
 }
 
 async function setSource() {
-  const el = document.getElementById('player')
+  const el = document.getElementById(view.value === 'video' ? 'video-player' : 'audio-player')
   if (!el || !props.media) return
   const PlyrCtor = window.Plyr
   if (!PlyrCtor) return
@@ -134,7 +134,7 @@ async function setSource() {
 }
 
 function attachMediaSessionHandler() {
-  const el = document.getElementById('player')
+  const el = document.getElementById(view.value === 'video' ? 'video-player' : 'audio-player')
   if (!('mediaSession' in navigator) || !el || !props.media) return
   if (playHandler) el.removeEventListener('play', playHandler)
   playHandler = () => {

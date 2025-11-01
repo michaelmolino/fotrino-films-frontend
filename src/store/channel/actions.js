@@ -68,7 +68,7 @@ export async function deleteResource(context, resource) {
     await api.delete(url)
   } catch (error) {
     // Ignore user-cancelled deletes
-    if (error && error.message === 'User cancelled delete') {
+    if (error?.message === 'User cancelled delete') {
       return
     }
     throw error
