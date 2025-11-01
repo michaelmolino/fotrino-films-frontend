@@ -145,7 +145,7 @@ export function useFileProcessor() {
   function upsertEntry(resourceType, file, processing) {
     const idx = findIndex(resourceType)
     const entry =
-      processing !== undefined ? { resourceType, file, processing } : { resourceType, file }
+      processing === undefined ? { resourceType, file } : { resourceType, file, processing }
     if (idx === -1) uploadFiles.value.push(entry)
     else uploadFiles.value[idx] = { ...uploadFiles.value[idx], ...entry }
   }
