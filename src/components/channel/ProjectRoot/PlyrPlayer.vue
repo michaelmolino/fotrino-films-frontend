@@ -1,5 +1,5 @@
 <template>
-  <div class="plyr-wrapper">
+  <div>
     <div v-if="view == 'video'">
       <video id="video-player" controls :key="media.id" class="videoEl"></video>
     </div>
@@ -14,6 +14,7 @@
 import { computed, onMounted, onBeforeUnmount, watch, ref, nextTick } from 'vue'
 import { useStore } from 'vuex'
 import Hls from 'hls.js'
+import 'plyr/dist/plyr.css'
 import { addPreconnectForUrl, addPreloadImageOnce } from '@utils/preconnect'
 
 const props = defineProps({
@@ -189,12 +190,7 @@ watch(view, async () => {
 :root {
   --plyr-color-main: #8d6a9f;
 }
-.plyr-wrapper {
-  position: relative;
-  width: 100%;
-}
 .videoEl {
-  display: block;
   width: 100%;
   aspect-ratio: 16 / 9;
 }

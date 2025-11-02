@@ -1,4 +1,4 @@
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { LocalStorage } from 'quasar'
 
 const DARK_KEY = 'fotrino-films-darkmode'
@@ -24,19 +24,18 @@ export function setDarkMode(mode) {
 }
 
 export function useDarkMode($q) {
-  // Apply dark mode immediately
-  applyDarkMode($q)
-
   watch(darkModePref, val => {
     LocalStorage.set(DARK_KEY, val)
     applyDarkMode($q)
   })
 
-  // Set up system preference listener
-  const mediaQuery = globalThis.matchMedia('(prefers-color-scheme: dark)')
-  mediaQuery.addEventListener('change', e => {
-    systemDark.value = e.matches
-    if (darkModePref.value === 'auto') applyDarkMode($q)
+  onMounted(() => {
+    applyDarkMode($q)
+    const mediaQuery = globalThis.matchMedia('(prefers-color-scheme: dark)')
+    mediaQuery.addEventListener('change', e => {
+      systemDark.value = e.matches
+      if (darkModePref.value === 'auto') applyDarkMode($q)
+    })
   })
 
   return {

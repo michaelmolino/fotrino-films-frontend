@@ -44,8 +44,9 @@
 <script setup>
 import { computed } from 'vue'
 import { useQuasar } from 'quasar'
-import { darkModePref, darkModeIcons, setDarkMode } from '@utils/dark.js'
+import { useDarkMode, darkModeIcons, setDarkMode } from '@utils/dark.js'
 
 const $q = useQuasar()
+const { darkModePref } = useDarkMode($q)
 const darkModeIcon = computed(() => darkModeIcons[darkModePref.value])
 </script>
