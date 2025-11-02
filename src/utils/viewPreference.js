@@ -6,9 +6,9 @@ const ALLOWED = new Set(['projects', 'main', 'all'])
 export function getViewPreference(defaultValue = 'all') {
   try {
     const val = LocalStorage.getItem(VIEW_KEY)
-    return ALLOWED.has(val) ? val : defaultValue
+    return typeof val === 'string' && ALLOWED.has(val) ? val : String(defaultValue)
   } catch {
-    return defaultValue
+    return String(defaultValue)
   }
 }
 

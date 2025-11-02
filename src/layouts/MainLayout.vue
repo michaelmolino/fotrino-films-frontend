@@ -2,9 +2,9 @@
   <q-layout view="hHh lpR fFf">
     <a href="#main-content" class="skip-to-content">Skip to main content</a>
     <FotrinoHeader />
-    <q-page-container id="main-content" role="main">
+    <main id="main-content">
       <router-view />
-    </q-page-container>
+    </main>
     <FotrinoFooter />
   </q-layout>
 </template>
@@ -26,7 +26,7 @@ export default {
   z-index: 999;
   padding: 8px 16px;
   background-color: #8d6a9f;
-  color: white;
+  color: #000000;
   text-decoration: none;
   font-weight: bold;
 }

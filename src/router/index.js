@@ -6,12 +6,15 @@ import {
 } from 'vue-router'
 import routes from './routes'
 
-export default function createRouterInstance(/* { store, ssrContext } */) {
-  const createHistory = process.env.SERVER
-    ? createMemoryHistory
-    : process.env.VUE_ROUTER_MODE === 'history'
-      ? createWebHistory
-      : createWebHashHistory
+export default function createRouterInstance() {
+  let createHistory;
+  if (process.env.SERVER) {
+    createHistory = createMemoryHistory;
+  } else if (process.env.VUE_ROUTER_MODE === 'history') {
+    createHistory = createWebHistory;
+  } else {
+    createHistory = createWebHashHistory;
+  }
 
   const Router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),

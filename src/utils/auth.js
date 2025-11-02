@@ -11,7 +11,10 @@ export function storeRedirect() {
 }
 
 export function getRedirect(route) {
-  const redirect = LocalStorage.getItem(REDIRECT_KEY) || '/'
+  let redirect = LocalStorage.getItem(REDIRECT_KEY) || '/'
   LocalStorage.remove(REDIRECT_KEY)
+  if (typeof redirect !== 'string' || redirect === '[object Object]') {
+    redirect = '/'
+  }
   return redirect + (route?.query?.newUser === 'true' ? '?showTerms=true' : '')
 }

@@ -84,7 +84,7 @@ export default boot(({ app, router, store }) => {
               label: 'Go Back',
               color: 'white',
               handler: () => {
-                reject(new axios.Cancel('User cancelled delete'))
+                reject(new Error('User cancelled delete'))
               }
             }
           ]

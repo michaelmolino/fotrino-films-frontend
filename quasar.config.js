@@ -44,8 +44,10 @@ export default defineConfig(() => ({
       viteConf.optimizeDeps.include = [...(viteConf.optimizeDeps.include || []), 'commentbox.io']
       // Generate pre-compressed assets (Brotli + Gzip) for better transfer sizes
       viteConf.plugins = viteConf.plugins || []
-      viteConf.plugins.push(viteCompression({ algorithm: 'brotliCompress', ext: '.br' }))
-      viteConf.plugins.push(viteCompression({ algorithm: 'gzip', ext: '.gz' }))
+      viteConf.plugins.push(
+        viteCompression({ algorithm: 'brotliCompress', ext: '.br' }),
+        viteCompression({ algorithm: 'gzip', ext: '.gz' })
+      )
     }
   },
 
