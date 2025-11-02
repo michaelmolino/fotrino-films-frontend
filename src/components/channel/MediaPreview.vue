@@ -15,7 +15,7 @@
     </q-badge>
     <q-img
       v-if="media.preview"
-      :src="media.preview"
+      :src="previewSrc"
       :ratio="16 / 9"
       fit="cover"
       loading="lazy"
@@ -49,7 +49,9 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import { addPreconnectForUrl } from '@utils/preconnect'
+import { useWebP } from '@composables/useWebP'
 
 const { media, project, detail, showMainAccent } = defineProps({
   media: Object,
@@ -58,8 +60,17 @@ const { media, project, detail, showMainAccent } = defineProps({
   showMainAccent: { type: Boolean, default: true }
 })
 
+const { checkWebPVersion } = useWebP()
+const previewSrc = ref(media?.preview)
+
+onMounted(async () => {
+  if (media?.preview) {
+    previewSrc.value = await checkWebPVersion(media.preview)
+  }
+})
+
 function onPreviewLoad() {
-  if (media?.preview) addPreconnectForUrl(media.preview)
+  if (previewSrc.value) addPreconnectForUrl(previewSrc.value)
 }
 </script>
 

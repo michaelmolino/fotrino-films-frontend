@@ -4,7 +4,7 @@
       <video id="video-player" controls :key="media.id" class="videoEl"></video>
     </div>
     <div v-else>
-      <q-img :src="media.preview" :ratio="16 / 9" fit="cover" class="full-width" />
+      <q-img :src="previewSrc" :ratio="16 / 9" fit="cover" class="full-width" />
       <audio id="audio-player" controls :key="media.id" class="audioEl"></audio>
     </div>
   </div>
@@ -16,6 +16,7 @@ import { useStore } from 'vuex'
 import Hls from 'hls.js'
 import 'plyr/dist/plyr.css'
 import { addPreconnectForUrl, addPreloadImageOnce } from '@utils/preconnect'
+import { useWebP } from '@composables/useWebP'
 
 const props = defineProps({
   media: Object,
@@ -27,6 +28,8 @@ const player = ref(null)
 const hls = ref(null)
 let playHandler = null
 let PlyrCtor = null
+const { checkWebPVersion } = useWebP()
+const previewSrc = ref(props.media?.preview)
 
 const view = computed(() => (props.media?.type?.startsWith('audio/') ? 'audio' : 'video'))
 
@@ -88,7 +91,7 @@ async function setSource() {
     const queryParams = token ? `token=${token}` : null
 
     // Preload poster (LCP candidate) with high priority
-    if (props.media.preview) addPreloadImageOnce(props.media.preview, 'high')
+    if (previewSrc.value) addPreloadImageOnce(previewSrc.value, 'high')
 
     // Preconnect to HLS segment origin
     addPreconnectForUrl(source)
@@ -134,7 +137,7 @@ async function setSource() {
     } else if (video) {
       video.src = queryParams ? source + '?' + queryParams : source
     }
-    player.value.poster = props.media.preview
+    player.value.poster = previewSrc.value
   } else {
     const audio = el.tagName.toLowerCase() === 'audio' ? el : document.querySelector('audio')
     if (audio) {
@@ -153,7 +156,7 @@ function attachMediaSessionHandler() {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: props.media.title,
       artist: props.artist,
-      artwork: [{ src: props.media.preview, type: 'image/jpeg' }]
+      artwork: [{ src: previewSrc.value, type: 'image/jpeg' }]
     })
   }
   el.addEventListener('play', playHandler, { once: true })
@@ -162,6 +165,10 @@ function attachMediaSessionHandler() {
 async function rebuild() {
   destroyPlayers()
   await nextTick()
+  // Check for WebP version before setting source
+  if (props.media?.preview) {
+    previewSrc.value = await checkWebPVersion(props.media.preview)
+  }
   setSource()
   attachMediaSessionHandler()
 }
