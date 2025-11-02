@@ -78,18 +78,6 @@
 </head>
 
 <body>
-  <script>
-    (function () {
-      try {
-        var pref = localStorage.getItem('fotrino-films-darkmode') || 'auto'
-        var systemDark =
-          window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-        var isDark = pref === 'dark' || (pref === 'auto' && systemDark)
-        document.body.classList.toggle('body--dark', isDark)
-        document.body.classList.toggle('body--light', !isDark)
-      } catch (e) { }
-    })()
-  </script>
   <!-- quasar:entry-point -->
 </body>
 
