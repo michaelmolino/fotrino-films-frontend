@@ -32,6 +32,7 @@
 <script setup>
 import { computed, onMounted, onBeforeUnmount, watch, ref, nextTick } from 'vue'
 import { useStore } from 'vuex'
+import { useMeta } from 'quasar'
 import Hls from 'hls.js'
 import 'plyr/dist/plyr.css'
 import { addPreconnectForUrl, addPreloadImageOnce } from '@utils/preconnect'
@@ -51,6 +52,26 @@ const { getWebPUrl } = useWebP()
 const webpUrl = computed(() => getWebPUrl(props.media?.preview))
 
 const view = computed(() => (props.media?.type?.startsWith('audio/') ? 'audio' : 'video'))
+
+// Preload poster image for LCP optimization
+const posterUrl = computed(() => webpUrl.value || props.media?.preview)
+useMeta(() => {
+  if (view.value === 'video' && posterUrl.value) {
+    return {
+      link: {
+        poster: {
+          rel: 'preload',
+          as: 'image',
+          href: posterUrl.value,
+          fetchpriority: 'high',
+          imagesrcset: webpUrl.value ? `${webpUrl.value} 1x` : undefined,
+          imagesizes: '(max-width: 720px) 100vw, 720px'
+        }
+      }
+    }
+  }
+  return {}
+})
 
 async function fetchMediaToken() {
   if (!props.media?.private_id) return null
