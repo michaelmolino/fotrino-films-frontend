@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="plyr-wrapper">
     <div v-if="view == 'video'">
       <video id="video-player" controls :key="media.id" class="videoEl"></video>
     </div>
@@ -56,11 +56,9 @@ function destroyPlayers() {
 async function setSource() {
   const el = document.getElementById(view.value === 'video' ? 'video-player' : 'audio-player')
   if (!el || !props.media) return
-  // Lazy-load Plyr JS and CSS only when needed
   if (!PlyrCtor) {
     const mod = await import('plyr')
     PlyrCtor = mod.default
-    await import('plyr/dist/plyr.css')
   }
   player.value = new PlyrCtor(el, {
     settings: [],
@@ -191,7 +189,12 @@ watch(view, async () => {
 :root {
   --plyr-color-main: #8d6a9f;
 }
+.plyr-wrapper {
+  position: relative;
+  width: 100%;
+}
 .videoEl {
+  display: block;
   width: 100%;
   aspect-ratio: 16 / 9;
 }

@@ -5,14 +5,13 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from '@quasar/app-vite/wrappers'
 import viteCompression from 'vite-plugin-compression'
-import vitePurgeCss from 'vite-plugin-purgecss'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 export default defineConfig(() => ({
   supportTS: false,
-  boot: ['install-store', 'resize-observer-patch', 'passive-events', 'axios'],
+  boot: ['dark-mode', 'plyr', 'install-store', 'resize-observer-patch', 'passive-events', 'axios'],
   css: [],
   extras: ['material-icons'],
 
@@ -77,15 +76,6 @@ export default defineConfig(() => ({
       viteConf.plugins = viteConf.plugins || []
       viteConf.plugins.push(viteCompression({ algorithm: 'brotliCompress', ext: '.br' }))
       viteConf.plugins.push(viteCompression({ algorithm: 'gzip', ext: '.gz' }))
-      viteConf.plugins.push(
-        vitePurgeCss({
-          safelist: [
-            /q-/,
-            /^body--/,
-            'material-icons'
-          ]
-        })
-      )
     }
   },
 
