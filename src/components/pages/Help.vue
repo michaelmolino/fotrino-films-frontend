@@ -219,7 +219,7 @@
 </template>
 
 <script setup>
-import facebookIcon from '../../assets/icons/facebook.svg'
+import facebookIcon from '@assets/icons/facebook.svg'
 import { useRoute, useRouter } from 'vue-router'
 
 defineOptions({ name: 'Help-Page' })

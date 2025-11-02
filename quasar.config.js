@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename)
 
 export default defineConfig(() => ({
   supportTS: false,
-  boot: ['dark-mode', 'plyr', 'install-store', 'resize-observer-patch', 'passive-events', 'axios'],
+  boot: ['install-store', 'resize-observer-patch', 'passive-events', 'axios'],
   css: [],
   extras: ['material-icons'],
 
@@ -41,37 +41,7 @@ export default defineConfig(() => ({
         'node_modules/commentbox.io/dist/commentbox.min.js'
       )
       viteConf.optimizeDeps = viteConf.optimizeDeps || {}
-      viteConf.optimizeDeps.include = [
-        ...(viteConf.optimizeDeps.include || []),
-        'vue',
-        'vue-router',
-        'vuex',
-        'quasar',
-        'axios',
-        'hls.js',
-        'plyr',
-        'dompurify',
-        'dayjs',
-        'i18n-iso-countries',
-        'commentbox.io'
-      ]
-
-      // Optimize build for production
-      viteConf.build = viteConf.build || {}
-      viteConf.build.rollupOptions = viteConf.build.rollupOptions || {}
-      viteConf.build.chunkSizeWarningLimit = 600 // Warn for chunks > 600kb
-
-      // Single vendor chunk for better HTTP/2 performance
-      const currentOutput = viteConf.build.rollupOptions.output || {}
-      viteConf.build.rollupOptions.output = {
-        ...currentOutput,
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            return 'vendor'
-          }
-        }
-      }
-
+      viteConf.optimizeDeps.include = [...(viteConf.optimizeDeps.include || []), 'commentbox.io']
       // Generate pre-compressed assets (Brotli + Gzip) for better transfer sizes
       viteConf.plugins = viteConf.plugins || []
       viteConf.plugins.push(viteCompression({ algorithm: 'brotliCompress', ext: '.br' }))

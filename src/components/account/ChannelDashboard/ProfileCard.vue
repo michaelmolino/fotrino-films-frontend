@@ -35,11 +35,12 @@
 import { computed } from 'vue'
 import { daysSince } from '@utils/date.js'
 import { getCountry } from '@utils/countries.js'
-// Import available brand SVGs as URLs
-import googleIcon from '../../../assets/icons/google.svg'
-import microsoftIcon from '../../../assets/icons/microsoft.svg'
-import facebookIcon from '../../../assets/icons/facebook.svg'
-import githubIcon from '../../../assets/icons/github.svg'
+import googleIcon from '@assets/icons/google.svg'
+import microsoftIcon from '@assets/icons/microsoft.svg'
+import facebookIcon from '@assets/icons/facebook.svg'
+import githubIcon from '@assets/icons/github.svg'
+import appleIcon from '@assets/icons/apple.svg'
+import yahooIcon from '@assets/icons/yahoo.svg'
 
 const props = defineProps({
   profile: { type: Object, default: null },
@@ -54,9 +55,8 @@ const providerIcon = computed(() => {
     microsoft: `img:${microsoftIcon}`,
     facebook: `img:${facebookIcon}`,
     github: `img:${githubIcon}`,
-    // Fallbacks until SVGs are added
-    apple: 'account_circle',
-    yahoo: 'mail'
+    apple: `img:${appleIcon}`,
+    yahoo: `img:${yahooIcon}`,
   }
   return map[p] || 'account_circle'
 })
