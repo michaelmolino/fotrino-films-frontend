@@ -1,10 +1,21 @@
 <template>
   <div>
     <div v-if="view == 'video'">
-      <video id="video-player" controls :key="media.id" class="videoEl"></video>
+      <video
+        id="video-player"
+        controls
+        :key="media.id"
+        :poster="webpUrl || media.preview"
+        class="videoEl"></video>
     </div>
-    <div v-else>
-      <q-img :src="previewSrc" :ratio="16 / 9" fit="cover" class="full-width" />
+    <div v-else class="audio-container">
+      <picture v-if="media.preview" class="audio-preview">
+        <source v-if="webpUrl" :srcset="webpUrl" type="image/webp" />
+        <img
+          :src="media.preview"
+          :alt="media.title"
+          class="audio-img" />
+      </picture>
       <audio id="audio-player" controls :key="media.id" class="audioEl"></audio>
     </div>
   </div>
@@ -28,8 +39,8 @@ const player = ref(null)
 const hls = ref(null)
 let playHandler = null
 let PlyrCtor = null
-const { checkWebPVersion } = useWebP()
-const previewSrc = ref(props.media?.preview)
+const { getWebPUrl } = useWebP()
+const webpUrl = computed(() => getWebPUrl(props.media?.preview))
 
 const view = computed(() => (props.media?.type?.startsWith('audio/') ? 'audio' : 'video'))
 
@@ -91,7 +102,8 @@ async function setSource() {
     const queryParams = token ? `token=${token}` : null
 
     // Preload poster (LCP candidate) with high priority
-    if (previewSrc.value) addPreloadImageOnce(previewSrc.value, 'high')
+    const posterUrl = webpUrl.value || props.media.preview
+    if (posterUrl) addPreloadImageOnce(posterUrl, 'high')
 
     // Preconnect to HLS segment origin
     addPreconnectForUrl(source)
@@ -137,7 +149,7 @@ async function setSource() {
     } else if (video) {
       video.src = queryParams ? source + '?' + queryParams : source
     }
-    player.value.poster = previewSrc.value
+    // Note: poster is already set on the video element via template binding
   } else {
     const audio = el.tagName.toLowerCase() === 'audio' ? el : document.querySelector('audio')
     if (audio) {
@@ -156,7 +168,7 @@ function attachMediaSessionHandler() {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: props.media.title,
       artist: props.artist,
-      artwork: [{ src: previewSrc.value, type: 'image/jpeg' }]
+      artwork: [{ src: webpUrl.value || props.media.preview, type: 'image/jpeg' }]
     })
   }
   el.addEventListener('play', playHandler, { once: true })
@@ -165,10 +177,6 @@ function attachMediaSessionHandler() {
 async function rebuild() {
   destroyPlayers()
   await nextTick()
-  // Check for WebP version before setting source
-  if (props.media?.preview) {
-    previewSrc.value = await checkWebPVersion(props.media.preview)
-  }
   setSource()
   attachMediaSessionHandler()
 }
@@ -197,7 +205,24 @@ watch(view, async () => {
 :root {
   --plyr-color-main: #8d6a9f;
 }
+.audio-container {
+  position: relative;
+  width: 100%;
+}
+.audio-preview {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+.audio-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 .videoEl {
+  display: block;
   width: 100%;
   aspect-ratio: 16 / 9;
 }

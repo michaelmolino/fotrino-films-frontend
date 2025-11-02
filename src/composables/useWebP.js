@@ -18,6 +18,13 @@ async function detectWebPSupport() {
     })
 }
 
+// Generate WebP URL from JPG/JPEG URL
+function getWebPUrl(url) {
+    if (!url || typeof url !== 'string') return null
+    if (!/\.(jpe?g)$/i.test(url)) return null
+    return url.replace(/\.(jpe?g)$/i, '.webp')
+}
+
 // Check if a WebP version exists for a given URL
 async function checkWebPVersion(url) {
     if (!url || typeof url !== 'string') return url
@@ -38,7 +45,7 @@ async function checkWebPVersion(url) {
     }
 
     // Generate WebP URL
-    const webpUrl = url.replace(/\.(jpe?g)$/i, '.webp')
+    const webpUrl = getWebPUrl(url)
 
     // Check if WebP version exists
     try {
@@ -59,6 +66,7 @@ async function checkWebPVersion(url) {
 export function useWebP() {
     return {
         checkWebPVersion,
+        getWebPUrl,
         supportsWebP
     }
 }
