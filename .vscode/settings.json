@@ -8,5 +8,9 @@
       "singleQuote": true,
       "semi": true
     }
+  },
+  "sonarlint.connectedMode.project": {
+    "connectionId": "michaelmolino",
+    "projectKey": "michaelmolino_fotrino-films-frontend"
   }
 }
