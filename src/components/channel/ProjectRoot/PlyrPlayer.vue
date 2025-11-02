@@ -6,6 +6,7 @@
         controls
         :key="media.id"
         :poster="webpUrl || media.preview"
+        :aria-label="`Video player for ${media.title}`"
         preload="metadata"
         class="videoEl"></video>
     </div>
@@ -14,11 +15,16 @@
         <source v-if="webpUrl" :srcset="webpUrl" type="image/webp" />
         <img
           :src="media.preview"
-          :alt="media.title"
+          :alt="`${media.title} cover art`"
           fetchpriority="high"
           class="audio-img" />
       </picture>
-      <audio id="audio-player" controls :key="media.id" class="audioEl"></audio>
+      <audio
+        id="audio-player"
+        controls
+        :key="media.id"
+        :aria-label="`Audio player for ${media.title}`"
+        class="audioEl"></audio>
     </div>
   </div>
 </template>

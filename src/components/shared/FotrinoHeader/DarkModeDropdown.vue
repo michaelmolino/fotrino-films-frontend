@@ -2,6 +2,7 @@
   <q-btn-dropdown
     :icon="darkModeIcon"
     :label="$q.screen.gt.sm ? 'Theme' : ''"
+    aria-label="Select theme preference"
     size="md"
     flat
     no-caps>
@@ -12,6 +13,7 @@
         align="left"
         :icon="darkModeIcons.light"
         label="Light"
+        aria-label="Switch to light theme"
         size="md"
         class="col-xs-12"
         @click="setDarkMode('light')" />
@@ -23,6 +25,7 @@
         align="left"
         :icon="darkModeIcons.auto"
         label="System"
+        aria-label="Use system theme preference"
         size="md"
         class="col-xs-12"
         @click="setDarkMode('auto')" />
@@ -34,6 +37,7 @@
         align="left"
         :icon="darkModeIcons.dark"
         label="Dark"
+        aria-label="Switch to dark theme"
         size="md"
         class="col-xs-12"
         @click="setDarkMode('dark')" />

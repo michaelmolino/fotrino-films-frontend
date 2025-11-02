@@ -8,6 +8,7 @@
         class="q-pa-sm float-right"
         icon="flag"
         color="warning"
+        aria-label="Report this content"
         data-cy="report-button"
         @click="openReportDialog">
         <q-tooltip>Report</q-tooltip>
@@ -16,6 +17,7 @@
         dropdown-icon="share"
         class="q-pa-sm float-right"
         color="info"
+        aria-label="Share this video"
         data-cy="share-button"
         flat>
         <q-list>

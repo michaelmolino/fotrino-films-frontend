@@ -3,6 +3,7 @@
     v-if="history && history.length > 0"
     icon="history"
     :label="$q.screen.gt.sm ? 'History' : ''"
+    aria-label="View recently visited channels"
     flat
     no-caps
     size="md"
@@ -16,6 +17,7 @@
         no-wrap
         class="col-xs-10"
         :label="channel.title"
+        :aria-label="`Visit ${channel.title}`"
         size="md"
         :to="`/${channel.uuid}/${channel.slug}`" />
       <q-btn
@@ -24,6 +26,7 @@
         no-caps
         no-wrap
         class="col-xs-2"
+        :aria-label="`Remove ${channel.title} from history`"
         size="md"
         @click="removeHistory(channel.uuid)" />
     </div>

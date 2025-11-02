@@ -2,6 +2,7 @@
   <q-btn-dropdown
     icon="account_circle"
     :label="$q.screen.gt.sm ? 'Sign Up/Login' : ''"
+    aria-label="Sign up or login to your account"
     flat
     no-caps
     size="md">
@@ -14,6 +15,7 @@
           no-caps
           :icon="provider.icon"
           :label="provider.name"
+          :aria-label="`Sign in with ${provider.name}`"
           size="md"
           class="col-xs-12"
           @click="storeRedirect" />

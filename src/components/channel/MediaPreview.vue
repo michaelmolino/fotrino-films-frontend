@@ -5,6 +5,8 @@
     no-caps
     padding="8px"
     data-cy="media-preview"
+    :to="to"
+    :aria-label="`View ${media.title}`"
     :class="['fit', 'width720', { 'bg-accent': media.main && showMainAccent }]">
     <q-badge
       v-if="media.type?.startsWith('audio/')"
@@ -52,12 +54,13 @@ import { computed, ref } from 'vue'
 import { addPreconnectForUrl } from '@utils/preconnect'
 import { useWebP } from '@composables/useWebP'
 
-const { media, project, detail, showMainAccent, priority } = defineProps({
+const { media, project, detail, showMainAccent, priority, to } = defineProps({
   media: Object,
   project: Object,
   detail: Boolean,
   showMainAccent: { type: Boolean, default: true },
-  priority: { type: String, default: 'auto' } // 'high', 'low', or 'auto'
+  priority: { type: String, default: 'auto' }, // 'high', 'low', or 'auto'
+  to: String
 })
 
 const { getWebPUrl } = useWebP()

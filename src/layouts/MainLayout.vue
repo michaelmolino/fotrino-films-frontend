@@ -1,7 +1,8 @@
 <template>
   <q-layout view="hHh lpR fFf">
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
     <FotrinoHeader />
-    <q-page-container>
+    <q-page-container id="main-content" role="main">
       <router-view />
     </q-page-container>
     <FotrinoFooter />
@@ -17,3 +18,21 @@ export default {
   components: { FotrinoHeader, FotrinoFooter }
 }
 </script>
+
+<style>
+.skip-to-content {
+  position: absolute;
+  left: -9999px;
+  z-index: 999;
+  padding: 8px 16px;
+  background-color: #8d6a9f;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+.skip-to-content:focus {
+  left: 50%;
+  top: 8px;
+  transform: translateX(-50%);
+}
+</style>

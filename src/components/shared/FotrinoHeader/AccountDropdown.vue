@@ -2,6 +2,7 @@
   <q-btn-dropdown
     :icon="'img:' + profile.profile_pic"
     :label="$q.screen.gt.sm ? 'Account' : ''"
+    :aria-label="'Account menu for ' + (profile.name || 'user')"
     flat
     no-caps
     size="md">
@@ -14,6 +15,7 @@
         no-caps
         icon="verified_user"
         label="Admin"
+        aria-label="Go to admin dashboard"
         size="md"
         class="col-xs-12" />
     </div>
@@ -25,6 +27,7 @@
         no-caps
         icon="dashboard"
         label="Dashboard"
+        aria-label="Go to account dashboard"
         size="md"
         class="col-xs-12" />
     </div>
@@ -36,6 +39,7 @@
         no-caps
         icon="cloud_upload"
         label="Upload Media"
+        aria-label="Upload a video"
         size="md"
         class="col-xs-12" />
     </div>
@@ -47,6 +51,7 @@
         no-caps
         icon="logout"
         label="Logout"
+        aria-label="Logout from your account"
         size="md"
         class="col-xs-12" />
     </div>
