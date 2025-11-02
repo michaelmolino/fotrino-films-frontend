@@ -50,7 +50,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { addPreconnectForUrl } from '@utils/preconnect'
 import { useWebP } from '@composables/useWebP'
 
@@ -63,9 +63,19 @@ const { media, project, detail, showMainAccent, priority, to } = defineProps({
   to: String
 })
 
-const { getWebPUrl } = useWebP()
-const webpUrl = computed(() => getWebPUrl(media?.preview))
+const { checkWebPVersion } = useWebP()
+const webpUrl = ref(null)
 const imageError = ref(false)
+
+onMounted(async () => {
+  if (media?.preview) {
+    const url = await checkWebPVersion(media.preview)
+    // Only set webpUrl if it's different from the original (meaning WebP exists)
+    if (url !== media.preview && url.endsWith('.webp')) {
+      webpUrl.value = url
+    }
+  }
+})
 
 function onPreviewLoad() {
   if (media?.preview) addPreconnectForUrl(media.preview)

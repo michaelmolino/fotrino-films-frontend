@@ -48,8 +48,8 @@ const player = ref(null)
 const hls = ref(null)
 let playHandler = null
 let PlyrCtor = null
-const { getWebPUrl } = useWebP()
-const webpUrl = computed(() => getWebPUrl(props.media?.preview))
+const { checkWebPVersion } = useWebP()
+const webpUrl = ref(null)
 
 const view = computed(() => (props.media?.type?.startsWith('audio/') ? 'audio' : 'video'))
 
@@ -190,8 +190,17 @@ async function rebuild() {
   attachMediaSessionHandler()
 }
 
-onMounted(() => {
-  // Preload LCP image immediately before any async operations
+onMounted(async () => {
+  // Check for WebP version first
+  if (props.media?.preview) {
+    const url = await checkWebPVersion(props.media.preview)
+    // Only set webpUrl if it's different from the original (meaning WebP exists)
+    if (url !== props.media.preview && url.endsWith('.webp')) {
+      webpUrl.value = url
+    }
+  }
+  
+  // Preload LCP image immediately
   const posterUrl = webpUrl.value || props.media?.preview
   if (posterUrl && view.value === 'video') {
     addPreloadImageOnce(posterUrl, 'high')
