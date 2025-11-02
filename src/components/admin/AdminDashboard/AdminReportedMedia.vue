@@ -21,7 +21,7 @@
           <q-btn
             :label="props.row.title"
             :to="`/private/${props.row.private_id}`"
-            icon="fas fa-link"
+            icon="link"
             flat
             dense
             size="sm" />

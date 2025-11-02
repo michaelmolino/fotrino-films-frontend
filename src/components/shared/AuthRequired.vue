@@ -59,10 +59,10 @@ const computedIcon = computed(() => {
   if (props.icon) return props.icon
   switch (props.type) {
     case 'admin':
-      return 'fas fa-user-shield'
+      return 'security'
     case 'login':
     default:
-      return 'fas fa-lock'
+      return 'lock'
   }
 })
 </script>

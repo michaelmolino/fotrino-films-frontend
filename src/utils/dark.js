@@ -6,9 +6,9 @@ export const darkModePref = ref(LocalStorage.getItem(DARK_KEY) || 'auto')
 export const systemDark = ref(globalThis.matchMedia('(prefers-color-scheme: dark)').matches)
 
 export const darkModeIcons = {
-  light: 'far fa-sun',
-  auto: 'fas fa-circle-half-stroke',
-  dark: 'far fa-moon'
+  light: 'light_mode',
+  auto: 'contrast',
+  dark: 'nights_stay'
 }
 
 function applyDarkMode($q) {

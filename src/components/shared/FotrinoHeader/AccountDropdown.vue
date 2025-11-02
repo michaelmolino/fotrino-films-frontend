@@ -12,7 +12,7 @@
         align="left"
         flat
         no-caps
-        icon="fas fa-user-shield"
+        icon="verified_user"
         label="Admin"
         size="md"
         class="col-xs-12" />
@@ -23,7 +23,7 @@
         align="left"
         flat
         no-caps
-        icon="fas fa-chalkboard"
+        icon="dashboard"
         label="Dashboard"
         size="md"
         class="col-xs-12" />
@@ -34,7 +34,7 @@
         align="left"
         flat
         no-caps
-        icon="fas fa-cloud-arrow-up"
+        icon="cloud_upload"
         label="Upload Media"
         size="md"
         class="col-xs-12" />
@@ -45,7 +45,7 @@
         align="left"
         flat
         no-caps
-        icon="fas fa-right-from-bracket"
+        icon="logout"
         label="Logout"
         size="md"
         class="col-xs-12" />

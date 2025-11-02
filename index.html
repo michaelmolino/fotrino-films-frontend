@@ -1,33 +1,68 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no,date=no,address=no,email=yes" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="robots" content="noindex" />
+    <meta name="viewport" content="initial-scale=1, minimum-scale=1, width=device-width" />
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="format-detection" content="telephone=no,date=no,address=no,email=yes" />
-  <meta name="msapplication-tap-highlight" content="no" />
-  <meta name="robots" content="noindex" />
-  <meta name="viewport" content="initial-scale=1, minimum-scale=1, width=device-width" />
+    <title>Fotrino Films</title>
 
-  <title>Fotrino Films</title>
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
 
-  <!-- Apple Touch Icon -->
-  <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
+    <!-- Standard favicons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png" />
+    <link rel="icon" href="/favicon.ico" />
 
-  <!-- Standard favicons -->
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png" />
-  <link rel="icon" href="/favicon.ico" />
+    <!-- Android / PWA -->
+    <link rel="manifest" href="/favicon/site.webmanifest" />
 
-  <!-- Android / PWA -->
-  <link rel="manifest" href="/favicon/site.webmanifest" />
+    <!-- Windows / Microsoft -->
+    <meta name="msapplication-TileColor" content="#ffffff" />
+    <meta name="theme-color" content="#ffffff" />
 
-  <!-- Windows / Microsoft -->
-  <meta name="msapplication-TileColor" content="#ffffff" />
-  <meta name="theme-color" content="#ffffff" />
-</head>
+    <!-- Inline critical styles (migrated from src/css/app.sass) to avoid a render-blocking request -->
+    <style>
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Helvetica,
+          Arial,
+          'Apple Color Emoji',
+          'Segoe UI Emoji',
+          'Segoe UI Symbol',
+          sans-serif;
+      }
 
-<body>
-  <!-- quasar:entry-point -->
-</body>
+      .width250 {
+        width: 250px;
+      }
 
+      .width480 {
+        max-width: 480px;
+      }
+
+      .width720 {
+        max-width: 720px;
+      }
+
+      .height250 {
+        height: 250px;
+      }
+
+      .my-history-dropdown-menu.q-menu[role='menu'] {
+        max-width: none !important;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- quasar:entry-point -->
+  </body>
 </html>

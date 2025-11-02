@@ -1,7 +1,7 @@
 <template>
   <q-btn-dropdown
     v-if="history && history.length > 0"
-    icon="fas fa-clock-rotate-left"
+    icon="history"
     :label="$q.screen.gt.sm ? 'History' : ''"
     flat
     no-caps
@@ -9,7 +9,7 @@
     content-class="my-history-dropdown-menu">
     <div v-for="channel in history" :key="channel.uuid" class="row">
       <q-btn
-        :icon="channel.cover ? 'img:' + channel.cover : 'fas fa-clapperboard'"
+        :icon="channel.cover ? 'img:' + channel.cover : 'movie'"
         align="left"
         flat
         no-caps
@@ -19,7 +19,7 @@
         size="md"
         :to="`/${channel.uuid}/${channel.slug}`" />
       <q-btn
-        icon="fas fa-circle-minus"
+        icon="remove_circle"
         flat
         no-caps
         no-wrap

@@ -145,7 +145,7 @@
               <q-btn
                 flat
                 dense
-                icon="fab fa-facebook"
+                :icon="`img:${facebookIcon}`"
                 label="Facebook Link Debugger"
                 href="https://developers.facebook.com/tools/debug/" />
               to check and manage how your link appears on Facebook. This tool lets you confirm the
@@ -219,6 +219,7 @@
 </template>
 
 <script setup>
+import facebookIcon from '../../assets/icons/facebook.svg'
 import { useRoute, useRouter } from 'vue-router'
 
 defineOptions({ name: 'Help-Page' })

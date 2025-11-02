@@ -67,11 +67,11 @@ export default boot(({ app, router, store }) => {
           timeout: 0,
           message: 'This is a destructive action. Are you sure you want to continue?',
           position: 'center',
-          icon: 'fas fa-info',
+          icon: 'info',
           multiLine: true,
           actions: [
             {
-              icon: 'fas fa-circle-exclamation',
+              icon: 'error',
               label: 'Confirm delete',
               color: 'white',
               handler: () => {
@@ -80,7 +80,7 @@ export default boot(({ app, router, store }) => {
               }
             },
             {
-              icon: 'fas fa-rotate-left',
+              icon: 'undo',
               label: 'Go Back',
               color: 'white',
               handler: () => {
@@ -134,7 +134,7 @@ export default boot(({ app, router, store }) => {
         type: 'negative',
         timeout: timeout,
         message: msg,
-        icon: 'fas fa-triangle-exclamation',
+        icon: 'warning',
         actions: timeout === 0 ? [{ label: 'Dismiss', color: 'white' }] : []
       })
 

@@ -5,6 +5,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from '@quasar/app-vite/wrappers'
 import viteCompression from 'vite-plugin-compression'
+import vitePurgeCss from 'vite-plugin-purgecss'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -12,8 +13,8 @@ const __dirname = path.dirname(__filename)
 export default defineConfig(() => ({
   supportTS: false,
   boot: ['install-store', 'resize-observer-patch', 'passive-events', 'axios'],
-  css: ['app.sass'],
-  extras: ['fontawesome-v6', 'material-icons'],
+  css: [],
+  extras: ['material-icons'],
 
   build: {
     vueRouterMode: 'history',
@@ -33,6 +34,7 @@ export default defineConfig(() => ({
         '@composables': path.resolve(__dirname, 'src/composables'),
         '@utils': path.resolve(__dirname, 'src/utils'),
         '@libs': path.resolve(__dirname, 'src/libs'),
+        '@assets': path.resolve(__dirname, 'src/assets'),
         '@deps': path.resolve(__dirname, 'node_modules')
       }
       viteConf.resolve.alias['commentbox.io'] = path.resolve(
@@ -73,9 +75,16 @@ export default defineConfig(() => ({
 
       // Generate pre-compressed assets (Brotli + Gzip) for better transfer sizes
       viteConf.plugins = viteConf.plugins || []
+      viteConf.plugins.push(viteCompression({ algorithm: 'brotliCompress', ext: '.br' }))
+      viteConf.plugins.push(viteCompression({ algorithm: 'gzip', ext: '.gz' }))
       viteConf.plugins.push(
-        viteCompression({ algorithm: 'brotliCompress', ext: '.br' }),
-        viteCompression({ algorithm: 'gzip', ext: '.gz' })
+        vitePurgeCss({
+          safelist: [
+            /q-/,
+            /^body--/,
+            'material-icons'
+          ]
+        })
       )
     }
   },

@@ -10,7 +10,7 @@
         flat
         no-caps
         align="left"
-        icon="far fa-sun"
+        :icon="darkModeIcons.light"
         label="Light"
         size="md"
         class="col-xs-12"
@@ -21,7 +21,7 @@
         flat
         no-caps
         align="left"
-        icon="fas fa-circle-half-stroke"
+        :icon="darkModeIcons.auto"
         label="System"
         size="md"
         class="col-xs-12"
@@ -32,7 +32,7 @@
         flat
         no-caps
         align="left"
-        icon="far fa-moon"
+        :icon="darkModeIcons.dark"
         label="Dark"
         size="md"
         class="col-xs-12"

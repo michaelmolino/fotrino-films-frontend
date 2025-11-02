@@ -13,7 +13,7 @@
         <q-tooltip>Report</q-tooltip>
       </q-btn>
       <q-btn-dropdown
-        dropdown-icon="fas fa-share-nodes"
+        dropdown-icon="share"
         class="q-pa-sm float-right"
         color="info"
         data-cy="share-button"
@@ -27,7 +27,7 @@
               <q-item-label>Share within this channel</q-item-label>
             </q-item-section>
             <q-item-section side>
-              <q-icon name="far fa-copy" color="accent" />
+              <q-icon name="content_copy" color="accent" />
             </q-item-section>
           </q-item>
           <q-item clickable v-close-popup @click="copyLink('private')">
@@ -39,7 +39,7 @@
               <q-item-label v-else>Share this video</q-item-label>
             </q-item-section>
             <q-item-section side>
-              <q-icon name="far fa-copy" color="accent" />
+              <q-icon name="content_copy" color="accent" />
             </q-item-section>
           </q-item>
         </q-list>
@@ -149,7 +149,7 @@ function copyLink(val) {
       Notify.create({
         message: 'URL copied to clipboard',
         color: 'accent',
-        icon: 'far fa-clipboard',
+        icon: 'content_paste',
         timeout: 1000
       })
     })
@@ -160,7 +160,7 @@ function copyLink(val) {
       Notify.create({
         message: 'URL copied to clipboard',
         color: 'accent',
-        icon: 'far fa-clipboard',
+        icon: 'content_paste',
         timeout: 1000
       })
     })

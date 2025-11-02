@@ -90,7 +90,7 @@ watch(darkMode, newVal => {
 
 watch(
   () => props.loggedIn,
-  (loggedIn) => {
+  loggedIn => {
     if (loggedIn) {
       nextTick(() => {
         initCommentBox(darkMode.value)

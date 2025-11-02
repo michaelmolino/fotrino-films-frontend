@@ -3,18 +3,14 @@
     <div class="row no-wrap">
       <q-btn
         flat
-        icon="far fa-copyright"
+        icon="info"
         :label="$q.screen.gt.xs ? year + ' Michael Molino' : year"
         :ripple="false"
         class="no-pointer-events" />
       <q-space />
+      <q-btn flat icon="description" :label="$q.screen.gt.xs ? 'Terms/Privacy' : ''" to="/terms" />
       <q-btn
-        flat
-        icon="fas fa-file-contract"
-        :label="$q.screen.gt.xs ? 'Terms/Privacy' : ''"
-        to="/terms" />
-      <q-btn
-        icon="fas fa-circle-question"
+        icon="help_outline"
         :label="$q.screen.gt.sm ? 'Help' : ''"
         flat
         no-caps
@@ -22,7 +18,7 @@
         to="/help" />
       <q-btn
         flat
-        icon="fab fa-github"
+        :icon="`img:${githubIcon}`"
         :label="$q.screen.gt.xs ? 'GitHub' : ''"
         href="https://github.com/michaelmolino/fotrino-films-frontend"
         target="_blank" />
@@ -31,5 +27,6 @@
 </template>
 
 <script setup>
+import githubIcon from '@assets/icons/github.svg'
 const year = new Date().getFullYear()
 </script>

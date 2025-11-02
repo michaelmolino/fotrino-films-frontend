@@ -26,7 +26,7 @@
             unelevated
             rounded
             size="md"
-            icon="far fa-circle-play"
+            icon="play_circle"
             label="Explore Sample Channel"
             to="/9944fa03-8a73-4e52-84bc-e8a514bd1271/Sample-Channel" />
         </div>

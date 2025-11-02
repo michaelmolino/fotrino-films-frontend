@@ -16,7 +16,7 @@
         :link="getMediaLink('channel', channel.id)"
         :avatarSize="'48px'"
         :badge="channel.is_admin"
-        badgeIcon="fas fa-user-shield"
+        badgeIcon="security"
         :subtitle="channel.created ? `Created: ${daysSince(channel.created, true)}` : ''"
         @delete="$emit('deleteChannel', channel.uuid)" />
     </template>
