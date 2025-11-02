@@ -6,7 +6,7 @@
       <div class="text-h5 q-mb-md">Page Not Found</div>
       <q-btn
         class="q-py-md q-mt-md"
-        icon="fas fa-house"
+        icon="home"
         label="Home"
         color="primary"
         unelevated

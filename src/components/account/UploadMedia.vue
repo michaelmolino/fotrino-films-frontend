@@ -19,7 +19,7 @@
       <q-step
         :name="1"
         :title="step > 1 ? media.title : 'Media'"
-        icon="fas fa-file-video"
+        icon="movie"
         :done="step > 1"
         :header-nav="false">
         <MediaStep
@@ -40,7 +40,7 @@
       <q-step
         :name="2"
         :title="step > 2 ? payload.title : 'Channel'"
-        icon="fas fa-video"
+        icon="video_library"
         :done="step > 2"
         :header-nav="step === 1 && !!next">
         <ChannelStep
@@ -59,7 +59,7 @@
       <q-step
         :name="3"
         :title="step > 3 ? project.title : 'Project'"
-        icon="fas fa-film"
+        icon="theaters"
         :done="step > 3"
         :header-nav="step === 2 && !!next">
         <ProjectStep
@@ -76,8 +76,8 @@
       <q-step
         :name="4"
         title="Upload"
-        icon="fas fa-cloud-arrow-up"
-        active-icon="fas fa-cloud-arrow-up"
+        icon="cloud_upload"
+        active-icon="cloud_upload"
         :done="step > 4"
         :header-nav="step === 3 && !!next">
         <div class="text-center">
@@ -114,8 +114,8 @@
       <q-step
         :name="5"
         title="Processing"
-        icon="fa fa-gears"
-        active-icon="fa fa-gears"
+        icon="settings"
+        active-icon="settings"
         :header-nav="step === 4 && !!next">
         <div class="text-center">
           <div class="q-mb-md">
@@ -127,7 +127,7 @@
               class="processing-preview" />
           </div>
           <div class="processing-status">
-            <q-icon name="fa fa-gears" size="24px" color="accent" class="q-mr-sm rotating-gears" />
+            <q-icon name="settings" size="24px" color="accent" class="q-mr-sm rotating-gears" />
             <span class="text-h6">Processing...</span>
           </div>
           <div class="q-pa-md text-body2">
@@ -143,28 +143,28 @@
           <!-- Back button for steps 2 and 3 -->
           <q-btn
             v-if="step === 2 || step === 3"
-            icon="fas fa-arrow-left"
+            icon="arrow_back"
             flat
             label="Back"
             @click="goBack" />
 
           <q-btn
             v-if="step === 1 && quickUploadAvailable"
-            icon="fas fa-bolt"
+            icon="bolt"
             flat
             label="Quick Upload"
             @click="quickUpload"
             :disabled="!next" />
           <q-btn
             v-if="step < 3"
-            icon="fas fa-arrow-right"
+            icon="arrow_forward"
             flat
             @click="goNext"
             :label="step === 1 && quickUploadAvailable ? 'More Options' : 'Next'"
             :disabled="!next" />
           <q-btn
             v-if="step === 3"
-            icon="fas fa-cloud-arrow-up"
+            icon="cloud_upload"
             flat
             label="Upload"
             :disabled="!next"
@@ -614,7 +614,7 @@ watch([() => mediaFile.value, () => counter.value], async ([mf]) => {
       type: 'negative',
       timeout: 0,
       message: 'Error extracting frames from video.',
-      icon: 'fas fa-triangle-exclamation'
+      icon: 'warning'
     })
   } finally {
     extractingFrame.value = false

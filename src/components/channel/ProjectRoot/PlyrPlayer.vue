@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="plyr-wrapper">
     <div v-if="view == 'video'">
       <video id="video-player" controls :key="media.id" class="videoEl"></video>
     </div>
@@ -14,6 +14,7 @@
 import { computed, onMounted, onBeforeUnmount, watch, ref, nextTick } from 'vue'
 import { useStore } from 'vuex'
 import Hls from 'hls.js'
+import { addPreconnectForUrl, addPreloadImageOnce } from '@utils/preconnect'
 
 const props = defineProps({
   media: Object,
@@ -24,6 +25,7 @@ const store = useStore()
 const player = ref(null)
 const hls = ref(null)
 let playHandler = null
+let PlyrCtor = null
 
 const view = computed(() => (props.media?.type?.startsWith('audio/') ? 'audio' : 'video'))
 
@@ -54,8 +56,10 @@ function destroyPlayers() {
 async function setSource() {
   const el = document.getElementById(view.value === 'video' ? 'video-player' : 'audio-player')
   if (!el || !props.media) return
-  const PlyrCtor = globalThis.Plyr
-  if (!PlyrCtor) return
+  if (!PlyrCtor) {
+    const mod = await import('plyr')
+    PlyrCtor = mod.default
+  }
   player.value = new PlyrCtor(el, {
     settings: [],
     controls: [
@@ -81,6 +85,12 @@ async function setSource() {
     const video = el.tagName.toLowerCase() === 'video' ? el : document.querySelector('video')
     const source = props.media.src
     const queryParams = token ? `token=${token}` : null
+
+    // Preload poster (LCP candidate) with high priority
+    if (props.media.preview) addPreloadImageOnce(props.media.preview, 'high')
+
+    // Preconnect to HLS segment origin
+    addPreconnectForUrl(source)
 
     if (Hls.isSupported()) {
       let currentQueryParams = queryParams
@@ -130,6 +140,7 @@ async function setSource() {
       audio.src = props.media.src + `?token=${token}`
       audio.type = props.media.type
     }
+    addPreconnectForUrl(props.media.src)
   }
 }
 
@@ -178,7 +189,12 @@ watch(view, async () => {
 :root {
   --plyr-color-main: #8d6a9f;
 }
+.plyr-wrapper {
+  position: relative;
+  width: 100%;
+}
 .videoEl {
+  display: block;
   width: 100%;
   aspect-ratio: 16 / 9;
 }

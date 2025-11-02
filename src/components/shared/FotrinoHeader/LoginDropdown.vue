@@ -1,6 +1,6 @@
 <template>
   <q-btn-dropdown
-    icon="fas fa-user"
+    icon="account_circle"
     :label="$q.screen.gt.sm ? 'Sign Up/Login' : ''"
     flat
     no-caps
@@ -27,6 +27,12 @@ import { ref, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useQuasar } from 'quasar'
 import { storeRedirect } from '@utils/auth.js'
+import googleIcon from '@assets/icons/google.svg'
+import microsoftIcon from '@assets/icons/microsoft.svg'
+import facebookIcon from '@assets/icons/facebook.svg'
+import githubIcon from '@assets/icons/github.svg'
+import appleIcon from '@assets/icons/apple.svg'
+import yahooIcon from '@assets/icons/yahoo.svg'
 
 const $q = useQuasar()
 const store = useStore()
@@ -38,26 +44,34 @@ onMounted(async () => {
   const providerMap = {
     google: {
       name: 'Google',
-      icon: 'fab fa-google',
+      icon: `img:${googleIcon}`,
       login: process.env.API + '/account/login/google'
     },
     microsoft: {
       name: 'Microsoft',
-      icon: 'fab fa-microsoft',
+      icon: `img:${microsoftIcon}`,
       login: process.env.API + '/account/login/microsoft'
     },
-    apple: { name: 'Apple', icon: 'fab fa-apple', login: process.env.API + '/account/login/apple' },
+    apple: {
+      name: 'Apple',
+      icon: `img:${appleIcon}`,
+      login: process.env.API + '/account/login/apple'
+    },
     facebook: {
       name: 'Facebook',
-      icon: 'fab fa-facebook',
+      icon: `img:${facebookIcon}`,
       login: process.env.API + '/account/login/facebook'
     },
     github: {
       name: 'Github',
-      icon: 'fab fa-github',
+      icon: `img:${githubIcon}`,
       login: process.env.API + '/account/login/github'
     },
-    yahoo: { name: 'Yahoo', icon: 'fab fa-yahoo', login: process.env.API + '/account/login/yahoo' }
+    yahoo: {
+      name: 'Yahoo',
+      icon: `img:${yahooIcon}`,
+      login: process.env.API + '/account/login/yahoo'
+    }
   }
   oauthProviders.value = providers.map(p => providerMap[p]).filter(Boolean)
 })

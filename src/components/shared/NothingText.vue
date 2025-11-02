@@ -10,7 +10,7 @@
 
 <script setup>
 defineProps({
-  icon: { type: String, default: 'fas fa-circle-info' },
+  icon: { type: String, default: 'info' },
   text: { type: String, default: 'Nothing to see here.' }
 })
 </script>

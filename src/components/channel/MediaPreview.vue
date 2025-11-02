@@ -13,7 +13,14 @@
       transparent>
       <span class="text-bold">Audio</span>
     </q-badge>
-    <q-img v-if="media.preview" :src="media.preview" :ratio="16 / 9" fit="cover">
+    <q-img
+      v-if="media.preview"
+      :src="media.preview"
+      :ratio="16 / 9"
+      fit="cover"
+      loading="lazy"
+      decoding="async"
+      @load="onPreviewLoad">
       <div class="absolute-bottom text-center">
         <div class="ellipsis">
           <span>{{ media.title }}</span
@@ -42,12 +49,18 @@
 </template>
 
 <script setup>
+import { addPreconnectForUrl } from '@utils/preconnect'
+
 const { media, project, detail, showMainAccent } = defineProps({
   media: Object,
   project: Object,
   detail: Boolean,
   showMainAccent: { type: Boolean, default: true }
 })
+
+function onPreviewLoad() {
+  if (media?.preview) addPreconnectForUrl(media.preview)
+}
 </script>
 
 <style scoped>

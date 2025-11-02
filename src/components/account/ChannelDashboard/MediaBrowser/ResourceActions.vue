@@ -19,7 +19,7 @@
             flat
             dense
             size="sm"
-            icon="fas fa-link"
+            icon="link"
             color="primary"
             class="q-ml-xs"
             :to="link"
@@ -43,7 +43,7 @@
             flat
             dense
             size="sm"
-            icon="fas fa-clock"
+            icon="schedule"
             color="grey-6"
             class="q-ml-xs cursor-not-allowed">
             <q-tooltip>Pending</q-tooltip>
@@ -117,7 +117,7 @@ function showEditNotification() {
   Notify.create({
     type: 'info',
     message: 'Edit functionality is not yet implemented.',
-    icon: 'fas fa-info-circle',
+    icon: 'info',
     position: 'bottom',
     timeout: 3000
   })

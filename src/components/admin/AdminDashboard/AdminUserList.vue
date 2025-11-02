@@ -18,7 +18,11 @@
           <q-item-section avatar>
             <div class="relative-position">
               <q-avatar size="48px" :class="{ 'deleted-user': user.deleted }">
-                <img :src="user.profile_pic" :alt="`${user.name}'s avatar`" />
+                <img
+                  :src="user.profile_pic"
+                  :alt="`${user.name}'s avatar`"
+                  loading="lazy"
+                  decoding="async" />
               </q-avatar>
               <q-badge
                 v-if="user.is_admin"
@@ -26,7 +30,7 @@
                 color="accent"
                 text-color="white"
                 class="admin-badge">
-                <q-icon name="fas fa-user-shield" size="12px" />
+                <q-icon name="security" size="12px" />
               </q-badge>
               <q-badge
                 v-if="user.deleted"
@@ -34,7 +38,7 @@
                 color="negative"
                 text-color="white"
                 class="deleted-badge">
-                <q-icon name="fas fa-trash" size="12px" />
+                <q-icon name="delete" size="12px" />
               </q-badge>
             </div>
           </q-item-section>
@@ -49,7 +53,7 @@
               </span>
               <q-btn
                 v-if="!user.deleted"
-                icon="fas fa-trash"
+                icon="delete"
                 flat
                 dense
                 round
@@ -60,7 +64,7 @@
                 :title="`Delete ${user.name}`" />
               <q-btn
                 v-else
-                icon="fas fa-trash"
+                icon="delete"
                 flat
                 dense
                 round
@@ -108,13 +112,15 @@
                 <q-avatar size="32px">
                   <img
                     :src="channel.cover || '/images/channel.png'"
-                    :alt="`${channel.title} cover`" />
+                    :alt="`${channel.title} cover`"
+                    loading="lazy"
+                    decoding="async" />
                 </q-avatar>
               </q-item-section>
               <q-item-section side>
                 <q-btn
                   :to="`/${channel.uuid}/${channel.slug}`"
-                  icon="fas fa-link"
+                  icon="link"
                   flat
                   dense
                   size="sm"
@@ -144,17 +150,23 @@ import { computed, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
 import { daysSince } from '@utils/date.js'
 import { getCountry } from '@utils/countries.js'
+import googleIcon from '@assets/icons/google.svg'
+import microsoftIcon from '@assets/icons/microsoft.svg'
+import facebookIcon from '@assets/icons/facebook.svg'
+import githubIcon from '@assets/icons/github.svg'
+import appleIcon from '@assets/icons/apple.svg'
+import yahooIcon from '@assets/icons/yahoo.svg'
 
 const store = useStore()
 const loading = ref(true)
 const users = computed(() => store.state.admin.users || [])
 const providerIcons = {
-  google: 'fab fa-google',
-  microsoft: 'fab fa-microsoft',
-  facebook: 'fab fa-facebook',
-  github: 'fab fa-github',
-  apple: 'fab fa-apple',
-  yahoo: 'fab fa-yahoo'
+  google: `img:${googleIcon}`,
+  microsoft: `img:${microsoftIcon}`,
+  facebook: `img:${facebookIcon}`,
+  github: `img:${githubIcon}`,
+  apple: `img:${appleIcon}`,
+  yahoo: `img:${yahooIcon}`,
 }
 
 const deleteUser = async user => {

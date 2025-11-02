@@ -35,6 +35,12 @@
 import { computed } from 'vue'
 import { daysSince } from '@utils/date.js'
 import { getCountry } from '@utils/countries.js'
+import googleIcon from '@assets/icons/google.svg'
+import microsoftIcon from '@assets/icons/microsoft.svg'
+import facebookIcon from '@assets/icons/facebook.svg'
+import githubIcon from '@assets/icons/github.svg'
+import appleIcon from '@assets/icons/apple.svg'
+import yahooIcon from '@assets/icons/yahoo.svg'
 
 const props = defineProps({
   profile: { type: Object, default: null },
@@ -42,7 +48,18 @@ const props = defineProps({
 })
 
 const profilePic = computed(() => props.profile?.profile_pic || undefined)
-const providerIcon = computed(() => `fab fa-${props.profile?.identity_provider}`)
+const providerIcon = computed(() => {
+  const p = (props.profile?.identity_provider || '').toLowerCase()
+  const map = {
+    google: `img:${googleIcon}`,
+    microsoft: `img:${microsoftIcon}`,
+    facebook: `img:${facebookIcon}`,
+    github: `img:${githubIcon}`,
+    apple: `img:${appleIcon}`,
+    yahoo: `img:${yahooIcon}`,
+  }
+  return map[p] || 'account_circle'
+})
 const joinedText = computed(() => {
   const created = props.profile?.created
   return created ? daysSince(created) : 'unknown'

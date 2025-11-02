@@ -79,7 +79,7 @@
                 v-if="payload.project.media.previewType === 'frame' && mediaFile"
                 :disable="previewProcessing"
                 :loading="previewProcessing"
-                icon="fas fa-arrows-rotate"
+                icon="autorenew"
                 flat
                 size="xl"
                 @click="emitCounterIncrement">

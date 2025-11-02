@@ -3,13 +3,13 @@
     <q-item>
       <q-item-section side v-if="$q.screen.gt.xs">
         <q-avatar>
-          <img :src="channel.cover" :alt="channel.title" />
+          <img :src="channel.cover" :alt="channel.title" loading="lazy" decoding="async" />
         </q-avatar>
       </q-item-section>
       <q-item-section>
         <q-breadcrumbs>
           <template #separator>
-            <q-icon size="1.5em" name="fas fa-chevron-right" color="primary" />
+            <q-icon size="1.5em" name="chevron_right" color="primary" />
           </template>
           <q-breadcrumbs-el
             v-for="location in breadcrumbs"
