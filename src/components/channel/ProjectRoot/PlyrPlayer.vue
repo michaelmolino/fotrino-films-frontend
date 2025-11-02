@@ -6,6 +6,7 @@
         controls
         :key="media.id"
         :poster="webpUrl || media.preview"
+        preload="metadata"
         class="videoEl"></video>
     </div>
     <div v-else class="audio-container">
@@ -14,6 +15,7 @@
         <img
           :src="media.preview"
           :alt="media.title"
+          fetchpriority="high"
           class="audio-img" />
       </picture>
       <audio id="audio-player" controls :key="media.id" class="audioEl"></audio>
@@ -182,6 +184,11 @@ async function rebuild() {
 }
 
 onMounted(() => {
+  // Preload LCP image immediately before any async operations
+  const posterUrl = webpUrl.value || props.media?.preview
+  if (posterUrl && view.value === 'video') {
+    addPreloadImageOnce(posterUrl, 'high')
+  }
   rebuild()
 })
 

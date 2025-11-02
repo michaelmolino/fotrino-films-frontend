@@ -19,7 +19,8 @@
         <img
           :src="media.preview"
           :alt="media.title"
-          loading="lazy"
+          :loading="priority === 'high' ? 'eager' : 'lazy'"
+          :fetchpriority="priority"
           decoding="async"
           @load="onPreviewLoad"
           @error="imageError = true"
@@ -51,11 +52,12 @@ import { computed, ref } from 'vue'
 import { addPreconnectForUrl } from '@utils/preconnect'
 import { useWebP } from '@composables/useWebP'
 
-const { media, project, detail, showMainAccent } = defineProps({
+const { media, project, detail, showMainAccent, priority } = defineProps({
   media: Object,
   project: Object,
   detail: Boolean,
-  showMainAccent: { type: Boolean, default: true }
+  showMainAccent: { type: Boolean, default: true },
+  priority: { type: String, default: 'auto' } // 'high', 'low', or 'auto'
 })
 
 const { getWebPUrl } = useWebP()

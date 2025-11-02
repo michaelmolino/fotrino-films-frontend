@@ -35,14 +35,15 @@
           <q-separator spaced />
           <div class="row">
             <div
-              v-for="related in relatedMedia"
+              v-for="(related, index) in relatedMedia"
               :key="related.id"
               class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm">
               <MediaPreview
                 :channel="channel"
                 :project="project"
                 :media="related"
-                :to="`/${channel.uuid}/${channel.slug}/${project.slug}/${related.slug}`" />
+                :to="`/${channel.uuid}/${channel.slug}/${project.slug}/${related.slug}`"
+                :priority="index === 0 ? 'high' : 'auto'" />
             </div>
           </div>
         </template>

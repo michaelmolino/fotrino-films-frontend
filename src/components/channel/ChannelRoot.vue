@@ -42,7 +42,7 @@
           <div class="row q-pt-md">
             <div
               class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm text-center"
-              v-for="item in sortedMedia"
+              v-for="(item, index) in sortedMedia"
               :key="item.media.id">
               <MediaPreview
                 :channel="channel"
@@ -50,7 +50,8 @@
                 :media="item.media"
                 :to="`/${channel.uuid}/${channel.slug}/${item.project.slug}/${item.media.slug}`"
                 :detail="true"
-                :showMainAccent="selectedView !== 'main'" />
+                :showMainAccent="selectedView !== 'main'"
+                :priority="index === 0 ? 'high' : 'auto'" />
             </div>
             <NothingText v-if="sortedMedia.length === 0" text="No content available." />
           </div>
