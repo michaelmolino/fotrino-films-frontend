@@ -3,7 +3,9 @@
     <a href="#main-content" class="skip-to-content">Skip to main content</a>
     <FotrinoHeader />
     <main id="main-content">
+      <q-page-container>
       <router-view />
+      </q-page-container>
     </main>
     <FotrinoFooter />
   </q-layout>
