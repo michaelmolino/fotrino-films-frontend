@@ -25,11 +25,12 @@
         aria-label="Help and documentation" />
       <q-btn
         flat
-        :icon="`img:${githubIcon}`"
-        :label="$q.screen.gt.xs ? 'GitHub' : ''"
         href="https://github.com/michaelmolino/fotrino-films-frontend"
         target="_blank"
-        aria-label="View source code on GitHub" />
+        aria-label="View source code on GitHub">
+        <q-icon :name="`img:${githubIcon}`" class="github-icon--white q-mr-sm" aria-hidden="true" />
+        <span v-if="$q.screen.gt.xs">GitHub</span>
+      </q-btn>
     </div>
   </q-footer>
 </template>
@@ -38,3 +39,11 @@
 import githubIcon from '@assets/icons/github.svg'
 const year = new Date().getFullYear()
 </script>
+
+<style scoped>
+:deep(.github-icon--white) {
+  width: 20px;
+  height: 20px;
+  filter: invert(1) brightness(1.6);
+}
+</style>

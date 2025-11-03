@@ -6,7 +6,7 @@
         <q-avatar size="80px" class="profile-avatar">
           <img :src="profilePic" :alt="safeName || safeEmail" />
           <q-badge class="bg-accent" floating>
-            <q-icon :name="providerIcon" />
+            <q-icon :name="providerIcon" class="oauth-icon--white"/>
           </q-badge>
         </q-avatar>
         <div class="profile-info">
@@ -94,5 +94,8 @@ const safeEmail = computed(() => props.profile?.email || '')
   display: flex;
   align-items: center;
   gap: 8px;
+}
+:deep(.oauth-icon--white) {
+  filter: invert(1) brightness(1.2);
 }
 </style>

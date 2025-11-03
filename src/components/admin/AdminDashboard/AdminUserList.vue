@@ -82,7 +82,7 @@
                   :name="providerIcons[provider.provider]"
                   size="16px"
                   :title="provider.provider"
-                  class="text-primary q-ml-xs" />
+                  :class="$q.dark.isActive ? 'oauth-icon--white q-ml-xs' : 'q-ml-xs'" />
               </span>
               <span>{{ user.email }}</span>
             </q-item-label>
@@ -209,5 +209,8 @@ onMounted(async () => {
   .channel-item {
     margin-left: 0.5rem;
   }
+}
+:deep(.oauth-icon--white) {
+  filter: invert(1) brightness(1.2);
 }
 </style>

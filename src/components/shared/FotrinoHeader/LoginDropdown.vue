@@ -13,12 +13,13 @@
           align="left"
           flat
           no-caps
-          :icon="provider.icon"
-          :label="provider.name"
           :aria-label="`Sign in with ${provider.name}`"
           size="md"
           class="col-xs-12"
-          @click="storeRedirect" />
+          @click="storeRedirect"
+        >
+          <q-icon :name="provider.icon" :class="$q.dark.isActive ? 'oauth-icon--white q-mr-md' : 'q-mr-md'" /> {{  provider.name }}
+        </q-btn>
       </div>
     </template>
   </q-btn-dropdown>
@@ -78,3 +79,9 @@ onMounted(async () => {
   oauthProviders.value = providers.map(p => providerMap[p]).filter(Boolean)
 })
 </script>
+
+<style scoped>
+:deep(.oauth-icon--white) {
+  filter: invert(1) brightness(1.2);
+}
+</style>
