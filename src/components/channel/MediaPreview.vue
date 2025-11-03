@@ -15,33 +15,35 @@
       transparent>
       <span class="text-bold">Audio</span>
     </q-badge>
-    <div v-if="media.preview" class="media-preview-wrapper">
-      <picture class="media-preview-img">
-        <source v-if="webpUrl" :srcset="webpUrl" type="image/webp" />
-        <img
-          :src="media.preview"
-          :alt="media.title"
-          :loading="priority === 'high' ? 'eager' : 'lazy'"
-          :fetchpriority="priority"
-          decoding="async"
-          @load="onPreviewLoad"
-          @error="imageError = true"
-          class="media-img" />
-      </picture>
-      <div v-if="imageError" class="image-error">
-        <div class="error-content">
-          <q-spinner-gears color="accent" size="xl" />
-        </div>
-      </div>
-      <div class="absolute-bottom text-center media-title">
+     <q-img
+      v-if="media.preview"
+      :src="webpUrl ? webpUrl : media.preview"
+      :alt="media.title"
+      :ratio="16 / 9"
+      fit="cover"
+      :loading="priority === 'high' ? 'eager' : 'lazy'"
+      decoding="async"
+      @load="onPreviewLoad">
+      <div class="absolute-bottom text-center">
         <div class="ellipsis">
           <span>{{ media.title }}</span
-          ><span v-if="detail && media.title !== project?.title"
-            ><br />{{ project?.title }}</span
-          >
+          ><span v-if="detail && media.title !== project?.title"><br />{{ project?.title }}</span>
         </div>
       </div>
-    </div>
+      <template v-slot:error>
+        <div class="absolute-full bg-black text-center text-h6">
+          <div class="absolute-center">
+            <q-spinner-gears color="accent" size="xl" />
+          </div>
+        </div>
+        <div class="absolute-bottom text-center">
+          <div class="ellipsis">
+            <span>{{ media.title }}</span
+            ><span v-if="detail && media.title !== project?.title"><br />{{ project?.title }}</span>
+          </div>
+        </div>
+      </template>
+    </q-img>
     <q-skeleton
       v-if="!media.preview"
       class="cursor-not-allowed preview-skeleton"
@@ -87,18 +89,6 @@ function onPreviewLoad() {
 .preview-skeleton {
   width: 250px;
   height: 141px;
-}
-.media-preview-wrapper {
-  width: 100%;
-  position: relative;
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-  background-color: #000;
-}
-.media-preview-img {
-  display: block;
-  width: 100%;
-  height: 100%;
 }
 .media-img {
   width: 100%;
