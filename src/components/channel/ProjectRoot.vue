@@ -56,8 +56,6 @@
 import { computed, watch, defineAsyncComponent, toRef, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute, useRouter } from 'vue-router'
-import { useMeta } from 'quasar'
-import { useWebP } from '@composables/useWebP'
 
 import BreadCrumbs from '@components/shared/BreadCrumbs.vue'
 import MediaPreview from '@components/channel/MediaPreview.vue'
@@ -69,7 +67,6 @@ const NothingText = defineAsyncComponent(() => import('@components/shared/Nothin
 const store = useStore()
 const route = useRoute()
 const router = useRouter()
-const { getWebPUrl } = useWebP()
 
 const profile = computed(() => store.state.account?.profile)
 const channel = toRef(store.state.channel, 'channel')
@@ -126,29 +123,6 @@ const relatedMedia = computed(() => {
   return (project.value?.media || []).filter(m => m.id !== media.value?.id)
 })
 const hasRelatedContent = computed(() => !!route.params.uuid && relatedMedia.value.length > 0)
-
-// Preload video poster for LCP optimization
-const posterUrl = computed(() => {
-  const preview = media.value?.preview
-  if (!preview || !media.value?.type?.startsWith('video/')) return null
-  return getWebPUrl(preview) || preview
-})
-
-useMeta(() => {
-  if (posterUrl.value) {
-    return {
-      link: {
-        videoPoster: {
-          rel: 'preload',
-          as: 'image',
-          href: posterUrl.value,
-          fetchpriority: 'high'
-        }
-      }
-    }
-  }
-  return {}
-})
 
 watch(
   [channel, () => route.params.uuid],

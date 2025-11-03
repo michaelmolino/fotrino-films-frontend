@@ -5,5 +5,6 @@
     flat
     no-caps
     size="lg"
-    to="/" />
+    to="/"
+    aria-label="Fotrino Films home" />
 </template>

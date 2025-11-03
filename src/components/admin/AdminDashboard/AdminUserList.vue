@@ -125,7 +125,8 @@
                   dense
                   size="sm"
                   color="primary"
-                  :title="`Visit ${channel.title}`" />
+                  :title="`Visit ${channel.title}`"
+                  :aria-label="`Visit ${channel.title}`" />
               </q-item-section>
               <q-item-section>
                 <q-item-label>{{ channel.title }}</q-item-label>

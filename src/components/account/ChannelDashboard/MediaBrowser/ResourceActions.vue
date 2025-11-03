@@ -23,7 +23,8 @@
             color="primary"
             class="q-ml-xs"
             :to="link"
-            :title="`Visit ${title}`">
+            :title="`Visit ${title}`"
+            :aria-label="`Visit ${title}`">
             <q-tooltip>Visit</q-tooltip>
           </q-btn>
           <q-btn

@@ -11,8 +11,7 @@
     <q-badge
       v-if="media.type?.startsWith('audio/')"
       class="bg-accent q-pa-md z-top"
-      floating
-      transparent>
+      floating>
       <span class="text-bold">Audio</span>
     </q-badge>
      <q-img

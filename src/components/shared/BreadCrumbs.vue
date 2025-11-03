@@ -1,15 +1,13 @@
 <template>
-  <span>
-    <q-item>
-      <q-item-section side v-if="$q.screen.gt.xs">
-        <q-avatar>
-          <img :src="channel.cover" :alt="channel.title" loading="lazy" decoding="async" />
-        </q-avatar>
-      </q-item-section>
-      <q-item-section>
-        <q-breadcrumbs>
+  <nav class="breadcrumb-nav">
+    <div class="row items-center q-gutter-md q-pa-md">
+      <q-avatar v-if="$q.screen.gt.xs">
+        <img :src="channel.cover" :alt="channel.title" loading="lazy" decoding="async" />
+      </q-avatar>
+      <div class="col">
+        <q-breadcrumbs :active-color="$q.dark.isActive ? 'info' : 'primary'">
           <template #separator>
-            <q-icon size="1.5em" name="chevron_right" color="primary" />
+            <q-icon size="1.5em" name="chevron_right" :color="$q.dark.isActive ? 'info' : 'primary'" />
           </template>
           <q-breadcrumbs-el
             v-for="location in breadcrumbs"
@@ -18,10 +16,10 @@
             :label="location.label"
             :to="location.to" />
         </q-breadcrumbs>
-        <q-item-label caption>By {{ channel.ownername }}</q-item-label>
-      </q-item-section>
-    </q-item>
-  </span>
+        <div class="text-caption">By {{ channel.ownername }}</div>
+      </div>
+    </div>
+  </nav>
 </template>
 
 <script setup>

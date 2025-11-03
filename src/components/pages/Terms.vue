@@ -36,8 +36,9 @@
             and used solely for debugging and system improvement.
           </div>
         </li>
-        <div v-for="provider in oAuthProviders" :key="provider">
-          <div class="text-primary q-my-md">
+        <q-separator />
+        <li v-for="provider in oAuthProviders" :key="provider" class="q-mb-lg">
+          <div class="text-h6 text-primary q-mb-xs">
             Information Received from {{ provider.toUpperCase() }} Login
           </div>
           <div>
@@ -47,7 +48,7 @@
             and communication purposes, and is subject to the same data deletion and privacy rights
             described in this policy.
           </div>
-        </div>
+        </li>
         <q-separator />
         <li class="q-mb-lg">
           <div class="text-h6 text-primary q-mb-xs">Content Ownership & Responsibility</div>
@@ -112,7 +113,9 @@
               dense
               :icon="'img:' + '/images/commentbox-32x32.png'"
               label="commentbox.io"
-              href="https://commentbox.io/" />
+              href="https://commentbox.io/"
+              aria-label="Visit CommentBox website"
+              target="_blank" />
             ) comment system. We share your name, email address, and profile photo with CommentBox
             to enable commenting functionality. Please review CommentBox’s own privacy policy for
             details on how they handle your information.

@@ -24,7 +24,8 @@
             icon="link"
             flat
             dense
-            size="sm" />
+            size="sm"
+            :aria-label="`View reported media: ${props.row.title}`" />
         </q-td>
       </template>
       <template #body-cell-created_at="props">

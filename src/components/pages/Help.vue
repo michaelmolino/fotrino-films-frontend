@@ -147,7 +147,9 @@
                 dense
                 :icon="`img:${facebookIcon}`"
                 label="Facebook Link Debugger"
-                href="https://developers.facebook.com/tools/debug/" />
+                href="https://developers.facebook.com/tools/debug/"
+                aria-label="Open Facebook Link Debugger tool"
+                target="_blank" />
               to check and manage how your link appears on Facebook. This tool lets you confirm the
               preview image and other metadata before sharing your link.
             </q-card-section>
