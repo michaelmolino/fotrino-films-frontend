@@ -5,7 +5,6 @@
         id="video-player"
         controls
         :key="media.id"
-        :poster="webpUrl || media.preview"
         :aria-label="`Video player for ${media.title}`"
         preload="metadata"
         fetchpriority="high"
@@ -13,9 +12,8 @@
     </div>
     <div v-else class="audio-container">
       <picture v-if="media.preview" class="audio-preview">
-        <source v-if="webpUrl" :srcset="webpUrl" type="image/webp" />
         <img
-          :src="media.preview"
+          :src="mediaPreviewUrl"
           :alt="`${media.title} cover art`"
           fetchpriority="high"
           class="audio-img" />
@@ -50,8 +48,18 @@ let playHandler = null
 let PlyrCtor = null
 const { checkWebPVersion } = useWebP()
 const webpUrl = ref(null)
-
 const view = computed(() => (props.media?.type?.startsWith('audio/') ? 'audio' : 'video'))
+const mediaPreviewUrl = computed(() => webpUrl.value || props.media?.preview || null)
+
+async function refreshWebp() {
+  webpUrl.value = null
+  if (props.media?.preview) {
+      const url = await checkWebPVersion(props.media.preview)
+      if (url && url !== props.media.preview && url.endsWith('.webp')) {
+        webpUrl.value = url
+      }
+  }
+}
 
 async function fetchMediaToken() {
   if (!props.media?.private_id) return null
@@ -77,9 +85,12 @@ function destroyPlayers() {
   }
 }
 
-async function setSource() {
+async function setupPlayer(token) {
   const el = document.getElementById(view.value === 'video' ? 'video-player' : 'audio-player')
   if (!el || !props.media) return
+  if (view.value === 'video') {
+    el.setAttribute('poster', mediaPreviewUrl.value)
+  }
   if (!PlyrCtor) {
     const mod = await import('plyr')
     PlyrCtor = mod.default
@@ -102,42 +113,26 @@ async function setSource() {
     ]
   })
 
-  // Fetch JWT token for secure media access
-  const token = await fetchMediaToken()
-
   if (view.value === 'video') {
     const video = el.tagName.toLowerCase() === 'video' ? el : document.querySelector('video')
-    const source = props.media.src
-    const queryParams = token ? `token=${token}` : null
-
-    // Preload poster (LCP candidate) with high priority
-    const posterUrl = webpUrl.value || props.media.preview
-    if (posterUrl) addPreloadImageOnce(posterUrl, 'high')
-
-    // Preconnect to HLS segment origin
-    addPreconnectForUrl(source)
+    let source = props.media.src
 
     if (Hls.isSupported()) {
-      let currentQueryParams = queryParams
       hls.value = new Hls({
         xhrSetup: function (xhr, url) {
-          // Append query parameters to all segment and playlist requests
-          if (currentQueryParams) {
-            xhr.open('GET', url + '?' + currentQueryParams, true)
-          }
+          xhr.open('GET', url + `?token=${token}`, true)
         }
       })
       hls.value.loadSource(source)
       hls.value.attachMedia(video)
       globalThis.hls = hls.value
 
-      // Intercept 403 errors and retry with a fresh token
       hls.value.on(Hls.Events.ERROR, async function (event, data) {
         if (data.response && data.response.code === 403) {
           const newToken = await fetchMediaToken()
           if (newToken) {
-            currentQueryParams = `token=${newToken}`
             const currentTime = video.currentTime
+            source = props.media.src + `?token=${newToken}`
             hls.value.loadSource(source)
             hls.value.attachMedia(video)
             const restorePlayback = () => {
@@ -150,22 +145,20 @@ async function setSource() {
             video.addEventListener('loadedmetadata', restorePlayback)
             hls.value.once(Hls.Events.MANIFEST_PARSED, restorePlayback)
           } else {
-            player.value && player.value.destroy()
-            globalThis.alert('Unable to refresh video token. Please try again later.')
+            player.value?.destroy()
+            console.error('Unable to refresh video token. Please try again later.')
           }
         }
       })
-    } else if (video) {
-      video.src = queryParams ? source + '?' + queryParams : source
+    } else {
+      console.error('HLS is not supported in this browser.')
     }
-    // Note: poster is already set on the video element via template binding
   } else {
     const audio = el.tagName.toLowerCase() === 'audio' ? el : document.querySelector('audio')
     if (audio) {
       audio.src = props.media.src + `?token=${token}`
       audio.type = props.media.type
     }
-    addPreconnectForUrl(props.media.src)
   }
 }
 
@@ -177,34 +170,25 @@ function attachMediaSessionHandler() {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: props.media.title,
       artist: props.artist,
-      artwork: [{ src: webpUrl.value || props.media.preview, type: 'image/jpeg' }]
+      artwork: [{ src: mediaPreviewUrl.value || '', type: 'image/jpeg' }]
     })
   }
   el.addEventListener('play', playHandler, { once: true })
 }
 
 async function rebuild() {
+  console.log('Rebuilding PlyrPlayer for media ID:', props.media?.id)
+  addPreconnectForUrl(props.media?.src)
+  addPreloadImageOnce(mediaPreviewUrl.value, 'high')
   destroyPlayers()
   await nextTick()
-  setSource()
+  const token = await fetchMediaToken()
+  setupPlayer(token)
   attachMediaSessionHandler()
 }
 
 onMounted(async () => {
-  // Check for WebP version first
-  if (props.media?.preview) {
-    const url = await checkWebPVersion(props.media.preview)
-    // Only set webpUrl if it's different from the original (meaning WebP exists)
-    if (url !== props.media.preview && url.endsWith('.webp')) {
-      webpUrl.value = url
-    }
-  }
-  
-  // Preload LCP image immediately
-  const posterUrl = webpUrl.value || props.media?.preview
-  if (posterUrl && view.value === 'video') {
-    addPreloadImageOnce(posterUrl, 'high')
-  }
+  await refreshWebp()
   rebuild()
 })
 
@@ -215,13 +199,10 @@ onBeforeUnmount(() => {
 watch(
   () => props.media?.id,
   async () => {
+    await refreshWebp()
     await rebuild()
   }
 )
-
-watch(view, async () => {
-  await rebuild()
-})
 </script>
 
 <style>
