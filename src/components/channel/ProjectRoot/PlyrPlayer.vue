@@ -119,6 +119,8 @@ async function setupPlayer(token) {
 
     if (Hls.isSupported()) {
       hls.value = new Hls({
+        autoStartLoad: false,
+        capLevelToPlayerSize: false,
         xhrSetup: function (xhr, url) {
           xhr.open('GET', url + `?token=${token}`, true)
         }
@@ -126,6 +128,13 @@ async function setupPlayer(token) {
       hls.value.loadSource(source)
       hls.value.attachMedia(video)
       globalThis.hls = hls.value
+
+      // Force initial playback at the highest available quality
+      hls.value.on(Hls.Events.MANIFEST_PARSED, function () {
+        const top = (hls.value.levels?.length || 1) - 1
+        hls.value.startLevel = top
+        hls.value.startLoad(-1)
+      })
 
       hls.value.on(Hls.Events.ERROR, async function (event, data) {
         if (data.response && data.response.code === 403) {
