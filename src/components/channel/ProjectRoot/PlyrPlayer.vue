@@ -118,38 +118,60 @@ async function setupPlayer(token) {
     let source = props.media.src
 
     if (Hls.isSupported()) {
+      let currentToken = token || null
+      let retrying = false
+      let retries = 0
+      const MAX_RETRIES = 2
+
       hls.value = new Hls({
         capLevelToPlayerSize: false,
         abrEwmaDefaultEstimate: 3000000,
         xhrSetup: function (xhr, url) {
-          xhr.open('GET', url + `?token=${token}`, true)
+          const hasQuery = url.indexOf('?') !== -1
+          const sep = hasQuery ? '&' : '?'
+          const tokenPart = currentToken ? `${sep}token=${encodeURIComponent(currentToken)}` : ''
+          xhr.open('GET', url + tokenPart, true)
         }
       })
       hls.value.loadSource(source)
       hls.value.attachMedia(video)
       globalThis.hls = hls.value
 
-      hls.value.on(Hls.Events.ERROR, async function (event, data) {
-        if (data.response && data.response.code === 403) {
-          const newToken = await fetchMediaToken()
-          if (newToken) {
-            const currentTime = video.currentTime
-            source = props.media.src + `?token=${newToken}`
-            hls.value.loadSource(source)
-            hls.value.attachMedia(video)
-            const restorePlayback = () => {
-              if (Math.abs(video.currentTime - currentTime) > 0.5 && currentTime > 0) {
-                video.currentTime = currentTime
-              }
-              video.play()
-              video.removeEventListener('loadedmetadata', restorePlayback)
-            }
-            video.addEventListener('loadedmetadata', restorePlayback)
-            hls.value.once(Hls.Events.MANIFEST_PARSED, restorePlayback)
-          } else {
-            player.value?.destroy()
-            console.error('Unable to refresh video token. Please try again later.')
+      hls.value.on(Hls.Events.ERROR, async function (_event, data) {
+        if (data?.response?.code !== 403) return
+        if (retrying || retries >= MAX_RETRIES) {
+          try { player.value?.destroy() } catch { /* no-op */ }
+          console.error('Media token refresh failed after retries.')
+          return
+        }
+        retrying = true
+        retries += 1
+        const newToken = await fetchMediaToken()
+        if (!newToken) {
+          try { player.value?.destroy() } catch { /* no-op */ }
+          console.error('Unable to refresh video token. Please try again later.')
+          retrying = false
+          return
+        }
+        currentToken = newToken
+        const currentTime = video.currentTime
+        // Reload original source; xhrSetup will append the updated token for all requests
+        hls.value.loadSource(props.media.src)
+        hls.value.attachMedia(video)
+        const restorePlayback = () => {
+          if (Math.abs(video.currentTime - currentTime) > 0.5 && currentTime > 0) {
+            video.currentTime = currentTime
           }
+          video.play().catch(() => {})
+          video.removeEventListener('loadedmetadata', restorePlayback)
+          retrying = false
+        }
+        video.addEventListener('loadedmetadata', restorePlayback)
+        if (typeof hls.value.once === 'function') {
+          hls.value.once(Hls.Events.MANIFEST_PARSED, restorePlayback)
+        } else {
+          const handler = () => { restorePlayback(); hls.value.off?.(Hls.Events.MANIFEST_PARSED, handler) }
+          hls.value.on(Hls.Events.MANIFEST_PARSED, handler)
         }
       })
     } else {
