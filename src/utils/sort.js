@@ -1,34 +1,41 @@
-// Universal sortBy utility for arrays of objects
+function asValidDate(val) {
+  const d = new Date(val)
+  return Number.isNaN(d.getTime()) ? null : d
+}
+
 export function sortBy(items, field, direction = 'desc') {
-  return [...(items || [])].sort((a, b) => {
-    const aValue = a[field]
-    const bValue = b[field]
+  const dir = direction === 'desc' ? -1 : 1
 
-    // Handle null/undefined values
-    if (!aValue && !bValue) return 0
-    if (!aValue) return direction === 'desc' ? 1 : -1
-    if (!bValue) return direction === 'desc' ? -1 : 1
+  function compareNulls(aVal, bVal) {
+    const aIsNull = aVal == null
+    const bIsNull = bVal == null
+    if (aIsNull && bIsNull) return 0
+    if (aIsNull) return dir === -1 ? 1 : -1
+    if (bIsNull) return dir === -1 ? -1 : 1
+    return null // no nulls involved
+  }
 
-    // Check if values are dates by trying to parse them
-    const aDate = new Date(aValue)
-    const bDate = new Date(bValue)
-    const aIsValidDate = !Number.isNaN(aDate.getTime())
-    const bIsValidDate = !Number.isNaN(bDate.getTime())
-
-    // Sort dates
-    if (aIsValidDate && bIsValidDate) {
-      return direction === 'desc' ? bDate - aDate : aDate - bDate
+  function compareValues(aVal, bVal) {
+    // Dates
+    const aDate = asValidDate(aVal)
+    const bDate = asValidDate(bVal)
+    if (aDate && bDate) {
+      return dir * (aDate - bDate)
     }
+    // Primitives (number/string/boolean)
+    if (aVal > bVal) return dir * 1
+    if (aVal < bVal) return dir * -1
+    return 0
+  }
 
-    // Sort strings/numbers
-    if (direction === 'desc') {
-      if (bValue > aValue) return 1
-      if (bValue < aValue) return -1
-      return 0
-    } else {
-      if (aValue > bValue) return 1
-      if (aValue < bValue) return -1
-      return 0
-    }
+  const list = Array.isArray(items) ? [...items] : []
+  return list.sort((a, b) => {
+    const aValue = a?.[field]
+    const bValue = b?.[field]
+
+    const nullCmp = compareNulls(aValue, bValue)
+    if (nullCmp !== null) return nullCmp
+
+    return compareValues(aValue, bValue)
   })
 }
