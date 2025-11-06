@@ -127,7 +127,7 @@ async function setupPlayer(token) {
         capLevelToPlayerSize: false,
         abrEwmaDefaultEstimate: 3000000,
         xhrSetup: function (xhr, url) {
-          const hasQuery = url.indexOf('?') !== -1
+          const hasQuery = url.includes('?')
           const sep = hasQuery ? '&' : '?'
           const tokenPart = currentToken ? `${sep}token=${encodeURIComponent(currentToken)}` : ''
           xhr.open('GET', url + tokenPart, true)

@@ -4,7 +4,7 @@
       <q-btn
         flat
         icon="info"
-        :label="$q.screen.gt.xs ? year + ' Michael Molino' : year"
+        :label="$q.screen.gt.sm ? year + ' Michael Molino' : year"
         :ripple="false"
         class="no-pointer-events"
         aria-label="Copyright information" />
@@ -17,7 +17,7 @@
         aria-label="Terms and Privacy Policy" />
       <q-btn
         icon="help_outline"
-        :label="$q.screen.gt.sm ? 'Help' : ''"
+        :label="$q.screen.gt.xs ? 'Help' : ''"
         flat
         no-caps
         size="md"
