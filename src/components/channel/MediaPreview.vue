@@ -15,8 +15,8 @@
       <span class="text-bold">Audio</span>
     </q-badge>
      <q-img
-      v-if="media.preview"
-      :src="webpUrl ? webpUrl : media.preview"
+      v-if="media.preview && ready"
+      :src="finalUrl"
       :alt="media.title"
       :ratio="16 / 9"
       fit="cover"
@@ -44,6 +44,10 @@
       </template>
     </q-img>
     <q-skeleton
+      v-if="media.preview && !ready"
+      class="cursor-not-allowed preview-skeleton"
+      animation="wave" />
+    <q-skeleton
       v-if="!media.preview"
       class="cursor-not-allowed preview-skeleton"
       animation="none" />
@@ -65,22 +69,19 @@ const { media, project, detail, showMainAccent, priority, to } = defineProps({
 })
 
 const { checkWebPVersion } = useWebP()
-const webpUrl = ref(null)
-const imageError = ref(false)
+const finalUrl = ref(null)
+const ready = ref(false)
 
 onMounted(async () => {
-  if (media?.preview) {
-    const url = await checkWebPVersion(media.preview)
-    // Only set webpUrl if it's different from the original (meaning WebP exists)
-    if (url !== media.preview && url.endsWith('.webp')) {
-      webpUrl.value = url
-    }
-  }
+  if (!media?.preview) return
+  // Resolve the final URL (WebP if supported & exists, else original) BEFORE rendering to avoid double fetch
+  const resolved = await checkWebPVersion(media.preview)
+  finalUrl.value = resolved || media.preview
+  ready.value = true
 })
 
 function onPreviewLoad() {
-  if (media?.preview) addPreconnectForUrl(media.preview)
-  imageError.value = false
+  if (finalUrl.value) addPreconnectForUrl(finalUrl.value)
 }
 </script>
 
