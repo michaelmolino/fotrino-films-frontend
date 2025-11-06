@@ -7,7 +7,6 @@
         :key="media.id"
         :aria-label="`Video player for ${media.title}`"
         preload="metadata"
-        fetchpriority="high"
         class="videoEl"></video>
     </div>
     <div v-else class="audio-container">
@@ -201,7 +200,6 @@ function attachMediaSessionHandler() {
 }
 
 async function rebuild() {
-  console.log('Rebuilding PlyrPlayer for media ID:', props.media?.id)
   addPreconnectForUrl(props.media?.src)
   addPreloadImageOnce(mediaPreviewUrl.value, 'high')
   destroyPlayers()
