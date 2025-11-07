@@ -53,10 +53,10 @@ const mediaPreviewUrl = computed(() => webpUrl.value || props.media?.preview || 
 async function refreshWebp() {
   webpUrl.value = null
   if (props.media?.preview) {
-      const url = await checkWebPVersion(props.media.preview)
-      if (url && url !== props.media.preview && url.endsWith('.webp')) {
-        webpUrl.value = url
-      }
+    const url = await checkWebPVersion(props.media.preview)
+    if (url && url !== props.media.preview && url.endsWith('.webp')) {
+      webpUrl.value = url
+    }
   }
 }
 
@@ -139,7 +139,11 @@ async function setupPlayer(token) {
       hls.value.on(Hls.Events.ERROR, async function (_event, data) {
         if (data?.response?.code !== 403) return
         if (retrying || retries >= MAX_RETRIES) {
-          try { player.value?.destroy() } catch { /* no-op */ }
+          try {
+            player.value?.destroy()
+          } catch {
+            /* no-op */
+          }
           console.error('Media token refresh failed after retries.')
           return
         }
@@ -147,7 +151,11 @@ async function setupPlayer(token) {
         retries += 1
         const newToken = await fetchMediaToken()
         if (!newToken) {
-          try { player.value?.destroy() } catch { /* no-op */ }
+          try {
+            player.value?.destroy()
+          } catch {
+            /* no-op */
+          }
           console.error('Unable to refresh video token. Please try again later.')
           retrying = false
           return
@@ -169,7 +177,10 @@ async function setupPlayer(token) {
         if (typeof hls.value.once === 'function') {
           hls.value.once(Hls.Events.MANIFEST_PARSED, restorePlayback)
         } else {
-          const handler = () => { restorePlayback(); hls.value.off?.(Hls.Events.MANIFEST_PARSED, handler) }
+          const handler = () => {
+            restorePlayback()
+            hls.value.off?.(Hls.Events.MANIFEST_PARSED, handler)
+          }
           hls.value.on(Hls.Events.MANIFEST_PARSED, handler)
         }
       })

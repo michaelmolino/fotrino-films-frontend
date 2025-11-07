@@ -36,7 +36,7 @@
             color="grey-6"
             class="q-ml-xs"
             disable
-            :title="'Resource pending deletion.'">
+            title="Resource pending deletion.">
             <q-tooltip>Resource pending deletion.</q-tooltip>
           </q-btn>
           <q-btn
@@ -66,6 +66,7 @@
             dense
             size="sm"
             icon="delete"
+            :aria-label="'Delete ' + title"
             :color="deleteColor"
             :disable="!canDelete"
             class="q-ml-xs"

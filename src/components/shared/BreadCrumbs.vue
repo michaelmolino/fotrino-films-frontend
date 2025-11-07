@@ -7,7 +7,10 @@
       <div class="col">
         <q-breadcrumbs :active-color="$q.dark.isActive ? 'info' : 'primary'">
           <template #separator>
-            <q-icon size="1.5em" name="chevron_right" :color="$q.dark.isActive ? 'info' : 'primary'" />
+            <q-icon
+              size="1.5em"
+              name="chevron_right"
+              :color="$q.dark.isActive ? 'info' : 'primary'" />
           </template>
           <q-breadcrumbs-el
             v-for="location in breadcrumbs"

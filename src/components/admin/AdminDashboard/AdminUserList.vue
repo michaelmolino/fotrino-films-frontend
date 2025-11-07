@@ -167,7 +167,7 @@ const providerIcons = {
   facebook: `img:${facebookIcon}`,
   github: `img:${githubIcon}`,
   apple: `img:${appleIcon}`,
-  yahoo: `img:${yahooIcon}`,
+  yahoo: `img:${yahooIcon}`
 }
 
 const deleteUser = async user => {

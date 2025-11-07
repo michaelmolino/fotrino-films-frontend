@@ -6,7 +6,7 @@
         <q-avatar size="80px" class="profile-avatar">
           <img :src="profilePic" :alt="safeName || safeEmail" />
           <q-badge class="bg-accent" floating>
-            <q-icon :name="providerIcon" class="oauth-icon--white"/>
+            <q-icon :name="providerIcon" class="oauth-icon--white" />
           </q-badge>
         </q-avatar>
         <div class="profile-info">
@@ -56,7 +56,7 @@ const providerIcon = computed(() => {
     facebook: `img:${facebookIcon}`,
     github: `img:${githubIcon}`,
     apple: `img:${appleIcon}`,
-    yahoo: `img:${yahooIcon}`,
+    yahoo: `img:${yahooIcon}`
   }
   return map[p] || 'account_circle'
 })

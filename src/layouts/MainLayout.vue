@@ -4,7 +4,7 @@
     <FotrinoHeader />
     <main id="main-content">
       <q-page-container>
-      <router-view />
+        <router-view />
       </q-page-container>
     </main>
     <FotrinoFooter />

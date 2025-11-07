@@ -47,17 +47,6 @@
       padding: 0;
     }
 
-    /* Ensure page background reflects Quasar dark mode classes even if core CSS load order changes */
-    body.body--light {
-      background-color: #ffffff;
-      color: #121212;
-    }
-
-    body.body--dark {
-      background-color: #121212;
-      color: #e0e0e0;
-    }
-
     .width250 {
       width: 250px;
     }
@@ -76,6 +65,17 @@
 
     .my-history-dropdown-menu.q-menu[role='menu'] {
       max-width: none !important;
+    }
+
+    /* Ensure page background reflects Quasar dark mode classes even if core CSS load order changes */
+    body.body--light {
+      background-color: #ffffff;
+      color: #121212;
+    }
+
+    body.body--dark {
+      background-color: #121212;
+      color: #e0e0e0;
     }
   </style>
 </head>

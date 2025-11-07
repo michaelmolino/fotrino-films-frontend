@@ -7,13 +7,13 @@ import {
 import routes from './routes'
 
 export default function createRouterInstance() {
-  let createHistory;
+  let createHistory
   if (process.env.SERVER) {
-    createHistory = createMemoryHistory;
+    createHistory = createMemoryHistory
   } else if (process.env.VUE_ROUTER_MODE === 'history') {
-    createHistory = createWebHistory;
+    createHistory = createWebHistory
   } else {
-    createHistory = createWebHashHistory;
+    createHistory = createWebHashHistory
   }
 
   const Router = createRouter({

@@ -21,7 +21,6 @@ export default defineConfig(() => ({
     env: {
       API: process.env.NODE_ENV === 'production' ? 'https://films.fotrino.com/api' : '/api'
     },
-    // Only generate sourcemaps in non-production to reduce payload/processing
     sourcemap: process.env.NODE_ENV !== 'production',
     extendViteConf(viteConf) {
       viteConf.resolve = viteConf.resolve || {}
@@ -42,7 +41,6 @@ export default defineConfig(() => ({
       )
       viteConf.optimizeDeps = viteConf.optimizeDeps || {}
       viteConf.optimizeDeps.include = [...(viteConf.optimizeDeps.include || []), 'commentbox.io']
-      // Generate pre-compressed assets (Brotli + Gzip) for better transfer sizes
       viteConf.plugins = viteConf.plugins || []
       viteConf.plugins.push(
         viteCompression({ algorithm: 'brotliCompress', ext: '.br' }),

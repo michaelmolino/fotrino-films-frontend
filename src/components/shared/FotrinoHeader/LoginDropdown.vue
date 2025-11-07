@@ -16,9 +16,11 @@
           :aria-label="`Sign in with ${provider.name}`"
           size="md"
           class="col-xs-12"
-          @click="storeRedirect"
-        >
-          <q-icon :name="provider.icon" :class="$q.dark.isActive ? 'oauth-icon--white q-mr-md' : 'q-mr-md'" /> {{  provider.name }}
+          @click="storeRedirect">
+          <q-icon
+            :name="provider.icon"
+            :class="$q.dark.isActive ? 'oauth-icon--white q-mr-md' : 'q-mr-md'" />
+          {{ provider.name }}
         </q-btn>
       </div>
     </template>
