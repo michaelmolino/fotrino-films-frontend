@@ -95,7 +95,7 @@ export async function postUpload(context, payload) {
 }
 
 export function confirmUpload(_, media) {
-  return api.put(`/channels/media/${media}`)
+  return api.put(`/channels/media/confirm/${media}`)
 }
 
 export async function reportMedia(_, { privateId, reason }) {
