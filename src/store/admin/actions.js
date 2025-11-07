@@ -70,7 +70,14 @@ export function getReportedMedia(context) {
 }
 
 export async function deleteMedia(context, privateId) {
-  await api.delete(`/admin/media/${privateId}`)
+  try {
+    await api.delete(`/admin/media/${privateId}`)
+  } catch (error) {
+    if (error?.__userCancelled) {
+      return
+    }
+    throw error
+  }
   // Refresh reported media list
   context.commit('SET_REPORTED_MEDIA', [])
   await getReportedMedia(context)

@@ -84,7 +84,10 @@ export default boot(({ app, router, store }) => {
               label: 'Go Back',
               color: 'white',
               handler: () => {
-                reject(new Error('User cancelled delete'))
+                const err = new Error('User cancelled delete')
+                err.__userCancelled = true
+                err.code = 'ERR_CANCELED'
+                reject(err)
               }
             }
           ]
