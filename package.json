@@ -8,7 +8,8 @@
   "scripts": {
     "format": "yarn prettier --write . && yarn eslint --fix 'src/**/*.{js,vue}'",
     "lint": "eslint --ext .js,.vue ./",
-    "test": "echo \"No test specified\" && exit 0"
+    "test": "echo \"No test specified\" && exit 0",
+    "coverage": "COVERAGE=true quasar dev"
   },
   "dependencies": {
     "@quasar/extras": "^1.16.17",
@@ -28,10 +29,12 @@
     "vuex-cache": "^3.4.0"
   },
   "devDependencies": {
+    "@cypress/code-coverage": "^3.14.7",
     "@eslint/js": "^9.38.0",
     "@quasar/app-vite": "^2.4.0",
     "@vue/eslint-config-prettier": "^10.2.0",
     "autoprefixer": "^10.4.21",
+    "babel-plugin-istanbul": "^7.0.1",
     "eslint": "9",
     "eslint-config-prettier": "^10.1.8",
     "eslint-config-standard": "^16.0.2",
@@ -49,6 +52,7 @@
     "vite": "^7.1.12",
     "vite-plugin-checker": "^0.11.0",
     "vite-plugin-compression": "^0.5.1",
+    "vite-plugin-istanbul": "^7.2.0",
     "vue-eslint-parser": "^10.2.0"
   },
   "engines": {

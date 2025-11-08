@@ -3,6 +3,8 @@
 node_modules
 *.tar
 *.sh
+coverage/
+.nyc_output/
 
 # Quasar core related directories
 .quasar

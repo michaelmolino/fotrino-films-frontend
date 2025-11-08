@@ -5,6 +5,8 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from '@quasar/app-vite/wrappers'
 import viteCompression from 'vite-plugin-compression'
+import istanbul from 'vite-plugin-istanbul'
+
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -46,6 +48,16 @@ export default defineConfig(() => ({
         viteCompression({ algorithm: 'brotliCompress', ext: '.br' }),
         viteCompression({ algorithm: 'gzip', ext: '.gz' })
       )
+      if (process.env.COVERAGE === 'true') {
+        viteConf.plugins.push(
+          istanbul({
+            include: ['src/**/*.js', 'src/**/*.vue'],
+            extension: ['.js', '.vue'],
+            cypress: true,
+            requireEnv: false
+          })
+        )
+      }
     }
   },
 
