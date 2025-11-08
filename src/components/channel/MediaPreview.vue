@@ -52,7 +52,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, watch } from 'vue'
 import { addPreconnectForUrl } from '@utils/preconnect'
 import { useWebP } from '@composables/useWebP'
 
@@ -69,13 +69,24 @@ const { checkWebPVersion } = useWebP()
 const finalUrl = ref(null)
 const ready = ref(false)
 
-onMounted(async () => {
-  if (!media?.preview) return
-  // Resolve the final URL (WebP if supported & exists, else original) BEFORE rendering to avoid double fetch
-  const resolved = await checkWebPVersion(media.preview)
-  finalUrl.value = resolved || media.preview
-  ready.value = true
-})
+// Watch media.preview to re-resolve whenever it changes (e.g., thumbnail refresh)
+watch(
+  () => media?.preview,
+  async newPreview => {
+    if (!newPreview) {
+      finalUrl.value = null
+      ready.value = false
+      return
+    }
+    // Reset ready to show skeleton while resolving
+    ready.value = false
+    // Resolve the final URL (WebP if supported & exists, else original)
+    const resolved = await checkWebPVersion(newPreview)
+    finalUrl.value = resolved || newPreview
+    ready.value = true
+  },
+  { immediate: true }
+)
 
 function onPreviewLoad() {
   if (finalUrl.value) addPreconnectForUrl(finalUrl.value)
