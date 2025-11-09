@@ -49,7 +49,7 @@
     "prettier": "3",
     "sass": "^1.93.3",
     "terser": "^5.44.0",
-    "vite": "^7.1.12",
+    "vite": "^7.2.2",
     "vite-plugin-checker": "^0.11.0",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-istanbul": "^7.2.0",
