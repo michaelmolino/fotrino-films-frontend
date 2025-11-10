@@ -143,7 +143,7 @@
     "@babel/types" "^7.28.5"
     debug "^4.3.1"
 
-"@babel/types@^7.27.1", "@babel/types@^7.28.5":
+"@babel/types@^7.0.0", "@babel/types@^7.27.1", "@babel/types@^7.28.5":
   version "7.28.5"
   resolved "https://registry.yarnpkg.com/@babel/types/-/types-7.28.5.tgz#10fc405f60897c35f07e85493c932c7b5ca0592b"
   integrity sha512-qQ5m48eI/MFLQ5PxQj4PFaprjyCTLI37ElWMmNs0K8Lk3dVeOdNpB3ks8jc7yM5CDmVC73eMVk/trk3fgmrUpA==
@@ -806,6 +806,13 @@
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@rtsao/scc/-/scc-1.1.0.tgz#927dd2fae9bc3361403ac2c7a00c32ddce9ad7e8"
   integrity sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==
+
+"@types/babel__generator@7.6.8":
+  version "7.6.8"
+  resolved "https://registry.yarnpkg.com/@types/babel__generator/-/babel__generator-7.6.8.tgz#f836c61f48b1346e7d2b0d93c6dacc5b9535d3ab"
+  integrity sha512-ASsj+tpEDsEiFr1arWrlN6V3mdfjRMZt6LtK/Vp/kreFLnr5QH5+DhvD5nINYZXzwJvXeGq+05iUXcAzVrqWtw==
+  dependencies:
+    "@babel/types" "^7.0.0"
 
 "@types/body-parser@*":
   version "1.19.5"
@@ -5428,13 +5435,14 @@ vite-plugin-compression@^0.5.1:
     debug "^4.3.3"
     fs-extra "^10.0.0"
 
-vite-plugin-istanbul@^7.2.0:
-  version "7.2.0"
-  resolved "https://registry.yarnpkg.com/vite-plugin-istanbul/-/vite-plugin-istanbul-7.2.0.tgz#5b42900665bd47fa1cbf0e43920e6cc8412df2d1"
-  integrity sha512-bZGwPaFBRMSUAhBMlkezr+XRzPidqMhuL28svdVUzy6ltI8aQbkZfGKwHk7sJgVrQ1QCFdg6lFwFApK1SN1xUw==
+vite-plugin-istanbul@^7.2.1:
+  version "7.2.1"
+  resolved "https://registry.yarnpkg.com/vite-plugin-istanbul/-/vite-plugin-istanbul-7.2.1.tgz#0c752a6032b3e2e7c8a20b5f6b47d9a44ef9b67e"
+  integrity sha512-DSPi4ulvYsjnP44sTI5oriNosbM0E6m3uoCxjdxboTtVzxSkFwcDy3/JnSYKebjr+ZToJwVLTms+2CM0rmbbzQ==
   dependencies:
     "@babel/generator" "^7.28.0"
     "@istanbuljs/load-nyc-config" "^1.1.0"
+    "@types/babel__generator" "7.6.8"
     espree "^10.3.0"
     istanbul-lib-instrument "^6.0.3"
     picocolors "^1.1.1"
