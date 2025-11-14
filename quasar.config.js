@@ -65,7 +65,7 @@ export default defineConfig(() => ({
     https: true,
     host: 'fotrino.example.com',
     port: 8080,
-    open: true,
+    open: process.env.COVERAGE !== 'true',
     proxy: {
       '/api': {
         target: 'https://fotrino.example.com:65443/',

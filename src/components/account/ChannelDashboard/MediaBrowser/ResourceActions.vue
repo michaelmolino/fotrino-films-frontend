@@ -46,7 +46,9 @@
             size="sm"
             icon="schedule"
             color="grey-6"
-            class="q-ml-xs cursor-not-allowed">
+            class="q-ml-xs cursor-not-allowed"
+            data-cy="media-pending"
+            :aria-label="'Pending ' + title">
             <q-tooltip>Pending</q-tooltip>
           </q-btn>
           <q-btn
@@ -70,6 +72,7 @@
             :color="deleteColor"
             :disable="!canDelete"
             class="q-ml-xs"
+            data-cy="delete-media"
             @click="$emit('delete')">
             <q-tooltip>Delete</q-tooltip>
           </q-btn>
