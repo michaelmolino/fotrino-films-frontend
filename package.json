@@ -52,7 +52,7 @@
     "vite": "^7.2.2",
     "vite-plugin-checker": "^0.11.0",
     "vite-plugin-compression": "^0.5.1",
-    "vite-plugin-istanbul": "^7.2.0",
+    "vite-plugin-istanbul": "^7.2.1",
     "vue-eslint-parser": "^10.2.0"
   },
   "engines": {
