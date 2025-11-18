@@ -101,7 +101,11 @@ function deleteMedia(privateId) {
 watch(
   () => true,
   () => {
-    fetchReportedMedia()
+    try {
+      fetchReportedMedia()
+    } catch (err) {
+      console.error('Failed to fetch reported media:', err)
+    }
   },
   { immediate: true }
 )

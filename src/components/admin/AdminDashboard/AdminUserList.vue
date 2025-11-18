@@ -178,6 +178,8 @@ onMounted(async () => {
   loading.value = true
   try {
     await store.dispatch('admin/getAllUsers')
+  } catch (err) {
+    console.error('Failed to load users:', err)
   } finally {
     loading.value = false
   }

@@ -71,6 +71,8 @@ onMounted(async () => {
   loading.value = true
   try {
     await store.dispatch('admin/getDLQ')
+  } catch (err) {
+    console.error('Failed to load DLQ:', err)
   } finally {
     loading.value = false
   }

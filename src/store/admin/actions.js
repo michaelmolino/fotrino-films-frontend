@@ -21,6 +21,11 @@ async function fetchAndCommit(context, { url, mutation, extract }) {
     return value
   } catch (error) {
     context.commit(mutation, null)
+    // Handle forbidden (403) gracefully
+    if (error?.response?.status === 403) {
+      return null
+    }
+    // For all other errors, rethrow
     throw error
   }
 }
