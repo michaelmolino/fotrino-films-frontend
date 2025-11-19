@@ -19,7 +19,7 @@
     "commentbox.io": "^2.1.0",
     "dayjs": "^1.11.19",
     "dompurify": "^3.3.0",
-    "hls.js": "^1.6.14",
+    "hls.js": "^1.6.15",
     "i18n-iso-countries": "^7.14.0",
     "plyr": "^3.7.8",
     "quasar": "2.18.6",
