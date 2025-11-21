@@ -1,0 +1,31 @@
+architecture-beta
+
+    service s3(logos:aws-s3)[Object Storage]
+    service cdn(logos:cloudflare-icon)[CDN]
+    service edge(logos:cloudflare-workers-icon)[Edge Functions]
+    service auth(logos:google-icon)[Auth Service]
+
+    group fotrino
+        service web(logos:vue)[Web App] in fotrino
+        service api(logos:python)[Backend API] in fotrino
+        service db(logos:postgresql)[Database] in fotrino
+        service queue(logos:redis)[Job Queue] in fotrino
+        service worker(logos:python)[Workers] in fotrino
+        service cache(logos:redis)[API Cache] in fotrino
+
+    api:B -- T:cache
+    api:R -- L:db
+    api:T -- B:queue
+    web:R -- L:api
+    worker:L -- R:queue
+
+    worker:B -- T:db
+    worker:T -- B:s3
+
+    web:L -- R:edge
+    web:T -- B:s3
+    edge:T -- B:cdn
+    cdn:T -- B:s3
+
+    web:B -- B:auth
+    api:B -- B:auth
