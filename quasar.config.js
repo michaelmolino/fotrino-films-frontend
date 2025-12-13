@@ -69,8 +69,14 @@ export default defineConfig(() => ({
     proxy: {
       '/api': {
         target: 'https://fotrino.example.com:65443/',
-        changeOrigin: false,
-        secure: false
+        changeOrigin: true,
+        secure: false,
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq, req) => {
+            proxyReq.setHeader('X-Forwarded-Host', req.headers.host || req.headers['x-forwarded-host'] || req.headers[':authority'] || '');
+            proxyReq.setHeader('X-Forwarded-Proto', req.headers['x-forwarded-proto'] || (req.socket.encrypted ? 'https' : 'http'));
+          });
+        }
       }
     }
   },
