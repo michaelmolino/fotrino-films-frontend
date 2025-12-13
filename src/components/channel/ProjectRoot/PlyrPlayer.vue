@@ -112,179 +112,172 @@ async function setupPlayer(token) {
     ]
   })
 
-  // Use Plyr API to reset to poster when playback ends so the preview
-  // image is shown instead of a final black frame.
-  if (view.value === 'video' && player.value && typeof player.value.on === 'function') {
-    const _onEnded = () => {
-      try {
-        player.value.stop()
-      } catch (e) {
-        console.error('Error stopping player:', e)
-      }
-    }
-    try {
-      player.value.on('ended', _onEnded)
-    } catch (e) {
-      console.error('Error attaching ended event:', e)
-    }
-
-    const _origDestroy = player.value.destroy?.bind(player.value)
-    if (_origDestroy) {
-      player.value.destroy = function () {
-        try {
-          player.value.off && player.value.off('ended', _onEnded)
-        } catch (e) {
-          console.error('Error detaching ended event:', e)
-        }
-        _origDestroy()
-      }
-    }
-  }
-
   if (view.value === 'video') {
-    const video = el.tagName.toLowerCase() === 'video' ? el : document.querySelector('video')
-    let source = props.media.src
-
-    if (Hls.isSupported()) {
-      let currentToken = token || null
-      let retrying = false
-      let retries = 0
-      let tokenRefreshTimer = null
-      const MAX_RETRIES = 2
-
-      const parseJwt = (t) => {
-        try {
-          const part = t.split('.')[1]
-          const base64 = part.replaceAll('-', '+').replaceAll('_', '/');
-          const json = JSON.parse(decodeURIComponent(escape(globalThis.atob(base64))))
-          return (json && json.exp) ? json.exp * 1000 : null
-        } catch (err) {
-          console.debug('Failed to parse JWT exp', err)
-          return null
-        }
-      }
-
-      // Schedule background token refresh 20s before expiry
-      const scheduleTokenRefresh = (tokenVal) => {
-        try {
-          const expMs = parseJwt(tokenVal)
-          if (!expMs) return
-          const now = Date.now()
-          const msUntil = expMs - now - 20000
-          if (tokenRefreshTimer) {
-            clearTimeout(tokenRefreshTimer)
-            tokenRefreshTimer = null
-          }
-          if (msUntil > 0) {
-            tokenRefreshTimer = setTimeout(async () => {
-              try {
-                const refreshed = await fetchMediaToken()
-                if (refreshed && refreshed !== currentToken) {
-                  currentToken = refreshed
-                  scheduleTokenRefresh(refreshed)
-                }
-              } catch (e) {
-                console.debug('Token refresh failed', e)
-              }
-            }, msUntil)
-          }
-        } catch {
-          /* no-op */
-        }
-      }
-
-      // Obtain token and schedule refresh
-      const obtainTokenAndSchedule = async () => {
-        const t = await fetchMediaToken()
-        if (t) {
-          const changed = t !== currentToken
-          currentToken = t
-          scheduleTokenRefresh(t)
-          return changed
-        }
-        return false
-      }
-
-      hls.value = new Hls({
-        capLevelToPlayerSize: false,
-        abrEwmaDefaultEstimate: 3000000,
-        xhrSetup: function (xhr, url) {
-          // Strip any existing token param and attach current token
-          let cleanUrl = url.replace(/([?&])token=[^&]*(&|$)/, (m, p1, p2) => (p2 ? p1 : ''))
-          cleanUrl = cleanUrl.replace(/[?&]$/, '')
-          const hasQuery = cleanUrl.includes('?')
-          const sep = hasQuery ? '&' : '?'
-          const tokenPart = currentToken ? `${sep}token=${encodeURIComponent(currentToken)}` : ''
-          xhr.open('GET', cleanUrl + tokenPart, true)
-        }
-      })
-
-      // Rewrite fragment URLs to include current token
-      hls.value.on(Hls.Events.FRAG_LOADING, function (_event, data) {
-        try {
-          const frag = data?.frag
-          if (!frag) return
-          const rewriteUrl = (u) => {
-            if (!u) return u
-            let clean = u.replace(/([?&])token=[^&]*(&|$)/, (m, p1, p2) => (p2 ? p1 : ''))
-            clean = clean.replace(/[?&]$/, '')
-            const sep = clean.includes('?') ? '&' : '?'
-            return clean + (currentToken ? `${sep}token=${encodeURIComponent(currentToken)}` : '')
-          }
-          if (Array.isArray(frag.url)) {
-            frag.url = frag.url.map(rewriteUrl)
-          } else if (typeof frag.url === 'string') {
-            frag.url = rewriteUrl(frag.url)
-          }
-        } catch (e) {
-          console.debug('Failed to rewrite frag URL', e)
-        }
-      })
-
-      // Schedule initial token refresh
-      await obtainTokenAndSchedule()
-      hls.value.loadSource(source)
-      hls.value.attachMedia(video)
-      globalThis.hls = hls.value
-
-      // Handle 403 errors by refreshing token in background
-      hls.value.on(Hls.Events.ERROR, async function (_event, data) {
-        console.debug('HLS ERROR', data, { retrying, retries, currentToken })
-        if (data?.response?.code !== 403) return
-        if (retrying || retries >= MAX_RETRIES) {
-          console.error('Media token refresh failed after retries.')
-          try {
-            player.value?.destroy()
-          } catch (err) {
-            console.error('Error destroying player after token refresh failure:', err)
-          }
-          return
-        }
-
-        // Try background refresh; FRAG_LOADING will use updated token for subsequent frags
-        retrying = true
-        retries += 1
-        const changed = await obtainTokenAndSchedule()
-        if (!changed && retries < MAX_RETRIES) {
-          // Token unchanged; wait briefly and let next frag error trigger another attempt
-          await new Promise((r) => setTimeout(r, 300 * retries))
-          retrying = false
-          return
-        }
-
-        // Token refreshed; continue playback using new token in FRAG_LOADING
-        retrying = false
-      })
-    } else {
-      console.error('HLS is not supported in this browser.')
-    }
+    await setupVideoPlayer(el, token)
   } else {
-    const audio = el.tagName.toLowerCase() === 'audio' ? el : document.querySelector('audio')
-    if (audio) {
-      audio.src = props.media.src + `?token=${token}`
-      audio.type = props.media.type
+    setupAudioPlayer(el, token)
+  }
+  setupPlyrEndedHandler()
+}
+
+function setupPlyrEndedHandler() {
+  if (view.value !== 'video' || !player.value || typeof player.value.on !== 'function') return
+  const _onEnded = () => {
+    try {
+      player.value.stop()
+    } catch (e) {
+      console.error('Error stopping player:', e)
     }
   }
+  try {
+    player.value.on('ended', _onEnded)
+  } catch (e) {
+    console.error('Error attaching ended event:', e)
+  }
+
+  const _origDestroy = player.value.destroy?.bind(player.value)
+  if (_origDestroy) {
+    player.value.destroy = function () {
+      try {
+        player.value.off && player.value.off('ended', _onEnded)
+      } catch (e) {
+        console.error('Error detaching ended event:', e)
+      }
+      _origDestroy()
+    }
+  }
+}
+
+function setupAudioPlayer(el, token) {
+  const audio = el.tagName.toLowerCase() === 'audio' ? el : document.querySelector('audio')
+  if (audio) {
+    audio.src = props.media.src + `?token=${token}`
+    audio.type = props.media.type
+  }
+}
+
+async function setupVideoPlayer(el, token) {
+  const video = el.tagName.toLowerCase() === 'video' ? el : document.querySelector('video')
+  let source = props.media.src
+  if (!Hls.isSupported()) {
+    console.error('HLS is not supported in this browser.')
+    return
+  }
+  let currentToken = token || null
+  let retrying = false
+  let retries = 0
+  let tokenRefreshTimer = null
+  const MAX_RETRIES = 2
+
+  function getExpFromJwt(t) {
+    try {
+      const part = t.split('.')[1]
+      const base64 = part.replaceAll('-', '+').replaceAll('_', '/')
+      const json = JSON.parse(decodeURIComponent(escape(globalThis.atob(base64))))
+      return (json && json.exp) ? json.exp * 1000 : null
+    } catch (err) {
+      console.debug('Failed to parse JWT exp', err)
+      return null
+    }
+  }
+
+  function scheduleTokenRefresh(tokenVal) {
+    try {
+      const expMs = getExpFromJwt(tokenVal)
+      if (!expMs) return
+      const now = Date.now()
+      const msUntil = expMs - now - 20000
+      if (tokenRefreshTimer) {
+        clearTimeout(tokenRefreshTimer)
+        tokenRefreshTimer = null
+      }
+      if (msUntil > 0) {
+        tokenRefreshTimer = setTimeout(async () => {
+          try {
+            const refreshed = await fetchMediaToken()
+            if (refreshed && refreshed !== currentToken) {
+              currentToken = refreshed
+              scheduleTokenRefresh(refreshed)
+            }
+          } catch (e) {
+            console.debug('Token refresh failed', e)
+          }
+        }, msUntil)
+      }
+    } catch {
+      /* no-op */
+    }
+  }
+
+  async function obtainTokenAndSchedule() {
+    const t = await fetchMediaToken()
+    if (t) {
+      const changed = t !== currentToken
+      currentToken = t
+      scheduleTokenRefresh(t)
+      return changed
+    }
+    return false
+  }
+
+  function rewriteUrlWithNewToken(u) {
+    if (!u) return u
+    const [base, query] = u.split('?')
+    const params = new URLSearchParams(query)
+    params.delete('token')
+    if (currentToken) params.set('token', currentToken)
+    return `${base}?${params.toString()}`
+  }
+
+  hls.value = new Hls({
+    capLevelToPlayerSize: false,
+    abrEwmaDefaultEstimate: 3000000,
+    xhrSetup: function (xhr, url) {
+      xhr.open('GET', rewriteUrlWithNewToken(url), true)
+    }
+  })
+
+  hls.value.on(Hls.Events.FRAG_LOADING, function (_event, data) {
+    try {
+      const frag = data?.frag
+      if (!frag) return
+      if (Array.isArray(frag.url)) {
+        frag.url = frag.url.map(rewriteUrlWithNewToken)
+      } else if (typeof frag.url === 'string') {
+        frag.url = rewriteUrlWithNewToken(frag.url)
+      }
+    } catch (e) {
+      console.debug('Failed to rewrite frag URL', e)
+    }
+  })
+
+  await obtainTokenAndSchedule()
+  hls.value.loadSource(source)
+  hls.value.attachMedia(video)
+  globalThis.hls = hls.value
+
+  hls.value.on(Hls.Events.ERROR, async function (_event, data) {
+    console.debug('HLS ERROR', data, { retrying, retries, currentToken })
+    if (data?.response?.code !== 403) return
+    if (retrying || retries >= MAX_RETRIES) {
+      console.error('Media token refresh failed after retries.')
+      try {
+        player.value?.destroy()
+      } catch (err) {
+        console.error('Error destroying player after token refresh failure:', err)
+      }
+      return
+    }
+    retrying = true
+    retries += 1
+    const changed = await obtainTokenAndSchedule()
+    if (!changed && retries < MAX_RETRIES) {
+      await new Promise((r) => setTimeout(r, 300 * retries))
+      retrying = false
+      return
+    }
+    retrying = false
+  })
 }
 
 function attachMediaSessionHandler() {
