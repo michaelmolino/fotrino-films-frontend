@@ -112,6 +112,35 @@ async function setupPlayer(token) {
     ]
   })
 
+  // Use Plyr API to reset to poster when playback ends so the preview
+  // image is shown instead of a final black frame.
+  if (view.value === 'video' && player.value && typeof player.value.on === 'function') {
+    const _onEnded = () => {
+      try {
+        player.value.stop()
+      } catch (e) {
+        console.error('Error stopping player:', e)
+      }
+    }
+    try {
+      player.value.on('ended', _onEnded)
+    } catch (e) {
+      console.error('Error attaching ended event:', e)
+    }
+
+    const _origDestroy = player.value.destroy?.bind(player.value)
+    if (_origDestroy) {
+      player.value.destroy = function () {
+        try {
+          player.value.off && player.value.off('ended', _onEnded)
+        } catch (e) {
+          console.error('Error detaching ended event:', e)
+        }
+        _origDestroy()
+      }
+    }
+  }
+
   if (view.value === 'video') {
     const video = el.tagName.toLowerCase() === 'video' ? el : document.querySelector('video')
     let source = props.media.src
@@ -141,8 +170,8 @@ async function setupPlayer(token) {
         if (retrying || retries >= MAX_RETRIES) {
           try {
             player.value?.destroy()
-          } catch {
-            /* no-op */
+          } catch (e) {
+            console.error('Error destroying player after token refresh failure:', e)
           }
           console.error('Media token refresh failed after retries.')
           return
@@ -153,8 +182,8 @@ async function setupPlayer(token) {
         if (!newToken) {
           try {
             player.value?.destroy()
-          } catch {
-            /* no-op */
+          } catch (e) {
+            console.error('Error destroying player after unable to refresh token:', e)
           }
           console.error('Unable to refresh video token. Please try again later.')
           retrying = false
