@@ -2,14 +2,13 @@
   <div class="q-pa-md flex flex-center">
     <q-card flat bordered class="q-pa-xl card-terms">
       <div class="text-h4 text-center q-mb-md">Privacy Policy & Terms of Use</div>
-      <div class="text-caption text-center q-mb-lg">Last updated: <i>2025-10-11</i></div>
+      <div class="text-caption text-center q-mb-lg">Last updated: <i>2025-12-14</i></div>
       <ol class="q-pl-md">
         <li class="q-mb-lg">
           <div class="text-h6 text-primary q-mb-xs">Introduction</div>
           <div class="q-mb-md">
-            Fotrino Films is currently under active development and is not ready for public use. The
-            database, all accounts, and any associated content (including images and videos) are
-            regularly deleted. You should have no expectation that this site is fit for any purpose.
+            Fotrino Films is currently under active development and is not ready for public use. Your 
+            account and any associated content (including images and videos) may be deleted at any time.
           </div>
           <div class="q-mb-md">
             We respect your privacy and are committed to protecting any personal information we
