@@ -4,6 +4,7 @@
       <video
         id="video-player"
         controls
+        x-webkit-airplay="allow"
         :key="media.id"
         :aria-label="`Video player for ${media.title}`"
         preload="metadata"
