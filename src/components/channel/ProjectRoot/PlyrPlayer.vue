@@ -109,7 +109,6 @@ async function setupPlayer(token) {
       'duration',
       'mute',
       'volume',
-      'airplay',
       'fullscreen'
     ]
   })
