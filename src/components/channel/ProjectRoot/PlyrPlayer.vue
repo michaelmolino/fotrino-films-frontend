@@ -97,6 +97,7 @@ async function setupPlayer(token) {
   }
   player.value = new PlyrCtor(el, {
     settings: [],
+    fullscreen: { iosNative: true },
     controls: [
       'play-large',
       'restart',
