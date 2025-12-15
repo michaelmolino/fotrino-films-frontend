@@ -85,7 +85,7 @@ function destroyPlayers() {
   }
 }
 
-async function setupPlayer(token) {
+async function setupPlayer() {
   const el = document.getElementById(view.value === 'video' ? 'video-player' : 'audio-player')
   if (!el || !props.media) return
   if (view.value === 'video') {
@@ -114,9 +114,9 @@ async function setupPlayer(token) {
   })
 
   if (view.value === 'video') {
-    await setupVideoPlayer(el, token)
+    await setupVideoPlayer(el)
   } else {
-    setupAudioPlayer(el, token)
+    setupAudioPlayer(el)
   }
   setupPlyrEndedHandler()
 }
@@ -149,22 +149,23 @@ function setupPlyrEndedHandler() {
   }
 }
 
-function setupAudioPlayer(el, token) {
+async function setupAudioPlayer(el) {
   const audio = el.tagName.toLowerCase() === 'audio' ? el : document.querySelector('audio')
   if (audio) {
-    audio.src = props.media.src + `?token=${token}`
+    const audioToken = await fetchMediaToken()
+    audio.src = props.media.src + `?token=${audioToken}`
     audio.type = props.media.type
   }
 }
 
-async function setupVideoPlayer(el, token) {
+async function setupVideoPlayer(el) {
   const video = el.tagName.toLowerCase() === 'video' ? el : document.querySelector('video')
   let source = props.media.src
   if (!Hls.isSupported()) {
     console.error('HLS is not supported in this browser.')
     return
   }
-  let currentToken = token || null
+  let currentToken = null
   let retrying = false
   let retries = 0
   let tokenRefreshTimer = null
@@ -300,8 +301,7 @@ async function rebuild() {
   addPreloadImageOnce(mediaPreviewUrl.value, 'high')
   destroyPlayers()
   await nextTick()
-  const token = await fetchMediaToken()
-  setupPlayer(token)
+  setupPlayer()
   attachMediaSessionHandler()
 }
 
