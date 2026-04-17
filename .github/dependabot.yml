@@ -9,3 +9,19 @@ updates:
     directory: '/' # Location of package manifests
     schedule:
       interval: 'daily'
+
+    rebase-strategy: "auto"
+
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+    labels:
+      - "dependencies"
+      - "auto-merge"
+
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
