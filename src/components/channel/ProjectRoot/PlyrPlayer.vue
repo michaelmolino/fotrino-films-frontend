@@ -161,15 +161,16 @@ async function setupAudioPlayer(el) {
 async function setupVideoPlayer(el) {
   const video = el.tagName.toLowerCase() === 'video' ? el : document.querySelector('video')
   let source = props.media.src
-  if (!Hls.isSupported()) {
-    console.error('HLS is not supported in this browser.')
-    return
-  }
   let currentToken = null
   let retrying = false
   let retries = 0
   let tokenRefreshTimer = null
   const MAX_RETRIES = 2
+  const nativeHlsMimeTypes = ['application/vnd.apple.mpegurl', 'application/x-mpegURL']
+
+  function supportsNativeHls() {
+    return nativeHlsMimeTypes.some((mimeType) => video.canPlayType(mimeType))
+  }
 
   function getExpFromJwt(t) {
     try {
@@ -229,6 +230,22 @@ async function setupVideoPlayer(el) {
     params.delete('token')
     if (currentToken) params.set('token', currentToken)
     return `${base}?${params.toString()}`
+  }
+
+  async function setupNativeHlsPlayer() {
+    await obtainTokenAndSchedule()
+    video.src = rewriteUrlWithNewToken(source)
+    video.load()
+  }
+
+  if (supportsNativeHls()) {
+    await setupNativeHlsPlayer()
+    return
+  }
+
+  if (!Hls.isSupported()) {
+    console.error('HLS is not supported in this browser.')
+    return
   }
 
   hls.value = new Hls({
