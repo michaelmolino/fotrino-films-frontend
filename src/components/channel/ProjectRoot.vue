@@ -23,11 +23,6 @@
           class="q-py-md plyrplayer" />
         <div v-if="media" class="plyrplayer">
           <MediaDescription :media="media" />
-          <CommentsBox
-            v-if="media?.comments_enabled"
-            :loggedIn="!!profile?.id"
-            :privateId="media?.private_id"
-            class="q-my-md" />
         </div>
 
         <template v-if="hasRelatedContent">
@@ -61,14 +56,12 @@ import BreadCrumbs from '@components/shared/BreadCrumbs.vue'
 import MediaPreview from '@components/channel/MediaPreview.vue'
 import PlyrPlayer from '@components/channel/ProjectRoot/PlyrPlayer.vue'
 import MediaDescription from '@components/channel/ProjectRoot/MediaDescription.vue'
-import CommentsBox from '@components/channel/ProjectRoot/CommentsBox.vue'
 const NothingText = defineAsyncComponent(() => import('@components/shared/NothingText.vue'))
 
 const store = useStore()
 const route = useRoute()
 const router = useRouter()
 
-const profile = computed(() => store.state.account?.profile)
 const channel = toRef(store.state.channel, 'channel')
 const loading = ref(true)
 

@@ -108,12 +108,6 @@ export default boot(({ app, router, store }) => {
       hideLoader()
 
       const status = error?.response?.status
-      const url = error?.response?.config?.url
-
-      // Special case: allow SSO (commentbox) to handle 401 itself
-      if (status === 401 && url?.endsWith('/sso/commentbox')) {
-        return Promise.resolve(error.response)
-      }
 
       if (status === 404) {
         router.replace('/404')

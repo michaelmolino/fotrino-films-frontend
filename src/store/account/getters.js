@@ -5,7 +5,3 @@ export function profile(state) {
 export function providers(state) {
   return state.providers
 }
-
-export function commentbox(state) {
-  return state.commentbox
-}

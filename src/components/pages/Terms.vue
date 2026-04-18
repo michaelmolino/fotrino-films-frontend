@@ -105,20 +105,6 @@
             or assume responsibility for their privacy practices, terms, or content. We encourage
             users to review the privacy policies of any third-party services they interact with.
           </div>
-          <div class="q-mb-md">
-            We also integrate with the CommentBox (
-            <q-btn
-              flat
-              dense
-              :icon="'img:' + '/images/commentbox-32x32.png'"
-              label="commentbox.io"
-              href="https://commentbox.io/"
-              aria-label="Visit CommentBox website"
-              target="_blank" />
-            ) comment system. We share your name, email address, and profile photo with CommentBox
-            to enable commenting functionality. Please review CommentBox’s own privacy policy for
-            details on how they handle your information.
-          </div>
         </li>
         <q-separator />
         <li class="q-mb-lg">
@@ -131,8 +117,7 @@
             <li>When required by law enforcement or legal obligations</li>
             <li>To prevent fraud, abuse, or security threats</li>
             <li>
-              When enabling third-party services you opt into (such as CommentBox, as described
-              above)
+              When enabling third-party services you opt into
             </li>
             <li>
               In the event of a merger, acquisition, or business transfer, in which case users will

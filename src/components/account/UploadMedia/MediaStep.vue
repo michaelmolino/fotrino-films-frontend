@@ -111,13 +111,6 @@
           </q-btn>
           <br />
           <q-checkbox outlined v-model="localMain" label="Featured" class="q-pr-lg q-pl-sm" />
-          <br />
-          <q-checkbox
-            class="q-pl-sm"
-            outlined
-            :model-value="localCommentsEnabled"
-            label="Enable comments"
-            @update:model-value="onToggleComments" />
         </q-card-section>
       </q-card>
     </div>
@@ -165,49 +158,6 @@ const localMain = computed({
       project: { ...props.payload.project, media: { ...props.payload.project.media, main: v } }
     })
 })
-
-const localCommentsEnabled = computed(() => !!props.payload.project.media.commentsEnabled)
-
-function onToggleComments(nextVal) {
-  // If turning off, apply immediately
-  if (!nextVal) {
-    emit('update:payload', {
-      ...props.payload,
-      project: {
-        ...props.payload.project,
-        media: { ...props.payload.project.media, commentsEnabled: false }
-      }
-    })
-    return
-  }
-
-  // Confirm before enabling
-  $q.dialog({
-    title: 'Enable comments',
-    message: 'Warning: Enabling comments may make your media more discoverable.',
-    cancel: true,
-    ok: 'OK'
-  })
-    .onOk(() => {
-      emit('update:payload', {
-        ...props.payload,
-        project: {
-          ...props.payload.project,
-          media: { ...props.payload.project.media, commentsEnabled: true }
-        }
-      })
-    })
-    .onCancel(() => {
-      // leave unchecked
-      emit('update:payload', {
-        ...props.payload,
-        project: {
-          ...props.payload.project,
-          media: { ...props.payload.project.media, commentsEnabled: false }
-        }
-      })
-    })
-}
 
 function onUpdateMediaTitle(val) {
   emit('update:payload', {

@@ -37,12 +37,7 @@ export default defineConfig(() => ({
         '@assets': path.resolve(__dirname, 'src/assets'),
         '@deps': path.resolve(__dirname, 'node_modules')
       }
-      viteConf.resolve.alias['commentbox.io'] = path.resolve(
-        __dirname,
-        'node_modules/commentbox.io/dist/commentbox.min.js'
-      )
       viteConf.optimizeDeps = viteConf.optimizeDeps || {}
-      viteConf.optimizeDeps.include = [...(viteConf.optimizeDeps.include || []), 'commentbox.io']
       viteConf.plugins = viteConf.plugins || []
       viteConf.plugins.push(
         viteCompression({ algorithm: 'brotliCompress', ext: '.br' }),

@@ -31,13 +31,6 @@ export function getProviders(context) {
   })
 }
 
-export function getCommentboxToken(context) {
-  return fetchAndCommit(context, {
-    url: '/sso/commentbox',
-    mutation: 'SET_COMMENTBOX'
-  })
-}
-
 export async function logout(context) {
   await api.get('/account/logout')
   context.commit('SET_PROFILE', null)

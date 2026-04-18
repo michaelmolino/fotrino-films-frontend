@@ -210,7 +210,6 @@ const payload = reactive({
     title: 'My Videos',
     media: {
       main: false,
-      commentsEnabled: false,
       previewType: 'frame',
       resourceDate: new Date().toISOString().split('T')[0].replaceAll('-', '/')
     }
