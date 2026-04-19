@@ -12,6 +12,7 @@ export type LastLogin = string | null
 export type Name = string
 export type ProfilePic = string | null
 export type Providers = string[]
+export type Accepted = boolean
 export type Deleted1 = boolean
 export type UserId = number
 export type Cover = string | null
@@ -136,6 +137,10 @@ export type Created11 = string | null
 export type Id11 = number
 export type LastError = string | null
 export type Type2 = string
+export type Error = string
+export type Error1 = string
+export type Error2 = string
+export type Status = string
 export type Label = string | null
 export type Value = number | string
 export type ExpiresAt = string
@@ -147,6 +152,12 @@ export type Main2 = boolean
 export type Previewtype = 'frame' | 'new'
 export type Resourcedate = string
 export type Title8 = string
+export type Message = string
+export type RedirectUrl = string
+export type Success = boolean
+export type Email3 = string
+export type Id12 = number
+export type Name3 = string
 /**
  * This interface was referenced by `ApiContracts`'s JSON-Schema
  * via the `definition` "OAuthProvider".
@@ -178,7 +189,7 @@ export type Postertype = 'default' | 'new'
 export type PosterColor2 = string | null
 export type Subtitle2 = string | null
 export type Title12 = string | null
-export type Message = string | null
+export type Message1 = string | null
 export type Reported = boolean
 export type MediaId = number
 export type PrivateId2 = string
@@ -190,7 +201,7 @@ export type Title13 = string
 export type CreatedAt1 = string
 export type Reason1 = string | null
 export type Reporter1 = string
-export type Error = string | null
+export type Error3 = string | null
 export type EventId = number
 export type Requeued = boolean
 export type Reference = number
@@ -203,10 +214,21 @@ export type Title14 = string | null
  * via the `definition` "UploadResourceType".
  */
 export type UploadResourceType = 'cover' | 'poster' | 'preview' | 'upload'
+export type Detail1 = string
+export type Error4 = string
+export type Detail2 = {
+  [k: string]: unknown
+}[]
+export type Error5 = string
+export type Idle = boolean
+export type JobsQueued = number
+export type JobsRunning = number
+export type OutboxPending = number
 
 export interface ApiContracts {
   AccountProfile: AccountProfileResponse
   AccountProvidersResponse: AccountProvidersResponse
+  AdminDeleteMediaResponse: AdminDeleteMediaResponse
   AdminDeleteUserResponse: AdminDeleteUserResponse
   AdminOwnedChannel: AdminOwnedChannelResponse
   AdminUser: AdminUserResponse
@@ -218,9 +240,15 @@ export interface ApiContracts {
   ChannelSummary: ChannelSummaryResponse
   CoverType: CoverType
   DeadLetterQueueItem: DeadLetterQueueItemResponse
+  DeletionBlockedResponse: DeletionBlockedResponse
+  ErrorDetailResponse: ErrorDetailResponse
+  ErrorResponse: ErrorResponse
+  HealthResponse: HealthResponse
   LabeledValue: LabeledValue
   MediaTokenResponse: MediaTokenResponse
   MediaUploadPayload: MediaUploadPayload
+  MockLoginResponse: MockLoginResponse
+  MockLoginUserResponse: MockLoginUserResponse
   OAuthProvider: OAuthProvider
   PosterType: PosterType
   PreviewType: PreviewType
@@ -234,6 +262,9 @@ export interface ApiContracts {
   UploadInstruction: UploadInstruction
   UploadMediaRequest: UploadMediaRequest
   UploadResourceType: UploadResourceType
+  UploadStorageConflictResponse: UploadStorageConflictResponse
+  UploadValidationErrorResponse: UploadValidationErrorResponse
+  WorkerStatusResponse: WorkerStatusResponse
 }
 /**
  * This interface was referenced by `ApiContracts`'s JSON-Schema
@@ -258,6 +289,13 @@ export interface AccountProfileResponse {
  */
 export interface AccountProvidersResponse {
   providers: Providers
+}
+/**
+ * This interface was referenced by `ApiContracts`'s JSON-Schema
+ * via the `definition` "AdminDeleteMediaResponse".
+ */
+export interface AdminDeleteMediaResponse {
+  accepted: Accepted
 }
 /**
  * This interface was referenced by `ApiContracts`'s JSON-Schema
@@ -474,6 +512,38 @@ export interface Payload {
 }
 /**
  * This interface was referenced by `ApiContracts`'s JSON-Schema
+ * via the `definition` "DeletionBlockedResponse".
+ */
+export interface DeletionBlockedResponse {
+  error: Error
+}
+/**
+ * This interface was referenced by `ApiContracts`'s JSON-Schema
+ * via the `definition` "ErrorDetailResponse".
+ */
+export interface ErrorDetailResponse {
+  detail: Detail
+  error: Error1
+}
+export interface Detail {
+  [k: string]: unknown
+}
+/**
+ * This interface was referenced by `ApiContracts`'s JSON-Schema
+ * via the `definition` "ErrorResponse".
+ */
+export interface ErrorResponse {
+  error: Error2
+}
+/**
+ * This interface was referenced by `ApiContracts`'s JSON-Schema
+ * via the `definition` "HealthResponse".
+ */
+export interface HealthResponse {
+  status: Status
+}
+/**
+ * This interface was referenced by `ApiContracts`'s JSON-Schema
  * via the `definition` "LabeledValue".
  */
 export interface LabeledValue {
@@ -500,6 +570,25 @@ export interface MediaUploadPayload {
   previewType?: Previewtype
   resourceDate: Resourcedate
   title: Title8
+}
+/**
+ * This interface was referenced by `ApiContracts`'s JSON-Schema
+ * via the `definition` "MockLoginResponse".
+ */
+export interface MockLoginResponse {
+  message: Message
+  redirect_url: RedirectUrl
+  success: Success
+  user: MockLoginUserResponse
+}
+/**
+ * This interface was referenced by `ApiContracts`'s JSON-Schema
+ * via the `definition` "MockLoginUserResponse".
+ */
+export interface MockLoginUserResponse {
+  email: Email3
+  id: Id12
+  name: Name3
 }
 /**
  * This interface was referenced by `ApiContracts`'s JSON-Schema
@@ -544,7 +633,7 @@ export interface ProjectUploadPayload {
  * via the `definition` "ReportMediaResponse".
  */
 export interface ReportMediaResponse {
-  message?: Message
+  message?: Message1
   reported: Reported
 }
 /**
@@ -580,7 +669,7 @@ export interface ReportedMediaReportResponse1 {
  * via the `definition` "RequeueOutboxResponse".
  */
 export interface RequeueOutboxResponse {
-  error?: Error
+  error?: Error3
   event_id: EventId
   requeued: Requeued
 }
@@ -602,4 +691,30 @@ export interface UploadMediaRequest {
   project: ProjectUploadPayload
   title?: Title14
   uuid: LabeledValue
+}
+/**
+ * This interface was referenced by `ApiContracts`'s JSON-Schema
+ * via the `definition` "UploadStorageConflictResponse".
+ */
+export interface UploadStorageConflictResponse {
+  detail: Detail1
+  error: Error4
+}
+/**
+ * This interface was referenced by `ApiContracts`'s JSON-Schema
+ * via the `definition` "UploadValidationErrorResponse".
+ */
+export interface UploadValidationErrorResponse {
+  detail: Detail2
+  error: Error5
+}
+/**
+ * This interface was referenced by `ApiContracts`'s JSON-Schema
+ * via the `definition` "WorkerStatusResponse".
+ */
+export interface WorkerStatusResponse {
+  idle: Idle
+  jobs_queued: JobsQueued
+  jobs_running: JobsRunning
+  outbox_pending: OutboxPending
 }
