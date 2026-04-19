@@ -105,3 +105,101 @@ export interface MediaTokenResponse {
     expires_at: string
     src: string
 }
+
+export interface ReportMediaResponse {
+    reported: boolean
+    message?: string
+}
+
+export type ChannelResourceType = 'channel' | 'project' | 'media'
+
+export interface ChannelResourceRef {
+    type: ChannelResourceType
+    id: string | number
+}
+
+export type OAuthProvider = 'apple' | 'facebook' | 'github' | 'google' | 'microsoft' | 'yahoo' | 'test'
+
+export interface AccountProfile {
+    id: number
+    name: string
+    email: string
+    profile_pic: string | null
+    country: string | null
+    csrf_token: string
+    last_login: string | null
+    created: string | null
+    is_admin: boolean
+    deleted: boolean
+    identity_provider?: string | null
+}
+
+export interface AccountProvidersResponse {
+    providers: OAuthProvider[]
+}
+
+export interface AdminUserProvider {
+    provider: string
+    external_id: string
+}
+
+export interface AdminOwnedChannel {
+    id: number
+    title: string
+    slug: string
+    cover: string | null
+    uuid: string
+    created: string | null
+}
+
+export interface AdminUser {
+    id: number
+    name: string
+    email: string
+    profile_pic: string | null
+    country: string | null
+    is_admin: boolean
+    last_login: string | null
+    created: string | null
+    deleted: boolean
+    providers: AdminUserProvider[]
+    channels: AdminOwnedChannel[]
+}
+
+export interface AdminUsersResponse {
+    users: AdminUser[]
+}
+
+export interface AdminDeleteUserResponse {
+    user_id: number
+    deleted: boolean
+}
+
+export interface DeadLetterQueueItem {
+    id: number
+    created: string | null
+    available_at: string | null
+    type: string
+    payload: unknown
+    attempts: number
+    last_error: string | null
+}
+
+export interface RequeueOutboxResponse {
+    event_id: number
+    requeued: boolean
+    error?: string
+}
+
+export interface ReportedMediaReport {
+    reporter: string
+    reason: string | null
+    created_at: string
+}
+
+export interface ReportedMediaItem {
+    media_id: number
+    private_id: string
+    title: string
+    reports: ReportedMediaReport[]
+}

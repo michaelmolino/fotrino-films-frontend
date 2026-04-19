@@ -3,6 +3,10 @@ import { sortBy } from '@utils/sort.js'
 
 // Helpers
 
+/**
+ * @param {import('src/types/api-contract').AdminUser[]} users
+ * @returns {import('src/types/api-contract').AdminUser[]}
+ */
 function sortUsers(users) {
   const sortedUsers = sortBy(users, 'last_login', 'desc')
   for (const user of sortedUsers) {
@@ -32,14 +36,23 @@ async function fetchAndCommit(context, { url, mutation, extract }) {
 
 // Actions
 
+/**
+ * @param {import('vuex').ActionContext<any, any>} context
+ * @returns {Promise<import('src/types/api-contract').AdminUser[] | null>}
+ */
 export function getAllUsers(context) {
   return fetchAndCommit(context, {
     url: '/admin/users',
     mutation: 'SET_USERS',
+    /** @param {import('src/types/api-contract').AdminUsersResponse} data */
     extract: data => sortUsers(data.users)
   })
 }
 
+/**
+ * @param {import('vuex').ActionContext<any, any>} context
+ * @returns {Promise<import('src/types/api-contract').DeadLetterQueueItem[] | null>}
+ */
 export function getDLQ(context) {
   return fetchAndCommit(context, {
     url: '/admin/outbox/dlq',
@@ -47,11 +60,22 @@ export function getDLQ(context) {
   })
 }
 
+/**
+ * @param {import('vuex').ActionContext<any, any>} context
+ * @param {number} eventId
+ * @returns {Promise<import('src/types/api-contract').RequeueOutboxResponse>}
+ */
 export async function requeueDLQItem(context, eventId) {
-  await api.post(`/admin/outbox/requeue/${eventId}`)
-  getDLQ(context)
+  const { data } = await api.post(`/admin/outbox/requeue/${eventId}`)
+  await getDLQ(context)
+  return data
 }
 
+/**
+ * @param {import('vuex').ActionContext<any, any>} context
+ * @param {number} userId
+ * @returns {Promise<void>}
+ */
 export async function deleteUser(context, userId) {
   try {
     await api.delete(`/admin/users/${userId}`)
@@ -67,6 +91,10 @@ export async function deleteUser(context, userId) {
   await getAllUsers(context)
 }
 
+/**
+ * @param {import('vuex').ActionContext<any, any>} context
+ * @returns {Promise<import('src/types/api-contract').ReportedMediaItem[] | null>}
+ */
 export function getReportedMedia(context) {
   return fetchAndCommit(context, {
     url: '/admin/media/reported',
@@ -74,6 +102,11 @@ export function getReportedMedia(context) {
   })
 }
 
+/**
+ * @param {import('vuex').ActionContext<any, any>} context
+ * @param {string} privateId
+ * @returns {Promise<void>}
+ */
 export async function deleteMedia(context, privateId) {
   try {
     await api.delete(`/admin/media/${privateId}`)
