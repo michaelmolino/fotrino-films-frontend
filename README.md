@@ -78,3 +78,14 @@ quasar dev
 ```
 
 Note: You'll need to proxy the backend somewhere in `quasar.config.js`.
+
+### API Contract Types
+
+Frontend API contract types are generated from backend contract schemas.
+
+```bash
+yarn generate:api-contracts
+```
+
+This updates `src/types/api.generated.d.ts`. The public wrapper file `src/types/api-contract.d.ts`
+re-exports the generated types and keeps a small number of frontend-only helper aliases.

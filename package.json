@@ -6,6 +6,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "generate:api-contracts": "node scripts/generate-api-contracts.mjs",
     "format": "yarn prettier --write . && yarn eslint --fix 'src/**/*.{js,vue}'",
     "lint": "eslint --ext .js,.vue ./",
     "test": "echo \"No test specified\" && exit 0",
@@ -43,6 +44,7 @@
     "eslint-plugin-quasar": "^1.0.0",
     "eslint-plugin-vue": "^10.8.0",
     "globals": "^16.5.0",
+    "json-schema-to-typescript": "^15.0.4",
     "postcss": "^8.5.6",
     "prettier": "3",
     "sass": "^1.99.0",
