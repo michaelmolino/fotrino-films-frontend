@@ -3,6 +3,10 @@ import { sortBy } from '@utils/sort.js'
 
 // Helpers
 
+/**
+ * @param {import('src/types/api-contract').ChannelDetail} channel
+ * @returns {import('src/types/api-contract').ChannelDetail}
+ */
 function sortChannel(channel) {
   if (!channel) return channel
   const projects = sortBy(channel.projects, 'resource_date', 'desc').map(project => ({
@@ -26,6 +30,11 @@ async function fetchAndCommit(context, { url, mutation, extract }) {
 
 // Actions
 
+/**
+ * @param {import('vuex').ActionContext<any, any>} context
+ * @param {boolean} [deep=false]
+ * @returns {Promise<import('src/types/api-contract').ChannelSummary[] | import('src/types/api-contract').ChannelDetail[]>}
+ */
 export function getChannels(context, deep = false) {
   return fetchAndCommit(context, {
     url: deep ? '/channels/deep' : '/channels',
@@ -34,6 +43,11 @@ export function getChannels(context, deep = false) {
   })
 }
 
+/**
+ * @param {import('vuex').ActionContext<any, any>} context
+ * @param {{ uuid: string, pending?: boolean }} options
+ * @returns {Promise<import('src/types/api-contract').ChannelDetail>}
+ */
 export function getChannel(context, { uuid, pending = false }) {
   const url = `/channels/${uuid}${pending ? '?pending=true' : ''}`
   return fetchAndCommit(context, {
@@ -43,6 +57,11 @@ export function getChannel(context, { uuid, pending = false }) {
   })
 }
 
+/**
+ * @param {import('vuex').ActionContext<any, any>} context
+ * @param {string} privateId
+ * @returns {Promise<import('src/types/api-contract').PrivateMediaChannel>}
+ */
 export function getPrivateMedia(context, privateId) {
   return fetchAndCommit(context, {
     url: `/channels/media/private/${privateId}`,
@@ -50,10 +69,16 @@ export function getPrivateMedia(context, privateId) {
   })
 }
 
+/**
+ * @param {import('vuex').ActionContext<any, any>} context
+ * @param {string} privateId
+ * @returns {Promise<string>}
+ */
 export function getMediaToken(context, privateId) {
   return fetchAndCommit(context, {
     url: `/channels/media/token/${privateId}`,
     mutation: 'SET_MEDIA_TOKEN',
+    /** @param {import('src/types/api-contract').MediaTokenResponse} data */
     extract: data => data.token
   })
 }
