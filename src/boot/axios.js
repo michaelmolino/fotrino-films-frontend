@@ -2,6 +2,11 @@ import { boot } from 'quasar/wrappers'
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
 import { Notify, Loading } from 'quasar'
+import {
+  getGlobalApiErrorMessage,
+  getGlobalApiErrorPayload,
+  isGlobalApiError
+} from 'src/utils/api-errors.js'
 
 const shouldRetryApi = error => {
   const status = error?.response?.status
@@ -107,19 +112,18 @@ export default boot(({ app, router, store }) => {
     error => {
       hideLoader()
 
-      const status = error?.response?.status
+      const apiError = getGlobalApiErrorPayload(error)
+      const status = apiError?.status ?? error?.response?.status
+      const skipNotify = error?.config?.__skipGlobalErrorNotify === true
 
-      if (status === 404) {
+      if (isGlobalApiError(error, 'not_found')) {
         router.replace('/404')
         return Promise.reject(error)
       }
 
-      let msg = 'Something went wrong!'
-      if (status === 400) msg = error?.message || error?.response?.data || msg
-      else if (status === 401) msg = 'Unauthorised. Please login.'
-      else if (status === 402) msg = 'You have exceeded a limit for your account type.'
-      else if (status === 403) msg = 'Forbidden.'
-      else if (status === 501) msg = 'Not yet implemented.'
+      let msg = getGlobalApiErrorMessage(error)
+      if (!apiError && status === 402) msg = 'You have exceeded a limit for your account type.'
+      else if (!apiError && status === 501) msg = 'Not yet implemented.'
 
       let timeout = 0
       if (error.code === 'ERR_CANCELED') {
@@ -127,15 +131,17 @@ export default boot(({ app, router, store }) => {
         timeout = 3000
       }
 
-      Notify.create({
-        type: 'negative',
-        timeout: timeout,
-        message: msg,
-        icon: 'warning',
-        actions: timeout === 0 ? [{ label: 'Dismiss', color: 'white' }] : []
-      })
+      if (!skipNotify) {
+        Notify.create({
+          type: 'negative',
+          timeout: timeout,
+          message: msg,
+          icon: 'warning',
+          actions: timeout === 0 ? [{ label: 'Dismiss', color: 'white' }] : []
+        })
+      }
 
-      if (status === 401) {
+      if (isGlobalApiError(error, 'unauthorized')) {
         router.replace('/')
       }
 

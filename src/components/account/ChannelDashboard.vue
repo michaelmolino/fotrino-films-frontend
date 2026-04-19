@@ -16,6 +16,7 @@ import ProfileCard from '@components/account/ChannelDashboard/ProfileCard.vue'
 import MediaBrowser from '@components/account/ChannelDashboard/MediaBrowser.vue'
 import NothingText from '@components/shared/NothingText.vue'
 import AuthRequired from '@components/shared/AuthRequired.vue'
+import { getGlobalApiErrorPayload } from 'src/utils/api-errors.js'
 
 const store = useStore()
 
@@ -36,7 +37,8 @@ onMounted(async () => {
   try {
     await store.dispatch('channel/getChannels', true)
   } catch (error) {
-    console.debug('Dashboard API call failed:', error?.response?.status)
+    const apiError = getGlobalApiErrorPayload(error)
+    console.debug('Dashboard API call failed:', apiError?.error || error?.response?.status)
   }
 })
 </script>

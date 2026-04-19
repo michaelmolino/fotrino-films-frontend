@@ -50,8 +50,10 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { Notify } from 'quasar'
 import { useStore } from 'vuex'
 import { daysSince } from '@utils/date.js'
+import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
 
 const store = useStore()
 const loading = ref(true)
@@ -89,23 +91,43 @@ async function fetchReportedMedia() {
   loading.value = true
   try {
     await store.dispatch('admin/getReportedMedia')
+  } catch (err) {
+    console.error('Failed to fetch reported media:', err)
+    Notify.create({
+      type: 'negative',
+      message: getComponentApiErrorMessage(err, 'Failed to load reported media.'),
+      icon: 'warning',
+      timeout: 0
+    })
   } finally {
     loading.value = false
   }
 }
 
-function deleteMedia(privateId) {
-  store.dispatch('admin/deleteMedia', privateId)
+async function deleteMedia(privateId) {
+  try {
+    await store.dispatch('admin/deleteMedia', privateId)
+    Notify.create({
+      type: 'positive',
+      message: 'Reported media deleted.',
+      icon: 'check',
+      timeout: 2000
+    })
+  } catch (err) {
+    console.error('Failed to delete reported media:', err)
+    Notify.create({
+      type: 'negative',
+      message: getComponentApiErrorMessage(err, 'Failed to delete reported media.'),
+      icon: 'warning',
+      timeout: 0
+    })
+  }
 }
 
 watch(
   () => true,
   () => {
-    try {
-      fetchReportedMedia()
-    } catch (err) {
-      console.error('Failed to fetch reported media:', err)
-    }
+    fetchReportedMedia()
   },
   { immediate: true }
 )

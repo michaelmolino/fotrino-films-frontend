@@ -192,6 +192,7 @@ import MediaStep from './UploadMedia/MediaStep.vue'
 import MediaPreview from '@components/channel/MediaPreview.vue'
 import AuthRequired from '@components/shared/AuthRequired.vue'
 import { Notify } from 'quasar'
+import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
 import { objectApi } from 'boot/axios'
 import { useFileProcessor } from '@composables/useFileProcessor.js'
 
@@ -483,7 +484,10 @@ async function quickUpload() {
     step.value = 4
   } catch (err) {
     console.error('Quick upload setup failed:', err)
-    Notify.create({ type: 'negative', message: 'Quick upload failed to initialize.' })
+    Notify.create({
+      type: 'negative',
+      message: getComponentApiErrorMessage(err, 'Quick upload failed to initialize.')
+    })
   }
 }
 
@@ -670,7 +674,13 @@ async function factoryUpload() {
   } catch (err) {
     isUploading.value = false
     progress.value = -1
-    statusText.value = 'Something went wrong!'
+    statusText.value = getComponentApiErrorMessage(err, 'Something went wrong!')
+    Notify.create({
+      type: 'negative',
+      timeout: 0,
+      message: statusText.value,
+      icon: 'warning'
+    })
     throw err
   }
 }
@@ -685,6 +695,10 @@ async function loadProjectsForChannelUuid(uuid) {
   } catch (err) {
     console.error('Failed to load channel projects:', err)
     projects.value = []
+    Notify.create({
+      type: 'negative',
+      message: getComponentApiErrorMessage(err, 'Failed to load channel projects.')
+    })
   }
 }
 

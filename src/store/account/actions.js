@@ -1,4 +1,5 @@
 import { api } from 'boot/axios'
+import { getGlobalApiErrorPayload } from 'src/utils/api-errors.js'
 
 // Helpers
 
@@ -10,6 +11,7 @@ async function fetchAndCommit(context, { url, mutation, extract }) {
     return value
   } catch (error) {
     context.commit(mutation, null)
+    getGlobalApiErrorPayload(error)
     throw error
   }
 }

@@ -19,8 +19,10 @@
 </template>
 
 <script setup>
+import { Notify } from 'quasar'
 import { useStore } from 'vuex'
 import ChannelItem from './MediaBrowser/ChannelItem.vue'
+import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
 
 const store = useStore()
 const props = defineProps({
@@ -70,8 +72,23 @@ function getMediaItemLink(channels, id) {
   return null
 }
 
-function deleteResource(type, id) {
-  store.dispatch('channel/deleteResource', { type, id })
+async function deleteResource(type, id) {
+  try {
+    await store.dispatch('channel/deleteResource', { type, id })
+    Notify.create({
+      type: 'positive',
+      message: 'Deletion queued.',
+      icon: 'check',
+      timeout: 2000
+    })
+  } catch (error) {
+    Notify.create({
+      type: 'negative',
+      message: getComponentApiErrorMessage(error, 'Unable to delete this resource.'),
+      icon: 'warning',
+      timeout: 0
+    })
+  }
 }
 </script>
 

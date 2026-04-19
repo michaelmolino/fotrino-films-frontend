@@ -92,6 +92,7 @@ import { Notify, copyToClipboard } from 'quasar'
 import { sanitizeHtml } from '@utils/text.js'
 import { daysSince } from '@utils/date.js'
 import { useStore } from 'vuex'
+import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
 
 const props = defineProps({
   media: Object
@@ -138,8 +139,13 @@ async function submitReport() {
     reportDialog.value = false
     reason.value = ''
   } catch (e) {
-    // Errors are handled by interceptor; just keep dialog open for user to retry/cancel
     console.debug(e)
+    Notify.create({
+      type: 'negative',
+      message: getComponentApiErrorMessage(e, 'Unable to submit report right now.'),
+      icon: 'warning',
+      timeout: 3000
+    })
   } finally {
     submitting.value = false
   }

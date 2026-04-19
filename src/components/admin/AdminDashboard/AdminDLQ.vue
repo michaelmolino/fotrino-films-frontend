@@ -42,8 +42,10 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { Notify } from 'quasar'
 import { useStore } from 'vuex'
 import { daysSince } from '@utils/date.js'
+import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
 
 const store = useStore()
 const loading = ref(true)
@@ -63,8 +65,24 @@ function pretty(obj) {
     return String(obj)
   }
 }
-function requeue(eventId) {
-  store.dispatch('admin/requeueDLQItem', eventId)
+async function requeue(eventId) {
+  try {
+    await store.dispatch('admin/requeueDLQItem', eventId)
+    Notify.create({
+      type: 'positive',
+      message: 'Dead-letter event requeued.',
+      icon: 'check',
+      timeout: 2000
+    })
+  } catch (err) {
+    console.error('Failed to requeue DLQ event:', err)
+    Notify.create({
+      type: 'negative',
+      message: getComponentApiErrorMessage(err, 'Failed to requeue dead-letter event.'),
+      icon: 'warning',
+      timeout: 0
+    })
+  }
 }
 
 onMounted(async () => {
@@ -73,6 +91,12 @@ onMounted(async () => {
     await store.dispatch('admin/getDLQ')
   } catch (err) {
     console.error('Failed to load DLQ:', err)
+    Notify.create({
+      type: 'negative',
+      message: getComponentApiErrorMessage(err, 'Failed to load dead-letter queue.'),
+      icon: 'warning',
+      timeout: 0
+    })
   } finally {
     loading.value = false
   }

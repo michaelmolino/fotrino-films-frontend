@@ -1,5 +1,6 @@
 import { api } from 'boot/axios'
 import { sortBy } from '@utils/sort.js'
+import { getGlobalApiErrorPayload } from 'src/utils/api-errors.js'
 
 // Helpers
 
@@ -32,6 +33,7 @@ async function fetchAndCommit(context, { url, mutation, extract }) {
     return value
   } catch (error) {
     context.commit(mutation, null)
+    getGlobalApiErrorPayload(error)
     throw error
   }
 }
@@ -100,7 +102,9 @@ export async function deleteResource(context, resource) {
       : `/channels/${resource.type}/${resource.id}`
 
   try {
-    await api.delete(url)
+    await api.delete(url, {
+      __skipGlobalErrorNotify: true
+    })
   } catch (error) {
     if (error?.__userCancelled) {
       return
@@ -120,6 +124,7 @@ export async function deleteResource(context, resource) {
 export async function postUpload(context, payload) {
   try {
     const { data } = await api.post('/channels/media', payload, {
+      __skipGlobalErrorNotify: true,
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json'
@@ -129,6 +134,7 @@ export async function postUpload(context, payload) {
     return data
   } catch (error) {
     context.commit('SET_UPLOAD', null)
+    getGlobalApiErrorPayload(error)
     throw error
   }
 }
@@ -139,7 +145,9 @@ export async function postUpload(context, payload) {
  * @returns {Promise<any>}
  */
 export function confirmUpload(_, media) {
-  return api.put(`/channels/media/confirm/${media}`)
+  return api.put(`/channels/media/confirm/${media}`, null, {
+    __skipGlobalErrorNotify: true
+  })
 }
 
 /**
@@ -148,8 +156,14 @@ export function confirmUpload(_, media) {
  * @returns {Promise<import('src/types/api-contract').ReportMediaResponse>}
  */
 export async function reportMedia(_, { privateId, reason }) {
-  const res = await api.post(`/channels/media/private/${privateId}/report`, {
-    reason: reason?.trim() || null
-  })
+  const res = await api.post(
+    `/channels/media/private/${privateId}/report`,
+    {
+      reason: reason?.trim() || null
+    },
+    {
+      __skipGlobalErrorNotify: true
+    }
+  )
   return res.data
 }

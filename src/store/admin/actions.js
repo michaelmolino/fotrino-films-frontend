@@ -1,5 +1,6 @@
 import { api } from 'boot/axios'
 import { sortBy } from '@utils/sort.js'
+import { getGlobalApiErrorPayload, isGlobalApiError } from 'src/utils/api-errors.js'
 
 // Helpers
 
@@ -17,18 +18,21 @@ function sortUsers(users) {
   return sortedUsers
 }
 
-async function fetchAndCommit(context, { url, mutation, extract }) {
+async function fetchAndCommit(context, { url, mutation, extract, skipGlobalErrorNotify = false }) {
   try {
-    const { data } = await api.get(url)
+    const { data } = await api.get(url, {
+      __skipGlobalErrorNotify: skipGlobalErrorNotify
+    })
     const value = extract ? extract(data) : data
     context.commit(mutation, value)
     return value
   } catch (error) {
     context.commit(mutation, null)
-    // Handle forbidden (403) gracefully
-    if (error?.response?.status === 403) {
+    // Handle contract-backed forbidden responses gracefully.
+    if (isGlobalApiError(error, 'forbidden')) {
       return null
     }
+    getGlobalApiErrorPayload(error)
     // For all other errors, rethrow
     throw error
   }
@@ -44,6 +48,7 @@ export function getAllUsers(context) {
   return fetchAndCommit(context, {
     url: '/admin/users',
     mutation: 'SET_USERS',
+    skipGlobalErrorNotify: true,
     /** @param {import('src/types/api-contract').AdminUsersResponse} data */
     extract: data => sortUsers(data.users)
   })
@@ -56,7 +61,8 @@ export function getAllUsers(context) {
 export function getDLQ(context) {
   return fetchAndCommit(context, {
     url: '/admin/outbox/dlq',
-    mutation: 'SET_OUTBOX_DLQ'
+    mutation: 'SET_OUTBOX_DLQ',
+    skipGlobalErrorNotify: true
   })
 }
 
@@ -66,7 +72,9 @@ export function getDLQ(context) {
  * @returns {Promise<import('src/types/api-contract').RequeueOutboxResponse>}
  */
 export async function requeueDLQItem(context, eventId) {
-  const { data } = await api.post(`/admin/outbox/requeue/${eventId}`)
+  const { data } = await api.post(`/admin/outbox/requeue/${eventId}`, null, {
+    __skipGlobalErrorNotify: true
+  })
   await getDLQ(context)
   return data
 }
@@ -78,7 +86,9 @@ export async function requeueDLQItem(context, eventId) {
  */
 export async function deleteUser(context, userId) {
   try {
-    await api.delete(`/admin/users/${userId}`)
+    await api.delete(`/admin/users/${userId}`, {
+      __skipGlobalErrorNotify: true
+    })
   } catch (error) {
     //Ignore user-cancelled deletes
     if (error?.message === 'User cancelled delete') {
@@ -98,7 +108,8 @@ export async function deleteUser(context, userId) {
 export function getReportedMedia(context) {
   return fetchAndCommit(context, {
     url: '/admin/media/reported',
-    mutation: 'SET_REPORTED_MEDIA'
+    mutation: 'SET_REPORTED_MEDIA',
+    skipGlobalErrorNotify: true
   })
 }
 
@@ -109,7 +120,9 @@ export function getReportedMedia(context) {
  */
 export async function deleteMedia(context, privateId) {
   try {
-    await api.delete(`/admin/media/${privateId}`)
+    await api.delete(`/admin/media/${privateId}`, {
+      __skipGlobalErrorNotify: true
+    })
   } catch (error) {
     if (error?.__userCancelled) {
       return

@@ -88,4 +88,9 @@ yarn generate:api-contracts
 ```
 
 This updates `src/types/api.generated.d.ts`. The public wrapper file `src/types/api-contract.d.ts`
-re-exports the generated types and keeps a small number of frontend-only helper aliases.
+re-exports the generated types and keeps only the frontend-only helper types. Clean public contract
+aliases are generated automatically from the backend schema bundle, so new backend contract additions
+do not need handwritten wrapper aliases. The raw generator internals are kept behind an internal
+namespace in `src/types/api.generated.d.ts`, which keeps the public type surface free of helper names
+like `Id1` and `Created7`. Shared parsing for the backend's global error-handler payloads lives in
+`src/utils/api-errors.js` and is used by the axios client and Vuex store actions.

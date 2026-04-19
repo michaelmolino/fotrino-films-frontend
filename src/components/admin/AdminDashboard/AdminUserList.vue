@@ -148,9 +148,11 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { Notify } from 'quasar'
 import { useStore } from 'vuex'
 import { daysSince } from '@utils/date.js'
 import { getCountry } from '@utils/countries.js'
+import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
 import googleIcon from '@assets/icons/google.svg'
 import microsoftIcon from '@assets/icons/microsoft.svg'
 import facebookIcon from '@assets/icons/facebook.svg'
@@ -171,7 +173,23 @@ const providerIcons = {
 }
 
 const deleteUser = async user => {
-  await store.dispatch('admin/deleteUser', user.id)
+  try {
+    await store.dispatch('admin/deleteUser', user.id)
+    Notify.create({
+      type: 'positive',
+      message: `Deleted ${user.name}.`,
+      icon: 'check',
+      timeout: 2000
+    })
+  } catch (err) {
+    console.error('Failed to delete user:', err)
+    Notify.create({
+      type: 'negative',
+      message: getComponentApiErrorMessage(err, `Failed to delete ${user.name}.`),
+      icon: 'warning',
+      timeout: 0
+    })
+  }
 }
 
 onMounted(async () => {
@@ -180,6 +198,12 @@ onMounted(async () => {
     await store.dispatch('admin/getAllUsers')
   } catch (err) {
     console.error('Failed to load users:', err)
+    Notify.create({
+      type: 'negative',
+      message: getComponentApiErrorMessage(err, 'Failed to load users.'),
+      icon: 'warning',
+      timeout: 0
+    })
   } finally {
     loading.value = false
   }
