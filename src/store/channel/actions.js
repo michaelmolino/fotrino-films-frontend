@@ -77,6 +77,11 @@ export async function deleteResource(context, resource) {
   await getChannels(context, true)
 }
 
+/**
+ * @param {import('vuex').ActionContext<any, any>} context
+ * @param {import('src/types/api-contract').UploadMediaRequest} payload
+ * @returns {Promise<import('src/types/api-contract').UploadInstruction[]>}
+ */
 export async function postUpload(context, payload) {
   try {
     const { data } = await api.post('/channels/media', payload, {

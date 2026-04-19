@@ -200,7 +200,8 @@ const store = useStore()
 const step = ref(1)
 const stepper = ref(null)
 const projects = ref([])
-const payload = reactive({
+/** @type {import('src/types/api-contract').UploadMediaRequest} */
+const initialPayload = {
   uuid: null,
   coverType: 'profile',
   title: 'My Channel',
@@ -214,6 +215,9 @@ const payload = reactive({
       resourceDate: new Date().toISOString().split('T')[0].replaceAll('-', '/')
     }
   }
+}
+const payload = reactive({
+  ...initialPayload
 })
 
 const coverFile = ref(null)
@@ -640,6 +644,7 @@ async function uploadSingle(u, current, total) {
 async function factoryUpload() {
   isUploading.value = true
   try {
+    /** @type {import('src/types/api-contract').UploadInstruction[]} */
     const upload = await store.dispatch('channel/postUpload', payload)
     let counterLocal = 1
     const total = upload.length
