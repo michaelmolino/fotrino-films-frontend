@@ -14,11 +14,11 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.18.0",
-    "axios": "^1.15.1",
+    "axios": "^1.15.2",
     "axios-retry": "^4.5.0",
     "browser-image-compression": "^2.0.2",
     "dayjs": "^1.11.20",
-    "dompurify": "^3.4.0",
+    "dompurify": "^3.4.1",
     "hls.js": "^1.6.16",
     "i18n-iso-countries": "^7.14.0",
     "plyr": "^3.8.4",
