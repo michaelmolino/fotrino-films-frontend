@@ -109,7 +109,8 @@ async function setupPlayer() {
       'duration',
       'mute',
       'volume',
-      'fullscreen'
+      'fullscreen',
+      'airplay'
     ]
   })
 
@@ -160,13 +161,10 @@ async function setupAudioPlayer(el) {
 
 async function setupVideoPlayer(el) {
   const video = el.tagName.toLowerCase() === 'video' ? el : document.querySelector('video')
-  let source = props.media.src
-  let currentToken = null
-  let retrying = false
-  let retries = 0
-  let tokenRefreshTimer = null
-  const MAX_RETRIES = 2
+  const source = props.media.src
   const nativeHlsMimeTypes = ['application/vnd.apple.mpegurl', 'application/x-mpegURL']
+  // Mutable token state shared by xhrSetup and the play-guard.
+  const tokenState = { value: null, issuedAt: 0, exp: 0 }
 
   function supportsNativeHls() {
     return nativeHlsMimeTypes.some((mimeType) => video.canPlayType(mimeType))
@@ -177,69 +175,54 @@ async function setupVideoPlayer(el) {
       const part = t.split('.')[1]
       const base64 = part.replaceAll('-', '+').replaceAll('_', '/')
       const json = JSON.parse(decodeURIComponent(escape(globalThis.atob(base64))))
-      return (json && json.exp) ? json.exp * 1000 : null
-    } catch (err) {
-      console.debug('Failed to parse JWT exp', err)
+      return json?.exp ? json.exp * 1000 : null
+    } catch {
       return null
     }
   }
 
-  function scheduleTokenRefresh(tokenVal) {
-    try {
-      const expMs = getExpFromJwt(tokenVal)
-      if (!expMs) return
-      const now = Date.now()
-      const msUntil = expMs - now - 20000
-      if (tokenRefreshTimer) {
-        clearTimeout(tokenRefreshTimer)
-        tokenRefreshTimer = null
-      }
-      if (msUntil > 0) {
-        tokenRefreshTimer = setTimeout(async () => {
-          try {
-            const refreshed = await fetchMediaToken()
-            if (refreshed && refreshed !== currentToken) {
-              currentToken = refreshed
-              scheduleTokenRefresh(refreshed)
-            }
-          } catch (e) {
-            console.debug('Token refresh failed', e)
-          }
-        }, msUntil)
-      }
-    } catch {
-      /* no-op */
-    }
+  function isTokenStale() {
+    if (!tokenState.value || !tokenState.exp) return true
+    const halfLife = (tokenState.exp - tokenState.issuedAt) / 2
+    return Date.now() >= tokenState.issuedAt + halfLife
   }
 
-  async function obtainTokenAndSchedule() {
+  async function refreshToken() {
     const t = await fetchMediaToken()
     if (t) {
-      const changed = t !== currentToken
-      currentToken = t
-      scheduleTokenRefresh(t)
-      return changed
+      tokenState.value = t
+      tokenState.issuedAt = Date.now()
+      tokenState.exp = getExpFromJwt(t) ?? 0
     }
-    return false
   }
 
-  function rewriteUrlWithNewToken(u) {
-    if (!u) return u
-    const [base, query] = u.split('?')
+  function buildTokenUrl(url) {
+    if (!tokenState.value) return url
+    const [base, query] = url.split('?')
     const params = new URLSearchParams(query)
     params.delete('token')
-    if (currentToken) params.set('token', currentToken)
+    params.set('token', tokenState.value)
     return `${base}?${params.toString()}`
   }
 
-  async function setupNativeHlsPlayer() {
-    await obtainTokenAndSchedule()
-    video.src = rewriteUrlWithNewToken(source)
-    video.load()
-  }
+  await refreshToken()
 
   if (supportsNativeHls()) {
-    await setupNativeHlsPlayer()
+    video.src = buildTokenUrl(source)
+    video.load()
+    // On play, if the token is at or past its half-life, reload the manifest
+    // with a fresh token and seek back to where the user left off.
+    video.addEventListener('play', async function onPlayGuard() {
+      if (!isTokenStale()) return
+      video.pause()
+      const resumeAt = video.currentTime
+      await refreshToken()
+      video.src = buildTokenUrl(source)
+      video.load()
+      await new Promise((resolve) => video.addEventListener('loadedmetadata', resolve, { once: true }))
+      video.currentTime = resumeAt
+      video.play().catch(() => {})
+    })
     return
   }
 
@@ -251,51 +234,23 @@ async function setupVideoPlayer(el) {
   hls.value = new Hls({
     capLevelToPlayerSize: false,
     abrEwmaDefaultEstimate: 3000000,
+    // xhrSetup reads tokenState.value on every request, so a token refreshed
+    // by the play-guard is picked up automatically without reloading anything.
     xhrSetup: function (xhr, url) {
-      xhr.open('GET', rewriteUrlWithNewToken(url), true)
+      xhr.open('GET', buildTokenUrl(url), true)
     }
   })
 
-  hls.value.on(Hls.Events.FRAG_LOADING, function (_event, data) {
-    try {
-      const frag = data?.frag
-      if (!frag) return
-      if (Array.isArray(frag.url)) {
-        frag.url = frag.url.map(rewriteUrlWithNewToken)
-      } else if (typeof frag.url === 'string') {
-        frag.url = rewriteUrlWithNewToken(frag.url)
-      }
-    } catch (e) {
-      console.debug('Failed to rewrite frag URL', e)
-    }
-  })
-
-  await obtainTokenAndSchedule()
-  hls.value.loadSource(source)
+  hls.value.loadSource(buildTokenUrl(source))
   hls.value.attachMedia(video)
   globalThis.hls = hls.value
 
-  hls.value.on(Hls.Events.ERROR, async function (_event, data) {
-    console.debug('HLS ERROR', data, { retrying, retries, currentToken })
-    if (data?.response?.code !== 403) return
-    if (retrying || retries >= MAX_RETRIES) {
-      console.error('Media token refresh failed after retries.')
-      try {
-        player.value?.destroy()
-      } catch (err) {
-        console.error('Error destroying player after token refresh failure:', err)
-      }
-      return
-    }
-    retrying = true
-    retries += 1
-    const changed = await obtainTokenAndSchedule()
-    if (!changed && retries < MAX_RETRIES) {
-      await new Promise((r) => setTimeout(r, 300 * retries))
-      retrying = false
-      return
-    }
-    retrying = false
+  // On play, if the token is at or past its half-life, refresh it.
+  // xhrSetup will use the new value for all subsequent segment/manifest requests.
+  // No source reload needed — the buffer is untouched.
+  video.addEventListener('play', async function onPlayGuard() {
+    if (!isTokenStale()) return
+    await refreshToken()
   })
 }
 
