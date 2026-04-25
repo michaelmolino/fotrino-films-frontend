@@ -152,6 +152,31 @@ export function confirmUpload(_, media) {
 
 /**
  * @param {import('vuex').ActionContext<any, any>} _
+ * @param {{ mediaId: number, description?: string | null, resourceDate?: string | null, main: boolean }} payload
+ * @returns {Promise<import('src/types/api-contract').ChannelMedia>}
+ */
+export async function updateMedia(_, { mediaId, description = null, resourceDate = null, main }) {
+  try {
+    const res = await api.put(
+      `/channels/media/${mediaId}`,
+      {
+        description: description?.trim() || null,
+        resourceDate: resourceDate?.trim() || null,
+        main
+      },
+      {
+        __skipGlobalErrorNotify: true
+      }
+    )
+    return res.data
+  } catch (error) {
+    getGlobalApiErrorPayload(error)
+    throw error
+  }
+}
+
+/**
+ * @param {import('vuex').ActionContext<any, any>} _
  * @param {{ privateId: string, reason?: string | null }} payload
  * @returns {Promise<import('src/types/api-contract').ReportMediaResponse>}
  */
