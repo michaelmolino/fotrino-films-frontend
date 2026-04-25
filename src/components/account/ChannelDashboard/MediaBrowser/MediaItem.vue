@@ -5,6 +5,7 @@
       :image="media.preview"
       :pending="media.pending"
       :deleted="media.deleted"
+      editable
       :link="getMediaLink('media', media.id)"
       :subtitle="media.created ? `Created: ${daysSince(media.created, true)}` : ''"
       delete-color="warning"

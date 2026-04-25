@@ -52,13 +52,14 @@
             <q-tooltip>Pending</q-tooltip>
           </q-btn>
           <q-btn
-            v-if="!pending && false"
+            v-if="editable && !pending && !deleted"
             flat
             dense
             size="sm"
             icon="edit"
             color="accent"
             class="q-ml-xs"
+            data-cy="edit-media"
             @click="showEditNotification">
             <q-tooltip>Edit</q-tooltip>
           </q-btn>
@@ -109,6 +110,10 @@ const props = defineProps({
   badge: Boolean,
   badgeIcon: String,
   subtitle: String,
+  editable: {
+    type: Boolean,
+    default: false
+  },
   avatarSize: {
     type: String,
     default: '48px'

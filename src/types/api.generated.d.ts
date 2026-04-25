@@ -163,10 +163,13 @@ declare namespace ApiContractsInternal {
   export type Src2 = string
   export type Token = string
   export type Description = string | null
-  export type Filename = string
   export type Main2 = boolean
+  export type Resourcedate = string | null
+  export type Description1 = string | null
+  export type Filename = string
+  export type Main3 = boolean
   export type Previewtype = 'frame' | 'new'
-  export type Resourcedate = string
+  export type Resourcedate1 = string
   export type Title8 = string
   export type Message5 = string
   export type RedirectUrl = string
@@ -279,6 +282,7 @@ declare namespace ApiContractsInternal {
     InternalServerErrorResponse: InternalServerErrorResponse
     LabeledValue: LabeledValue
     MediaTokenResponse: MediaTokenResponse
+    MediaUpdateRequest: MediaUpdateRequest
     MediaUploadPayload: MediaUploadPayload
     MockLoginResponse: MockLoginResponse
     MockLoginUserResponse: MockLoginUserResponse
@@ -642,14 +646,23 @@ declare namespace ApiContractsInternal {
   }
   /**
    * This interface was referenced by `ApiContracts`'s JSON-Schema
+   * via the `definition` "MediaUpdateRequest".
+   */
+  export interface MediaUpdateRequest {
+    description?: Description
+    main: Main2
+    resourceDate?: Resourcedate
+  }
+  /**
+   * This interface was referenced by `ApiContracts`'s JSON-Schema
    * via the `definition` "MediaUploadPayload".
    */
   export interface MediaUploadPayload {
-    description?: Description
+    description?: Description1
     filename: Filename
-    main?: Main2
+    main?: Main3
     previewType?: Previewtype
-    resourceDate: Resourcedate
+    resourceDate: Resourcedate1
     title: Title8
   }
   /**
@@ -857,6 +870,7 @@ export type HealthResponse = ApiContracts['HealthResponse']
 export type InternalServerErrorResponse = ApiContracts['InternalServerErrorResponse']
 export type LabeledValue = ApiContracts['LabeledValue']
 export type MediaTokenResponse = ApiContracts['MediaTokenResponse']
+export type MediaUpdateRequest = ApiContracts['MediaUpdateRequest']
 export type MediaUploadPayload = ApiContracts['MediaUploadPayload']
 export type MockLoginResponse = ApiContracts['MockLoginResponse']
 export type MockLoginUserResponse = ApiContracts['MockLoginUserResponse']
