@@ -25,15 +25,6 @@
         :model-value="payload.project.media.title"
         label="Title *"
         @update:model-value="onUpdateMediaTitle" />
-      <q-input
-        outlined
-        autogrow
-        :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
-        class="q-pb-md"
-        clearable
-        :model-value="payload.project.media.description"
-        label="Description - p, br, strong, and i tags allowed"
-        @update:model-value="onUpdateMediaDescription" />
       <q-card flat bordered class="q-pb-md">
         <q-card-section>
           <div class="text-overline">Media Preview</div>
@@ -90,27 +81,14 @@
         </q-card-section>
         <q-separator inset />
         <q-card-section>
-          <div class="text-overline">Extended Attributes</div>
-          <q-btn
-            icon="event"
-            flat
-            :label="new Date(payload.project.media.resourceDate).toLocaleDateString()">
-            <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-              <q-date
-                :model-value="payload.project.media.resourceDate"
-                subtitle="Capture Date"
-                :options="dateOptionsFn"
-                @update:model-value="onUpdateResourceDate">
-                <div class="row items-center justify-end q-gutter-sm">
-                  <q-btn label="Cancel" flat v-close-popup />
-                  <q-btn label="OK" flat v-close-popup />
-                </div>
-              </q-date>
-            </q-popup-proxy>
-            <q-tooltip>Capture Date</q-tooltip>
-          </q-btn>
-          <br />
-          <q-checkbox outlined v-model="localMain" label="Featured" class="q-pr-lg q-pl-sm" />
+          <MediaMetadataFields
+            :description="payload.project.media.description"
+            :resource-date="payload.project.media.resourceDate"
+            :main="!!payload.project.media.main"
+            :input-color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
+            @update:description="onUpdateMediaDescription"
+            @update:resourceDate="onUpdateResourceDate"
+            @update:main="onUpdateMediaMain" />
         </q-card-section>
       </q-card>
     </div>
@@ -121,6 +99,7 @@
 import { computed } from 'vue'
 import { useQuasar } from 'quasar'
 import MediaPreview from '@components/channel/MediaPreview.vue'
+import MediaMetadataFields from '@components/account/shared/MediaMetadataFields.vue'
 const props = defineProps({
   payload: Object,
   media: Object,
@@ -147,15 +126,6 @@ const localPreviewType = computed({
         ...props.payload.project,
         media: { ...props.payload.project.media, previewType: v }
       }
-    })
-})
-
-const localMain = computed({
-  get: () => !!props.payload.project.media.main,
-  set: v =>
-    emit('update:payload', {
-      ...props.payload,
-      project: { ...props.payload.project, media: { ...props.payload.project.media, main: v } }
     })
 })
 
@@ -219,6 +189,15 @@ function onUpdateResourceDate(val) {
     }
   })
 }
+function onUpdateMediaMain(val) {
+  emit('update:payload', {
+    ...props.payload,
+    project: {
+      ...props.payload.project,
+      media: { ...props.payload.project.media, main: !!val }
+    }
+  })
+}
 function emitUpdatePreviewNull() {
   emit('update:previewFile', null)
 }
@@ -227,9 +206,6 @@ function emitUpdateMediaNull() {
 }
 function emitCounterIncrement() {
   emit('increment:counter')
-}
-function dateOptionsFn(date) {
-  return new Date(date) <= new Date()
 }
 
 // Attempt to read a capture date from metadata; for videos, browsers often expose limited metadata.

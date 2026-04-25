@@ -30,7 +30,8 @@
       :channel="channel"
       data-cy="media-item"
       :getMediaLink="getMediaLink"
-      @deleteMedia="$emit('deleteMedia', $event)" />
+      @deleteMedia="$emit('deleteMedia', $event)"
+      @editMedia="$emit('editMedia', $event)" />
   </q-expansion-item>
 </template>
 
@@ -46,7 +47,7 @@ const props = defineProps({
   getMediaLink: Function
 })
 
-defineEmits(['deleteProject', 'deleteMedia'])
+defineEmits(['deleteProject', 'deleteMedia', 'editMedia'])
 
 const hasPendingChildren = computed(() => {
   return props.project.media?.some(media => media.pending) || false

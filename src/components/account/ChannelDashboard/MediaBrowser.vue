@@ -10,7 +10,8 @@
         data-cy="channel-item"
         @deleteChannel="deleteResource('channel', $event)"
         @deleteProject="deleteResource('project', $event)"
-        @deleteMedia="deleteResource('media', $event)" />
+        @deleteMedia="deleteResource('media', $event)"
+        @editMedia="saveMediaEdit" />
     </q-list>
     <div v-if="channels.length === 0" class="q-pa-md text-grey-6 text-center">
       No channels found
@@ -85,6 +86,31 @@ async function deleteResource(type, id) {
     Notify.create({
       type: 'negative',
       message: getComponentApiErrorMessage(error, 'Unable to delete this resource.'),
+      icon: 'warning',
+      timeout: 0
+    })
+  }
+}
+
+async function saveMediaEdit(payload) {
+  try {
+    await store.dispatch('channel/updateMedia', {
+      mediaId: payload?.id,
+      description: payload?.description ?? null,
+      resourceDate: payload?.resourceDate ?? null,
+      main: !!payload?.main
+    })
+    await store.dispatch('channel/getChannels', true)
+    Notify.create({
+      type: 'positive',
+      message: 'Media updated.',
+      icon: 'check',
+      timeout: 2000
+    })
+  } catch (error) {
+    Notify.create({
+      type: 'negative',
+      message: getComponentApiErrorMessage(error, 'Unable to update this media.'),
       icon: 'warning',
       timeout: 0
     })

@@ -60,7 +60,7 @@
             color="accent"
             class="q-ml-xs"
             data-cy="edit-media"
-            @click="showEditNotification">
+            @click="$emit('edit')">
             <q-tooltip>Edit</q-tooltip>
           </q-btn>
           <q-btn
@@ -92,7 +92,6 @@
 
 <script setup>
 import { computed } from 'vue'
-import { Notify } from 'quasar'
 
 const props = defineProps({
   title: String,
@@ -120,18 +119,8 @@ const props = defineProps({
   }
 })
 
-defineEmits(['delete'])
+defineEmits(['delete', 'edit'])
 const canDelete = computed(() => !props.pending && !props.hasPendingChildren)
-
-function showEditNotification() {
-  Notify.create({
-    type: 'info',
-    message: 'Edit functionality is not yet implemented.',
-    icon: 'info',
-    position: 'bottom',
-    timeout: 3000
-  })
-}
 </script>
 
 <style scoped>
