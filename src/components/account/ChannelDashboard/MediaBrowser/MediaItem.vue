@@ -13,24 +13,37 @@
       @edit="openEditDialog"
       square />
 
-    <q-dialog v-model="editDialog" persistent>
-      <q-card style="min-width: 320px; width: 100%; max-width: 560px">
-        <q-card-section class="row items-center q-gutter-md">
-          <q-avatar square size="72px">
-            <q-img v-if="media.preview" :src="media.preview" />
-            <div v-else class="bg-grey-4" style="width: 100%; height: 100%" />
-          </q-avatar>
-          <div class="column justify-center">
+      <q-dialog v-model="editDialog" persistent>
+        <q-card style="min-width: 320px; width: 100%; max-width: 560px">
+          <q-card-section>
             <div class="text-h6 text-weight-medium">{{ media.title }}</div>
-          </div>
-        </q-card-section>
+          </q-card-section>
 
         <q-card-section>
           <MediaMetadataFields
             :description="editForm.description"
             :resource-date="editForm.resourceDate"
             :main="!!editForm.main"
+            :show-extended-attributes="false"
             @update:description="onUpdateDescription"
+            @update:resourceDate="onUpdateResourceDate"
+            @update:main="onUpdateMain" />
+
+          <MediaPreviewSelectorFields
+            :allow-frame-mode="false"
+            :preview-file="editPreviewFile"
+            :preview-image="editPreviewImage"
+            :show-featured-border="!!editForm.main"
+            :preview-processing="false"
+            :frame-refresh-enabled="false"
+            @update:previewFile="onUpdatePreviewFile"
+            />
+
+          <MediaMetadataFields
+            :description="editForm.description"
+            :resource-date="editForm.resourceDate"
+            :main="!!editForm.main"
+            :show-description="false"
             @update:resourceDate="onUpdateResourceDate"
             @update:main="onUpdateMain" />
         </q-card-section>
@@ -45,10 +58,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onBeforeUnmount, ref } from 'vue'
 import ResourceActions from './ResourceActions.vue'
 import { daysSince } from '@utils/date.js'
 import MediaMetadataFields from '@components/account/shared/MediaMetadataFields.vue'
+import MediaPreviewSelectorFields from '@components/account/shared/MediaPreviewSelectorFields.vue'
+import { useFileProcessor } from '@composables/useFileProcessor.js'
 
 const props = defineProps({
   media: Object,
@@ -64,6 +79,30 @@ const editForm = ref({
   description: null,
   resourceDate: null,
   main: false
+})
+const editPreviewFile = ref(null)
+const editPreviewImage = ref(null)
+const localObjectUrl = ref(null)
+
+const { handleFile: processFile } = useFileProcessor()
+
+function clearLocalObjectUrl() {
+  if (localObjectUrl.value) {
+    URL.revokeObjectURL(localObjectUrl.value)
+    localObjectUrl.value = null
+  }
+}
+
+function setLocalPreviewImage(url) {
+  clearLocalObjectUrl()
+  if (url) {
+    localObjectUrl.value = url
+  }
+  editPreviewImage.value = url || props.media?.preview || null
+}
+
+onBeforeUnmount(() => {
+  clearLocalObjectUrl()
 })
 
 function normalizeResourceDate(raw) {
@@ -81,6 +120,9 @@ function openEditDialog() {
     resourceDate: normalizeResourceDate(props.media?.resource_date),
     main: !!props.media?.main
   }
+  editPreviewFile.value = null
+  editPreviewImage.value = props.media?.preview || null
+  clearLocalObjectUrl()
   editDialog.value = true
 }
 
@@ -105,12 +147,27 @@ function onUpdateMain(value) {
   }
 }
 
+async function onUpdatePreviewFile(fileOrFiles) {
+  const file = Array.isArray(fileOrFiles) ? fileOrFiles[0] : fileOrFiles
+  if (!file) {
+    editPreviewFile.value = null
+    clearLocalObjectUrl()
+    editPreviewImage.value = props.media?.preview || null
+    return
+  }
+  const processed = await processFile(file, 'preview')
+  editPreviewFile.value = processed || file
+  const previewUrl = URL.createObjectURL(editPreviewFile.value)
+  setLocalPreviewImage(previewUrl)
+}
+
 function saveEdit() {
   emit('editMedia', {
     id: props.media?.id,
     description: editForm.value.description,
     resourceDate: editForm.value.resourceDate,
-    main: !!editForm.value.main
+    main: !!editForm.value.main,
+    previewFile: editPreviewFile.value
   })
   editDialog.value = false
 }

@@ -1,4 +1,4 @@
-import { api } from 'boot/axios'
+import { api, objectApi } from 'boot/axios'
 import { sortBy } from '@utils/sort.js'
 import { getGlobalApiErrorPayload } from 'src/utils/api-errors.js'
 
@@ -173,6 +173,50 @@ export async function updateMedia(_, { mediaId, description = null, resourceDate
     getGlobalApiErrorPayload(error)
     throw error
   }
+}
+
+/**
+ * @param {import('vuex').ActionContext<any, any>} _
+ * @param {{ mediaId: number }} payload
+ * @returns {Promise<import('src/types/api-contract').UploadInstruction>}
+ */
+export async function requestMediaPreviewUpload(_, { mediaId }) {
+  const res = await api.post(
+    `/channels/media/${mediaId}/preview`,
+    null,
+    {
+      __skipGlobalErrorNotify: true
+    }
+  )
+  return res.data
+}
+
+/**
+ * @param {import('vuex').ActionContext<any, any>} _
+ * @param {{ mediaId: number }} payload
+ * @returns {Promise<void>}
+ */
+export async function confirmMediaPreviewUpload(_, { mediaId }) {
+  await api.put(
+    `/channels/media/${mediaId}/preview/confirm`,
+    null,
+    {
+      __skipGlobalErrorNotify: true
+    }
+  )
+}
+
+/**
+ * @param {import('vuex').ActionContext<any, any>} _
+ * @param {{ url: string, file: File | Blob }} payload
+ * @returns {Promise<void>}
+ */
+export async function uploadMediaPreviewBinary(_, { url, file }) {
+  await objectApi.put(url, file, {
+    headers: {
+      'Content-Type': file?.type || 'image/jpeg'
+    }
+  })
 }
 
 /**

@@ -27,57 +27,16 @@
         @update:model-value="onUpdateMediaTitle" />
       <q-card flat bordered class="q-pb-md">
         <q-card-section>
-          <div class="text-overline">Media Preview</div>
-          <q-radio
-            class="q-pl-sm"
-            v-model="localPreviewType"
-            val="frame"
-            label="Video Frame"
-            color="accent" />
-          <q-radio
-            class="q-pl-sm"
-            v-model="localPreviewType"
-            val="new"
-            label="Upload Photo"
-            color="accent" />
-          <q-file
-            v-if="localPreviewType === 'new'"
-            label="Media Preview (Image)"
-            outlined
-            :model-value="previewFile"
-            accept="image/*"
-            class="q-pb-md"
-            color="accent"
-            @update:model-value="onUpdatePreviewFile">
-            <template v-slot:prepend>
-              <q-icon name="image" @click.stop.prevent />
-            </template>
-            <template v-slot:append>
-              <q-icon
-                name="close"
-                @click.stop.prevent="emitUpdatePreviewNull"
-                class="cursor-pointer" />
-            </template>
-          </q-file>
-          <div class="row items-center q-gutter-sm">
-            <div class="col-auto">
-              <div class="width250">
-                <MediaPreview :media="media" />
-              </div>
-            </div>
-            <div class="col-auto">
-              <q-btn
-                v-if="payload.project.media.previewType === 'frame' && mediaFile"
-                :disable="previewProcessing"
-                :loading="previewProcessing"
-                icon="autorenew"
-                flat
-                size="xl"
-                @click="emitCounterIncrement">
-                <q-tooltip>Refresh Thumbnail</q-tooltip>
-              </q-btn>
-            </div>
-          </div>
+          <MediaPreviewSelectorFields
+            :preview-type="payload.project.media.previewType"
+            :preview-file="previewFile"
+            :preview-image="media?.preview || null"
+            :show-featured-border="!!payload.project.media.main"
+            :preview-processing="previewProcessing"
+            :frame-refresh-enabled="!!mediaFile"
+            @update:previewType="onUpdatePreviewType"
+            @update:previewFile="onUpdatePreviewFile"
+            @refresh:frame="emitCounterIncrement" />
         </q-card-section>
         <q-separator inset />
         <q-card-section>
@@ -96,10 +55,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
 import { useQuasar } from 'quasar'
-import MediaPreview from '@components/channel/MediaPreview.vue'
 import MediaMetadataFields from '@components/account/shared/MediaMetadataFields.vue'
+import MediaPreviewSelectorFields from '@components/account/shared/MediaPreviewSelectorFields.vue'
 const props = defineProps({
   payload: Object,
   media: Object,
@@ -116,18 +74,6 @@ const emit = defineEmits([
 ])
 
 const $q = useQuasar()
-
-const localPreviewType = computed({
-  get: () => props.payload.project.media.previewType,
-  set: v =>
-    emit('update:payload', {
-      ...props.payload,
-      project: {
-        ...props.payload.project,
-        media: { ...props.payload.project.media, previewType: v }
-      }
-    })
-})
 
 function onUpdateMediaTitle(val) {
   emit('update:payload', {
@@ -179,6 +125,18 @@ function onUpdatePreviewFile(fileOrFiles) {
   const file = Array.isArray(fileOrFiles) ? fileOrFiles[0] : fileOrFiles
   emit('update:previewFile', file)
   if (file && props.handleFile) props.handleFile(file, 'preview')
+}
+function onUpdatePreviewType(val) {
+  emit('update:payload', {
+    ...props.payload,
+    project: {
+      ...props.payload.project,
+      media: { ...props.payload.project.media, previewType: val }
+    }
+  })
+  if (val !== 'new') {
+    emitUpdatePreviewNull()
+  }
 }
 function onUpdateResourceDate(val) {
   emit('update:payload', {

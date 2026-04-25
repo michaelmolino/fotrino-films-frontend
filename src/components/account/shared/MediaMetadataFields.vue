@@ -1,6 +1,7 @@
 <template>
   <div>
     <q-input
+      v-if="showDescription"
       :model-value="description"
       outlined
       autogrow
@@ -10,34 +11,36 @@
       label="Description - p, br, strong, and i tags allowed"
       @update:model-value="$emit('update:description', $event)" />
 
-    <div class="text-overline">Extended Attributes</div>
-    <q-btn
-      icon="event"
-      flat
-      class="q-mt-xs"
-      :label="resourceDateLabel">
-      <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-        <q-date
-          :model-value="resourceDate"
-          subtitle="Capture Date"
-          :options="dateOptionsFn"
-          @update:model-value="$emit('update:resourceDate', $event)">
-          <div class="row items-center justify-end q-gutter-sm">
-            <q-btn label="Cancel" flat v-close-popup />
-            <q-btn label="OK" flat v-close-popup />
-          </div>
-        </q-date>
-      </q-popup-proxy>
-      <q-tooltip>Capture Date</q-tooltip>
-    </q-btn>
+    <div v-if="showExtendedAttributes">
+      <div class="text-overline">Extended Attributes</div>
+      <q-btn
+        icon="event"
+        flat
+        class="q-mt-xs"
+        :label="resourceDateLabel">
+        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+          <q-date
+            :model-value="resourceDate"
+            subtitle="Capture Date"
+            :options="dateOptionsFn"
+            @update:model-value="$emit('update:resourceDate', $event)">
+            <div class="row items-center justify-end q-gutter-sm">
+              <q-btn label="Cancel" flat v-close-popup />
+              <q-btn label="OK" flat v-close-popup />
+            </div>
+          </q-date>
+        </q-popup-proxy>
+        <q-tooltip>Capture Date</q-tooltip>
+      </q-btn>
 
-    <div>
-      <q-checkbox
-        :model-value="main"
-        outlined
-        label="Featured"
-        class="q-pr-lg q-pl-sm"
-        @update:model-value="$emit('update:main', $event)" />
+      <div>
+        <q-checkbox
+          :model-value="main"
+          outlined
+          label="Featured"
+          class="q-pr-lg q-pl-sm"
+          @update:model-value="$emit('update:main', $event)" />
+      </div>
     </div>
   </div>
 </template>
@@ -61,6 +64,14 @@ const props = defineProps({
   inputColor: {
     type: String,
     default: undefined
+  },
+  showDescription: {
+    type: Boolean,
+    default: true
+  },
+  showExtendedAttributes: {
+    type: Boolean,
+    default: true
   }
 })
 

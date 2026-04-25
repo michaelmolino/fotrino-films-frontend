@@ -100,6 +100,20 @@ async function saveMediaEdit(payload) {
       resourceDate: payload?.resourceDate ?? null,
       main: !!payload?.main
     })
+
+    if (payload?.previewFile) {
+      const instruction = await store.dispatch('channel/requestMediaPreviewUpload', {
+        mediaId: payload?.id
+      })
+      await store.dispatch('channel/uploadMediaPreviewBinary', {
+        url: instruction.url,
+        file: payload.previewFile
+      })
+      await store.dispatch('channel/confirmMediaPreviewUpload', {
+        mediaId: payload?.id
+      })
+    }
+
     await store.dispatch('channel/getChannels', true)
     Notify.create({
       type: 'positive',
