@@ -40,7 +40,7 @@ onMounted(async () => {
 })
 
 watch(
-  () => route.fullPath,
+  [() => route.params.uuid, () => route.params.privateId],
   async () => {
     await loadChannel(route)
   }

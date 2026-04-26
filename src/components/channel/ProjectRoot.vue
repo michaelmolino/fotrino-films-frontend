@@ -90,24 +90,12 @@ function findMediaByParams(project) {
   return project.media?.find(m => m.main) || project.media?.[0] || null
 }
 
-function shouldRedirect404() {
-  return !loading.value && channel.value && channel.value.uuid === route.params.uuid
-}
-
 const project = computed(() => {
-  const p = findProjectByParams()
-  if (!p && shouldRedirect404()) {
-    redirect('/404')
-  }
-  return p
+  return findProjectByParams()
 })
 
 const media = computed(() => {
-  const m = findMediaByParams(project.value)
-  if (!m && shouldRedirect404()) {
-    redirect('/404')
-  }
-  return m
+  return findMediaByParams(project.value)
 })
 
 const relatedMedia = computed(() => {
@@ -136,7 +124,7 @@ watch(
       !loading.value
     ) {
       redirect('/404')
-    } else if (newMedia && !route.params.mediaSlug) {
+    } else if (newMedia && route.params.uuid && !route.params.mediaSlug) {
       redirect({ params: { ...route.params, mediaSlug: newMedia.slug } })
     }
   },

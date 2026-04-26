@@ -230,6 +230,7 @@ const previewThumb = ref(null)
 const previewThumbRandom = ref(null)
 const mediaFile = ref(null)
 const counter = ref(0)
+const projectsLoadToken = ref(0)
 const isUploading = ref(false)
 const progress = ref(0)
 const statusText = ref(null)
@@ -437,6 +438,7 @@ watch(
   async newUuid => {
     try {
       if (!newUuid || newUuid === 0) {
+        projectsLoadToken.value++
         projects.value = []
         // Ensure the Project step defaults to creating a new project
         if (!payload.project?.id || payload.project.id.value !== 0) {
@@ -445,7 +447,9 @@ watch(
         return
       }
 
-      await loadProjectsForChannelUuid(newUuid)
+      const requestToken = ++projectsLoadToken.value
+      await loadProjectsForChannelUuid(newUuid, requestToken)
+      if (requestToken !== projectsLoadToken.value) return
       // If the previously selected project isn't part of this channel, reset selection
       const currentId = payload.project?.id?.value
       const found = currentId && projects.value.some(p => p.id === currentId)
@@ -472,8 +476,10 @@ watch(channels, ch => {
   }
   // Keep projects in sync for quick upload checks
   if (ch.length === 1) {
-    loadProjectsForChannelUuid(ch[0].uuid)
+    const requestToken = ++projectsLoadToken.value
+    loadProjectsForChannelUuid(ch[0].uuid, requestToken)
   } else {
+    projectsLoadToken.value++
     projects.value = []
   }
 })
@@ -487,18 +493,17 @@ watch(projects, p => {
 
 watch(step, s => {
   if (s === 3 && payload.uuid?.value !== 0 && payload.uuid?.value) {
-    store.cache
-      .dispatch('channel/getChannel', { uuid: payload.uuid.value, pending: true })
-      .then(ch => {
-        projects.value = ch.projects
-        if (projects.value.length === 0) payload.project.id = { value: 0, label: 'New...' }
-        if (projects.value.length === 1) {
-          payload.project.id = projects.value.map(({ id, title }) => ({
-            value: id,
-            label: title
-          }))[0]
-        }
-      })
+    const requestToken = ++projectsLoadToken.value
+    loadProjectsForChannelUuid(payload.uuid.value, requestToken).then(() => {
+      if (requestToken !== projectsLoadToken.value) return
+      if (projects.value.length === 0) payload.project.id = { value: 0, label: 'New...' }
+      if (projects.value.length === 1) {
+        payload.project.id = projects.value.map(({ id, title }) => ({
+          value: id,
+          label: title
+        }))[0]
+      }
+    })
   } else if (projects.value.length === 0 && s === 3) {
     payload.project.id = { value: 0, label: 'New...' }
   }
@@ -613,11 +618,13 @@ async function factoryUpload() {
 // Step-specific helpers live in the step components now
 
 // lifecycle
-async function loadProjectsForChannelUuid(uuid) {
+async function loadProjectsForChannelUuid(uuid, requestToken = projectsLoadToken.value) {
   try {
     const chan = await store.cache.dispatch('channel/getChannel', { uuid, pending: true })
+    if (requestToken !== projectsLoadToken.value) return
     projects.value = chan?.projects || []
   } catch (err) {
+    if (requestToken !== projectsLoadToken.value) return
     console.error('Failed to load channel projects:', err)
     projects.value = []
     Notify.create({
@@ -638,8 +645,10 @@ onMounted(async () => {
   await store.dispatch('channel/getChannels')
   const list = store.state.channel.channels || []
   if (list.length === 1) {
-    await loadProjectsForChannelUuid(list[0].uuid)
+    const requestToken = ++projectsLoadToken.value
+    await loadProjectsForChannelUuid(list[0].uuid, requestToken)
   } else {
+    projectsLoadToken.value++
     projects.value = []
   }
   globalThis.addEventListener('beforeunload', beforeUnloadHandler)
