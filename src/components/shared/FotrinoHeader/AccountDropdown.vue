@@ -3,6 +3,7 @@
     :icon="'img:' + profile.profile_pic"
     :label="$q.screen.gt.sm ? 'Account' : ''"
     :aria-label="'Account menu for ' + (profile.name || 'user')"
+    data-cy="account-menu"
     flat
     no-caps
     size="md">
@@ -52,6 +53,7 @@
         icon="logout"
         label="Logout"
         aria-label="Logout from your account"
+        data-cy="account-logout"
         size="md"
         class="col-xs-12" />
     </div>

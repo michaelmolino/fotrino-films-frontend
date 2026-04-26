@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md">
+  <div class="q-pa-md" data-cy="project-root">
     <template v-if="loading || !channel || !project">
       <q-skeleton type="rect" class="q-mb-md skeleton-large" />
       <q-skeleton type="text" width="60%" />
@@ -21,12 +21,12 @@
           :media="media"
           :artist="channel?.ownername"
           class="q-py-md plyrplayer" />
-        <div v-if="media" class="plyrplayer">
+        <div v-if="media" class="plyrplayer" data-cy="media-description-container">
           <MediaDescription :media="media" />
         </div>
 
         <template v-if="hasRelatedContent">
-          <div class="q-pt-md text-h6">More from {{ project.title }}</div>
+          <div class="q-pt-md text-h6" data-cy="related-media-title">More from {{ project.title }}</div>
           <q-separator spaced />
           <div class="row">
             <div

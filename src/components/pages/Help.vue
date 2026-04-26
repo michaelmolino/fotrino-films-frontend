@@ -1,13 +1,14 @@
 <template>
-  <div class="q-pa-md flex flex-center">
-    <q-card flat bordered class="q-pa-xl card-terms">
-      <div class="text-h4 text-center q-mb-md">Frequently Asked Questions</div>
+  <div class="q-pa-md flex flex-center" data-cy="help-page">
+    <q-card flat bordered class="q-pa-xl card-terms" data-cy="help-card">
+      <div class="text-h4 text-center q-mb-md" data-cy="help-title">Frequently Asked Questions</div>
       <div class="text-caption text-center q-mb-lg">Frequently asked questions and answers</div>
-      <q-list bordered>
+      <q-list bordered data-cy="help-faq-list">
         <q-expansion-item
+          data-cy="help-item-about"
           group="faq"
           label="What is Fotrino Films?"
-          :default-opened="!$route.query.item || $route.query.item === 'about'"
+          :default-opened="!selectedItem || selectedItem === 'about'"
           header-class="text-bold"
           @show="onItemSelect('about')"
           @hide="() => onItemHide('about')">
@@ -20,14 +21,15 @@
         </q-expansion-item>
         <q-separator />
         <q-expansion-item
+          data-cy="help-item-different"
           group="faq"
           label="How is it different from other video hosts?"
           header-class="text-bold"
-          :default-opened="$route.query.item === 'different'"
+          :default-opened="selectedItem === 'different'"
           @show="onItemSelect('different')"
           @hide="() => onItemHide('different')">
           <q-card>
-            <q-card-section>
+            <q-card-section data-cy="help-answer-different">
               <div>
                 Fotrino Films focuses on private, ad-free video hosting. It’s not built for
                 monetization or content discovery — there are no ads, algorithms, or data tracking.
@@ -39,14 +41,15 @@
         </q-expansion-item>
         <q-separator />
         <q-expansion-item
+          data-cy="help-item-opensource"
           group="faq"
           label="Is Fotrino Films open source?"
           header-class="text-bold"
-          :default-opened="$route.query.item === 'opensource'"
+          :default-opened="selectedItem === 'opensource'"
           @show="onItemSelect('opensource')"
           @hide="() => onItemHide('opensource')">
           <q-card>
-            <q-card-section>
+            <q-card-section data-cy="help-answer-opensource">
               The frontend of Fotrino Films is open source. The backend might be open-sourced in the
               future.
             </q-card-section>
@@ -54,10 +57,11 @@
         </q-expansion-item>
         <q-separator />
         <q-expansion-item
+          data-cy="help-item-privacy"
           group="faq"
           label="Is my content public or private?"
           header-class="text-bold"
-          :default-opened="$route.query.item === 'privacy'"
+          :default-opened="selectedItem === 'privacy'"
           @show="onItemSelect('privacy')"
           @hide="() => onItemHide('privacy')">
           <q-card>
@@ -74,10 +78,11 @@
         </q-expansion-item>
         <q-separator />
         <q-expansion-item
+          data-cy="help-item-production"
           group="faq"
           label="Is it ready to use?"
           header-class="text-bold"
-          :default-opened="$route.query.item === 'production'"
+          :default-opened="selectedItem === 'production'"
           @show="onItemSelect('production')"
           @hide="() => onItemHide('production')">
           <q-card>
@@ -88,10 +93,11 @@
         </q-expansion-item>
         <q-separator />
         <q-expansion-item
+          data-cy="help-item-mobilesupport"
           group="faq"
           label="Does it work on mobile?"
           header-class="text-bold"
-          :default-opened="$route.query.item === 'mobilesupport'"
+          :default-opened="selectedItem === 'mobilesupport'"
           @show="onItemSelect('mobilesupport')"
           @hide="() => onItemHide('mobilesupport')">
           <q-card>
@@ -100,10 +106,11 @@
         </q-expansion-item>
         <q-separator />
         <q-expansion-item
+          data-cy="help-item-download"
           group="faq"
           label="Do videos have any DRM?  Can I download a video?"
           header-class="text-bold"
-          :default-opened="$route.query.item === 'download'"
+          :default-opened="selectedItem === 'download'"
           @show="onItemSelect('download')"
           @hide="() => onItemHide('download')">
           <q-card>
@@ -116,10 +123,11 @@
         </q-expansion-item>
         <q-separator />
         <q-expansion-item
+          data-cy="help-item-buffering"
           group="faq"
           label="What can I do if I'm experiencing buffering or poor video quality?"
           header-class="text-bold"
-          :default-opened="$route.query.item === 'buffering'"
+          :default-opened="selectedItem === 'buffering'"
           @show="onItemSelect('buffering')"
           @hide="() => onItemHide('buffering')">
           <q-card>
@@ -133,10 +141,11 @@
         </q-expansion-item>
         <q-separator />
         <q-expansion-item
+          data-cy="help-item-facebook"
           group="faq"
           label="When I share a link on Facebook, I'm not getting a preview image.  What should I do?"
           header-class="text-bold"
-          :default-opened="$route.query.item === 'facebook'"
+          :default-opened="selectedItem === 'facebook'"
           @show="onItemSelect('facebook')"
           @hide="() => onItemHide('facebook')">
           <q-card>
@@ -157,10 +166,11 @@
         </q-expansion-item>
         <q-separator />
         <q-expansion-item
+          data-cy="help-item-login"
           group="faq"
           label="Why can I only login with Google?"
           header-class="text-bold"
-          :default-opened="$route.query.item === 'login'"
+          :default-opened="selectedItem === 'login'"
           @show="onItemSelect('login')"
           @hide="() => onItemHide('login')">
           <q-card>
@@ -174,10 +184,11 @@
         </q-expansion-item>
         <q-separator />
         <q-expansion-item
+          data-cy="help-item-filesize"
           group="faq"
           label="Is there a file size limit for uploads?"
           header-class="text-bold"
-          :default-opened="$route.query.item === 'filesize'"
+          :default-opened="selectedItem === 'filesize'"
           @show="onItemSelect('filesize')"
           @hide="() => onItemHide('filesize')">
           <q-card>
@@ -189,10 +200,11 @@
         </q-expansion-item>
         <q-separator />
         <q-expansion-item
+          data-cy="help-item-terminology"
           group="faq"
           label="Terminology"
           header-class="text-bold"
-          :default-opened="$route.query.item === 'terminology'"
+          :default-opened="selectedItem === 'terminology'"
           @show="onItemSelect('terminology')"
           @hide="() => onItemHide('terminology')">
           <q-card>
@@ -222,11 +234,14 @@
 
 <script setup>
 import facebookIcon from '@assets/icons/facebook.svg'
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 defineOptions({ name: 'Help-Page' })
 const route = useRoute()
 const router = useRouter()
+const selectedItem = computed(() => route.query.item)
+let hideTimer = null
 
 function onItemSelect(item) {
   router.replace({
@@ -238,9 +253,13 @@ function onItemSelect(item) {
 }
 
 function onItemHide(item) {
-  // Add delay to prevent race conditions with @show events
-  setTimeout(() => {
-    if (route.query.item === item) {
+  if (hideTimer) {
+    clearTimeout(hideTimer)
+  }
+
+  // A short delay prevents races with the next expansion item's @show event.
+  hideTimer = setTimeout(() => {
+    if (selectedItem.value === item) {
       const otherQuery = { ...route.query }
       delete otherQuery.item
       router.replace({

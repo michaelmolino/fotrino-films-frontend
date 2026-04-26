@@ -1,11 +1,11 @@
 <template>
-  <nav class="breadcrumb-nav">
+  <nav class="breadcrumb-nav" data-cy="breadcrumbs">
     <div class="row items-center q-gutter-md q-pa-md">
       <q-avatar v-if="$q.screen.gt.xs">
         <img :src="channel.cover" :alt="channel.title" loading="lazy" decoding="async" />
       </q-avatar>
       <div class="col">
-        <q-breadcrumbs :active-color="$q.dark.isActive ? 'info' : 'primary'">
+        <q-breadcrumbs :active-color="$q.dark.isActive ? 'info' : 'primary'" data-cy="breadcrumbs-list">
           <template #separator>
             <q-icon
               size="1.5em"

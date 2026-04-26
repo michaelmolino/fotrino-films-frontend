@@ -1,5 +1,5 @@
 <template>
-  <q-footer reveal class="bg-secondary">
+  <q-footer reveal class="bg-secondary" data-cy="app-footer">
     <div class="row no-wrap">
       <q-btn
         flat
@@ -14,6 +14,7 @@
         icon="description"
         :label="$q.screen.gt.xs ? 'Terms/Privacy' : ''"
         to="/terms"
+        data-cy="footer-terms-link"
         aria-label="Terms and Privacy Policy" />
       <q-btn
         icon="help_outline"
@@ -22,6 +23,7 @@
         no-caps
         size="md"
         to="/help"
+        data-cy="footer-help-link"
         aria-label="Help and documentation" />
       <q-btn
         flat

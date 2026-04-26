@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div data-cy="media-player">
     <div v-if="view == 'video'">
       <video
         id="video-player"
@@ -8,6 +8,7 @@
         :key="media.id"
         :aria-label="`Video player for ${media.title}`"
         preload="metadata"
+        data-cy="video-player"
         class="videoEl"></video>
     </div>
     <div v-else class="audio-container">
@@ -23,6 +24,7 @@
         controls
         :key="media.id"
         :aria-label="`Audio player for ${media.title}`"
+        data-cy="audio-player"
         class="audioEl"></audio>
     </div>
   </div>

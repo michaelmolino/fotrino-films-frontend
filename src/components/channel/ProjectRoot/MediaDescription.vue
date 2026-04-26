@@ -1,5 +1,5 @@
 <template>
-  <q-card flat bordered class="description">
+  <q-card flat bordered class="description" data-cy="media-description-card">
     <q-card-section vertical>
       <q-icon :name="isPublic ? 'public' : 'public_off'" size="md" class="q-pr-sm" />
       <span class="text-h6">{{ media?.title || '' }}</span>
@@ -21,7 +21,7 @@
         data-cy="share-button"
         flat>
         <q-list>
-          <q-item v-if="isPublic" clickable v-close-popup @click="copyLink('public')">
+          <q-item v-if="isPublic" clickable v-close-popup data-cy="share-within-channel" @click="copyLink('public')">
             <q-item-section avatar>
               <q-avatar icon="public" color="accent" text-color="white" />
             </q-item-section>
@@ -32,7 +32,7 @@
               <q-icon name="content_copy" color="accent" />
             </q-item-section>
           </q-item>
-          <q-item clickable v-close-popup @click="copyLink('private')">
+          <q-item clickable v-close-popup data-cy="share-only-video" @click="copyLink('private')">
             <q-item-section avatar>
               <q-avatar icon="public_off" color="accent" text-color="white" />
             </q-item-section>
@@ -51,11 +51,11 @@
     </q-card-section>
     <q-separator inset v-if="descriptionSafe" />
     <q-card-section vertical>
-      <div class="text-body1" v-html="descriptionSafe"></div>
+      <div class="text-body1" data-cy="media-description-text" v-html="descriptionSafe"></div>
     </q-card-section>
 
-    <q-dialog v-model="reportDialog" persistent>
-      <q-card style="min-width: 320px; max-width: 480px">
+    <q-dialog v-model="reportDialog" persistent data-cy="report-dialog">
+      <q-card style="min-width: 320px; max-width: 480px" data-cy="report-dialog-card">
         <q-card-section class="row items-center q-gutter-sm">
           <q-icon name="flag" color="negative" />
           <div class="text-h6">Report this video</div>
@@ -69,6 +69,7 @@
             outlined
             counter
             :maxlength="500"
+            data-cy="report-reason-input"
             placeholder="Reason (optional)" />
         </q-card-section>
         <q-card-actions align="right">
@@ -78,6 +79,7 @@
             label="Submit"
             color="negative"
             :loading="submitting"
+            data-cy="report-submit"
             @click="submitReport" />
         </q-card-actions>
       </q-card>

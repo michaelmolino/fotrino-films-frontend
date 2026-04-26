@@ -3,6 +3,7 @@
     :model-value="model"
     @update:model-value="updateModelValue"
     class="q-py-md"
+    data-cy="channel-view-toggle"
     no-caps
     rounded
     unelevated
@@ -15,7 +16,7 @@
       { value: 'all', slot: 'all' }
     ]">
     <template #project>
-      <div class="row items-center no-wrap">
+      <div class="row items-center no-wrap" data-cy="channel-view-projects">
         <span class="text-center">Projects</span>
         <q-avatar color="accent" text-color="white" size="sm" square class="q-ml-sm">{{
           projectCount
@@ -23,7 +24,7 @@
       </div>
     </template>
     <template #main>
-      <div class="row items-center no-wrap">
+      <div class="row items-center no-wrap" data-cy="channel-view-featured">
         <span class="text-center">Featured Media</span>
         <q-avatar color="accent" text-color="white" size="sm" square class="q-ml-sm">{{
           mainCount
@@ -31,7 +32,7 @@
       </div>
     </template>
     <template #all>
-      <div class="row items-center no-wrap">
+      <div class="row items-center no-wrap" data-cy="channel-view-all">
         <span class="text-center">All Media</span>
         <q-avatar color="accent" text-color="white" size="sm" square class="q-ml-sm">{{
           allCount

@@ -1,7 +1,7 @@
 <template>
   <div class="admin-dashboard-page q-pa-md" data-cy="admin-dashboard">
     <template v-if="isAdmin">
-      <div class="text-h6 text-weight-bold">Admin: All Users</div>
+      <div class="text-h6 text-weight-bold" data-cy="admin-all-users-title">Admin: All Users</div>
       <div class="text-caption text-grey-7 q-mb-md">All registered users.</div>
       <AdminUserList class="q-mb-xl" />
       <AdminDLQ class="q-mb-xl" />

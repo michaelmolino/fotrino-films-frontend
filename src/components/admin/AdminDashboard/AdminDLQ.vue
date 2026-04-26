@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="text-h6 text-weight-bold">Admin: Dead Letter Queue</div>
+    <div class="text-h6 text-weight-bold" data-cy="admin-dlq-title">Admin: Dead Letter Queue</div>
     <div class="text-caption text-grey-7 q-mb-md">
       Events that exhausted retries or were marked dead.
     </div>

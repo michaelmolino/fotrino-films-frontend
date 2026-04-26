@@ -8,6 +8,7 @@
       max-file-size="5368709120"
       class="q-pb-md"
       color="accent"
+      data-cy="upload-media-file"
       @update:model-value="onUpdateMediaFile">
       <template v-slot:prepend>
         <q-icon name="movie" @click.stop.prevent />
@@ -24,6 +25,7 @@
         clearable
         :model-value="payload.project.media.title"
         label="Title *"
+        data-cy="upload-media-title"
         @update:model-value="onUpdateMediaTitle" />
       <q-card flat bordered class="q-pb-md">
         <q-card-section>

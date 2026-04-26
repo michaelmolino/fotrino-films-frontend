@@ -9,6 +9,7 @@
       :color="inputColor"
       class="q-pb-md"
       label="Description - p, br, strong, and i tags allowed"
+      data-cy="media-description-input"
       @update:model-value="$emit('update:description', $event)" />
 
     <div v-if="showExtendedAttributes">
@@ -39,6 +40,7 @@
           outlined
           label="Featured"
           class="q-pr-lg q-pl-sm"
+          data-cy="media-featured-checkbox"
           @update:model-value="$emit('update:main', $event)" />
       </div>
     </div>

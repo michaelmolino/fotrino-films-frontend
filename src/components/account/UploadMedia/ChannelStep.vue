@@ -6,6 +6,7 @@
       label="Channel *"
       :model-value="payload.uuid"
       @update:model-value="onUpdateUuid"
+      data-cy="upload-channel-select"
       :options="
         channels
           .map(({ uuid, title }) => ({ value: uuid, label: title }))
@@ -21,6 +22,7 @@
         :model-value="payload.title"
         label="Channel Title *"
         clearable
+        data-cy="upload-channel-title"
         @focus="clearDefaultChannelTitle"
         @blur="restoreDefaultChannelTitle"
         @update:model-value="onUpdateTitle" />
@@ -39,6 +41,7 @@
             val="new"
             label="Upload Photo"
             color="accent"
+            data-cy="upload-channel-cover-type-new"
             class="q-pb-md" /><br />
           <q-file
             v-if="payload.uuid?.value === 0 && localCoverType === 'new'"
@@ -48,6 +51,7 @@
             accept="image/*"
             color="accent"
             class="q-mb-md"
+            data-cy="upload-channel-cover-file"
             @update:model-value="onUpdateCoverFile">
             <template v-slot:prepend>
               <q-icon name="image" @click.stop.prevent />

@@ -79,6 +79,7 @@ export default boot(({ app, router, store }) => {
               icon: 'error',
               label: 'Confirm delete',
               color: 'white',
+              attrs: { 'data-cy': 'confirm-delete' },
               handler: () => {
                 showLoader()
                 resolve(req)
@@ -88,6 +89,7 @@ export default boot(({ app, router, store }) => {
               icon: 'undo',
               label: 'Go Back',
               color: 'white',
+              attrs: { 'data-cy': 'cancel-delete' },
               handler: () => {
                 const err = new Error('User cancelled delete')
                 err.__userCancelled = true

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="text-h6 text-weight-bold">Admin: Reported Media</div>
+    <div class="text-h6 text-weight-bold" data-cy="admin-reported-media-title">Admin: Reported Media</div>
     <div class="text-caption text-grey-7 q-mb-md">All media that has been reported by users.</div>
     <div v-if="loading">
       <q-skeleton type="rect" height="40px" class="q-mb-sm" />

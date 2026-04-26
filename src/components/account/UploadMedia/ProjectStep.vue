@@ -7,6 +7,7 @@
       :model-value="payload.project.id"
       @update:model-value="onUpdateProjectId"
       :options="filteredOptions"
+      data-cy="upload-project-select"
       class="q-pb-md" />
     <q-input
       v-if="payload.project.id?.value === 0"
@@ -16,6 +17,7 @@
       clearable
       :model-value="payload.project.title"
       label="Project Title *"
+      data-cy="upload-project-title"
       @update:model-value="onUpdateProjectTitle"
       @focus="clearDefaultProjectTitle"
       @blur="restoreDefaultProjectTitle" />
@@ -53,6 +55,7 @@
           v-model="localPosterType"
           val="new"
           label="Upload Photo"
+          data-cy="upload-project-poster-type-new"
           color="accent" />
         <q-file
           v-if="payload.project.id?.value === 0 && localPosterType === 'new'"
@@ -62,6 +65,7 @@
           accept="image/*"
           class="q-py-md"
           color="accent"
+          data-cy="upload-project-poster-file"
           @update:model-value="onUpdatePosterFile">
           <template v-slot:prepend>
             <q-icon name="image" @click.stop.prevent />

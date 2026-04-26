@@ -1,8 +1,8 @@
 <template>
-  <div class="auth-required-container">
+  <div class="auth-required-container" :data-cy="`auth-required-${props.type}`">
     <q-icon :name="computedIcon" :size="iconSize" color="grey-5" />
-    <div class="text-h6 q-mt-md text-grey-6">{{ computedTitle }}</div>
-    <div class="text-body2 text-grey-7">{{ computedMessage }}</div>
+    <div class="text-h6 q-mt-md text-grey-6" data-cy="auth-required-title">{{ computedTitle }}</div>
+    <div class="text-body2 text-grey-7" data-cy="auth-required-message">{{ computedMessage }}</div>
   </div>
 </template>
 

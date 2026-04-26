@@ -15,6 +15,7 @@
       :model-value="previewType"
       val="new"
       label="Upload Photo"
+      data-cy="preview-type-upload"
       color="accent"
       @update:model-value="$emit('update:previewType', $event)" />
 
@@ -26,6 +27,7 @@
       accept="image/*"
       class="q-pb-md"
       color="accent"
+      data-cy="preview-image-file"
       @update:model-value="$emit('update:previewFile', $event)">
       <template v-slot:prepend>
         <q-icon name="image" @click.stop.prevent />

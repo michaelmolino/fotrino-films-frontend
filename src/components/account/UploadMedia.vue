@@ -1,5 +1,5 @@
 <template>
-  <div v-if="profile?.id" class="q-pa-md">
+  <div v-if="profile?.id" class="q-pa-md" data-cy="upload-page">
     <q-item class="q-pb-md">
       <q-item-section>
         <q-item-label class="text-h5">Upload Media</q-item-label>
@@ -10,6 +10,7 @@
       ref="stepper"
       flat
       bordered
+      data-cy="upload-stepper"
       active-color="info"
       :inactive-color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
       done-color="positive"
@@ -78,6 +79,7 @@
         title="Upload"
         icon="cloud_upload"
         active-icon="cloud_upload"
+        data-cy="upload-step-upload"
         :done="step > 4"
         :header-nav="step === 3 && !!next">
         <div class="text-center">
@@ -116,6 +118,7 @@
         title="Processing"
         icon="settings"
         active-icon="settings"
+        data-cy="upload-step-processing"
         :header-nav="step === 4 && !!next">
         <div class="text-center">
           <div class="q-mb-md">
@@ -126,9 +129,9 @@
               :showMainAccent="false"
               class="processing-preview" />
           </div>
-          <div class="processing-status">
+          <div class="processing-status" data-cy="upload-processing-status">
             <q-icon name="settings" size="24px" color="accent" class="q-mr-sm rotating-gears" />
-            <span class="text-h6">Processing...</span>
+            <span class="text-h6" data-cy="upload-processing-text">Processing...</span>
           </div>
           <div class="q-pa-md text-body2">
             Your media <strong>{{ media.title || 'Untitled Media' }}</strong> is processing and will
@@ -153,12 +156,14 @@
             icon="bolt"
             flat
             label="Quick Upload"
+            data-cy="upload-quick-button"
             @click="quickUpload"
             :disabled="!next" />
           <q-btn
             v-if="step < 3"
             icon="arrow_forward"
             flat
+            data-cy="upload-next-button"
             @click="goNext"
             :label="step === 1 && quickUploadAvailable ? 'More Options' : 'Next'"
             :disabled="!next" />
@@ -167,6 +172,7 @@
             icon="cloud_upload"
             flat
             label="Upload"
+            data-cy="upload-submit-button"
             :disabled="!next"
             @click="goNext">
           </q-btn>

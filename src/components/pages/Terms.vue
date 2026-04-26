@@ -1,7 +1,7 @@
 <template>
-  <div class="q-pa-md flex flex-center">
-    <q-card flat bordered class="q-pa-xl card-terms">
-      <div class="text-h4 text-center q-mb-md">Privacy Policy & Terms of Use</div>
+  <div class="q-pa-md flex flex-center" data-cy="terms-page">
+    <q-card flat bordered class="q-pa-xl card-terms" data-cy="terms-card">
+      <div class="text-h4 text-center q-mb-md" data-cy="terms-title">Privacy Policy & Terms of Use</div>
       <div class="text-caption text-center q-mb-lg">Last updated: <i>2025-12-14</i></div>
       <ol class="q-pl-md">
         <li class="q-mb-lg">
