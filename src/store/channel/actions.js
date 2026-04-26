@@ -178,7 +178,7 @@ export async function updateMedia(_, { mediaId, description = null, resourceDate
 /**
  * @param {import('vuex').ActionContext<any, any>} _
  * @param {{ mediaId: number }} payload
- * @returns {Promise<import('src/types/api-contract').UploadInstruction>}
+ * @returns {Promise<import('src/types/api-contract').UploadInstruction & { objectName: string }}
  */
 export async function requestMediaPreviewUpload(_, { mediaId }) {
   const res = await api.post(
@@ -193,13 +193,15 @@ export async function requestMediaPreviewUpload(_, { mediaId }) {
 
 /**
  * @param {import('vuex').ActionContext<any, any>} _
- * @param {{ mediaId: number }} payload
+ * @param {{ mediaId: number, objectName: string }} payload
  * @returns {Promise<void>}
  */
-export async function confirmMediaPreviewUpload(_, { mediaId }) {
+export async function confirmMediaPreviewUpload(_, { mediaId, objectName }) {
   await api.put(
     `/channels/media/${mediaId}/preview/confirm`,
-    null,
+    {
+      objectName
+    },
     {
       __skipGlobalErrorNotify: true
     }

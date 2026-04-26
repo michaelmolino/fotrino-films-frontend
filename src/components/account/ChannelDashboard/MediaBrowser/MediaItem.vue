@@ -50,7 +50,13 @@
 
         <q-card-actions align="right">
           <q-btn flat label="Cancel" color="primary" @click="editDialog = false" />
-          <q-btn unelevated label="Save" color="accent" @click="saveEdit" />
+          <q-btn
+            unelevated
+            label="Save"
+            color="accent"
+            :loading="editPreviewProcessing"
+            :disable="editPreviewProcessing"
+            @click="saveEdit" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -82,6 +88,7 @@ const editForm = ref({
 })
 const editPreviewFile = ref(null)
 const editPreviewImage = ref(null)
+const editPreviewProcessing = ref(false)
 const localObjectUrl = ref(null)
 
 const { handleFile: processFile } = useFileProcessor()
@@ -122,6 +129,7 @@ function openEditDialog() {
   }
   editPreviewFile.value = null
   editPreviewImage.value = props.media?.preview || null
+  editPreviewProcessing.value = false
   clearLocalObjectUrl()
   editDialog.value = true
 }
@@ -151,14 +159,23 @@ async function onUpdatePreviewFile(fileOrFiles) {
   const file = Array.isArray(fileOrFiles) ? fileOrFiles[0] : fileOrFiles
   if (!file) {
     editPreviewFile.value = null
+    editPreviewProcessing.value = false
     clearLocalObjectUrl()
     editPreviewImage.value = props.media?.preview || null
     return
   }
-  const processed = await processFile(file, 'preview')
-  editPreviewFile.value = processed || file
-  const previewUrl = URL.createObjectURL(editPreviewFile.value)
+  // Set immediately so Save cannot race ahead of async image processing.
+  editPreviewFile.value = file
+  const previewUrl = URL.createObjectURL(file)
   setLocalPreviewImage(previewUrl)
+
+  editPreviewProcessing.value = true
+  try {
+    const processed = await processFile(file, 'preview')
+    editPreviewFile.value = processed || file
+  } finally {
+    editPreviewProcessing.value = false
+  }
 }
 
 function saveEdit() {

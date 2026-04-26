@@ -422,6 +422,7 @@ const next = computed(() => {
       return (
         !!payload.project?.media?.title &&
         !!mediaFile.value &&
+        !isPreviewProcessing.value &&
         ((payload.project.media.previewType === 'new' && !!previewFile.value) ||
           (payload.project.media.previewType === 'frame' && !!previewThumbRandom.value))
       )

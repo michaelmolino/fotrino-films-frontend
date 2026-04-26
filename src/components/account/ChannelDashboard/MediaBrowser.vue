@@ -110,7 +110,8 @@ async function saveMediaEdit(payload) {
         file: payload.previewFile
       })
       await store.dispatch('channel/confirmMediaPreviewUpload', {
-        mediaId: payload?.id
+        mediaId: payload?.id,
+        objectName: instruction.objectName
       })
     }
 
