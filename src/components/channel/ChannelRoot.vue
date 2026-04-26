@@ -66,11 +66,11 @@
 </template>
 
 <script setup>
-import { ref, toRef, computed, defineAsyncComponent, watch } from 'vue'
+import { ref, computed, defineAsyncComponent, watch } from 'vue'
 import { getViewPreference, setViewPreference } from '@utils/viewPreference.js'
-import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
 import { sortBy } from '@utils/sort.js'
+import { useChannelLoading } from '@composables/useChannelLoading.js'
 
 import BreadCrumbs from '@components/shared/BreadCrumbs.vue'
 import ProjectPoster from '@components/channel/ProjectPoster.vue'
@@ -78,27 +78,9 @@ import MediaPreview from '@components/channel/MediaPreview.vue'
 import ViewToggle from './ChannelRoot/ViewToggle.vue'
 const NothingText = defineAsyncComponent(() => import('@components/shared/NothingText.vue'))
 
-const store = useStore()
 const route = useRoute()
 const selectedView = ref(getViewPreference('all'))
-const loading = ref(true)
-const channel = toRef(store.state.channel, 'channel')
-
-watch(
-  [channel, () => route.params.uuid],
-  ([newChannel, newUuid]) => {
-    // If we have a route UUID but no matching channel, we're still loading
-    if (newUuid && (!newChannel || newChannel.uuid !== newUuid)) {
-      loading.value = true
-    } else if (newChannel?.uuid === newUuid) {
-      // Channel matches route, we're done loading
-      loading.value = false
-    } else if (!newUuid) {
-      loading.value = false
-    }
-  },
-  { immediate: true }
-)
+const { channel, loading } = useChannelLoading()
 
 watch(selectedView, val => {
   setViewPreference(val)
@@ -128,7 +110,7 @@ const sortedMedia = computed(() => {
 })
 
 const projectCount = computed(() => projects.value.length)
-const mainCount = computed(() => allMedia.value.filter(f => f.media?.main).length)
+const mainCount = computed(() => mainMedia.value.length)
 const allCount = computed(() => allMedia.value.length)
 </script>
 

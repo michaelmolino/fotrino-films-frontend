@@ -13,57 +13,44 @@
   <router-view />
 </template>
 
-<script>
+<script setup>
 import { ref, watch, defineAsyncComponent, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
 
-export default {
-  name: 'App',
+const Terms = defineAsyncComponent(() => import('@components/pages/Terms.vue'))
 
-  components: {
-    Terms: defineAsyncComponent(() => import('@components/pages/Terms.vue'))
-  },
+const store = useStore()
+const route = useRoute()
+const router = useRouter()
+const { loadChannel } = useChannelLoader()
 
-  setup() {
-    const store = useStore()
-    const route = useRoute()
-    const router = useRouter()
-    const { loadChannel } = useChannelLoader()
+const showTerms = ref(false)
 
-    const showTerms = ref(false)
-
-    onMounted(async () => {
-      if (process.env.NODE_ENV === 'development') {
-        console.warn(
-          'WARNING: This is a development server and should not be exposed to the internet.'
-        )
-      }
-      await store.dispatch('account/getProfile')
-      showTerms.value = route.query?.showTerms?.toLowerCase() === 'true'
-      await loadChannel(route)
-    })
-
-    watch(
-      () => route.fullPath,
-      async () => {
-        await loadChannel(route)
-      }
+onMounted(async () => {
+  if (process.env.NODE_ENV === 'development') {
+    console.warn(
+      'WARNING: This is a development server and should not be exposed to the internet.'
     )
+  }
+  await store.dispatch('account/getProfile')
+  showTerms.value = route.query?.showTerms?.toLowerCase() === 'true'
+  await loadChannel(route)
+})
 
-    const onTermsClose = () => {
-      if (route.query?.showTerms) {
-        router.replace({
-          query: { ...route.query, showTerms: undefined }
-        })
-      }
-    }
+watch(
+  () => route.fullPath,
+  async () => {
+    await loadChannel(route)
+  }
+)
 
-    return {
-      showTerms,
-      onTermsClose
-    }
+const onTermsClose = () => {
+  if (route.query?.showTerms) {
+    router.replace({
+      query: { ...route.query, showTerms: undefined }
+    })
   }
 }
 </script>

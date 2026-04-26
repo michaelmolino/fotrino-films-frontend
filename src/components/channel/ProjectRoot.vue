@@ -48,9 +48,9 @@
 </template>
 
 <script setup>
-import { computed, watch, defineAsyncComponent, toRef, ref } from 'vue'
-import { useStore } from 'vuex'
+import { computed, watch, defineAsyncComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useChannelLoading } from '@composables/useChannelLoading.js'
 
 import BreadCrumbs from '@components/shared/BreadCrumbs.vue'
 import MediaPreview from '@components/channel/MediaPreview.vue'
@@ -58,12 +58,10 @@ import PlyrPlayer from '@components/channel/ProjectRoot/PlyrPlayer.vue'
 import MediaDescription from '@components/channel/ProjectRoot/MediaDescription.vue'
 const NothingText = defineAsyncComponent(() => import('@components/shared/NothingText.vue'))
 
-const store = useStore()
 const route = useRoute()
 const router = useRouter()
 
-const channel = toRef(store.state.channel, 'channel')
-const loading = ref(true)
+const { channel, loading } = useChannelLoading()
 
 function redirect(pathOrObj) {
   setTimeout(() => router.replace(pathOrObj), 0)
@@ -116,20 +114,6 @@ const relatedMedia = computed(() => {
   return (project.value?.media || []).filter(m => m.id !== media.value?.id)
 })
 const hasRelatedContent = computed(() => !!route.params.uuid && relatedMedia.value.length > 0)
-
-watch(
-  [channel, () => route.params.uuid],
-  ([newChannel, newUuid]) => {
-    if (newUuid && (!newChannel || newChannel.uuid !== newUuid)) {
-      loading.value = true
-    } else if (newChannel?.uuid === newUuid) {
-      loading.value = false
-    } else if (!newUuid) {
-      loading.value = false
-    }
-  },
-  { immediate: true }
-)
 
 watch(
   project,

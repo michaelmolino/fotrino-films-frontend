@@ -31,9 +31,9 @@
           :handleFile="handleFile"
           :previewProcessing="isPreviewProcessing"
           @update:payload="p => Object.assign(payload, p)"
-          @update:mediaFile="updateMediaFile"
-          @update:previewFile="updatePreviewFile"
-          @increment:counter="incrementCounter" />
+          @update:mediaFile="file => handleFile(file, 'upload')"
+          @update:previewFile="file => handleFile(file, 'preview')"
+          @increment:counter="() => counter.value++" />
       </q-step>
 
       <!-- Step 2: Channel -->
@@ -52,7 +52,7 @@
           :coverThumb="coverThumb"
           :handleFile="handleFile"
           @update:payload="p => Object.assign(payload, p)"
-          @update:coverFile="updateCoverFile" />
+          @update:coverFile="file => handleFile(file, 'cover')" />
       </q-step>
 
       <!-- Step 3: Project -->
@@ -70,7 +70,7 @@
           :posterFile="posterFile"
           :handleFile="handleFile"
           @update:payload="p => Object.assign(payload, p)"
-          @update:posterFile="updatePosterFile" />
+          @update:posterFile="file => handleFile(file, 'poster')" />
       </q-step>
 
       <q-step
@@ -266,68 +266,6 @@ async function handleFile(fileOrFiles, resourceType) {
     // processFile already notifies on error, but keep console log here
     console.error('Background file processing error:', err)
   })
-}
-
-// named update helpers used by child components to avoid inline closures that may
-// try to set .value on a null/undefined ref (seen in runtime error).
-function updateCoverFile(fileOrFiles) {
-  const file = Array.isArray(fileOrFiles) ? fileOrFiles[0] : fileOrFiles
-  try {
-    coverFile.value = file
-    if (file && processFile) processFile(file, 'cover').catch(err => console.error(err))
-  } catch (err) {
-    console.error('Failed to update coverFile ref:', err)
-    Notify.create({ type: 'negative', message: 'Internal error updating cover file.' })
-  }
-}
-
-function updatePosterFile(fileOrFiles) {
-  const file = Array.isArray(fileOrFiles) ? fileOrFiles[0] : fileOrFiles
-  try {
-    posterFile.value = file
-    if (file && processFile) processFile(file, 'poster').catch(err => console.error(err))
-  } catch (err) {
-    console.error('Failed to update posterFile ref:', err)
-    Notify.create({ type: 'negative', message: 'Internal error updating poster file.' })
-  }
-}
-
-function updateMediaFile(fileOrFiles) {
-  const file = Array.isArray(fileOrFiles) ? fileOrFiles[0] : fileOrFiles
-  try {
-    mediaFile.value = file
-    if (file && processFile) processFile(file, 'upload').catch(err => console.error(err))
-  } catch (err) {
-    console.error('Failed to update mediaFile ref:', err)
-    Notify.create({ type: 'negative', message: 'Internal error updating media file.' })
-  }
-}
-
-function updatePreviewFile(fileOrFiles) {
-  const file = Array.isArray(fileOrFiles) ? fileOrFiles[0] : fileOrFiles
-  try {
-    previewFile.value = file
-    if (file && processFile) processFile(file, 'preview').catch(err => console.error(err))
-  } catch (err) {
-    console.error('Failed to update previewFile ref:', err)
-    Notify.create({ type: 'negative', message: 'Internal error updating preview file.' })
-  }
-}
-
-function incrementCounter() {
-  try {
-    if (typeof counter.value !== 'number') counter.value = 0
-    counter.value = (counter.value || 0) + 1
-  } catch (err) {
-    console.error('Failed to increment counter:', err)
-    // try a safe fallback
-    try {
-      counter.value = Number(counter.value) + 1
-    } catch (e) {
-      console.error(e)
-      counter.value = 1
-    }
-  }
 }
 
 function goNext() {
@@ -568,35 +506,21 @@ watch(step, s => {
 })
 
 // thumbnail previews for selected files
-watch(coverFile, file => {
-  if (file) {
-    const reader = new FileReader()
-    reader.onload = e => {
-      coverThumb.value = e.target.result
+function watchFileThumb(fileRef, thumbRef) {
+  watch(fileRef, (file, _, onCleanup) => {
+    if (!file) {
+      thumbRef.value = null
+      return
     }
-    reader.readAsDataURL(file)
-  } else coverThumb.value = null
-})
+    const url = URL.createObjectURL(file)
+    thumbRef.value = url
+    onCleanup(() => URL.revokeObjectURL(url))
+  })
+}
 
-watch(posterFile, file => {
-  if (file) {
-    const reader = new FileReader()
-    reader.onload = e => {
-      posterThumb.value = e.target.result
-    }
-    reader.readAsDataURL(file)
-  } else posterThumb.value = null
-})
-
-watch(previewFile, file => {
-  if (file) {
-    const reader = new FileReader()
-    reader.onload = e => {
-      previewThumb.value = e.target.result
-    }
-    reader.readAsDataURL(file)
-  } else previewThumb.value = null
-})
+watchFileThumb(coverFile, coverThumb)
+watchFileThumb(posterFile, posterThumb)
+watchFileThumb(previewFile, previewThumb)
 
 watch(mediaFile, file => {
   if (file) payload.project.media.filename = file.name
