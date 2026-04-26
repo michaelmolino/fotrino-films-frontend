@@ -193,8 +193,8 @@ import MediaPreview from '@components/channel/MediaPreview.vue'
 import AuthRequired from '@components/shared/AuthRequired.vue'
 import { Notify } from 'quasar'
 import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
-import { objectApi } from 'boot/axios'
 import { useFileProcessor } from '@composables/useFileProcessor.js'
+import { useUploadFlow } from '@composables/useUploadFlow.js'
 
 // refs & reactive state
 const store = useStore()
@@ -237,6 +237,15 @@ const statusText = ref(null)
 const extractingFrame = ref(false)
 
 const { uploadFiles, handleFile: processFile, getRandomFrameFromFile } = useFileProcessor()
+const { factoryUpload } = useUploadFlow({
+  store,
+  payload,
+  stepper,
+  uploadFiles,
+  progress,
+  statusText,
+  isUploading
+})
 
 const isPreviewProcessing = computed(() => {
   const preview = uploadFiles.value.find(r => r.resourceType === 'preview')
@@ -507,7 +516,17 @@ watch(step, s => {
   } else if (projects.value.length === 0 && s === 3) {
     payload.project.id = { value: 0, label: 'New...' }
   }
-  if (s === 4) factoryUpload()
+  if (s === 4) {
+    factoryUpload().catch(err => {
+      statusText.value = getComponentApiErrorMessage(err, 'Something went wrong!')
+      Notify.create({
+        type: 'negative',
+        timeout: 0,
+        message: statusText.value,
+        icon: 'warning'
+      })
+    })
+  }
 })
 
 // thumbnail previews for selected files
@@ -557,63 +576,6 @@ watch([() => mediaFile.value, () => counter.value], async ([mf]) => {
     extractingFrame.value = false
   }
 })
-
-// composable provides uploadFiles and helpers
-// processFile(file, resourceType) stores processed image or upload file into uploadFiles
-
-// helpers for upload flow
-function onUploadProgress(progressEvent) {
-  progress.value = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-}
-
-async function uploadSingle(u, current, total) {
-  const item = uploadFiles.value.find(f => f.resourceType === u.resourceType)
-  const file = item?.file
-  if (!file) throw new Error(`Missing file for ${u.resourceType}`)
-  statusText.value = `Uploading file ${current} of ${total}. Do not navigate away from this page!`
-  await objectApi.put(u.url, file, { headers: { 'Content-Type': file.type }, onUploadProgress })
-  return u.resourceType === 'upload' ? u.reference : null
-}
-
-async function factoryUpload() {
-  isUploading.value = true
-  try {
-    /** @type {import('src/types/api-contract').UploadInstruction[]} */
-    const upload = await store.dispatch('channel/postUpload', payload)
-    let counterLocal = 1
-    const total = upload.length
-    let mediaRef = null
-    for (const u of upload) {
-      progress.value = 0
-      try {
-        const maybeMedia = await uploadSingle(u, counterLocal, total)
-        if (maybeMedia) mediaRef = maybeMedia
-      } catch (err) {
-        progress.value = -1
-        statusText.value = 'Something went wrong!'
-        console.error('Error uploading:', err)
-        isUploading.value = false
-        throw err
-      }
-      counterLocal++
-    }
-
-    await store.dispatch('channel/confirmUpload', mediaRef)
-    stepper.value?.next()
-    isUploading.value = false
-  } catch (err) {
-    isUploading.value = false
-    progress.value = -1
-    statusText.value = getComponentApiErrorMessage(err, 'Something went wrong!')
-    Notify.create({
-      type: 'negative',
-      timeout: 0,
-      message: statusText.value,
-      icon: 'warning'
-    })
-    throw err
-  }
-}
 
 // Step-specific helpers live in the step components now
 
