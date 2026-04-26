@@ -33,7 +33,7 @@
           @update:payload="p => Object.assign(payload, p)"
           @update:mediaFile="file => handleFile(file, 'upload')"
           @update:previewFile="file => handleFile(file, 'preview')"
-          @increment:counter="() => counter.value++" />
+          @increment:counter="incrementCounter" />
       </q-step>
 
       <!-- Step 2: Channel -->
@@ -276,6 +276,10 @@ async function handleFile(fileOrFiles, resourceType) {
     // processFile already notifies on error, but keep console log here
     console.error('Background file processing error:', err)
   })
+}
+
+function incrementCounter() {
+  counter.value += 1
 }
 
 function goNext() {
