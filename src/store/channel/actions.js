@@ -107,7 +107,7 @@ export async function deleteResource(context, resource) {
     })
   } catch (error) {
     if (error?.__userCancelled) {
-      return
+      return false
     }
     throw error
   }

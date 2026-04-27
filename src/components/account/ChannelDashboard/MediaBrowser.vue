@@ -75,7 +75,8 @@ function getMediaItemLink(channels, id) {
 
 async function deleteResource(type, id) {
   try {
-    await store.dispatch('channel/deleteResource', { type, id })
+    const deleted = await store.dispatch('channel/deleteResource', { type, id })
+    if (deleted === false) return
     Notify.create({
       type: 'positive',
       message: 'Deletion queued.',
