@@ -202,6 +202,29 @@ export async function updateProject(_, { projectId, subtitle = null, posterType,
 
 /**
  * @param {import('vuex').ActionContext<any, any>} _
+ * @param {{ channelUuid: string, title: string }} payload
+ * @returns {Promise<import('src/types/api-contract').ChannelSummary>}
+ */
+export async function updateChannel(_, { channelUuid, title }) {
+  try {
+    const res = await api.put(
+      `/channels/${channelUuid}`,
+      {
+        title: title?.trim()
+      },
+      {
+        __skipGlobalErrorNotify: true
+      }
+    )
+    return res.data
+  } catch (error) {
+    getGlobalApiErrorPayload(error)
+    throw error
+  }
+}
+
+/**
+ * @param {import('vuex').ActionContext<any, any>} _
  * @param {{ mediaId: number }} payload
  * @returns {Promise<import('src/types/api-contract').UploadInstruction & { objectName: string }}
  */
@@ -224,6 +247,22 @@ export async function requestMediaPreviewUpload(_, { mediaId }) {
 export async function requestProjectPosterUpload(_, { projectId }) {
   const res = await api.post(
     `/channels/project/${projectId}/poster`,
+    null,
+    {
+      __skipGlobalErrorNotify: true
+    }
+  )
+  return res.data
+}
+
+/**
+ * @param {import('vuex').ActionContext<any, any>} _
+ * @param {{ channelUuid: string }} payload
+ * @returns {Promise<import('src/types/api-contract').UploadInstruction & { objectName: string }}
+ */
+export async function requestChannelCoverUpload(_, { channelUuid }) {
+  const res = await api.post(
+    `/channels/${channelUuid}/cover`,
     null,
     {
       __skipGlobalErrorNotify: true
@@ -257,6 +296,23 @@ export async function confirmMediaPreviewUpload(_, { mediaId, objectName }) {
 export async function confirmProjectPosterUpload(_, { projectId, objectName }) {
   await api.put(
     `/channels/project/${projectId}/poster/confirm`,
+    {
+      objectName
+    },
+    {
+      __skipGlobalErrorNotify: true
+    }
+  )
+}
+
+/**
+ * @param {import('vuex').ActionContext<any, any>} _
+ * @param {{ channelUuid: string, objectName: string }} payload
+ * @returns {Promise<void>}
+ */
+export async function confirmChannelCoverUpload(_, { channelUuid, objectName }) {
+  await api.put(
+    `/channels/${channelUuid}/cover/confirm`,
     {
       objectName
     },

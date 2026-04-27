@@ -12,7 +12,8 @@
         @deleteProject="deleteResource('project', $event)"
         @deleteMedia="deleteResource('media', $event)"
         @editProject="saveProjectEdit"
-        @editMedia="saveMediaEdit" />
+        @editMedia="saveMediaEdit"
+        @editChannel="saveChannelEdit" />
     </q-list>
     <div v-if="channels.length === 0" class="q-pa-md text-grey-6 text-center">
       No channels found
@@ -168,6 +169,44 @@ async function saveProjectEdit(payload) {
     Notify.create({
       type: 'negative',
       message: getComponentApiErrorMessage(error, 'Unable to update this project.'),
+      icon: 'warning',
+      timeout: 0
+    })
+  }
+}
+
+async function saveChannelEdit(payload) {
+  try {
+    await store.dispatch('channel/updateChannel', {
+      channelUuid: payload?.channelUuid,
+      title: payload?.title
+    })
+
+    if (payload?.coverFile) {
+      const instruction = await store.dispatch('channel/requestChannelCoverUpload', {
+        channelUuid: payload?.channelUuid
+      })
+      await store.dispatch('channel/uploadMediaPreviewBinary', {
+        url: instruction.url,
+        file: payload.coverFile
+      })
+      await store.dispatch('channel/confirmChannelCoverUpload', {
+        channelUuid: payload?.channelUuid,
+        objectName: instruction.objectName
+      })
+    }
+
+    await store.dispatch('channel/getChannels', true)
+    Notify.create({
+      type: 'positive',
+      message: 'Channel updated.',
+      icon: 'check',
+      timeout: 2000
+    })
+  } catch (error) {
+    Notify.create({
+      type: 'negative',
+      message: getComponentApiErrorMessage(error, 'Unable to update this channel.'),
       icon: 'warning',
       timeout: 0
     })
