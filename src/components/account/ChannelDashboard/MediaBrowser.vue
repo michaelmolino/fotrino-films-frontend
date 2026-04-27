@@ -95,122 +95,119 @@ async function deleteResource(type, id) {
   }
 }
 
-async function saveMediaEdit(payload) {
+async function runEditJourney({
+  updateAction,
+  updatePayload,
+  upload = null,
+  successMessage,
+  errorMessage
+}) {
   try {
-    await store.dispatch('channel/updateMedia', {
+    await store.dispatch(updateAction, updatePayload)
+
+    if (upload?.shouldUpload) {
+      const instruction = await store.dispatch(upload.prepareAction, upload.preparePayload)
+      await store.dispatch('channel/uploadMediaPreviewBinary', {
+        url: instruction.url,
+        file: upload.file
+      })
+      await store.dispatch(upload.confirmAction, {
+        ...upload.confirmPayload,
+        objectName: instruction.objectName
+      })
+    }
+
+    await store.dispatch('channel/getChannels', true)
+    Notify.create({
+      type: 'positive',
+      message: successMessage,
+      icon: 'check',
+      timeout: 2000
+    })
+  } catch (error) {
+    Notify.create({
+      type: 'negative',
+      message: getComponentApiErrorMessage(error, errorMessage),
+      icon: 'warning',
+      timeout: 0
+    })
+  }
+}
+
+async function saveMediaEdit(payload) {
+  return runEditJourney({
+    updateAction: 'channel/updateMedia',
+    updatePayload: {
       mediaId: payload?.id,
       description: payload?.description ?? null,
       resourceDate: payload?.resourceDate ?? null,
       main: !!payload?.main
-    })
-
-    if (payload?.previewFile) {
-      const instruction = await store.dispatch('channel/requestMediaPreviewUpload', {
+    },
+    upload: {
+      shouldUpload: !!payload?.previewFile,
+      prepareAction: 'channel/requestMediaPreviewUpload',
+      preparePayload: {
         mediaId: payload?.id
-      })
-      await store.dispatch('channel/uploadMediaPreviewBinary', {
-        url: instruction.url,
-        file: payload.previewFile
-      })
-      await store.dispatch('channel/confirmMediaPreviewUpload', {
+      },
+      file: payload?.previewFile,
+      confirmAction: 'channel/confirmMediaPreviewUpload',
+      confirmPayload: {
         mediaId: payload?.id,
-        objectName: instruction.objectName
-      })
-    }
-
-    await store.dispatch('channel/getChannels', true)
-    Notify.create({
-      type: 'positive',
-      message: 'Media updated.',
-      icon: 'check',
-      timeout: 2000
-    })
-  } catch (error) {
-    Notify.create({
-      type: 'negative',
-      message: getComponentApiErrorMessage(error, 'Unable to update this media.'),
-      icon: 'warning',
-      timeout: 0
-    })
-  }
+      }
+    },
+    successMessage: 'Media updated.',
+    errorMessage: 'Unable to update this media.'
+  })
 }
 
 async function saveProjectEdit(payload) {
-  try {
-    await store.dispatch('channel/updateProject', {
+  return runEditJourney({
+    updateAction: 'channel/updateProject',
+    updatePayload: {
       projectId: payload?.id,
       subtitle: payload?.subtitle ?? null,
       posterType: payload?.posterType,
       posterColor: payload?.posterColor ?? null
-    })
-
-    if (payload?.posterType === 'new' && payload?.posterFile) {
-      const instruction = await store.dispatch('channel/requestProjectPosterUpload', {
+    },
+    upload: {
+      shouldUpload: payload?.posterType === 'new' && !!payload?.posterFile,
+      prepareAction: 'channel/requestProjectPosterUpload',
+      preparePayload: {
         projectId: payload?.id
-      })
-      await store.dispatch('channel/uploadMediaPreviewBinary', {
-        url: instruction.url,
-        file: payload.posterFile
-      })
-      await store.dispatch('channel/confirmProjectPosterUpload', {
+      },
+      file: payload?.posterFile,
+      confirmAction: 'channel/confirmProjectPosterUpload',
+      confirmPayload: {
         projectId: payload?.id,
-        objectName: instruction.objectName
-      })
-    }
-
-    await store.dispatch('channel/getChannels', true)
-    Notify.create({
-      type: 'positive',
-      message: 'Project updated.',
-      icon: 'check',
-      timeout: 2000
-    })
-  } catch (error) {
-    Notify.create({
-      type: 'negative',
-      message: getComponentApiErrorMessage(error, 'Unable to update this project.'),
-      icon: 'warning',
-      timeout: 0
-    })
-  }
+      }
+    },
+    successMessage: 'Project updated.',
+    errorMessage: 'Unable to update this project.'
+  })
 }
 
 async function saveChannelEdit(payload) {
-  try {
-    await store.dispatch('channel/updateChannel', {
+  return runEditJourney({
+    updateAction: 'channel/updateChannel',
+    updatePayload: {
       channelUuid: payload?.channelUuid,
       title: payload?.title
-    })
-
-    if (payload?.coverFile) {
-      const instruction = await store.dispatch('channel/requestChannelCoverUpload', {
+    },
+    upload: {
+      shouldUpload: !!payload?.coverFile,
+      prepareAction: 'channel/requestChannelCoverUpload',
+      preparePayload: {
         channelUuid: payload?.channelUuid
-      })
-      await store.dispatch('channel/uploadMediaPreviewBinary', {
-        url: instruction.url,
-        file: payload.coverFile
-      })
-      await store.dispatch('channel/confirmChannelCoverUpload', {
+      },
+      file: payload?.coverFile,
+      confirmAction: 'channel/confirmChannelCoverUpload',
+      confirmPayload: {
         channelUuid: payload?.channelUuid,
-        objectName: instruction.objectName
-      })
-    }
-
-    await store.dispatch('channel/getChannels', true)
-    Notify.create({
-      type: 'positive',
-      message: 'Channel updated.',
-      icon: 'check',
-      timeout: 2000
-    })
-  } catch (error) {
-    Notify.create({
-      type: 'negative',
-      message: getComponentApiErrorMessage(error, 'Unable to update this channel.'),
-      icon: 'warning',
-      timeout: 0
-    })
-  }
+      }
+    },
+    successMessage: 'Channel updated.',
+    errorMessage: 'Unable to update this channel.'
+  })
 }
 </script>
 

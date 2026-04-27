@@ -48,8 +48,8 @@
         <q-card-section>
           <EditableChannelFields
             :title="editForm.title"
-               :cover-preview="editCoverPreview || channel.cover"
-               :cover-file="editCoverFile"
+            :cover-preview="editCoverPreview || channel.cover"
+            :cover-file="editCoverFile"
             :cover-processing="editCoverProcessing"
             @update:title="editForm.title = $event"
             @update:coverFile="handleCoverFileSelected" />
@@ -77,12 +77,12 @@
 </template>
 
 <script setup>
-import { computed, ref, onBeforeUnmount } from 'vue'
+import { computed, ref } from 'vue'
 import ResourceActions from './ResourceActions.vue'
 import ProjectItem from './ProjectItem.vue'
 import EditableChannelFields from '@components/account/shared/EditableChannelFields.vue'
 import { daysSince } from '@utils/date.js'
-import { useFileProcessor } from '@composables/useFileProcessor'
+import { useProcessedImageFile } from '@composables/useProcessedImageFile.js'
 
 const props = defineProps({
   channel: Object,
@@ -105,12 +105,14 @@ const editDialog = ref(false)
 const editForm = ref({
   title: ''
 })
-const editCoverFile = ref(null)
+const {
+  selectedFile: editCoverFile,
+  processing: editCoverProcessing,
+  processSelectedFile: processCoverFile,
+  reset: resetCoverFile
+} = useProcessedImageFile('cover')
 const editCoverPreview = ref(null)
-const editCoverProcessing = ref(false)
 const savingEdit = ref(false)
-
-const { processFile } = useFileProcessor()
 
 const hasChanges = computed(() => {
   return editForm.value.title !== props.channel.title || editCoverFile.value !== null
@@ -120,35 +122,28 @@ const openEditDialog = () => {
   editForm.value = {
     title: props.channel.title
   }
-  editCoverFile.value = null
+  resetCoverFile()
   editCoverPreview.value = null
   editDialog.value = true
 }
 
 const resetEditForm = () => {
   editForm.value = { title: '' }
-  editCoverFile.value = null
+  resetCoverFile()
   editCoverPreview.value = null
-  editCoverProcessing.value = false
   savingEdit.value = false
 }
 
 const handleCoverFileSelected = async (file) => {
   if (!file) {
-    editCoverFile.value = null
+    resetCoverFile()
     editCoverPreview.value = null
     return
   }
 
-  editCoverFile.value = file
-  editCoverProcessing.value = true
-
-  try {
-    const processed = await processFile(file)
-    editCoverPreview.value = URL.createObjectURL(processed)
-  } finally {
-    editCoverProcessing.value = false
-  }
+  const { file: processedFile, previewUrl } = await processCoverFile(file)
+  editCoverFile.value = processedFile
+  editCoverPreview.value = previewUrl
 }
 
 const saveEdit = () => {
@@ -165,10 +160,4 @@ const saveEdit = () => {
     savingEdit.value = false
   }
 }
-
-onBeforeUnmount(() => {
-  if (editCoverPreview.value) {
-    URL.revokeObjectURL(editCoverPreview.value)
-  }
-})
 </script>

@@ -81,12 +81,12 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, ref } from 'vue'
+import { computed, ref } from 'vue'
 import ResourceActions from './ResourceActions.vue'
 import MediaItem from './MediaItem.vue'
 import { daysSince } from '@utils/date.js'
 import ProjectPosterFields from '@components/account/shared/ProjectPosterFields.vue'
-import { useFileProcessor } from '@composables/useFileProcessor.js'
+import { useProcessedImageFile } from '@composables/useProcessedImageFile.js'
 
 const props = defineProps({
   project: Object,
@@ -97,17 +97,18 @@ const props = defineProps({
 const emit = defineEmits(['deleteProject', 'deleteMedia', 'editMedia', 'editProject'])
 
 const editDialog = ref(false)
-const editPosterFile = ref(null)
-const editPosterProcessing = ref(false)
-const localPosterObjectUrl = ref(null)
+const {
+  selectedFile: editPosterFile,
+  processing: editPosterProcessing,
+  processSelectedFile: processPosterFile,
+  reset: resetPosterFile
+} = useProcessedImageFile('poster')
 const editForm = ref({
   subtitle: null,
   posterType: 'default',
   posterColor: '#000000',
   posterImage: null
 })
-
-const { handleFile: processFile } = useFileProcessor()
 
 const hasPendingChildren = computed(() => {
   return props.project.media?.some(media => media.pending) || false
@@ -123,17 +124,6 @@ const editProjectPreview = computed(() => {
   }
 })
 
-function clearLocalPosterObjectUrl() {
-  if (localPosterObjectUrl.value) {
-    URL.revokeObjectURL(localPosterObjectUrl.value)
-    localPosterObjectUrl.value = null
-  }
-}
-
-onBeforeUnmount(() => {
-  clearLocalPosterObjectUrl()
-})
-
 function openEditDialog() {
   editForm.value = {
     subtitle: props.project?.subtitle ?? null,
@@ -141,9 +131,7 @@ function openEditDialog() {
     posterColor: props.project?.poster_color || '#000000',
     posterImage: props.project?.poster || null
   }
-  editPosterFile.value = null
-  editPosterProcessing.value = false
-  clearLocalPosterObjectUrl()
+  resetPosterFile()
   editDialog.value = true
 }
 
@@ -156,8 +144,7 @@ function onUpdateSubtitle(value) {
 
 function onUpdatePosterType(value) {
   if (value === 'default') {
-    editPosterFile.value = null
-    clearLocalPosterObjectUrl()
+    resetPosterFile()
     editForm.value = {
       ...editForm.value,
       posterType: 'default',
@@ -183,9 +170,7 @@ function onUpdatePosterColor(value) {
 async function onUpdatePosterFile(fileOrFiles) {
   const file = Array.isArray(fileOrFiles) ? fileOrFiles[0] : fileOrFiles
   if (!file) {
-    editPosterFile.value = null
-    editPosterProcessing.value = false
-    clearLocalPosterObjectUrl()
+    resetPosterFile()
     editForm.value = {
       ...editForm.value,
       posterImage: props.project?.poster || null
@@ -193,23 +178,13 @@ async function onUpdatePosterFile(fileOrFiles) {
     return
   }
 
-  editPosterFile.value = file
-  const localUrl = URL.createObjectURL(file)
-  clearLocalPosterObjectUrl()
-  localPosterObjectUrl.value = localUrl
+  const { file: processedFile, previewUrl } = await processPosterFile(file)
   editForm.value = {
     ...editForm.value,
     posterType: 'new',
-    posterImage: localUrl
+    posterImage: previewUrl
   }
-
-  editPosterProcessing.value = true
-  try {
-    const processed = await processFile(file, 'poster')
-    editPosterFile.value = processed || file
-  } finally {
-    editPosterProcessing.value = false
-  }
+  editPosterFile.value = processedFile
 }
 
 function saveEdit() {

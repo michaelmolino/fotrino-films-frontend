@@ -38,6 +38,29 @@ async function fetchAndCommit(context, { url, mutation, extract }) {
   }
 }
 
+async function requestUploadInstruction(url) {
+  const res = await api.post(
+    url,
+    null,
+    {
+      __skipGlobalErrorNotify: true
+    }
+  )
+  return res.data
+}
+
+async function confirmUploadInstruction(url, objectName) {
+  await api.put(
+    url,
+    {
+      objectName
+    },
+    {
+      __skipGlobalErrorNotify: true
+    }
+  )
+}
+
 // Actions
 
 /**
@@ -229,14 +252,7 @@ export async function updateChannel(_, { channelUuid, title }) {
  * @returns {Promise<import('src/types/api-contract').UploadInstruction & { objectName: string }}
  */
 export async function requestMediaPreviewUpload(_, { mediaId }) {
-  const res = await api.post(
-    `/channels/media/${mediaId}/preview`,
-    null,
-    {
-      __skipGlobalErrorNotify: true
-    }
-  )
-  return res.data
+  return requestUploadInstruction(`/channels/media/${mediaId}/preview`)
 }
 
 /**
@@ -245,14 +261,7 @@ export async function requestMediaPreviewUpload(_, { mediaId }) {
  * @returns {Promise<import('src/types/api-contract').UploadInstruction & { objectName: string }}
  */
 export async function requestProjectPosterUpload(_, { projectId }) {
-  const res = await api.post(
-    `/channels/project/${projectId}/poster`,
-    null,
-    {
-      __skipGlobalErrorNotify: true
-    }
-  )
-  return res.data
+  return requestUploadInstruction(`/channels/project/${projectId}/poster`)
 }
 
 /**
@@ -261,14 +270,7 @@ export async function requestProjectPosterUpload(_, { projectId }) {
  * @returns {Promise<import('src/types/api-contract').UploadInstruction & { objectName: string }}
  */
 export async function requestChannelCoverUpload(_, { channelUuid }) {
-  const res = await api.post(
-    `/channels/${channelUuid}/cover`,
-    null,
-    {
-      __skipGlobalErrorNotify: true
-    }
-  )
-  return res.data
+  return requestUploadInstruction(`/channels/${channelUuid}/cover`)
 }
 
 /**
@@ -277,15 +279,7 @@ export async function requestChannelCoverUpload(_, { channelUuid }) {
  * @returns {Promise<void>}
  */
 export async function confirmMediaPreviewUpload(_, { mediaId, objectName }) {
-  await api.put(
-    `/channels/media/${mediaId}/preview/confirm`,
-    {
-      objectName
-    },
-    {
-      __skipGlobalErrorNotify: true
-    }
-  )
+  await confirmUploadInstruction(`/channels/media/${mediaId}/preview/confirm`, objectName)
 }
 
 /**
@@ -294,15 +288,7 @@ export async function confirmMediaPreviewUpload(_, { mediaId, objectName }) {
  * @returns {Promise<void>}
  */
 export async function confirmProjectPosterUpload(_, { projectId, objectName }) {
-  await api.put(
-    `/channels/project/${projectId}/poster/confirm`,
-    {
-      objectName
-    },
-    {
-      __skipGlobalErrorNotify: true
-    }
-  )
+  await confirmUploadInstruction(`/channels/project/${projectId}/poster/confirm`, objectName)
 }
 
 /**
@@ -311,15 +297,7 @@ export async function confirmProjectPosterUpload(_, { projectId, objectName }) {
  * @returns {Promise<void>}
  */
 export async function confirmChannelCoverUpload(_, { channelUuid, objectName }) {
-  await api.put(
-    `/channels/${channelUuid}/cover/confirm`,
-    {
-      objectName
-    },
-    {
-      __skipGlobalErrorNotify: true
-    }
-  )
+  await confirmUploadInstruction(`/channels/${channelUuid}/cover/confirm`, objectName)
 }
 
 /**

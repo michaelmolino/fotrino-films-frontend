@@ -65,12 +65,12 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, ref } from 'vue'
+import { ref } from 'vue'
 import ResourceActions from './ResourceActions.vue'
 import { daysSince } from '@utils/date.js'
 import MediaMetadataFields from '@components/account/shared/MediaMetadataFields.vue'
 import MediaPreviewSelectorFields from '@components/account/shared/MediaPreviewSelectorFields.vue'
-import { useFileProcessor } from '@composables/useFileProcessor.js'
+import { useProcessedImageFile } from '@composables/useProcessedImageFile.js'
 
 const props = defineProps({
   media: Object,
@@ -89,29 +89,15 @@ const editForm = ref({
 })
 const editPreviewFile = ref(null)
 const editPreviewImage = ref(null)
-const editPreviewProcessing = ref(false)
-const localObjectUrl = ref(null)
-
-const { handleFile: processFile } = useFileProcessor()
-
-function clearLocalObjectUrl() {
-  if (localObjectUrl.value) {
-    URL.revokeObjectURL(localObjectUrl.value)
-    localObjectUrl.value = null
-  }
-}
+const {
+  processing: editPreviewProcessing,
+  processSelectedFile: processPreviewFile,
+  reset: resetPreviewFile
+} = useProcessedImageFile('preview')
 
 function setLocalPreviewImage(url) {
-  clearLocalObjectUrl()
-  if (url) {
-    localObjectUrl.value = url
-  }
   editPreviewImage.value = url || props.media?.preview || null
 }
-
-onBeforeUnmount(() => {
-  clearLocalObjectUrl()
-})
 
 function normalizeResourceDate(raw) {
   if (!raw) return null
@@ -128,10 +114,9 @@ function openEditDialog() {
     resourceDate: normalizeResourceDate(props.media?.resource_date),
     main: !!props.media?.main
   }
+  resetPreviewFile()
   editPreviewFile.value = null
   editPreviewImage.value = props.media?.preview || null
-  editPreviewProcessing.value = false
-  clearLocalObjectUrl()
   editDialog.value = true
 }
 
@@ -159,24 +144,15 @@ function onUpdateMain(value) {
 async function onUpdatePreviewFile(fileOrFiles) {
   const file = Array.isArray(fileOrFiles) ? fileOrFiles[0] : fileOrFiles
   if (!file) {
+    resetPreviewFile()
     editPreviewFile.value = null
-    editPreviewProcessing.value = false
-    clearLocalObjectUrl()
     editPreviewImage.value = props.media?.preview || null
     return
   }
-  // Set immediately so Save cannot race ahead of async image processing.
-  editPreviewFile.value = file
-  const previewUrl = URL.createObjectURL(file)
-  setLocalPreviewImage(previewUrl)
 
-  editPreviewProcessing.value = true
-  try {
-    const processed = await processFile(file, 'preview')
-    editPreviewFile.value = processed || file
-  } finally {
-    editPreviewProcessing.value = false
-  }
+  const { file: processedFile, previewUrl } = await processPreviewFile(file)
+  editPreviewFile.value = processedFile
+  setLocalPreviewImage(previewUrl)
 }
 
 function saveEdit() {
