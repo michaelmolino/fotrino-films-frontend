@@ -21,96 +21,36 @@
       @update:model-value="onUpdateProjectTitle"
       @focus="clearDefaultProjectTitle"
       @blur="restoreDefaultProjectTitle" />
-    <q-input
-      v-if="payload.project.id?.value === 0"
-      outlined
-      :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
-      class="q-pb-md"
-      clearable
-      :model-value="payload.project.subtitle"
-      label="Project SubTitle"
-      @update:model-value="onUpdateProjectSubtitle" />
     <q-card flat bordered class="q-pb-md">
       <q-card-section>
-        <div class="text-overline q-mb-md">Project Poster</div>
-        <div class="row items-center q-gutter-sm">
-          <q-radio
-            v-if="payload.project.id?.value === 0"
-            v-model="localPosterType"
-            val="default"
-            label="Solid Colour"
-            color="accent" />
-          <q-btn
-            v-if="payload.project.id?.value === 0 && localPosterType === 'default'"
-            flat
-            dense
-            no-caps
-            padding="0px"
-            color="accent"
-            label="Change Colour"
-            @click="colorDialog = true" />
-        </div>
-        <q-radio
+        <ProjectPosterFields
           v-if="payload.project.id?.value === 0"
-          v-model="localPosterType"
-          val="new"
-          label="Upload Photo"
-          data-cy="upload-project-poster-type-new"
-          color="accent" />
-        <q-file
-          v-if="payload.project.id?.value === 0 && localPosterType === 'new'"
-          label="Profile Poster (Image)"
-          outlined
-          :model-value="posterFile"
-          accept="image/*"
-          class="q-py-md"
-          color="accent"
-          data-cy="upload-project-poster-file"
-          @update:model-value="onUpdatePosterFile">
-          <template v-slot:prepend>
-            <q-icon name="image" @click.stop.prevent />
-          </template>
-          <template v-slot:append>
-            <q-icon
-              name="close"
-              @click.stop.prevent="emitUpdatePosterNull"
-              class="cursor-pointer" />
-          </template>
-        </q-file>
-        <div class="width250">
-          <ProjectPoster v-if="displayProject" :project="displayProject" />
-          <q-skeleton
-            v-else
-            class="cursor-not-allowed"
-            style="width: 250px; height: 375px"
-            animation="none" />
-        </div>
+          :subtitle="payload.project.subtitle"
+          :input-color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
+          :show-subtitle="true"
+          :show-poster-type="true"
+          :poster-type="localPosterType"
+          :poster-color="payload.project.poster_color || defaultColor"
+          :poster-file="posterFile"
+          :project-preview="displayProject"
+          subtitle-data-cy="upload-project-subtitle"
+          poster-type-default-data-cy="upload-project-poster-type-default"
+          poster-type-new-data-cy="upload-project-poster-type-new"
+          poster-file-data-cy="upload-project-poster-file"
+          poster-color-button-data-cy="upload-project-poster-color"
+          poster-preview-data-cy="upload-project-poster-preview"
+          @update:subtitle="onUpdateProjectSubtitle"
+          @update:posterType="onUpdatePosterType"
+          @update:posterColor="onUpdatePosterColor"
+          @update:posterFile="onUpdatePosterFile" />
       </q-card-section>
     </q-card>
-    <q-dialog v-model="colorDialog">
-      <q-card style="min-width: 300px">
-        <q-card-section class="q-pb-none">
-          <div class="text-subtitle1">Choose Poster Colour</div>
-        </q-card-section>
-        <q-card-section>
-          <q-color
-            class="q-mt-sm"
-            :model-value="payload.project.poster_color || defaultColor"
-            @update:model-value="onUpdatePosterColor"
-            format="hex"
-            default-view="palette" />
-        </q-card-section>
-        <q-card-actions align="right">
-          <q-btn flat label="Close" @click="colorDialog = false" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import ProjectPoster from '@components/channel/ProjectPoster.vue'
+import { computed, onMounted, watch } from 'vue'
+import ProjectPosterFields from '@components/account/shared/ProjectPosterFields.vue'
 const props = defineProps({
   payload: Object,
   projects: Array,
@@ -120,7 +60,6 @@ const props = defineProps({
 })
 const emit = defineEmits(['update:payload', 'update:posterFile'])
 const defaultColor = '#000000'
-const colorDialog = ref(false)
 
 // Filter projects that are eligible for the currently selected channel.
 // Parent now syncs projects per-channel, but keep this defensive.
@@ -131,14 +70,7 @@ const filteredOptions = computed(() => {
     .concat({ value: 0, label: 'New...' })
 })
 
-const localPosterType = computed({
-  get: () => props.payload.project.posterType,
-  set: v =>
-    emit('update:payload', {
-      ...props.payload,
-      project: { ...props.payload.project, posterType: v }
-    })
-})
+const localPosterType = computed(() => props.payload.project.posterType)
 
 // Use payload.project for preview when creating a new project (id === 0),
 // otherwise use the existing project prop. This ensures poster_color updates
@@ -186,23 +118,19 @@ function onUpdateProjectSubtitle(val) {
     project: { ...props.payload.project, subtitle: val }
   })
 }
-function onUpdatePosterColor(val) {
-  // Normalize color to CSS-friendly hex with leading '#'
-  let color = defaultColor
-  if (typeof val === 'string') {
-    color = val.startsWith('#') ? val : `#${val}`
-  } else if (val && typeof val === 'object') {
-    // Quasar may emit an object depending on format; prefer hex
-    const hex = val.hex || ''
-    if (hex) {
-      color = hex.startsWith('#') ? hex : `#${hex}`
-    } else {
-      color = defaultColor
-    }
-  }
+function onUpdatePosterType(val) {
   emit('update:payload', {
     ...props.payload,
-    project: { ...props.payload.project, poster_color: color }
+    project: { ...props.payload.project, posterType: val }
+  })
+  if (val !== 'new') {
+    emitUpdatePosterNull()
+  }
+}
+function onUpdatePosterColor(val) {
+  emit('update:payload', {
+    ...props.payload,
+    project: { ...props.payload.project, poster_color: val }
   })
 }
 function onUpdatePosterFile(fileOrFiles) {

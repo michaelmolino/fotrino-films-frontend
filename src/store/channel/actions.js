@@ -177,6 +177,31 @@ export async function updateMedia(_, { mediaId, description = null, resourceDate
 
 /**
  * @param {import('vuex').ActionContext<any, any>} _
+ * @param {{ projectId: number, subtitle?: string | null, posterType: 'default' | 'new', posterColor?: string | null }} payload
+ * @returns {Promise<import('src/types/api-contract').ChannelProject>}
+ */
+export async function updateProject(_, { projectId, subtitle = null, posterType, posterColor = null }) {
+  try {
+    const res = await api.put(
+      `/channels/project/${projectId}`,
+      {
+        subtitle: subtitle?.trim() || null,
+        posterType,
+        posterColor
+      },
+      {
+        __skipGlobalErrorNotify: true
+      }
+    )
+    return res.data
+  } catch (error) {
+    getGlobalApiErrorPayload(error)
+    throw error
+  }
+}
+
+/**
+ * @param {import('vuex').ActionContext<any, any>} _
  * @param {{ mediaId: number }} payload
  * @returns {Promise<import('src/types/api-contract').UploadInstruction & { objectName: string }}
  */
@@ -193,12 +218,45 @@ export async function requestMediaPreviewUpload(_, { mediaId }) {
 
 /**
  * @param {import('vuex').ActionContext<any, any>} _
+ * @param {{ projectId: number }} payload
+ * @returns {Promise<import('src/types/api-contract').UploadInstruction & { objectName: string }}
+ */
+export async function requestProjectPosterUpload(_, { projectId }) {
+  const res = await api.post(
+    `/channels/project/${projectId}/poster`,
+    null,
+    {
+      __skipGlobalErrorNotify: true
+    }
+  )
+  return res.data
+}
+
+/**
+ * @param {import('vuex').ActionContext<any, any>} _
  * @param {{ mediaId: number, objectName: string }} payload
  * @returns {Promise<void>}
  */
 export async function confirmMediaPreviewUpload(_, { mediaId, objectName }) {
   await api.put(
     `/channels/media/${mediaId}/preview/confirm`,
+    {
+      objectName
+    },
+    {
+      __skipGlobalErrorNotify: true
+    }
+  )
+}
+
+/**
+ * @param {import('vuex').ActionContext<any, any>} _
+ * @param {{ projectId: number, objectName: string }} payload
+ * @returns {Promise<void>}
+ */
+export async function confirmProjectPosterUpload(_, { projectId, objectName }) {
+  await api.put(
+    `/channels/project/${projectId}/poster/confirm`,
     {
       objectName
     },

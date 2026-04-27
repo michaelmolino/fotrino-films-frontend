@@ -59,7 +59,7 @@
             icon="edit"
             color="accent"
             class="q-ml-xs"
-            data-cy="edit-media"
+            :data-cy="editDataCy"
             @click="$emit('edit')">
             <q-tooltip>Edit</q-tooltip>
           </q-btn>
@@ -112,6 +112,10 @@ const props = defineProps({
   editable: {
     type: Boolean,
     default: false
+  },
+  editDataCy: {
+    type: String,
+    default: 'edit-media'
   },
   avatarSize: {
     type: String,

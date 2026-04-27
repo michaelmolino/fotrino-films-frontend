@@ -11,6 +11,7 @@
         @deleteChannel="deleteResource('channel', $event)"
         @deleteProject="deleteResource('project', $event)"
         @deleteMedia="deleteResource('media', $event)"
+        @editProject="saveProjectEdit"
         @editMedia="saveMediaEdit" />
     </q-list>
     <div v-if="channels.length === 0" class="q-pa-md text-grey-6 text-center">
@@ -127,6 +128,46 @@ async function saveMediaEdit(payload) {
     Notify.create({
       type: 'negative',
       message: getComponentApiErrorMessage(error, 'Unable to update this media.'),
+      icon: 'warning',
+      timeout: 0
+    })
+  }
+}
+
+async function saveProjectEdit(payload) {
+  try {
+    await store.dispatch('channel/updateProject', {
+      projectId: payload?.id,
+      subtitle: payload?.subtitle ?? null,
+      posterType: payload?.posterType,
+      posterColor: payload?.posterColor ?? null
+    })
+
+    if (payload?.posterType === 'new' && payload?.posterFile) {
+      const instruction = await store.dispatch('channel/requestProjectPosterUpload', {
+        projectId: payload?.id
+      })
+      await store.dispatch('channel/uploadMediaPreviewBinary', {
+        url: instruction.url,
+        file: payload.posterFile
+      })
+      await store.dispatch('channel/confirmProjectPosterUpload', {
+        projectId: payload?.id,
+        objectName: instruction.objectName
+      })
+    }
+
+    await store.dispatch('channel/getChannels', true)
+    Notify.create({
+      type: 'positive',
+      message: 'Project updated.',
+      icon: 'check',
+      timeout: 2000
+    })
+  } catch (error) {
+    Notify.create({
+      type: 'negative',
+      message: getComponentApiErrorMessage(error, 'Unable to update this project.'),
       icon: 'warning',
       timeout: 0
     })
