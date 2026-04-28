@@ -63,6 +63,7 @@
     "js-yaml": "^4.1.1",
     "glob": "^10.5.0",
     "**/glob/minimatch": "9.0.7",
-    "**/readdir-glob/minimatch": "5.1.8"
+    "**/readdir-glob/minimatch": "5.1.8",
+    "**/micromatch/picomatch": "2.3.2"
   }
 }
