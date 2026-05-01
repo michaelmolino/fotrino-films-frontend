@@ -82,7 +82,7 @@ export async function requeueDLQItem(context, eventId) {
 /**
  * @param {import('vuex').ActionContext<any, any>} context
  * @param {number} userId
- * @returns {Promise<void>}
+ * @returns {Promise<boolean|void>}
  */
 export async function deleteUser(context, userId) {
   try {
@@ -90,9 +90,8 @@ export async function deleteUser(context, userId) {
       __skipGlobalErrorNotify: true
     })
   } catch (error) {
-    //Ignore user-cancelled deletes
-    if (error?.message === 'User cancelled delete') {
-      return
+    if (error?.__userCancelled) {
+      return false
     }
     throw error
   }

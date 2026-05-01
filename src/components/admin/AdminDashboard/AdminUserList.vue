@@ -174,7 +174,8 @@ const providerIcons = {
 
 const deleteUser = async user => {
   try {
-    await store.dispatch('admin/deleteUser', user.id)
+    const deleted = await store.dispatch('admin/deleteUser', user.id)
+    if (deleted === false) return
     Notify.create({
       type: 'positive',
       message: `Deleted ${user.name}.`,
