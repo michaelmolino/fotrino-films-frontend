@@ -47,7 +47,7 @@ const props = defineProps({
   mediaCount: { type: Number, default: 0 }
 })
 
-const profilePic = computed(() => props.profile?.profile_pic || undefined)
+const profilePic = computed(() => props.profile?.avatar || undefined)
 const providerIcon = computed(() => {
   const p = (props.profile?.identity_provider || '').toLowerCase()
   const map = {

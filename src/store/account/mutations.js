@@ -1,6 +1,6 @@
 export function SET_PROFILE(state, profile) {
-  if (profile && !profile.profile_pic) {
-    profile.profile_pic = '/images/profile.png'
+  if (profile && !profile.avatar) {
+    profile.avatar = '/images/profile.png'
   }
   state.profile = profile
 }

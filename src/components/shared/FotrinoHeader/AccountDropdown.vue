@@ -1,6 +1,6 @@
 <template>
   <q-btn-dropdown
-    :icon="'img:' + profile.profile_pic"
+    :icon="'img:' + profile.avatar"
     :label="$q.screen.gt.sm ? 'Account' : ''"
     :aria-label="'Account menu for ' + (profile.name || 'user')"
     data-cy="account-menu"

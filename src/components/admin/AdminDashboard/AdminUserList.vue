@@ -19,7 +19,7 @@
             <div class="relative-position">
               <q-avatar size="48px" :class="{ 'deleted-user': user.deleted }">
                 <img
-                  :src="user.profile_pic"
+                  :src="user.avatar"
                   :alt="`${user.name}'s avatar`"
                   loading="lazy"
                   decoding="async" />

@@ -143,7 +143,7 @@ export default boot(({ app, router, store }) => {
         })
       }
 
-      if (isGlobalApiError(error, 'unauthorized')) {
+      if (isGlobalApiError(error, 'unauthorized') || status === 401) {
         router.replace('/')
       }
 

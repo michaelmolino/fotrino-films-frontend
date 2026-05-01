@@ -84,7 +84,7 @@
               decoding="async" />
             <q-img
               v-if="payload.uuid && payload.uuid.value === 0"
-              :src="payload.coverType === 'profile' ? profile.profile_pic : coverThumb"
+              :src="payload.coverType === 'profile' ? profile.avatar : coverThumb"
               class="width250"
               :ratio="1 / 1"
               fit="cover"

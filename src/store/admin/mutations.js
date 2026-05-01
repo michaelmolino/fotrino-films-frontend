@@ -1,8 +1,8 @@
 export function SET_USERS(state, users) {
   if (Array.isArray(users)) {
     for (const user of users) {
-      if (!user.profile_pic) {
-        user.profile_pic = '/images/profile.png'
+      if (!user.avatar) {
+        user.avatar = '/images/profile.png'
       }
     }
   }
