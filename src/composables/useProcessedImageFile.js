@@ -6,6 +6,7 @@ export function useProcessedImageFile(resourceType) {
     const processing = ref(false)
     const localObjectUrl = ref(null)
     const { handleFile } = useFileProcessor()
+    let processVersion = 0
 
     function clearLocalObjectUrl() {
         if (localObjectUrl.value) {
@@ -15,12 +16,14 @@ export function useProcessedImageFile(resourceType) {
     }
 
     function reset() {
+        processVersion += 1
         selectedFile.value = null
         processing.value = false
         clearLocalObjectUrl()
     }
 
     async function processSelectedFile(fileOrFiles) {
+        const currentVersion = ++processVersion
         const file = Array.isArray(fileOrFiles) ? fileOrFiles[0] : fileOrFiles
         if (!file) {
             reset()
@@ -35,9 +38,14 @@ export function useProcessedImageFile(resourceType) {
         processing.value = true
         try {
             const processed = await handleFile(file, resourceType)
+            if (currentVersion !== processVersion) {
+                return { file: selectedFile.value, previewUrl: localObjectUrl.value }
+            }
             selectedFile.value = processed || file
         } finally {
-            processing.value = false
+            if (currentVersion === processVersion) {
+                processing.value = false
+            }
         }
 
         return { file: selectedFile.value, previewUrl }

@@ -135,8 +135,19 @@ async function getRandomFrameFromFile(file) {
 
 export function useFileProcessor() {
   const uploadFiles = ref([])
+  const latestTokenByResource = new Map()
 
   const IMAGE_TYPES = new Set(['cover', 'poster', 'preview'])
+
+  function beginResourceProcessing(resourceType) {
+    const token = (latestTokenByResource.get(resourceType) || 0) + 1
+    latestTokenByResource.set(resourceType, token)
+    return token
+  }
+
+  function isLatestResourceProcessing(resourceType, token) {
+    return latestTokenByResource.get(resourceType) === token
+  }
 
   function findIndex(resourceType) {
     return uploadFiles.value.findIndex(r => r.resourceType === resourceType)
@@ -156,13 +167,20 @@ export function useFileProcessor() {
   }
 
   async function handleImageResource(file, resourceType) {
+    const token = beginResourceProcessing(resourceType)
     // add placeholder immediately so other flows see a file
     upsertEntry(resourceType, file, true)
     try {
       const compressed = await compressImage(file)
+      if (!isLatestResourceProcessing(resourceType, token)) {
+        return file
+      }
       upsertEntry(resourceType, compressed, false)
       return compressed
     } catch (error) {
+      if (!isLatestResourceProcessing(resourceType, token)) {
+        return file
+      }
       // keep original file but mark processing false and notify user
       markProcessing(resourceType, false)
       console.error('Error processing file:', error)

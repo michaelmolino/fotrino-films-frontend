@@ -6,6 +6,10 @@ export function SET_CHANNEL(state, channel) {
   state.channel = channel ? { ...channel } : channel
 }
 
+export function SET_CHANNEL_LOAD_STATUS(state, status) {
+  state.loadStatus = status
+}
+
 export function SET_UPLOAD(state, upload) {
   state.upload = upload
 }

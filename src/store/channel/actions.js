@@ -2,6 +2,18 @@ import { api, objectApi } from 'boot/axios'
 import { sortBy } from '@utils/sort.js'
 import { getGlobalApiErrorPayload } from 'src/utils/api-errors.js'
 
+const latestRequestByKey = new Map()
+
+function beginRequest(requestKey) {
+  const nextId = (latestRequestByKey.get(requestKey) || 0) + 1
+  latestRequestByKey.set(requestKey, nextId)
+  return nextId
+}
+
+function isLatestRequest(requestKey, requestId) {
+  return latestRequestByKey.get(requestKey) === requestId
+}
+
 // Helpers
 
 /**
@@ -25,14 +37,23 @@ function sortChannelsByTitle(channels) {
   return sortBy(channels, 'title', 'desc')
 }
 
-async function fetchAndCommit(context, { url, mutation, extract }) {
+async function fetchAndCommit(context, { url, mutation, extract, requestKey = mutation || url }) {
+  const requestId = beginRequest(requestKey)
   try {
     const { data } = await api.get(url)
     const value = extract ? extract(data) : data
-    context.commit(mutation, value)
+    if (mutation && isLatestRequest(requestKey, requestId)) {
+      context.commit(mutation, value)
+    }
     return value
   } catch (error) {
-    context.commit(mutation, null)
+    // If this request is stale, do not overwrite newer state or emit stale errors.
+    if (!isLatestRequest(requestKey, requestId)) {
+      return null
+    }
+    if (mutation) {
+      context.commit(mutation, null)
+    }
     getGlobalApiErrorPayload(error)
     throw error
   }
@@ -126,6 +147,29 @@ export function getPrivateMedia(context, privateId) {
     url: `/channels/media/private/${privateId}`,
     mutation: 'SET_CHANNEL'
   })
+}
+
+/**
+ * Raw fetch variant that does not mutate shared state.
+ * @param {import('vuex').ActionContext<any, any>} _
+ * @param {{ uuid: string, pending?: boolean }} options
+ * @returns {Promise<import('src/types/api-contract').ChannelDetail>}
+ */
+export async function fetchChannelRaw(_, { uuid, pending = false }) {
+  const url = `/channels/${uuid}${pending ? '?pending=true' : ''}`
+  const { data } = await api.get(url)
+  return sortChannelDetail(data)
+}
+
+/**
+ * Raw fetch variant that does not mutate shared state.
+ * @param {import('vuex').ActionContext<any, any>} _
+ * @param {string} privateId
+ * @returns {Promise<import('src/types/api-contract').PrivateMediaChannel>}
+ */
+export async function fetchPrivateMediaRaw(_, privateId) {
+  const { data } = await api.get(`/channels/media/private/${privateId}`)
+  return data
 }
 
 /**

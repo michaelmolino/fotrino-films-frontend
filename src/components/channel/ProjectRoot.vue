@@ -1,12 +1,12 @@
 <template>
   <div class="q-pa-md" data-cy="project-root">
-    <template v-if="loading || !channel || !project">
+    <template v-if="loading">
       <q-skeleton type="rect" class="q-mb-md skeleton-large" />
       <q-skeleton type="text" width="60%" />
       <q-skeleton type="text" width="40%" />
     </template>
 
-    <template v-else-if="channel.uuid === route.params.uuid">
+    <template v-else-if="channel && project && (route.params.privateId || channel.uuid === route.params.uuid)">
       <BreadCrumbs
         :channel="channel"
         :project="project"
@@ -43,6 +43,10 @@
           </div>
         </template>
       </template>
+    </template>
+
+    <template v-else>
+      <NothingText text="Media not found or unavailable." />
     </template>
   </div>
 </template>

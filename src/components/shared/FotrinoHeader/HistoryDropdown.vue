@@ -34,7 +34,7 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { onBeforeUnmount, onMounted } from 'vue'
 import { Notify } from 'quasar'
 import { useStore } from 'vuex'
 import {
@@ -45,7 +45,13 @@ import {
 } from '@utils/history.js'
 
 const $store = useStore()
-watchChannelHistory($store)
+const stopWatchingHistory = watchChannelHistory($store)
+
+onBeforeUnmount(() => {
+  if (typeof stopWatchingHistory === 'function') {
+    stopWatchingHistory()
+  }
+})
 
 onMounted(async () => {
   const result = await resolveHistoryFromBackend($store)

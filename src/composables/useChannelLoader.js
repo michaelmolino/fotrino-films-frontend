@@ -14,6 +14,7 @@ export function useChannelLoader() {
   const store = useStore()
   const router = useRouter()
   const metaData = ref(getMetaData(null, null))
+  const loadVersion = ref(0)
 
   // Setup Quasar meta management
   useMeta(() => metaData.value)
@@ -24,24 +25,36 @@ export function useChannelLoader() {
    * @returns {Promise<Object|null>} - Channel object or null
    */
   const loadChannel = async route => {
+    const requestVersion = ++loadVersion.value
+    const isStale = () => requestVersion !== loadVersion.value
+
+    store.commit('channel/SET_CHANNEL_LOAD_STATUS', 'loading')
+
     try {
       let channel = null
 
       if (route.params?.uuid) {
-        channel = await store.cache.dispatch('channel/getChannel', {
+        channel = await store.cache.dispatch('channel/fetchChannelRaw', {
           uuid: route.params.uuid
         })
-        store.commit('channel/SET_CHANNEL', channel)
       } else if (route.params?.privateId) {
-        channel = await store.cache.dispatch('channel/getPrivateMedia', route.params.privateId)
-        store.commit('channel/SET_CHANNEL', channel)
+        channel = await store.cache.dispatch('channel/fetchPrivateMediaRaw', route.params.privateId)
+      }
+
+      if (isStale()) {
+        return null
+      }
+
+      store.commit('channel/SET_CHANNEL', channel)
+
+      if (route.params?.privateId && channel) {
         addPrivateHistory(route.params.privateId, {
           title: channel?.project?.media?.title || channel?.title || '',
           cover: channel?.cover || null
         })
       }
 
-      if (channel?.uuid) {
+      if (route.params?.uuid && channel?.uuid && channel.slug && channel.slug !== route.params.channelSlug) {
         router.replace({
           params: { channelSlug: channel.slug },
           query: route.query
@@ -49,9 +62,15 @@ export function useChannelLoader() {
       }
 
       metaData.value = getMetaData(route, channel)
+      store.commit('channel/SET_CHANNEL_LOAD_STATUS', 'success')
       return channel
     } catch (error) {
+      if (isStale()) {
+        return null
+      }
+
       store.commit('channel/SET_CHANNEL', null)
+      store.commit('channel/SET_CHANNEL_LOAD_STATUS', 'error')
       metaData.value = getMetaData(null, null)
       console.error('Failed to load channel:', error)
       return null
