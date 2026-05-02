@@ -81,7 +81,7 @@ export function removeHistory(uuid) {
 
 export async function resolveHistoryFromBackend(store, { force = false } = {}) {
   if (hasResolvedHistory && !force) {
-    return historyChannels.value
+    return { channels: historyChannels.value, deletedUuids: [] }
   }
 
   if (resolveHistoryPromise) {
@@ -94,22 +94,29 @@ export async function resolveHistoryFromBackend(store, { force = false } = {}) {
     if (uuids.length === 0) {
       historyChannels.value = []
       hasResolvedHistory = true
-      return historyChannels.value
+      return { channels: historyChannels.value, deletedUuids: [] }
     }
 
     try {
-      const data = await store.dispatch('channel/resolveHistoryChannels', uuids)
+      const response = await store.dispatch('channel/resolveHistoryChannels', uuids)
+      const channels = Array.isArray(response?.channels) ? response.channels : []
+      const deletedUuids = Array.isArray(response?.deletedUuids) ? response.deletedUuids : []
 
-      if (!Array.isArray(data)) {
-        return historyChannels.value
+      if (deletedUuids.length > 0) {
+        const deletedSet = new Set(deletedUuids)
+        const remaining = uuids.filter(uuid => !deletedSet.has(uuid))
+        if (remaining.length !== uuids.length) {
+          writeHistoryUuids(remaining)
+        }
       }
 
-      const channelsByUuid = new Map(data.filter(item => item?.uuid).map(item => [item.uuid, item]))
-      historyChannels.value = uuids.map(uuid => channelsByUuid.get(uuid)).filter(Boolean)
+      const activeUuids = [...history.value]
+      const channelsByUuid = new Map(channels.filter(item => item?.uuid).map(item => [item.uuid, item]))
+      historyChannels.value = activeUuids.map(uuid => channelsByUuid.get(uuid)).filter(Boolean)
       hasResolvedHistory = true
-      return historyChannels.value
+      return { channels: historyChannels.value, deletedUuids }
     } catch {
-      return historyChannels.value
+      return { channels: historyChannels.value, deletedUuids: [] }
     } finally {
       resolveHistoryPromise = null
     }

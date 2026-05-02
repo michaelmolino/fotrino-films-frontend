@@ -35,6 +35,7 @@
 
 <script setup>
 import { onMounted } from 'vue'
+import { Notify } from 'quasar'
 import { useStore } from 'vuex'
 import {
   historyChannels,
@@ -46,7 +47,20 @@ import {
 const $store = useStore()
 watchChannelHistory($store)
 
-onMounted(() => {
-  void resolveHistoryFromBackend($store)
+onMounted(async () => {
+  const result = await resolveHistoryFromBackend($store)
+  const removedCount = result?.deletedUuids?.length || 0
+
+  if (removedCount > 0) {
+    Notify.create({
+      type: 'warning',
+      timeout: 2200,
+      icon: 'info',
+      message:
+        removedCount === 1
+          ? '1 deleted channel was removed from your history.'
+          : `${removedCount} deleted channels were removed from your history.`
+    })
+  }
 })
 </script>

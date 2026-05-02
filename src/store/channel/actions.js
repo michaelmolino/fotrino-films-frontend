@@ -81,16 +81,16 @@ export function getChannels(context, deep = false) {
  * Resolve channel history entries in one request.
  * @param {import('vuex').ActionContext<any, any>} _
  * @param {string[]} uuids
- * @returns {Promise<Array<{ uuid: string, title: string, slug: string, cover: string | null }>>}
+ * @returns {Promise<{ channels: Array<{ uuid: string, title: string, slug: string, cover: string | null }>, deletedUuids: string[] }>}
  */
 export async function resolveHistoryChannels(_, uuids = []) {
   if (!Array.isArray(uuids) || uuids.length === 0) {
-    return []
+    return { channels: [], deletedUuids: [] }
   }
 
   const sanitized = [...new Set(uuids.filter(value => typeof value === 'string' && value.trim()))]
   if (sanitized.length === 0) {
-    return []
+    return { channels: [], deletedUuids: [] }
   }
 
   const { data } = await api.post(
@@ -101,7 +101,14 @@ export async function resolveHistoryChannels(_, uuids = []) {
     }
   )
 
-  return Array.isArray(data) ? data : []
+  if (Array.isArray(data)) {
+    return { channels: data, deletedUuids: [] }
+  }
+
+  return {
+    channels: Array.isArray(data?.channels) ? data.channels : [],
+    deletedUuids: Array.isArray(data?.deletedUuids) ? data.deletedUuids : []
+  }
 }
 
 /**
