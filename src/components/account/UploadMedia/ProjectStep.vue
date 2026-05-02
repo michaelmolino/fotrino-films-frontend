@@ -21,10 +21,9 @@
       @update:model-value="onUpdateProjectTitle"
       @focus="clearDefaultProjectTitle"
       @blur="restoreDefaultProjectTitle" />
-    <q-card flat bordered class="q-pb-md">
+    <q-card v-if="payload.project.id?.value === 0" flat bordered class="q-pb-md">
       <q-card-section>
         <ProjectPosterFields
-          v-if="payload.project.id?.value === 0"
           :subtitle="payload.project.subtitle"
           :input-color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
           :show-subtitle="true"
