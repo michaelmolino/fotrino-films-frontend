@@ -106,7 +106,7 @@ const mainMedia = computed(() => {
 const sortedMedia = computed(() => {
   if (loading.value) return []
   const arr = selectedView.value === 'main' ? mainMedia.value : allMedia.value
-  return sortBy(arr, 'media.resource_date', 'desc')
+  return sortBy(arr, 'media.resourceDate', 'desc')
 })
 
 const projectCount = computed(() => projects.value.length)

@@ -19,7 +19,7 @@
         <PlyrPlayer
           v-if="media"
           :media="media"
-          :artist="channel?.ownername"
+          :artist="channel?.ownerName"
           class="q-py-md plyrplayer" />
         <div v-if="media" class="plyrplayer" data-cy="media-description-container">
           <MediaDescription :media="media" />

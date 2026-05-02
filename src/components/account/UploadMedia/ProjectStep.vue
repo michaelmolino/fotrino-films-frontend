@@ -30,7 +30,7 @@
           :show-subtitle="true"
           :show-poster-type="true"
           :poster-type="localPosterType"
-          :poster-color="payload.project.poster_color || defaultColor"
+          :poster-color="payload.project.posterColor || defaultColor"
           :poster-file="posterFile"
           :project-preview="displayProject"
           subtitle-data-cy="upload-project-subtitle"
@@ -73,7 +73,7 @@ const filteredOptions = computed(() => {
 const localPosterType = computed(() => props.payload.project.posterType)
 
 // Use payload.project for preview when creating a new project (id === 0),
-// otherwise use the existing project prop. This ensures poster_color updates
+// otherwise use the existing project prop. This ensures posterColor updates
 // are reflected in the live preview.
 const displayProject = computed(() => {
   const currentId = props.payload?.project?.id
@@ -87,11 +87,11 @@ const displayProject = computed(() => {
   const base = isNew ? props.payload.project || {} : props.project || {}
   const parentProject = props.project || {}
 
-  // For new projects, poster_color should come from payload
-  // For existing projects, poster_color should come from the project data
+  // For new projects, posterColor should come from payload
+  // For existing projects, posterColor should come from the project data
   const posterColor = isNew
-    ? props.payload?.project?.poster_color || defaultColor
-    : parentProject.poster_color || defaultColor
+    ? props.payload?.project?.posterColor || defaultColor
+    : parentProject.posterColor || defaultColor
 
   return {
     // Prefer parent-computed media array (reflects current poster/media counts)
@@ -102,7 +102,7 @@ const displayProject = computed(() => {
     title: base.title || parentProject.title || '',
     subtitle: base.subtitle || parentProject.subtitle || '',
     // Use the appropriate poster color based on whether it's a new or existing project
-    poster_color: posterColor
+    posterColor: posterColor
   }
 })
 
@@ -130,7 +130,7 @@ function onUpdatePosterType(val) {
 function onUpdatePosterColor(val) {
   emit('update:payload', {
     ...props.payload,
-    project: { ...props.payload.project, poster_color: val }
+    project: { ...props.payload.project, posterColor: val }
   })
 }
 function onUpdatePosterFile(fileOrFiles) {

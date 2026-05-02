@@ -15,7 +15,7 @@
         :hasPending-children="hasPendingChildren"
         :link="getMediaLink('channel', channel.id)"
         :avatarSize="'48px'"
-        :badge="channel.is_admin"
+        :badge="channel.isAdmin"
         badgeIcon="security"
         :subtitle="channel.created ? `Created: ${daysSince(channel.created, true)}` : ''"
         :editable="true"

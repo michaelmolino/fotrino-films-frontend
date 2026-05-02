@@ -31,9 +31,8 @@ const DEFAULT_GLOBAL_API_ERROR_MESSAGES = {
 /** @typedef {GlobalApiErrorResponse['error']} GlobalApiErrorCode */
 
 /**
- * @typedef {import('src/types/api-contract').UploadValidationErrorResponse |
- * import('src/types/api-contract').UploadStorageConflictResponse |
- * import('src/types/api-contract').DeletionBlockedResponse} ComponentApiErrorResponse
+ * @typedef {import('src/types/api-contract').ErrorDetailResponse |
+ * import('src/types/api-contract').ErrorResponse} ComponentApiErrorResponse
  */
 
 function isPlainObject(value) {

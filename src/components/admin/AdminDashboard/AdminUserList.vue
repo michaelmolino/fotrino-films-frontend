@@ -25,7 +25,7 @@
                   decoding="async" />
               </q-avatar>
               <q-badge
-                v-if="user.is_admin"
+                v-if="user.isAdmin"
                 floating
                 color="accent"
                 text-color="white"
@@ -89,9 +89,9 @@
             <q-item-label
               caption
               class="text-grey-7 q-mt-xs"
-              v-if="user.last_login"
+              v-if="user.lastLogin"
               :class="{ 'deleted-user': user.deleted }">
-              Last login: {{ daysSince(user.last_login, true) }}
+              Last login: {{ daysSince(user.lastLogin, true) }}
             </q-item-label>
             <q-item-label
               caption

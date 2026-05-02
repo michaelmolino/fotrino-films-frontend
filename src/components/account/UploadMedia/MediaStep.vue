@@ -114,7 +114,7 @@ async function onUpdateMediaFile(fileOrFiles) {
         const yyyy = dateObj.getFullYear()
         const mm = String(dateObj.getMonth() + 1).padStart(2, '0')
         const dd = String(dateObj.getDate()).padStart(2, '0')
-        onUpdateResourceDate(`${yyyy}/${mm}/${dd}`)
+        onUpdateResourceDate(`${yyyy}-${mm}-${dd}`)
       }
     } catch (e) {
       /* noop */
@@ -141,11 +141,12 @@ function onUpdatePreviewType(val) {
   }
 }
 function onUpdateResourceDate(val) {
+  const normalized = val ? val.replaceAll('/', '-') : val
   emit('update:payload', {
     ...props.payload,
     project: {
       ...props.payload.project,
-      media: { ...props.payload.project.media, resourceDate: val }
+      media: { ...props.payload.project.media, resourceDate: normalized }
     }
   })
 }

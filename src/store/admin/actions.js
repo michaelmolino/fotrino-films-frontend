@@ -9,7 +9,7 @@ import { getGlobalApiErrorPayload, isGlobalApiError } from 'src/utils/api-errors
  * @returns {import('src/types/api-contract').AdminUser[]}
  */
 function sortUsers(users) {
-  const sortedUsers = sortBy(users, 'last_login', 'desc')
+  const sortedUsers = sortBy(users, 'lastLogin', 'desc')
   for (const user of sortedUsers) {
     if (Array.isArray(user.channels)) {
       user.channels = sortBy(user.channels, 'created', 'desc')
@@ -50,7 +50,7 @@ export function getAllUsers(context) {
     mutation: 'SET_USERS',
     skipGlobalErrorNotify: true,
     /** @param {import('src/types/api-contract').AdminUsersResponse} data */
-    extract: data => sortUsers(data.users)
+    extract: data => sortUsers(data)
   })
 }
 
@@ -69,14 +69,13 @@ export function getDLQ(context) {
 /**
  * @param {import('vuex').ActionContext<any, any>} context
  * @param {number} eventId
- * @returns {Promise<import('src/types/api-contract').RequeueOutboxResponse>}
+ * @returns {Promise<void>}
  */
 export async function requeueDLQItem(context, eventId) {
-  const { data } = await api.post(`/admin/outbox/requeue/${eventId}`, null, {
+  await api.post(`/admin/outbox/requeue/${eventId}`, null, {
     __skipGlobalErrorNotify: true
   })
   await getDLQ(context)
-  return data
 }
 
 /**

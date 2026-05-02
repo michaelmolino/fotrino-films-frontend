@@ -21,7 +21,7 @@ export function getMetaData(route, channel) {
       : project?.media?.find(m => m.main)
 
     title = media?.title || null
-    description = sanitizeText(media?.description_unsafe)
+    description = sanitizeText(media?.descriptionUnsafe)
     image = media?.preview || null
     type = 'video'
   }
@@ -30,7 +30,7 @@ export function getMetaData(route, channel) {
   if (route?.params.privateId) {
     const media = channel?.project?.media
     title = media?.title || null
-    description = sanitizeText(media?.description_unsafe)
+    description = sanitizeText(media?.descriptionUnsafe)
     image = media?.preview || null
     type = 'video'
   }

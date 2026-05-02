@@ -219,7 +219,7 @@ const initialPayload = {
     media: {
       main: false,
       previewType: 'frame',
-      resourceDate: new Date().toISOString().split('T')[0].replaceAll('-', '/')
+      resourceDate: new Date().toISOString().split('T')[0]
     }
   }
 }

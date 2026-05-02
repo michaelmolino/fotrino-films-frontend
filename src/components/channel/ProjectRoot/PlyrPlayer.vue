@@ -64,8 +64,8 @@ async function refreshWebp() {
 }
 
 async function fetchMediaToken() {
-  if (!props.media?.private_id) return null
-  return await store.dispatch('channel/getMediaToken', props.media.private_id)
+  if (!props.media?.privateId) return null
+  return await store.dispatch('channel/getMediaToken', props.media.privateId)
 }
 
 function destroyPlayers() {

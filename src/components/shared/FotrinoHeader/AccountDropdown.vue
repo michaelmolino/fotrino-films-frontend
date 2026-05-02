@@ -9,7 +9,7 @@
     size="md">
     <div style="max-width: 220px; margin: 0 auto; width: 100%" class="row">
       <q-btn
-        v-if="profile?.is_admin"
+        v-if="profile?.isAdmin"
         to="/admin"
         align="left"
         flat

@@ -3,133 +3,118 @@
 declare namespace ApiContractsInternal {
   export type Avatar = string | null
   export type Country = string | null
-  export type Created = string | null
+  export type Created = string
   export type CsrfToken = string
   export type Deleted = boolean
   export type Email = string
   export type Id = number
-  export type IdentityProvider = string | null
+  export type ExternalId = string
+  export type Provider = string
   export type IsAdmin = boolean
   export type LastLogin = string | null
   export type Name = string
   export type Providers = string[]
-  export type Accepted = boolean
-  export type Deleted1 = boolean
-  export type UserId = number
+  export type Avatar1 = string | null
   export type Cover = string | null
-  export type Created1 = string | null
+  export type Created1 = string
   export type Id1 = number
   export type Slug = string
   export type Title = string
   export type Uuid = string
-  export type Avatar1 = string | null
-  export type Cover1 = string | null
-  export type Created2 = string | null
-  export type Id2 = number
-  export type Slug1 = string
-  export type Title1 = string
-  export type Uuid1 = string
-  export type Channels = AdminOwnedChannelResponse1[]
+  export type Channels = ChannelCoreResponse[]
   export type Country1 = string | null
-  export type Created3 = string | null
-  export type Deleted2 = boolean
+  export type Created2 = string
+  export type Deleted1 = boolean
   export type Email1 = string
-  export type Id3 = number
+  export type Id2 = number
   export type IsAdmin1 = boolean
   export type LastLogin1 = string | null
   export type Name1 = string
-  export type ExternalId = string
-  export type Provider = string
-  export type Providers1 = AdminUserProviderResponse[]
-  export type ExternalId1 = string
-  export type Provider1 = string
-  export type Avatar2 = string | null
-  export type Channels1 = AdminOwnedChannelResponse1[]
-  export type Country2 = string | null
-  export type Created4 = string | null
-  export type Deleted3 = boolean
-  export type Email2 = string
-  export type Id4 = number
-  export type IsAdmin2 = boolean
-  export type LastLogin2 = string | null
-  export type Name2 = string
-  export type Providers2 = AdminUserProviderResponse[]
-  export type Users = AdminUserResponse1[]
+  export type Providers1 = UserProviderResponse[]
+  /**
+   * This interface was referenced by `ApiContracts`'s JSON-Schema
+   * via the `definition` "AdminUsersResponse".
+   */
+  export type AdminUsersResponse = UserResponse[]
   export type Error = 'bad_request'
   export type Message = string | null
   export type Status = 400
-  export type Cover2 = string | null
-  export type Created5 = string
-  export type Deleted4 = boolean
-  export type Id5 = number
+  export type Cover1 = string | null
+  export type Created3 = string
+  export type Deleted2 = boolean
+  export type Id3 = number
   export type Owner = number
-  export type Ownername = string | null
+  export type Ownername = string
   export type Pending = boolean
   export type Channel = number
-  export type Created6 = string | null
-  export type Deleted5 = boolean
-  export type Id6 = number
-  export type Created7 = string | null
-  export type Deleted6 = boolean
+  export type Created4 = string
+  export type Deleted3 = boolean
+  export type Id4 = number
+  export type Created5 = string
+  export type Deleted4 = boolean
   export type DescriptionUnsafe = string | null
-  export type Id7 = number
-  export type Main = boolean | null
+  export type Id5 = number
+  export type Main = boolean
   export type Pending1 = boolean
-  export type Preview = string | null
+  export type Preview = string
   export type PrivateId = string
   export type Project = number
-  export type ResourceDate = string | null
-  export type Slug2 = string
+  export type ResourceDate = string
+  export type Slug1 = string
   export type Src = string | null
-  export type Title2 = string
+  export type Title1 = string
   export type Type = string | null
+  export type UpdatedAt = string
   export type Media = MediaResponse[]
   export type Pending2 = boolean
   export type Poster = string | null
   export type PosterColor = string | null
-  export type ResourceDate1 = string | null
-  export type Slug3 = string
+  export type ResourceDate1 = string
+  export type Slug2 = string
   export type Subtitle = string | null
-  export type Title3 = string
+  export type Title2 = string
+  export type UpdatedAt1 = string
   export type Projects = ProjectResponse[]
-  export type Slug4 = string
-  export type Title4 = string
-  export type Uuid2 = string
-  export type Created8 = string | null
-  export type Deleted7 = boolean
+  export type Slug3 = string
+  export type Title3 = string
+  export type Uuid1 = string
+  export type Created6 = string
+  export type Deleted5 = boolean
   export type DescriptionUnsafe1 = string | null
-  export type Id8 = number
-  export type Main1 = boolean | null
+  export type Id6 = number
+  export type Main1 = boolean
   export type Pending3 = boolean
-  export type Preview1 = string | null
+  export type Preview1 = string
   export type PrivateId1 = string
   export type Project1 = number
-  export type ResourceDate2 = string | null
-  export type Slug5 = string
+  export type ResourceDate2 = string
+  export type Slug4 = string
   export type Src1 = string | null
-  export type Title5 = string
+  export type Title4 = string
   export type Type1 = string | null
+  export type UpdatedAt2 = string
   export type Channel1 = number
-  export type Created9 = string | null
-  export type Deleted8 = boolean
-  export type Id9 = number
+  export type Created7 = string
+  export type Deleted6 = boolean
+  export type Id7 = number
   export type Media1 = MediaResponse[]
   export type Pending4 = boolean
   export type Poster1 = string | null
   export type PosterColor1 = string | null
-  export type ResourceDate3 = string | null
-  export type Slug6 = string
+  export type ResourceDate3 = string
+  export type Slug5 = string
   export type Subtitle1 = string | null
-  export type Title6 = string
-  export type Cover3 = string | null
-  export type Created10 = string
-  export type Deleted9 = boolean
-  export type Id10 = number
+  export type Title5 = string
+  export type UpdatedAt3 = string
+  export type Cover2 = string | null
+  export type Created8 = string
+  export type Deleted7 = boolean
+  export type Id8 = number
   export type Owner1 = number
   export type Pending5 = boolean
-  export type Slug7 = string
-  export type Title7 = string
-  export type Uuid3 = string
+  export type Slug6 = string
+  export type Title6 = string
+  export type Uuid2 = string
   export type Error1 = 'conflict'
   export type Message1 = string | null
   export type Status1 = 409
@@ -139,10 +124,30 @@ declare namespace ApiContractsInternal {
    */
   export type CoverType = 'profile' | 'new'
   export type Attempts = number
-  export type AvailableAt = string | null
-  export type Created11 = string | null
-  export type Id11 = number
-  export type LastError = string | null
+  export type Availableat = string
+  export type Created9 = string
+  export type Id9 = number
+  export type Lasterror = string | null
+  export type Payload =
+    | ObjectsDeleteNamePayload
+    | MediaProcessPayload
+    | NotificationSendPayload
+    | EmailSendPayload
+    | DatabaseHardDeletePayload
+  export type Name2 = string
+  export type Objecttype = string
+  export type Media2 = number
+  export type Owner2 = number
+  export type Source = string
+  export type Description = string
+  export type Event = string
+  export type Htmlbody = string
+  export type Subject = string
+  export type Toemail = string
+  export type Toname = string
+  export type Entitytype = 'MEDIA' | 'PROJECT' | 'CHANNEL'
+  export type Owner3 = number
+  export type Reference = number
   export type Type2 = string
   export type Error2 = string
   export type Error3 = string
@@ -159,26 +164,20 @@ declare namespace ApiContractsInternal {
   export type Status5 = 500
   export type Label = string | null
   export type Value = number | string
-  export type ExpiresAt = string
+  export type Expiresat = string
   export type Src2 = string
   export type Token = string
-  export type Description = string | null
-  export type Main2 = boolean
-  export type Resourcedate = string | null
   export type Description1 = string | null
+  export type Main2 = boolean
+  export type Resourcedate = string
+  export type Description2 = string | null
   export type Filename = string
   export type Main3 = boolean
   export type Previewtype = 'frame' | 'new'
   export type Resourcedate1 = string
-  export type Title8 = string
-  export type Message5 = string
-  export type RedirectUrl = string
-  export type Success = boolean
-  export type Email3 = string
-  export type Id12 = number
-  export type Name3 = string
+  export type Title7 = string
   export type Error8 = 'not_found'
-  export type Message6 = string | null
+  export type Message5 = string | null
   export type Status6 = 404
   /**
    * This interface was referenced by `ApiContracts`'s JSON-Schema
@@ -202,68 +201,61 @@ declare namespace ApiContractsInternal {
    * via the `definition` "PreviewType".
    */
   export type PreviewType = 'frame' | 'new'
-  export type Cover4 = string | null
+  export type Cover3 = string | null
   export type Ownername1 = string
+  export type Title8 = string
   export type Title9 = string
   export type Title10 = string
-  export type Title11 = string
+  export type Postercolor = string | null
   export type Postertype = 'default' | 'new'
-  export type PosterColor2 = string | null
   export type Subtitle2 = string | null
-  export type Title12 = string | null
-  export type Message7 = string | null
+  export type Title11 = string | null
+  export type Message6 = string | null
   export type Reported = boolean
-  export type MediaId = number
-  export type PrivateId2 = string
-  export type CreatedAt = string
+  export type Mediaid = number
+  export type Privateid = string
+  export type Createdat = string
   export type Reason = string | null
   export type Reporter = string
   export type Reports = ReportedMediaReportResponse[]
-  export type Title13 = string
-  export type CreatedAt1 = string
+  export type Title12 = string
+  export type Createdat1 = string
   export type Reason1 = string | null
   export type Reporter1 = string
-  export type Error9 = string | null
-  export type EventId = number
-  export type Requeued = boolean
-  export type Error10 = 'unauthorized'
-  export type Message8 = string | null
+  export type Error9 = 'unauthorized'
+  export type Message7 = string | null
   export type Status7 = 401
-  export type Error11 = 'unprocessable_entity'
-  export type Message9 = string | null
+  export type Error10 = 'unprocessable_entity'
+  export type Message8 = string | null
   export type Status8 = 422
-  export type Reference = number
+  export type Reference1 = number
   export type Resourcetype = 'cover' | 'poster' | 'preview' | 'upload'
   export type Url = string
   export type Covertype = 'profile' | 'new'
-  export type Title14 = string | null
+  export type Title13 = string | null
   /**
    * This interface was referenced by `ApiContracts`'s JSON-Schema
    * via the `definition` "UploadResourceType".
    */
   export type UploadResourceType = 'cover' | 'poster' | 'preview' | 'upload'
   export type Detail1 = string
-  export type Error12 = string
+  export type Error11 = string
   export type Detail2 = {
     [k: string]: unknown
   }[]
-  export type Error13 = string
+  export type Error12 = string
   export type Idle = boolean
-  export type JobsQueued = number
-  export type JobsRunning = number
-  export type OutboxDelayed = number
-  export type OutboxPending = number
-  export type OutboxProcessing = number
-  export type OutboxReady = number
+  export type Jobsqueued = number
+  export type Jobsrunning = number
+  export type Outboxdelayed = number
+  export type Outboxpending = number
+  export type Outboxprocessing = number
+  export type Outboxready = number
 
   export interface ApiContracts {
     AccountProfile: AccountProfileResponse
     AccountProvidersResponse: AccountProvidersResponse
-    AdminDeleteMediaResponse: AdminDeleteMediaResponse
-    AdminDeleteUserResponse: AdminDeleteUserResponse
-    AdminOwnedChannel: AdminOwnedChannelResponse
-    AdminUser: AdminUserResponse
-    AdminUserProvider: AdminUserProviderResponse1
+    AdminUser: UserResponse
     AdminUsersResponse: AdminUsersResponse
     BadRequestErrorResponse: BadRequestErrorResponse
     ChannelDetail: ChannelDetailResponse
@@ -284,8 +276,6 @@ declare namespace ApiContractsInternal {
     MediaTokenResponse: MediaTokenResponse
     MediaUpdateRequest: MediaUpdateRequest
     MediaUploadPayload: MediaUploadPayload
-    MockLoginResponse: MockLoginResponse
-    MockLoginUserResponse: MockLoginUserResponse
     NotFoundErrorResponse: NotFoundErrorResponse
     OAuthProvider: OAuthProvider
     PosterType: PosterType
@@ -296,7 +286,6 @@ declare namespace ApiContractsInternal {
     ReportMediaResponse: ReportMediaResponse
     ReportedMediaItem: ReportedMediaItemResponse
     ReportedMediaReport: ReportedMediaReportResponse1
-    RequeueOutboxResponse: RequeueOutboxResponse
     UnauthorizedErrorResponse: UnauthorizedErrorResponse
     UnprocessableEntityErrorResponse: UnprocessableEntityErrorResponse
     UploadInstruction: UploadInstruction
@@ -315,13 +304,21 @@ declare namespace ApiContractsInternal {
     country: Country
     created: Created
     csrf_token: CsrfToken
-    deleted?: Deleted
+    deleted: Deleted
     email: Email
     id: Id
-    identity_provider?: IdentityProvider
-    is_admin?: IsAdmin
+    identity_provider: UserProviderResponse | null
+    is_admin: IsAdmin
     last_login: LastLogin
     name: Name
+  }
+  /**
+   * This interface was referenced by `ApiContracts`'s JSON-Schema
+   * via the `definition` "UserProviderResponse".
+   */
+  export interface UserProviderResponse {
+    external_id: ExternalId
+    provider: Provider
   }
   /**
    * This interface was referenced by `ApiContracts`'s JSON-Schema
@@ -332,43 +329,16 @@ declare namespace ApiContractsInternal {
   }
   /**
    * This interface was referenced by `ApiContracts`'s JSON-Schema
-   * via the `definition` "AdminDeleteMediaResponse".
-   */
-  export interface AdminDeleteMediaResponse {
-    accepted: Accepted
-  }
-  /**
-   * This interface was referenced by `ApiContracts`'s JSON-Schema
-   * via the `definition` "AdminDeleteUserResponse".
-   */
-  export interface AdminDeleteUserResponse {
-    deleted: Deleted1
-    user_id: UserId
-  }
-  /**
-   * This interface was referenced by `ApiContracts`'s JSON-Schema
-   * via the `definition` "AdminOwnedChannel".
-   */
-  export interface AdminOwnedChannelResponse {
-    cover: Cover
-    created: Created1
-    id: Id1
-    slug: Slug
-    title: Title
-    uuid: Uuid
-  }
-  /**
-   * This interface was referenced by `ApiContracts`'s JSON-Schema
    * via the `definition` "AdminUser".
    */
-  export interface AdminUserResponse {
+  export interface UserResponse {
     avatar: Avatar1
     channels: Channels
     country: Country1
-    created: Created3
-    deleted: Deleted2
+    created: Created2
+    deleted: Deleted1
     email: Email1
-    id: Id3
+    id: Id2
     is_admin: IsAdmin1
     last_login: LastLogin1
     name: Name1
@@ -376,55 +346,15 @@ declare namespace ApiContractsInternal {
   }
   /**
    * This interface was referenced by `ApiContracts`'s JSON-Schema
-   * via the `definition` "AdminOwnedChannelResponse".
+   * via the `definition` "ChannelCoreResponse".
    */
-  export interface AdminOwnedChannelResponse1 {
-    cover: Cover1
-    created: Created2
-    id: Id2
-    slug: Slug1
-    title: Title1
-    uuid: Uuid1
-  }
-  /**
-   * This interface was referenced by `ApiContracts`'s JSON-Schema
-   * via the `definition` "AdminUserProviderResponse".
-   */
-  export interface AdminUserProviderResponse {
-    external_id: ExternalId
-    provider: Provider
-  }
-  /**
-   * This interface was referenced by `ApiContracts`'s JSON-Schema
-   * via the `definition` "AdminUserProvider".
-   */
-  export interface AdminUserProviderResponse1 {
-    external_id: ExternalId1
-    provider: Provider1
-  }
-  /**
-   * This interface was referenced by `ApiContracts`'s JSON-Schema
-   * via the `definition` "AdminUsersResponse".
-   */
-  export interface AdminUsersResponse {
-    users: Users
-  }
-  /**
-   * This interface was referenced by `ApiContracts`'s JSON-Schema
-   * via the `definition` "AdminUserResponse".
-   */
-  export interface AdminUserResponse1 {
-    avatar: Avatar2
-    channels: Channels1
-    country: Country2
-    created: Created4
-    deleted: Deleted3
-    email: Email2
-    id: Id4
-    is_admin: IsAdmin2
-    last_login: LastLogin2
-    name: Name2
-    providers: Providers2
+  export interface ChannelCoreResponse {
+    cover: Cover
+    created: Created1
+    id: Id1
+    slug: Slug
+    title: Title
+    uuid: Uuid
   }
   /**
    * This interface was referenced by `ApiContracts`'s JSON-Schema
@@ -440,17 +370,17 @@ declare namespace ApiContractsInternal {
    * via the `definition` "ChannelDetail".
    */
   export interface ChannelDetailResponse {
-    cover: Cover2
-    created: Created5
-    deleted?: Deleted4
-    id: Id5
+    cover: Cover1
+    created: Created3
+    deleted?: Deleted2
+    id: Id3
     owner: Owner
-    ownername?: Ownername
+    ownername: Ownername
     pending?: Pending
     projects?: Projects
-    slug: Slug4
-    title: Title4
-    uuid: Uuid2
+    slug: Slug3
+    title: Title3
+    uuid: Uuid1
   }
   /**
    * This interface was referenced by `ApiContracts`'s JSON-Schema
@@ -458,57 +388,60 @@ declare namespace ApiContractsInternal {
    */
   export interface ProjectResponse {
     channel: Channel
-    created: Created6
-    deleted?: Deleted5
-    id: Id6
+    created: Created4
+    deleted?: Deleted3
+    id: Id4
     media?: Media
     pending?: Pending2
     poster: Poster
     poster_color: PosterColor
     resource_date: ResourceDate1
-    slug: Slug3
+    slug: Slug2
     subtitle: Subtitle
-    title: Title3
+    title: Title2
+    updated_at: UpdatedAt1
   }
   /**
    * This interface was referenced by `ApiContracts`'s JSON-Schema
    * via the `definition` "MediaResponse".
    */
   export interface MediaResponse {
-    created: Created7
-    deleted?: Deleted6
+    created: Created5
+    deleted?: Deleted4
     description_unsafe: DescriptionUnsafe
-    id: Id7
+    id: Id5
     main: Main
     pending?: Pending1
     preview: Preview
     private_id: PrivateId
     project: Project
     resource_date: ResourceDate
-    slug: Slug2
+    slug: Slug1
     src: Src
-    title: Title2
+    title: Title1
     type: Type
+    updated_at: UpdatedAt
   }
   /**
    * This interface was referenced by `ApiContracts`'s JSON-Schema
    * via the `definition` "ChannelMedia".
    */
   export interface MediaResponse1 {
-    created: Created8
-    deleted?: Deleted7
+    created: Created6
+    deleted?: Deleted5
     description_unsafe: DescriptionUnsafe1
-    id: Id8
+    id: Id6
     main: Main1
     pending?: Pending3
     preview: Preview1
     private_id: PrivateId1
     project: Project1
     resource_date: ResourceDate2
-    slug: Slug5
+    slug: Slug4
     src: Src1
-    title: Title5
+    title: Title4
     type: Type1
+    updated_at: UpdatedAt2
   }
   /**
    * This interface was referenced by `ApiContracts`'s JSON-Schema
@@ -516,32 +449,33 @@ declare namespace ApiContractsInternal {
    */
   export interface ProjectResponse1 {
     channel: Channel1
-    created: Created9
-    deleted?: Deleted8
-    id: Id9
+    created: Created7
+    deleted?: Deleted6
+    id: Id7
     media?: Media1
     pending?: Pending4
     poster: Poster1
     poster_color: PosterColor1
     resource_date: ResourceDate3
-    slug: Slug6
+    slug: Slug5
     subtitle: Subtitle1
-    title: Title6
+    title: Title5
+    updated_at: UpdatedAt3
   }
   /**
    * This interface was referenced by `ApiContracts`'s JSON-Schema
    * via the `definition` "ChannelSummary".
    */
   export interface ChannelSummaryResponse {
-    cover: Cover3
-    created: Created10
-    deleted?: Deleted9
-    id: Id10
+    cover: Cover2
+    created: Created8
+    deleted?: Deleted7
+    id: Id8
     owner: Owner1
     pending?: Pending5
-    slug: Slug7
-    title: Title7
-    uuid: Uuid3
+    slug: Slug6
+    title: Title6
+    uuid: Uuid2
   }
   /**
    * This interface was referenced by `ApiContracts`'s JSON-Schema
@@ -558,15 +492,56 @@ declare namespace ApiContractsInternal {
    */
   export interface DeadLetterQueueItemResponse {
     attempts: Attempts
-    available_at: AvailableAt
-    created: Created11
-    id: Id11
-    last_error: LastError
+    availableAt: Availableat
+    created: Created9
+    id: Id9
+    lastError: Lasterror
     payload: Payload
     type: Type2
   }
-  export interface Payload {
-    [k: string]: unknown
+  /**
+   * This interface was referenced by `ApiContracts`'s JSON-Schema
+   * via the `definition` "ObjectsDeleteNamePayload".
+   */
+  export interface ObjectsDeleteNamePayload {
+    name: Name2
+    objectType: Objecttype
+  }
+  /**
+   * This interface was referenced by `ApiContracts`'s JSON-Schema
+   * via the `definition` "MediaProcessPayload".
+   */
+  export interface MediaProcessPayload {
+    media: Media2
+    owner: Owner2
+    source: Source
+  }
+  /**
+   * This interface was referenced by `ApiContracts`'s JSON-Schema
+   * via the `definition` "NotificationSendPayload".
+   */
+  export interface NotificationSendPayload {
+    description: Description
+    event: Event
+  }
+  /**
+   * This interface was referenced by `ApiContracts`'s JSON-Schema
+   * via the `definition` "EmailSendPayload".
+   */
+  export interface EmailSendPayload {
+    htmlBody: Htmlbody
+    subject: Subject
+    toEmail: Toemail
+    toName: Toname
+  }
+  /**
+   * This interface was referenced by `ApiContracts`'s JSON-Schema
+   * via the `definition` "DatabaseHardDeletePayload".
+   */
+  export interface DatabaseHardDeletePayload {
+    entityType: Entitytype
+    owner: Owner3
+    reference: Reference
   }
   /**
    * This interface was referenced by `ApiContracts`'s JSON-Schema
@@ -640,7 +615,7 @@ declare namespace ApiContractsInternal {
    * via the `definition` "MediaTokenResponse".
    */
   export interface MediaTokenResponse {
-    expires_at: ExpiresAt
+    expiresAt: Expiresat
     src: Src2
     token: Token
   }
@@ -649,40 +624,21 @@ declare namespace ApiContractsInternal {
    * via the `definition` "MediaUpdateRequest".
    */
   export interface MediaUpdateRequest {
-    description?: Description
+    description: Description1
     main: Main2
-    resourceDate?: Resourcedate
+    resourceDate: Resourcedate
   }
   /**
    * This interface was referenced by `ApiContracts`'s JSON-Schema
    * via the `definition` "MediaUploadPayload".
    */
   export interface MediaUploadPayload {
-    description?: Description1
+    description?: Description2
     filename: Filename
     main?: Main3
     previewType?: Previewtype
     resourceDate: Resourcedate1
-    title: Title8
-  }
-  /**
-   * This interface was referenced by `ApiContracts`'s JSON-Schema
-   * via the `definition` "MockLoginResponse".
-   */
-  export interface MockLoginResponse {
-    message: Message5
-    redirect_url: RedirectUrl
-    success: Success
-    user: MockLoginUserResponse
-  }
-  /**
-   * This interface was referenced by `ApiContracts`'s JSON-Schema
-   * via the `definition` "MockLoginUserResponse".
-   */
-  export interface MockLoginUserResponse {
-    email: Email3
-    id: Id12
-    name: Name3
+    title: Title7
   }
   /**
    * This interface was referenced by `ApiContracts`'s JSON-Schema
@@ -690,7 +646,7 @@ declare namespace ApiContractsInternal {
    */
   export interface NotFoundErrorResponse {
     error: Error8
-    message?: Message6
+    message?: Message5
     status: Status6
   }
   /**
@@ -698,10 +654,10 @@ declare namespace ApiContractsInternal {
    * via the `definition` "PrivateMediaChannel".
    */
   export interface PrivateMediaChannelResponse {
-    cover: Cover4
+    cover: Cover3
     ownername: Ownername1
     project: PrivateMediaProjectResponse
-    title: Title10
+    title: Title9
   }
   /**
    * This interface was referenced by `ApiContracts`'s JSON-Schema
@@ -709,7 +665,7 @@ declare namespace ApiContractsInternal {
    */
   export interface PrivateMediaProjectResponse {
     media: MediaResponse
-    title: Title9
+    title: Title8
   }
   /**
    * This interface was referenced by `ApiContracts`'s JSON-Schema
@@ -717,7 +673,7 @@ declare namespace ApiContractsInternal {
    */
   export interface PrivateMediaProjectResponse1 {
     media: MediaResponse
-    title: Title11
+    title: Title10
   }
   /**
    * This interface was referenced by `ApiContracts`'s JSON-Schema
@@ -726,17 +682,17 @@ declare namespace ApiContractsInternal {
   export interface ProjectUploadPayload {
     id: LabeledValue
     media: MediaUploadPayload
+    posterColor?: Postercolor
     posterType?: Postertype
-    poster_color?: PosterColor2
     subtitle?: Subtitle2
-    title?: Title12
+    title?: Title11
   }
   /**
    * This interface was referenced by `ApiContracts`'s JSON-Schema
    * via the `definition` "ReportMediaResponse".
    */
   export interface ReportMediaResponse {
-    message?: Message7
+    message?: Message6
     reported: Reported
   }
   /**
@@ -744,17 +700,17 @@ declare namespace ApiContractsInternal {
    * via the `definition` "ReportedMediaItem".
    */
   export interface ReportedMediaItemResponse {
-    media_id: MediaId
-    private_id: PrivateId2
+    mediaId: Mediaid
+    privateId: Privateid
     reports: Reports
-    title: Title13
+    title: Title12
   }
   /**
    * This interface was referenced by `ApiContracts`'s JSON-Schema
    * via the `definition` "ReportedMediaReportResponse".
    */
   export interface ReportedMediaReportResponse {
-    created_at: CreatedAt
+    createdAt: Createdat
     reason: Reason
     reporter: Reporter
   }
@@ -763,26 +719,17 @@ declare namespace ApiContractsInternal {
    * via the `definition` "ReportedMediaReport".
    */
   export interface ReportedMediaReportResponse1 {
-    created_at: CreatedAt1
+    createdAt: Createdat1
     reason: Reason1
     reporter: Reporter1
-  }
-  /**
-   * This interface was referenced by `ApiContracts`'s JSON-Schema
-   * via the `definition` "RequeueOutboxResponse".
-   */
-  export interface RequeueOutboxResponse {
-    error?: Error9
-    event_id: EventId
-    requeued: Requeued
   }
   /**
    * This interface was referenced by `ApiContracts`'s JSON-Schema
    * via the `definition` "UnauthorizedErrorResponse".
    */
   export interface UnauthorizedErrorResponse {
-    error: Error10
-    message?: Message8
+    error: Error9
+    message?: Message7
     status: Status7
   }
   /**
@@ -790,8 +737,8 @@ declare namespace ApiContractsInternal {
    * via the `definition` "UnprocessableEntityErrorResponse".
    */
   export interface UnprocessableEntityErrorResponse {
-    error: Error11
-    message?: Message9
+    error: Error10
+    message?: Message8
     status: Status8
   }
   /**
@@ -799,7 +746,7 @@ declare namespace ApiContractsInternal {
    * via the `definition` "UploadInstruction".
    */
   export interface UploadInstruction {
-    reference: Reference
+    reference: Reference1
     resourceType: Resourcetype
     url: Url
   }
@@ -810,7 +757,7 @@ declare namespace ApiContractsInternal {
   export interface UploadMediaRequest {
     coverType?: Covertype
     project: ProjectUploadPayload
-    title?: Title14
+    title?: Title13
     uuid: LabeledValue
   }
   /**
@@ -819,7 +766,7 @@ declare namespace ApiContractsInternal {
    */
   export interface UploadStorageConflictResponse {
     detail: Detail1
-    error: Error12
+    error: Error11
   }
   /**
    * This interface was referenced by `ApiContracts`'s JSON-Schema
@@ -827,7 +774,7 @@ declare namespace ApiContractsInternal {
    */
   export interface UploadValidationErrorResponse {
     detail: Detail2
-    error: Error13
+    error: Error12
   }
   /**
    * This interface was referenced by `ApiContracts`'s JSON-Schema
@@ -835,23 +782,19 @@ declare namespace ApiContractsInternal {
    */
   export interface WorkerStatusResponse {
     idle: Idle
-    jobs_queued: JobsQueued
-    jobs_running: JobsRunning
-    outbox_delayed: OutboxDelayed
-    outbox_pending: OutboxPending
-    outbox_processing: OutboxProcessing
-    outbox_ready: OutboxReady
+    jobsQueued: Jobsqueued
+    jobsRunning: Jobsrunning
+    outboxDelayed: Outboxdelayed
+    outboxPending: Outboxpending
+    outboxProcessing: Outboxprocessing
+    outboxReady: Outboxready
   }
 }
 /* Clean public aliases for root backend contracts. */
 export type ApiContracts = ApiContractsInternal.ApiContracts
 export type AccountProfile = ApiContracts['AccountProfile']
 export type AccountProvidersResponse = ApiContracts['AccountProvidersResponse']
-export type AdminDeleteMediaResponse = ApiContracts['AdminDeleteMediaResponse']
-export type AdminDeleteUserResponse = ApiContracts['AdminDeleteUserResponse']
-export type AdminOwnedChannel = ApiContracts['AdminOwnedChannel']
 export type AdminUser = ApiContracts['AdminUser']
-export type AdminUserProvider = ApiContracts['AdminUserProvider']
 export type AdminUsersResponse = ApiContracts['AdminUsersResponse']
 export type BadRequestErrorResponse = ApiContracts['BadRequestErrorResponse']
 export type ChannelDetail = ApiContracts['ChannelDetail']
@@ -872,8 +815,6 @@ export type LabeledValue = ApiContracts['LabeledValue']
 export type MediaTokenResponse = ApiContracts['MediaTokenResponse']
 export type MediaUpdateRequest = ApiContracts['MediaUpdateRequest']
 export type MediaUploadPayload = ApiContracts['MediaUploadPayload']
-export type MockLoginResponse = ApiContracts['MockLoginResponse']
-export type MockLoginUserResponse = ApiContracts['MockLoginUserResponse']
 export type NotFoundErrorResponse = ApiContracts['NotFoundErrorResponse']
 export type OAuthProvider = ApiContracts['OAuthProvider']
 export type PosterType = ApiContracts['PosterType']
@@ -884,7 +825,6 @@ export type ProjectUploadPayload = ApiContracts['ProjectUploadPayload']
 export type ReportMediaResponse = ApiContracts['ReportMediaResponse']
 export type ReportedMediaItem = ApiContracts['ReportedMediaItem']
 export type ReportedMediaReport = ApiContracts['ReportedMediaReport']
-export type RequeueOutboxResponse = ApiContracts['RequeueOutboxResponse']
 export type UnauthorizedErrorResponse = ApiContracts['UnauthorizedErrorResponse']
 export type UnprocessableEntityErrorResponse = ApiContracts['UnprocessableEntityErrorResponse']
 export type UploadInstruction = ApiContracts['UploadInstruction']

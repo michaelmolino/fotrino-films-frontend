@@ -102,16 +102,15 @@ function setLocalPreviewImage(url) {
 function normalizeResourceDate(raw) {
   if (!raw) return null
   if (typeof raw === 'string') {
-    const normalized = raw.trim().replaceAll('-', '/')
-    return normalized.slice(0, 10)
+    return raw.trim().slice(0, 10)
   }
   return null
 }
 
 function openEditDialog() {
   editForm.value = {
-    description: props.media?.description_unsafe ?? null,
-    resourceDate: normalizeResourceDate(props.media?.resource_date),
+    description: props.media?.descriptionUnsafe ?? null,
+    resourceDate: normalizeResourceDate(props.media?.resourceDate),
     main: !!props.media?.main
   }
   resetPreviewFile()
@@ -123,7 +122,7 @@ function openEditDialog() {
 function onUpdateResourceDate(value) {
   editForm.value = {
     ...editForm.value,
-    resourceDate: value
+    resourceDate: value ? value.replaceAll('/', '-') : value
   }
 }
 

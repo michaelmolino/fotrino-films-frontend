@@ -103,10 +103,10 @@ const props = defineProps({
 const route = useRoute()
 const isPublic = computed(() => !!route.params.uuid)
 const sinceCaptured = computed(() =>
-  props.media?.resource_date ? daysSince(props.media.resource_date, false) : ''
+  props.media?.resourceDate ? daysSince(props.media.resourceDate, false) : ''
 )
 const sincePublished = computed(() => (props.media?.created ? daysSince(props.media.created) : ''))
-const descriptionSafe = computed(() => sanitizeHtml(props.media?.description_unsafe || ''))
+const descriptionSafe = computed(() => sanitizeHtml(props.media?.descriptionUnsafe || ''))
 
 const reportDialog = ref(false)
 const reason = ref('')
@@ -114,16 +114,16 @@ const submitting = ref(false)
 const store = useStore()
 
 function openReportDialog() {
-  if (!props.media?.private_id) return
+  if (!props.media?.privateId) return
   reportDialog.value = true
 }
 
 async function submitReport() {
-  if (!props.media?.private_id) return
+  if (!props.media?.privateId) return
   submitting.value = true
   try {
     const res = await store.dispatch('channel/reportMedia', {
-      privateId: props.media.private_id,
+      privateId: props.media.privateId,
       reason: reason.value
     })
     const reported = !!res?.reported
@@ -164,7 +164,7 @@ function copyLink(val) {
       })
     })
   } else if (val === 'private') {
-    const id = props.media?.private_id
+    const id = props.media?.privateId
     if (!id) return
     copyToClipboard(`${globalThis.location.origin}/private/${id}`).then(() => {
       Notify.create({

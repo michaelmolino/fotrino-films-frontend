@@ -19,7 +19,7 @@
             :label="location.label"
             :to="location.to" />
         </q-breadcrumbs>
-        <div class="text-caption">By {{ channel.ownername }}</div>
+        <div class="text-caption">By {{ channel.ownerName }}</div>
       </div>
     </div>
   </nav>

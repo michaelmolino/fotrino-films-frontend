@@ -13,7 +13,7 @@
         <ResourceActions
           :title="project.title"
           :image="project.poster"
-          :color="project.poster_color || '#000000'"
+          :color="project.posterColor || '#000000'"
           :pending="project.pending"
           :deleted="project.deleted"
           :hasPending-children="hasPendingChildren"
@@ -119,7 +119,7 @@ const editProjectPreview = computed(() => {
     title: props.project?.title || '',
     subtitle: editForm.value.subtitle || '',
     poster: editForm.value.posterType === 'new' ? editForm.value.posterImage : null,
-    poster_color: editForm.value.posterColor || '#000000',
+    posterColor: editForm.value.posterColor || '#000000',
     media: Array.isArray(props.project?.media) ? props.project.media : []
   }
 })
@@ -128,7 +128,7 @@ function openEditDialog() {
   editForm.value = {
     subtitle: props.project?.subtitle ?? null,
     posterType: props.project?.poster ? 'new' : 'default',
-    posterColor: props.project?.poster_color || '#000000',
+    posterColor: props.project?.posterColor || '#000000',
     posterImage: props.project?.poster || null
   }
   resetPosterFile()

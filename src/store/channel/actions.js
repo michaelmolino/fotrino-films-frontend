@@ -10,9 +10,9 @@ import { getGlobalApiErrorPayload } from 'src/utils/api-errors.js'
  */
 function sortChannelDetail(channel) {
   if (!channel) return channel
-  const projects = sortBy(channel.projects, 'resource_date', 'desc').map(project => ({
+  const projects = sortBy(channel.projects, 'resourceDate', 'desc').map(project => ({
     ...project,
-    media: sortBy(project.media, 'resource_date', 'desc')
+    media: sortBy(project.media, 'resourceDate', 'desc')
   }))
   return { ...channel, projects }
 }

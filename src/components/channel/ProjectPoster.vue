@@ -37,7 +37,7 @@
     <div
       v-if="!project.poster"
       class="poster-fallback"
-      :style="{ backgroundColor: project.poster_color || '#000000' }">
+      :style="{ backgroundColor: project.posterColor || '#000000' }">
       <!-- Centered overlay in the main body for color fallback -->
       <div
         class="absolute-center text-center q-pa-sm poster-center-overlay"
@@ -80,7 +80,7 @@ function getContrastColor(hex) {
   return yiq >= 128 ? '#000000' : '#FFFFFF'
 }
 
-const contrastTextColor = computed(() => getContrastColor(props.project?.poster_color || '#000000'))
+const contrastTextColor = computed(() => getContrastColor(props.project?.posterColor || '#000000'))
 </script>
 
 <style scoped>
