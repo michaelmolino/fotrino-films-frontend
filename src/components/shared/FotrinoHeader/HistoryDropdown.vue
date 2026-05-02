@@ -58,8 +58,8 @@ onMounted(async () => {
       icon: 'info',
       message:
         removedCount === 1
-          ? '1 deleted channel was removed from your history.'
-          : `${removedCount} deleted channels were removed from your history.`
+          ? '1 deleted item was removed from your history.'
+          : `${removedCount} deleted items were removed from your history.`
     })
   }
 })
