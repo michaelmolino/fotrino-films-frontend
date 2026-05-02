@@ -3,6 +3,7 @@ import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { useMeta } from 'quasar'
 import { getMetaData } from '@utils/meta.js'
+import { addPrivateHistory } from '@utils/history.js'
 
 /**
  * Composable for loading and setting channel data based on route parameters
@@ -34,6 +35,10 @@ export function useChannelLoader() {
       } else if (route.params?.privateId) {
         channel = await store.cache.dispatch('channel/getPrivateMedia', route.params.privateId)
         store.commit('channel/SET_CHANNEL', channel)
+        addPrivateHistory(route.params.privateId, {
+          title: channel?.project?.media?.title || channel?.title || '',
+          cover: channel?.cover || null
+        })
       }
 
       if (channel?.uuid) {

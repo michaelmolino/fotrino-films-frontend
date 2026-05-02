@@ -19,7 +19,7 @@
         :label="channel.title"
         :aria-label="`Visit ${channel.title}`"
         size="md"
-        :to="`/${channel.uuid}/${channel.slug}`" />
+        :to="channel.type === 'private' ? `/private/${channel.uuid}` : `/${channel.uuid}/${channel.slug}`" />
       <q-btn
         icon="remove_circle"
         flat
