@@ -1,6 +1,6 @@
 <template>
   <q-btn-dropdown
-    v-if="history && history.length > 0"
+    v-if="historyChannels && historyChannels.length > 0"
     icon="history"
     :label="$q.screen.gt.sm ? 'History' : ''"
     aria-label="View recently visited channels"
@@ -8,7 +8,7 @@
     no-caps
     size="md"
     content-class="my-history-dropdown-menu">
-    <div v-for="channel in history" :key="channel.uuid" class="row">
+    <div v-for="channel in historyChannels" :key="channel.uuid" class="row">
       <q-btn
         :icon="channel.cover ? 'img:' + channel.cover : 'movie'"
         align="left"
@@ -34,9 +34,19 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue'
 import { useStore } from 'vuex'
-import { history, watchChannelHistory, removeHistory } from '@utils/history.js'
+import {
+  historyChannels,
+  watchChannelHistory,
+  removeHistory,
+  resolveHistoryFromBackend
+} from '@utils/history.js'
 
 const $store = useStore()
 watchChannelHistory($store)
+
+onMounted(() => {
+  void resolveHistoryFromBackend($store)
+})
 </script>

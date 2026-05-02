@@ -78,6 +78,33 @@ export function getChannels(context, deep = false) {
 }
 
 /**
+ * Resolve channel history entries in one request.
+ * @param {import('vuex').ActionContext<any, any>} _
+ * @param {string[]} uuids
+ * @returns {Promise<Array<{ uuid: string, title: string, slug: string, cover: string | null }>>}
+ */
+export async function resolveHistoryChannels(_, uuids = []) {
+  if (!Array.isArray(uuids) || uuids.length === 0) {
+    return []
+  }
+
+  const sanitized = [...new Set(uuids.filter(value => typeof value === 'string' && value.trim()))]
+  if (sanitized.length === 0) {
+    return []
+  }
+
+  const { data } = await api.post(
+    '/channels/history',
+    { uuids: sanitized },
+    {
+      __skipGlobalErrorNotify: true
+    }
+  )
+
+  return Array.isArray(data) ? data : []
+}
+
+/**
  * @param {import('vuex').ActionContext<any, any>} context
  * @param {{ uuid: string, pending?: boolean }} options
  * @returns {Promise<import('src/types/api-contract').ChannelDetail>}
