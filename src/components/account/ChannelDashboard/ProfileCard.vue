@@ -49,7 +49,7 @@ const props = defineProps({
 
 const profilePic = computed(() => props.profile?.avatar || undefined)
 const providerIcon = computed(() => {
-  const p = (props.profile?.identity_provider?.provider || '').toLowerCase()
+  const p = (props.profile?.identityProvider?.provider || '').toLowerCase()
   const map = {
     google: `img:${googleIcon}`,
     microsoft: `img:${microsoftIcon}`,
