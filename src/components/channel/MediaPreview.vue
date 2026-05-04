@@ -19,7 +19,8 @@
       fit="cover"
       :loading="priority === 'high' ? 'eager' : 'lazy'"
       decoding="async"
-      @load="onPreviewLoad">
+      @load="onPreviewLoad"
+      @error="onPreviewError">
       <div class="absolute-bottom text-center">
         <div class="ellipsis">
           <span>{{ media.title }}</span
@@ -65,7 +66,8 @@ const { media, project, detail, showMainAccent, priority, to } = defineProps({
   to: String
 })
 
-const { checkWebPVersion } = useWebP()
+const { resolvePreviewSource } = useWebP()
+const previewSource = ref({ strategy: 'original-only', primaryUrl: null, fallbackUrl: null })
 const finalUrl = ref(null)
 const ready = ref(false)
 
@@ -74,15 +76,17 @@ watch(
   () => media?.preview,
   async newPreview => {
     if (!newPreview) {
+      previewSource.value = { strategy: 'original-only', primaryUrl: null, fallbackUrl: null }
       finalUrl.value = null
       ready.value = false
       return
     }
     // Reset ready to show skeleton while resolving
     ready.value = false
-    // Resolve the final URL (WebP if supported & exists, else original)
-    const resolved = await checkWebPVersion(newPreview)
-    finalUrl.value = resolved || newPreview
+    // Resolve explicit source strategy: primary first, fallback on error.
+    const resolved = await resolvePreviewSource(newPreview)
+    previewSource.value = resolved
+    finalUrl.value = resolved.primaryUrl || newPreview
     ready.value = true
   },
   { immediate: true }
@@ -90,6 +94,12 @@ watch(
 
 function onPreviewLoad() {
   if (finalUrl.value) addPreconnectForUrl(finalUrl.value)
+}
+
+function onPreviewError() {
+  if (previewSource.value.fallbackUrl && finalUrl.value !== previewSource.value.fallbackUrl) {
+    finalUrl.value = previewSource.value.fallbackUrl
+  }
 }
 </script>
 

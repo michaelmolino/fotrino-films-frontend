@@ -1,7 +1,6 @@
 import { ref } from 'vue'
 
 const supportsWebP = ref(null)
-const checkedUrls = new Map()
 
 // Detect WebP support once
 async function detectWebPSupport() {
@@ -25,47 +24,52 @@ function getWebPUrl(url) {
   return url.replace(/\.(jpe?g)$/i, '.webp')
 }
 
-// Check if a WebP version exists for a given URL
-async function checkWebPVersion(url) {
-  if (!url || typeof url !== 'string') return url
-
-  // Only process .jpg and .jpeg URLs
-  if (!/\.(jpe?g)$/i.test(url)) return url
-
-  // Check cache first
-  if (checkedUrls.has(url)) {
-    return checkedUrls.get(url)
+// Build an explicit image source strategy that components can apply directly:
+// load primaryUrl first, then fallbackUrl on error when provided.
+async function resolvePreviewSource(url) {
+  if (!url || typeof url !== 'string') {
+    return {
+      strategy: 'original-only',
+      primaryUrl: null,
+      fallbackUrl: null
+    }
   }
 
-  // Check if browser supports WebP
+  const webpUrl = getWebPUrl(url)
+  if (!webpUrl) {
+    return {
+      strategy: 'original-only',
+      primaryUrl: url,
+      fallbackUrl: null
+    }
+  }
+
   const hasWebPSupport = await detectWebPSupport()
   if (!hasWebPSupport) {
-    checkedUrls.set(url, url)
-    return url
-  }
-
-  // Generate WebP URL
-  const webpUrl = getWebPUrl(url)
-
-  // Check if WebP version exists
-  try {
-    const response = await fetch(webpUrl, { method: 'HEAD' })
-    if (response.ok) {
-      checkedUrls.set(url, webpUrl)
-      return webpUrl
+    return {
+      strategy: 'original-only',
+      primaryUrl: url,
+      fallbackUrl: null
     }
-  } catch {
-    // WebP version doesn't exist or network error
   }
 
-  // Fall back to original
-  checkedUrls.set(url, url)
-  return url
+  return {
+    strategy: 'webp-primary-jpeg-fallback',
+    primaryUrl: webpUrl,
+    fallbackUrl: url
+  }
+}
+
+// Backward-compatible helper for existing call sites.
+async function checkWebPVersion(url) {
+  const source = await resolvePreviewSource(url)
+  return source.primaryUrl || url
 }
 
 export function useWebP() {
   return {
     checkWebPVersion,
+    resolvePreviewSource,
     getWebPUrl,
     supportsWebP
   }

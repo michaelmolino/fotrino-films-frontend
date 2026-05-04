@@ -14,9 +14,10 @@
     <div v-else class="audio-container">
       <picture v-if="media.preview" class="audio-preview">
         <img
-          :src="mediaPreviewUrl"
+          :src="audioPreviewUrl"
           :alt="`${media.title} cover art`"
           fetchpriority="high"
+          @error="onAudioPreviewError"
           class="audio-img" />
       </picture>
       <audio
@@ -48,19 +49,27 @@ const player = ref(null)
 const hls = ref(null)
 let playHandler = null
 let PlyrCtor = null
-const { checkWebPVersion } = useWebP()
-const webpUrl = ref(null)
+const { resolvePreviewSource } = useWebP()
+const audioPreviewSource = ref({ strategy: 'original-only', primaryUrl: null, fallbackUrl: null })
+const audioPreviewUrl = ref(null)
 const view = computed(() => (props.media?.type?.startsWith('audio/') ? 'audio' : 'video'))
-const mediaPreviewUrl = computed(() => webpUrl.value || props.media?.preview || null)
+const videoPosterUrl = computed(() => props.media?.preview || null)
 
-async function refreshWebp() {
-  webpUrl.value = null
-  if (props.media?.preview) {
-    const url = await checkWebPVersion(props.media.preview)
-    if (url && url !== props.media.preview && url.endsWith('.webp')) {
-      webpUrl.value = url
-    }
+function onAudioPreviewError() {
+  if (audioPreviewSource.value.fallbackUrl && audioPreviewUrl.value !== audioPreviewSource.value.fallbackUrl) {
+    audioPreviewUrl.value = audioPreviewSource.value.fallbackUrl
   }
+}
+
+async function refreshAudioPreviewSource() {
+  audioPreviewSource.value = { strategy: 'original-only', primaryUrl: null, fallbackUrl: null }
+  audioPreviewUrl.value = null
+  if (!props.media?.preview) {
+    return
+  }
+  const source = await resolvePreviewSource(props.media.preview)
+  audioPreviewSource.value = source
+  audioPreviewUrl.value = source.primaryUrl || props.media.preview
 }
 
 async function fetchMediaToken() {
@@ -91,7 +100,7 @@ async function setupPlayer() {
   const el = document.getElementById(view.value === 'video' ? 'video-player' : 'audio-player')
   if (!el || !props.media) return
   if (view.value === 'video') {
-    el.setAttribute('poster', mediaPreviewUrl.value)
+    el.setAttribute('poster', videoPosterUrl.value)
   }
   if (!PlyrCtor) {
     const mod = await import('plyr')
@@ -264,7 +273,7 @@ function attachMediaSessionHandler() {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: props.media.title,
       artist: props.artist,
-      artwork: [{ src: mediaPreviewUrl.value || '', type: 'image/jpeg' }]
+      artwork: [{ src: audioPreviewUrl.value || '', type: 'image/jpeg' }]
     })
   }
   el.addEventListener('play', playHandler, { once: true })
@@ -272,7 +281,7 @@ function attachMediaSessionHandler() {
 
 async function rebuild() {
   addPreconnectForUrl(props.media?.src)
-  addPreloadImageOnce(mediaPreviewUrl.value, 'high')
+  addPreloadImageOnce(audioPreviewUrl.value, 'high')
   destroyPlayers()
   await nextTick()
   setupPlayer()
@@ -280,7 +289,7 @@ async function rebuild() {
 }
 
 onMounted(async () => {
-  await refreshWebp()
+  await refreshAudioPreviewSource()
   rebuild()
 })
 
@@ -291,7 +300,7 @@ onBeforeUnmount(() => {
 watch(
   () => props.media?.id,
   async () => {
-    await refreshWebp()
+    await refreshAudioPreviewSource()
     await rebuild()
   }
 )
