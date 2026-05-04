@@ -22,6 +22,7 @@
         <q-popup-proxy cover transition-show="scale" transition-hide="scale">
           <q-date
             :model-value="resourceDate"
+            mask="YYYY-MM-DD"
             subtitle="Capture Date"
             :options="dateOptionsFn"
             @update:model-value="$emit('update:resourceDate', $event)">
@@ -83,11 +84,25 @@ const resourceDateLabel = computed(() => {
   if (!props.resourceDate) {
     return 'Set Capture Date'
   }
-  const date = new Date(props.resourceDate.replaceAll('/', '-'))
+  const date = parseResourceDate(props.resourceDate)
   return Number.isNaN(date.getTime()) ? props.resourceDate : date.toLocaleDateString()
 })
 
 function dateOptionsFn(date) {
-  return new Date(date) <= new Date()
+  return parseResourceDate(date) <= new Date()
+}
+
+function parseResourceDate(value) {
+  if (!value || typeof value !== 'string') {
+    return new Date('invalid')
+  }
+
+  const [year, month, day] = value.replaceAll('/', '-').split('-').map((part) => Number.parseInt(part, 10))
+  if (!year || !month || !day) {
+    return new Date('invalid')
+  }
+
+  // Construct local date explicitly to avoid browser-specific string parsing differences.
+  return new Date(year, month - 1, day)
 }
 </script>
