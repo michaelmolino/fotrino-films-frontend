@@ -50,7 +50,7 @@ export function useChannelLoader() {
       if (route.params?.privateId && channel) {
         addPrivateHistory(route.params.privateId, {
           title: channel?.project?.media?.title || channel?.title || '',
-          cover: channel?.cover || null
+          cover: channel?.project?.media?.preview || channel?.cover || null
         })
       }
 
