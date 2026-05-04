@@ -175,8 +175,17 @@ export function useFileProcessor() {
       if (!isLatestResourceProcessing(resourceType, token)) {
         return file
       }
-      upsertEntry(resourceType, compressed, false)
-      return compressed
+      // browser-image-compression may return a Blob (not File) when converting
+      // file types (e.g. PNG→JPEG). Wrap it so prop validators see a File.
+      const compressedFile =
+        compressed instanceof File
+          ? compressed
+          : new File([compressed], file.name, {
+              type: compressed.type || 'image/jpeg',
+              lastModified: file.lastModified ?? Date.now()
+            })
+      upsertEntry(resourceType, compressedFile, false)
+      return compressedFile
     } catch (error) {
       if (!isLatestResourceProcessing(resourceType, token)) {
         return file

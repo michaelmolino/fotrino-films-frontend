@@ -176,11 +176,17 @@
             :disabled="!next"
             @click="goNext">
           </q-btn>
-          <q-btn v-if="step === 4" loading disabled flat label="Uploading">
+          <q-btn v-if="step === 4 && isUploading" loading disabled flat label="Uploading">
             <template v-slot:loading>
               <q-spinner-hourglass />
             </template>
           </q-btn>
+          <q-btn
+            v-if="step === 4 && !isUploading"
+            icon="refresh"
+            flat
+            label="Retry Upload"
+            @click="startUploadJourney" />
         </q-stepper-navigation>
       </template>
     </q-stepper>
@@ -189,7 +195,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { ref, reactive, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useStore } from 'vuex'
 import { onBeforeRouteLeave } from 'vue-router'
 import ChannelStep from './UploadMedia/ChannelStep.vue'
@@ -241,6 +247,7 @@ const isUploading = ref(false)
 const progress = ref(0)
 const statusText = ref(null)
 const extractingFrame = ref(false)
+const uploadTriggered = ref(false)
 
 const { uploadFiles, handleFile: processFile, getRandomFrameFromFile } = useFileProcessor()
 const { factoryUpload } = useUploadFlow({
@@ -289,7 +296,33 @@ function incrementCounter() {
 }
 
 function goNext() {
+  if (step.value === 3) {
+    startUploadJourney()
+    return
+  }
   stepper.value.next()
+}
+
+async function startUploadJourney() {
+  if (isUploading.value || uploadTriggered.value) {
+    return
+  }
+
+  uploadTriggered.value = true
+  step.value = 4
+  await nextTick()
+
+  factoryUpload().catch(err => {
+    statusText.value = getComponentApiErrorMessage(err, 'Something went wrong!')
+    Notify.create({
+      type: 'negative',
+      timeout: 0,
+      message: statusText.value,
+      icon: 'warning'
+    })
+  }).finally(() => {
+    uploadTriggered.value = false
+  })
 }
 
 function goBack() {
@@ -439,8 +472,7 @@ async function quickUpload() {
     } else {
       payload.project.id = { value: 0, label: 'New...' }
     }
-    // Jump directly to Upload step (4)
-    step.value = 4
+    await startUploadJourney()
   } catch (err) {
     console.error('Quick upload setup failed:', err)
     Notify.create({
@@ -525,17 +557,6 @@ watch(step, s => {
     })
   } else if (projects.value.length === 0 && s === 3) {
     payload.project.id = { value: 0, label: 'New...' }
-  }
-  if (s === 4) {
-    factoryUpload().catch(err => {
-      statusText.value = getComponentApiErrorMessage(err, 'Something went wrong!')
-      Notify.create({
-        type: 'negative',
-        timeout: 0,
-        message: statusText.value,
-        icon: 'warning'
-      })
-    })
   }
 })
 

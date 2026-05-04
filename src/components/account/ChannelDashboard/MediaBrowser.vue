@@ -26,6 +26,7 @@ import { Notify } from 'quasar'
 import { useStore } from 'vuex'
 import ChannelItem from './MediaBrowser/ChannelItem.vue'
 import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
+import { uploadPresignedFileWithUppy } from '@libs/uppy-upload.js'
 
 const store = useStore()
 const props = defineProps({
@@ -103,18 +104,24 @@ async function runEditJourney({
   errorMessage
 }) {
   try {
-    await store.dispatch(updateAction, updatePayload)
-
     if (upload?.shouldUpload) {
       const instruction = await store.dispatch(upload.prepareAction, upload.preparePayload)
-      await store.dispatch('channel/uploadMediaPreviewBinary', {
+      if (!instruction?.url || !instruction?.objectName) {
+        throw new Error('Invalid upload instruction returned by backend.')
+      }
+      await uploadPresignedFileWithUppy({
         url: instruction.url,
-        file: upload.file
+        file: upload.file,
+        resourceType: instruction.resourceType || 'upload'
       })
+      // Confirm + metadata update atomically in one backend call
       await store.dispatch(upload.confirmAction, {
         ...upload.confirmPayload,
+        ...updatePayload,
         objectName: instruction.objectName
       })
+    } else {
+      await store.dispatch(updateAction, updatePayload)
     }
 
     await store.dispatch('channel/getChannels', true)

@@ -1,4 +1,4 @@
-import { api, objectApi } from 'boot/axios'
+import { api } from 'boot/axios'
 import { sortBy } from '@utils/sort.js'
 import { getGlobalApiErrorPayload } from 'src/utils/api-errors.js'
 
@@ -68,18 +68,6 @@ async function requestUploadInstruction(url) {
     }
   )
   return res.data
-}
-
-async function confirmUploadInstruction(url, objectName) {
-  await api.put(
-    url,
-    {
-      objectName
-    },
-    {
-      __skipGlobalErrorNotify: true
-    }
-  )
 }
 
 // Actions
@@ -344,42 +332,54 @@ export async function requestChannelCoverUpload(_, { channelUuid }) {
 
 /**
  * @param {import('vuex').ActionContext<any, any>} _
- * @param {{ mediaId: number, objectName: string }} payload
+ * @param {{ mediaId: number, objectName: string, description?: string | null, resourceDate?: string | null, main: boolean }} payload
  * @returns {Promise<void>}
  */
-export async function confirmMediaPreviewUpload(_, { mediaId, objectName }) {
-  await confirmUploadInstruction(`/channels/media/${mediaId}/preview/confirm`, objectName)
+export async function confirmMediaPreviewUpload(_, { mediaId, objectName, description = null, resourceDate = null, main }) {
+  await api.put(
+    `/channels/media/${mediaId}/preview/confirm`,
+    {
+      objectName,
+      description: description?.trim() || null,
+      resourceDate: resourceDate?.trim() || null,
+      main
+    },
+    { __skipGlobalErrorNotify: true }
+  )
 }
 
 /**
  * @param {import('vuex').ActionContext<any, any>} _
- * @param {{ projectId: number, objectName: string }} payload
+ * @param {{ projectId: number, objectName: string, subtitle?: string | null, posterType: 'default' | 'new', posterColor?: string | null }} payload
  * @returns {Promise<void>}
  */
-export async function confirmProjectPosterUpload(_, { projectId, objectName }) {
-  await confirmUploadInstruction(`/channels/project/${projectId}/poster/confirm`, objectName)
+export async function confirmProjectPosterUpload(_, { projectId, objectName, subtitle = null, posterType, posterColor = null }) {
+  await api.put(
+    `/channels/project/${projectId}/poster/confirm`,
+    {
+      objectName,
+      subtitle: subtitle?.trim() || null,
+      posterType,
+      posterColor
+    },
+    { __skipGlobalErrorNotify: true }
+  )
 }
 
 /**
  * @param {import('vuex').ActionContext<any, any>} _
- * @param {{ channelUuid: string, objectName: string }} payload
+ * @param {{ channelUuid: string, objectName: string, title: string }} payload
  * @returns {Promise<void>}
  */
-export async function confirmChannelCoverUpload(_, { channelUuid, objectName }) {
-  await confirmUploadInstruction(`/channels/${channelUuid}/cover/confirm`, objectName)
-}
-
-/**
- * @param {import('vuex').ActionContext<any, any>} _
- * @param {{ url: string, file: File | Blob }} payload
- * @returns {Promise<void>}
- */
-export async function uploadMediaPreviewBinary(_, { url, file }) {
-  await objectApi.put(url, file, {
-    headers: {
-      'Content-Type': file?.type || 'image/jpeg'
-    }
-  })
+export async function confirmChannelCoverUpload(_, { channelUuid, objectName, title }) {
+  await api.put(
+    `/channels/${channelUuid}/cover/confirm`,
+    {
+      objectName,
+      title: title?.trim()
+    },
+    { __skipGlobalErrorNotify: true }
+  )
 }
 
 /**

@@ -16,25 +16,12 @@ const shouldRetryApi = error => {
   return ![400, 401, 402, 403, 404, 409, 500, 501].includes(status)
 }
 
-const shouldRetryObjects = error => {
-  const status = error?.response?.status
-  return axiosRetry.isNetworkOrIdempotentRequestError(error) || status === 408
-}
-
 const api = axios.create({ baseURL: process.env.API })
 
 axiosRetry(api, {
   retries: 6,
   retryDelay: axiosRetry.exponentialDelay,
   retryCondition: shouldRetryApi
-})
-
-const objectApi = axios.create()
-
-axiosRetry(objectApi, {
-  retries: 6,
-  retryDelay: axiosRetry.exponentialDelay,
-  retryCondition: shouldRetryObjects
 })
 
 export default boot(({ app, router, store }) => {
@@ -154,4 +141,4 @@ export default boot(({ app, router, store }) => {
   app.config.globalProperties.$api = api
 })
 
-export { api, objectApi }
+export { api }

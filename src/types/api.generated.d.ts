@@ -229,6 +229,7 @@ declare namespace ApiContractsInternal {
   export type Message8 = string | null
   export type Status8 = 422
   export type Reference1 = number
+  export type Requiredresources = ('cover' | 'poster' | 'preview' | 'upload')[]
   export type Resourcetype = 'cover' | 'poster' | 'preview' | 'upload'
   export type Url = string
   export type Covertype = 'profile' | 'new'
@@ -743,6 +744,7 @@ declare namespace ApiContractsInternal {
    */
   export interface UploadInstruction {
     reference: Reference1
+    requiredResources?: Requiredresources
     resourceType: Resourcetype
     url: Url
   }
