@@ -1,25 +1,34 @@
+import { ref } from 'vue'
 import { useUppyPresignedUpload } from './useUppyPresignedUpload.js'
 
 export function useUploadFlow({
     store,
     payload,
     stepper,
-    uploadFiles,
-    progress,
-    statusText,
-    isUploading
+    uploadFiles
 }) {
-    const { initializeUppy, addFilesToUppy, startUpload, getMediaReference, cleanup } =
-        useUppyPresignedUpload({
-            progress,
-            statusText
-        })
+    const isUploading = ref(false)
+    // Set to true when cancel() is called so the async catch block in factoryUpload
+    // can distinguish a user-initiated cancellation from a real error.
+    let cancelled = false
+
+    const {
+        progress,
+        statusText,
+        initializeUppy,
+        addFilesToUppy,
+        startUpload,
+        getMediaReference,
+        cancelUploads,
+        cleanup
+    } = useUppyPresignedUpload()
 
     async function factoryUpload() {
         if (isUploading.value) {
             return
         }
 
+        cancelled = false
         isUploading.value = true
         try {
             // Get presigned upload instructions from backend
@@ -64,6 +73,10 @@ export function useUploadFlow({
             statusText.value = 'Upload complete!'
             stepper.value?.next()
         } catch (err) {
+            if (cancelled) {
+                // User initiated the cancel; state already set by cancel(). Do not overwrite.
+                return
+            }
             progress.value = -1
             statusText.value = 'Something went wrong!'
             console.error('Error uploading:', err)
@@ -74,7 +87,26 @@ export function useUploadFlow({
         }
     }
 
+    function cancel() {
+        cancelled = true
+        // Grab the media reference before cleanup clears Uppy state.
+        const mediaRef = getMediaReference()
+        cancelUploads()
+        isUploading.value = false
+        progress.value = 0
+        statusText.value = 'Upload cancelled.'
+        if (mediaRef != null) {
+            store.dispatch('channel/abortUpload', mediaRef).catch(err => {
+                console.warn('Failed to abort pending upload on cancel:', err)
+            })
+        }
+    }
+
     return {
-        factoryUpload
+        factoryUpload,
+        cancel,
+        progress,
+        statusText,
+        isUploading
     }
 }

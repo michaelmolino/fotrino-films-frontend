@@ -3,17 +3,13 @@ import { createPresignedUppyClient } from '@libs/uppy-upload.js'
 
 /**
  * Composable for managing presigned URL uploads with Uppy.
- * Maps files to presigned upload URLs and tracks progress.
+ * Owns and exposes upload progress and status as reactive refs.
  *
- * @param {Object} options
- * @param {import('vue').Ref} options.progress - Ref for overall progress percent
- * @param {import('vue').Ref} options.statusText - Ref for status message
- * @returns {Object} uppy instance, methods, and state
+ * @returns {Object} uppy instance, methods, progress, statusText, and state
  */
-export function useUppyPresignedUpload({
-    progress = ref(0),
-    statusText = ref(null)
-}) {
+export function useUppyPresignedUpload() {
+    const progress = ref(0)
+    const statusText = ref(null)
     const uppy = shallowRef(null)
     const client = shallowRef(null)
     const uploadInstructions = ref([])
@@ -196,6 +192,8 @@ export function useUppyPresignedUpload({
     return {
         uppy,
         state,
+        progress,
+        statusText,
         initializeUppy,
         addFilesToUppy,
         startUpload,

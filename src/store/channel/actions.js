@@ -231,6 +231,20 @@ export function confirmUpload(_, media) {
 }
 
 /**
+ * Abort a pending (unconfirmed) upload, removing the DB record and scheduling
+ * S3 cleanup. Fire-and-forget — callers should not block on this.
+ *
+ * @param {import('vuex').ActionContext<any, any>} _
+ * @param {number} mediaId
+ * @returns {Promise<void>}
+ */
+export function abortUpload(_, mediaId) {
+  return api.delete(`/channels/media/${mediaId}/abort`, {
+    __skipGlobalErrorNotify: true
+  })
+}
+
+/**
  * @param {import('vuex').ActionContext<any, any>} _
  * @param {{ mediaId: number, description?: string | null, resourceDate?: string | null, main: boolean }} payload
  * @returns {Promise<import('src/types/api-contract').ChannelMedia>}

@@ -182,6 +182,13 @@
             </template>
           </q-btn>
           <q-btn
+            v-if="step === 4 && isUploading"
+            flat
+            icon="cancel"
+            label="Cancel"
+            color="negative"
+            @click="cancelUpload" />
+          <q-btn
             v-if="step === 4 && !isUploading"
             icon="refresh"
             flat
@@ -243,22 +250,16 @@ const previewThumbRandom = ref(null)
 const mediaFile = ref(null)
 const counter = ref(0)
 const projectsLoadToken = ref(0)
-const isUploading = ref(false)
-const progress = ref(0)
-const statusText = ref(null)
 const extractingFrame = ref(false)
 const uploadTriggered = ref(false)
 let dismissUploadErrorNotify = null
 
 const { uploadFiles, handleFile: processFile, getRandomFrameFromFile } = useFileProcessor()
-const { factoryUpload } = useUploadFlow({
+const { factoryUpload, cancel: cancelUpload, progress, statusText, isUploading } = useUploadFlow({
   store,
   payload,
   stepper,
-  uploadFiles,
-  progress,
-  statusText,
-  isUploading
+  uploadFiles
 })
 
 const isPreviewProcessing = computed(() => {
