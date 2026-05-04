@@ -248,6 +248,7 @@ const progress = ref(0)
 const statusText = ref(null)
 const extractingFrame = ref(false)
 const uploadTriggered = ref(false)
+let dismissUploadErrorNotify = null
 
 const { uploadFiles, handleFile: processFile, getRandomFrameFromFile } = useFileProcessor()
 const { factoryUpload } = useUploadFlow({
@@ -264,6 +265,13 @@ const isPreviewProcessing = computed(() => {
   const preview = uploadFiles.value.find(r => r.resourceType === 'preview')
   return extractingFrame.value || (preview && preview.processing === true)
 })
+
+function clearUploadErrorNotify() {
+  if (typeof dismissUploadErrorNotify === 'function') {
+    dismissUploadErrorNotify()
+    dismissUploadErrorNotify = null
+  }
+}
 
 // Keep a template-friendly handleFile function name (wrapper)
 async function handleFile(fileOrFiles, resourceType) {
@@ -308,17 +316,22 @@ async function startUploadJourney() {
     return
   }
 
+  clearUploadErrorNotify()
   uploadTriggered.value = true
   step.value = 4
   await nextTick()
 
-  factoryUpload().catch(err => {
+  factoryUpload().then(() => {
+    clearUploadErrorNotify()
+  }).catch(err => {
     statusText.value = getComponentApiErrorMessage(err, 'Something went wrong!')
-    Notify.create({
+    clearUploadErrorNotify()
+    dismissUploadErrorNotify = Notify.create({
       type: 'negative',
       timeout: 0,
       message: statusText.value,
-      icon: 'warning'
+      icon: 'warning',
+      actions: [{ label: 'Dismiss', color: 'white' }]
     })
   }).finally(() => {
     uploadTriggered.value = false
@@ -601,7 +614,8 @@ watch([() => mediaFile.value, () => counter.value], async ([mf]) => {
       type: 'negative',
       timeout: 0,
       message: 'Error extracting frames from video.',
-      icon: 'warning'
+      icon: 'warning',
+      actions: [{ label: 'Dismiss', color: 'white' }]
     })
   } finally {
     extractingFrame.value = false

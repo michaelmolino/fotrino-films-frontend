@@ -91,7 +91,8 @@ async function deleteResource(type, id) {
       type: 'negative',
       message: getComponentApiErrorMessage(error, 'Unable to delete this resource.'),
       icon: 'warning',
-      timeout: 0
+      timeout: 0,
+      actions: [{ label: 'Dismiss', color: 'white' }]
     })
   }
 }
@@ -136,7 +137,8 @@ async function runEditJourney({
       type: 'negative',
       message: getComponentApiErrorMessage(error, errorMessage),
       icon: 'warning',
-      timeout: 0
+      timeout: 0,
+      actions: [{ label: 'Dismiss', color: 'white' }]
     })
   }
 }
