@@ -21,6 +21,19 @@
       @update:model-value="onUpdateProjectTitle"
       @focus="clearDefaultProjectTitle"
       @blur="restoreDefaultProjectTitle" />
+    <q-card v-if="payload.project.id?.value !== 0" flat bordered class="q-pb-md">
+      <q-card-section>
+        <div class="text-overline">Project Poster</div>
+        <div class="width250" data-cy="upload-project-poster-preview-existing">
+          <ProjectPoster v-if="displayProject" :project="displayProject" />
+          <q-skeleton
+            v-else
+            class="cursor-not-allowed"
+            style="width: 250px; height: 375px"
+            animation="none" />
+        </div>
+      </q-card-section>
+    </q-card>
     <q-card v-if="payload.project.id?.value === 0" flat bordered class="q-pb-md">
       <q-card-section>
         <ProjectPosterFields
@@ -49,6 +62,7 @@
 
 <script setup>
 import { computed, onMounted, watch } from 'vue'
+import ProjectPoster from '@components/channel/ProjectPoster.vue'
 import ProjectPosterFields from '@components/account/shared/ProjectPosterFields.vue'
 const props = defineProps({
   payload: Object,
