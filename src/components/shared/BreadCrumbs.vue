@@ -5,12 +5,12 @@
         <img :src="channel.cover" :alt="channel.title" loading="lazy" decoding="async" />
       </q-avatar>
       <div class="col">
-        <q-breadcrumbs :active-color="$q.dark.isActive ? 'info' : 'primary'" data-cy="breadcrumbs-list">
+        <q-breadcrumbs active-color="primary" data-cy="breadcrumbs-list">
           <template #separator>
             <q-icon
               size="1.5em"
               name="chevron_right"
-              :color="$q.dark.isActive ? 'info' : 'primary'" />
+              color="primary" />
           </template>
           <q-breadcrumbs-el
             v-for="location in breadcrumbs"

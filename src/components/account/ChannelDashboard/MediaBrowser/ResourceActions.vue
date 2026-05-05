@@ -20,7 +20,7 @@
             dense
             size="sm"
             icon="link"
-            color="primary"
+            color="info"
             class="q-ml-xs"
             :to="link"
             :title="`Visit ${title}`"
@@ -70,7 +70,7 @@
             dense
             size="sm"
             icon="edit"
-            color="accent"
+            color="warning"
             class="q-ml-xs"
             :data-cy="editDataCy"
             @click="$emit('edit')">
@@ -83,7 +83,7 @@
             size="sm"
             icon="delete"
             :aria-label="'Delete ' + title"
-            :color="deleteColor"
+            color="negative"
             :disable="!canDelete"
             class="q-ml-xs"
             data-cy="delete-media"
@@ -119,10 +119,6 @@ const props = defineProps({
   hasPendingChildren: Boolean,
   link: String,
   square: Boolean,
-  deleteColor: {
-    type: String,
-    default: 'negative'
-  },
   badge: Boolean,
   badgeIcon: String,
   subtitle: String,

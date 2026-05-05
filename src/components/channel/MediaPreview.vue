@@ -9,7 +9,7 @@
     :aria-label="`View ${media.title}`"
     :class="['fit', 'width720', { 'bg-accent': media.main && showMainAccent }]">
     <q-badge v-if="media.type?.startsWith('audio/')" class="bg-accent q-pa-md z-top" floating>
-      <span class="text-bold">Audio</span>
+      <span class="text-bold text-black">Audio</span>
     </q-badge>
     <q-img
       v-if="media.preview && ready"

@@ -17,7 +17,7 @@
     <template #project>
       <div class="row items-center no-wrap" data-cy="channel-view-projects">
         <span class="text-center">Projects</span>
-        <q-avatar color="accent" text-color="white" size="sm" square class="q-ml-sm">{{
+        <q-avatar color="accent" text-color="black" size="sm" square class="q-ml-sm">{{
           projectCount
         }}</q-avatar>
       </div>
@@ -25,7 +25,7 @@
     <template #all>
       <div class="row items-center no-wrap" data-cy="channel-view-all">
         <span class="text-center">All Media</span>
-        <q-avatar color="accent" text-color="white" size="sm" square class="q-ml-sm">{{
+        <q-avatar color="accent" text-color="black" size="sm" square class="q-ml-sm">{{
           allCount
         }}</q-avatar>
       </div>
