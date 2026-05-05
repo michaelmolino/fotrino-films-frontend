@@ -11,6 +11,7 @@
         @deleteChannel="deleteResource('channel', $event)"
         @deleteProject="deleteResource('project', $event)"
         @deleteMedia="deleteResource('media', $event)"
+        @abortMedia="abortPendingMedia($event)"
         @editProject="saveProjectEdit"
         @editMedia="saveMediaEdit"
         @editChannel="saveChannelEdit" />
@@ -27,6 +28,7 @@ import { useStore } from 'vuex'
 import ChannelItem from './MediaBrowser/ChannelItem.vue'
 import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
 import { uploadPresignedFileWithUppy } from '@libs/uppy-upload.js'
+import { isPendingUploadLockedByAnotherTab } from '@utils/pendingUploadLocks.js'
 
 const store = useStore()
 const props = defineProps({
@@ -90,6 +92,40 @@ async function deleteResource(type, id) {
     Notify.create({
       type: 'negative',
       message: getComponentApiErrorMessage(error, 'Unable to delete this resource.'),
+      icon: 'warning',
+      timeout: 0,
+      actions: [{ label: 'Dismiss', color: 'white' }]
+    })
+  }
+}
+
+async function abortPendingMedia(mediaId) {
+  if (isPendingUploadLockedByAnotherTab(mediaId)) {
+    Notify.create({
+      type: 'warning',
+      message: 'This upload is currently active in another tab. Cancel there first.',
+      icon: 'warning',
+      timeout: 3500
+    })
+    return
+  }
+
+  try {
+    await store.dispatch('channel/abortUpload', mediaId)
+    await store.dispatch('channel/getChannels', true)
+    Notify.create({
+      type: 'positive',
+      message: 'Pending upload aborted.',
+      icon: 'check',
+      timeout: 2000
+    })
+  } catch (error) {
+    if (error?.__userCancelled || error?.code === 'ERR_CANCELED') {
+      return
+    }
+    Notify.create({
+      type: 'negative',
+      message: getComponentApiErrorMessage(error, 'Unable to abort this pending upload.'),
       icon: 'warning',
       timeout: 0,
       actions: [{ label: 'Dismiss', color: 'white' }]

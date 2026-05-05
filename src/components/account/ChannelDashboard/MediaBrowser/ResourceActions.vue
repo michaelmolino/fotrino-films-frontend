@@ -52,6 +52,19 @@
             <q-tooltip>Pending</q-tooltip>
           </q-btn>
           <q-btn
+            v-if="pending && abortable"
+            flat
+            dense
+            size="sm"
+            icon="cancel"
+            color="negative"
+            class="q-ml-xs"
+            data-cy="abort-pending-media"
+            :aria-label="'Abort pending upload for ' + title"
+            @click="$emit('abort')">
+            <q-tooltip>Abort Pending Upload</q-tooltip>
+          </q-btn>
+          <q-btn
             v-if="editable && !pending && !deleted"
             flat
             dense
@@ -98,6 +111,10 @@ const props = defineProps({
   image: String,
   color: String,
   pending: Boolean,
+  abortable: {
+    type: Boolean,
+    default: false
+  },
   deleted: Boolean,
   hasPendingChildren: Boolean,
   link: String,
@@ -123,7 +140,7 @@ const props = defineProps({
   }
 })
 
-defineEmits(['delete', 'edit'])
+defineEmits(['delete', 'edit', 'abort'])
 const canDelete = computed(() => !props.pending && !props.hasPendingChildren)
 </script>
 

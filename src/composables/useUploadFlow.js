@@ -1,5 +1,10 @@
 import { ref } from 'vue'
 import { useUppyPresignedUpload } from './useUppyPresignedUpload.js'
+import {
+    acquirePendingUploadLock,
+    releasePendingUploadLock,
+    startPendingUploadLockHeartbeat
+} from '@utils/pendingUploadLocks.js'
 
 export function useUploadFlow({
     store,
@@ -11,6 +16,28 @@ export function useUploadFlow({
     // Set to true when cancel() is called so the async catch block in factoryUpload
     // can distinguish a user-initiated cancellation from a real error.
     let cancelled = false
+    let activeMediaRef = null
+    let stopLockHeartbeat = null
+
+    function startLock(mediaRef) {
+        if (mediaRef == null) {
+            return
+        }
+        activeMediaRef = mediaRef
+        acquirePendingUploadLock(mediaRef)
+        stopLockHeartbeat = startPendingUploadLockHeartbeat(mediaRef)
+    }
+
+    function stopLock() {
+        if (typeof stopLockHeartbeat === 'function') {
+            stopLockHeartbeat()
+            stopLockHeartbeat = null
+        }
+        if (activeMediaRef != null) {
+            releasePendingUploadLock(activeMediaRef)
+            activeMediaRef = null
+        }
+    }
 
     const {
         progress,
@@ -56,6 +83,9 @@ export function useUploadFlow({
             // Add files to upload
             addFilesToUppy(uploadItems)
 
+            const mediaRef = getMediaReference()
+            startLock(mediaRef)
+
             // Start uploads
             await startUpload()
 
@@ -64,11 +94,11 @@ export function useUploadFlow({
             }
 
             // Get the media reference and confirm upload
-            const mediaRef = getMediaReference()
-            if (mediaRef == null) {
+            const confirmMediaRef = getMediaReference()
+            if (confirmMediaRef == null) {
                 throw new Error('Upload completed without a media reference. Confirm step aborted.')
             }
-            await store.dispatch('channel/confirmUpload', mediaRef)
+            await store.dispatch('channel/confirmUpload', confirmMediaRef)
 
             statusText.value = 'Upload complete!'
             stepper.value?.next()
@@ -82,6 +112,7 @@ export function useUploadFlow({
             console.error('Error uploading:', err)
             throw err
         } finally {
+            stopLock()
             cleanup()
             isUploading.value = false
         }
@@ -90,7 +121,8 @@ export function useUploadFlow({
     function cancel() {
         cancelled = true
         // Grab the media reference before cleanup clears Uppy state.
-        const mediaRef = getMediaReference()
+        const mediaRef = getMediaReference() ?? activeMediaRef
+        stopLock()
         cancelUploads()
         isUploading.value = false
         progress.value = 0

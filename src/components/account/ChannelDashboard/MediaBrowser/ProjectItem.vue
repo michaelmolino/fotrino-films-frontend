@@ -35,6 +35,7 @@
         data-cy="media-item"
         :getMediaLink="getMediaLink"
         @deleteMedia="$emit('deleteMedia', $event)"
+        @abortMedia="$emit('abortMedia', $event)"
         @editMedia="$emit('editMedia', $event)" />
     </q-expansion-item>
 
@@ -94,7 +95,7 @@ const props = defineProps({
   getMediaLink: Function
 })
 
-const emit = defineEmits(['deleteProject', 'deleteMedia', 'editMedia', 'editProject'])
+const emit = defineEmits(['deleteProject', 'deleteMedia', 'abortMedia', 'editMedia', 'editProject'])
 
 const editDialog = ref(false)
 const {
