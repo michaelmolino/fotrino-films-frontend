@@ -1,10 +1,75 @@
-import { ref } from 'vue'
+import { nextTick, ref, watch } from 'vue'
 import { useUppyPresignedUpload } from './useUppyPresignedUpload.js'
 import {
     acquirePendingUploadLock,
     releasePendingUploadLock,
     startPendingUploadLockHeartbeat
 } from '@utils/pendingUploadLocks.js'
+
+function getRequiredUploadTypes(uploadInstructions) {
+    return new Set(uploadInstructions.map(instruction => instruction.resourceType))
+}
+
+function getPendingUploadTypes(files, requiredTypes) {
+    return files
+        .filter(uf => requiredTypes.has(uf.resourceType) && uf.processing === true)
+        .map(uf => uf.resourceType)
+}
+
+async function waitForUploadItemsReady(uploadFiles, uploadInstructions, timeoutMs = 5000) {
+    const requiredTypes = getRequiredUploadTypes(uploadInstructions)
+    const currentPendingTypes = () => getPendingUploadTypes(uploadFiles.value, requiredTypes)
+
+    if (currentPendingTypes().length === 0) {
+        return
+    }
+
+    await new Promise((resolve, reject) => {
+        let settled = false
+        let stopWatching = null
+
+        const finish = callback => {
+            if (settled) {
+                return
+            }
+            settled = true
+            clearTimeout(timeoutId)
+            if (typeof stopWatching === 'function') {
+                stopWatching()
+            }
+            callback()
+        }
+
+        const timeoutId = setTimeout(() => {
+            const pendingTypes = currentPendingTypes()
+            finish(() => {
+                reject(new Error(`Files still processing: ${pendingTypes.join(', ')}`))
+            })
+        }, timeoutMs)
+
+        stopWatching = watch(
+            uploadFiles,
+            files => {
+                const pendingTypes = getPendingUploadTypes(files, requiredTypes)
+                if (pendingTypes.length === 0) {
+                    finish(resolve)
+                }
+            },
+            { deep: true, flush: 'post' }
+        )
+    })
+}
+
+function buildUploadItems(uploadFiles, uploadInstructions) {
+    const requiredTypes = getRequiredUploadTypes(uploadInstructions)
+
+    return uploadFiles.value
+        .filter(uploadFile => uploadFile.file && requiredTypes.has(uploadFile.resourceType))
+        .map(uploadFile => ({
+            file: uploadFile.file,
+            resourceType: uploadFile.resourceType
+        }))
+}
 
 export function useUploadFlow({
     store,
@@ -13,31 +78,9 @@ export function useUploadFlow({
     uploadFiles
 }) {
     const isUploading = ref(false)
-    // Set to true when cancel() is called so the async catch block in factoryUpload
-    // can distinguish a user-initiated cancellation from a real error.
     let cancelled = false
     let activeMediaRef = null
     let stopLockHeartbeat = null
-
-    function startLock(mediaRef) {
-        if (mediaRef == null) {
-            return
-        }
-        activeMediaRef = mediaRef
-        acquirePendingUploadLock(mediaRef)
-        stopLockHeartbeat = startPendingUploadLockHeartbeat(mediaRef)
-    }
-
-    function stopLock() {
-        if (typeof stopLockHeartbeat === 'function') {
-            stopLockHeartbeat()
-            stopLockHeartbeat = null
-        }
-        if (activeMediaRef != null) {
-            releasePendingUploadLock(activeMediaRef)
-            activeMediaRef = null
-        }
-    }
 
     const {
         progress,
@@ -50,50 +93,55 @@ export function useUploadFlow({
         cleanup
     } = useUppyPresignedUpload()
 
+    const startLock = mediaRef => {
+        if (mediaRef == null) {
+            return
+        }
+
+        activeMediaRef = mediaRef
+        acquirePendingUploadLock(mediaRef)
+        stopLockHeartbeat = startPendingUploadLockHeartbeat(mediaRef)
+    }
+
+    const stopLock = () => {
+        if (typeof stopLockHeartbeat === 'function') {
+            stopLockHeartbeat()
+            stopLockHeartbeat = null
+        }
+        if (activeMediaRef != null) {
+            releasePendingUploadLock(activeMediaRef)
+            activeMediaRef = null
+        }
+    }
+
     async function factoryUpload() {
         if (isUploading.value) {
-            return
+            throw new Error('Upload already in progress.')
         }
 
         cancelled = false
         isUploading.value = true
+
         try {
-            // Get presigned upload instructions from backend
-            /** @type {import('src/types/api-contract').UploadInstruction[]} */
             const uploadInstructions = await store.dispatch('channel/postUpload', payload)
 
-            // Collect files that need to be uploaded.
-            const uploadItems = uploadFiles.value
-                .filter(uf => {
-                    // Ensure we have a file and a matching upload instruction
-                    return uf.file && uploadInstructions.some(ui => ui.resourceType === uf.resourceType)
-                })
-                .map(uf => ({
-                    file: uf.file,
-                    resourceType: uf.resourceType
-                }))
+            // Allow any in-flight reactive updates to settle before reading uploadFiles.
+            await nextTick()
+            await waitForUploadItemsReady(uploadFiles, uploadInstructions)
 
+            const uploadItems = buildUploadItems(uploadFiles, uploadInstructions)
             if (uploadItems.length === 0) {
                 throw new Error('No files to upload')
             }
 
-            // Initialize Uppy with upload instructions
             initializeUppy(uploadInstructions)
-
-            // Add files to upload
             addFilesToUppy(uploadItems)
 
             const mediaRef = getMediaReference()
             startLock(mediaRef)
 
-            // Start uploads
             await startUpload()
 
-            if (progress.value !== 100) {
-                progress.value = 100
-            }
-
-            // Get the media reference and confirm upload
             const confirmMediaRef = getMediaReference()
             if (confirmMediaRef == null) {
                 throw new Error('Upload completed without a media reference. Confirm step aborted.')
@@ -104,11 +152,11 @@ export function useUploadFlow({
             stepper.value?.next()
         } catch (err) {
             if (cancelled) {
-                // User initiated the cancel; state already set by cancel(). Do not overwrite.
                 return
             }
+
             progress.value = -1
-            statusText.value = 'Something went wrong!'
+            statusText.value = err?.message || 'Something went wrong!'
             console.error('Error uploading:', err)
             throw err
         } finally {
@@ -120,13 +168,14 @@ export function useUploadFlow({
 
     function cancel() {
         cancelled = true
-        // Grab the media reference before cleanup clears Uppy state.
         const mediaRef = getMediaReference() ?? activeMediaRef
+
         stopLock()
         cancelUploads()
         isUploading.value = false
         progress.value = 0
         statusText.value = 'Upload cancelled.'
+
         if (mediaRef != null) {
             store.dispatch('channel/abortUpload', mediaRef).catch(err => {
                 console.warn('Failed to abort pending upload on cancel:', err)

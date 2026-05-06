@@ -5,11 +5,11 @@
       outlined
       :model-value="mediaFile"
       accept="video/*"
-      max-file-size="5368709120"
       class="q-pb-md"
       color="accent"
       data-cy="upload-media-file"
-      @update:model-value="onUpdateMediaFile">
+      @update:model-value="onUpdateMediaFile"
+      @rejected="onMediaFileRejected">
       <template v-slot:prepend>
         <q-icon name="movie" @click.stop.prevent />
       </template>
@@ -122,6 +122,25 @@ async function onUpdateMediaFile(fileOrFiles) {
     }
   }
   if (file && props.handleFile) props.handleFile(file, 'upload')
+}
+function onMediaFileRejected(rejectedEntries) {
+  const first = rejectedEntries?.[0]
+  const failedProp = first?.failedPropValidation || first?.failedProp
+
+  if (failedProp === 'accept') {
+    $q.notify({
+      color: 'negative',
+      icon: 'warning',
+      message: 'Unsupported file type. Please choose a video file.'
+    })
+    return
+  }
+
+  $q.notify({
+    color: 'negative',
+    icon: 'warning',
+    message: 'Selected file could not be added. Please try a different file.'
+  })
 }
 function onUpdatePreviewFile(fileOrFiles) {
   const file = Array.isArray(fileOrFiles) ? fileOrFiles[0] : fileOrFiles

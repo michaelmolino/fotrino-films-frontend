@@ -19,7 +19,7 @@
       <!-- Step 1: Media first -->
       <q-step
         :name="1"
-        :title="step > 1 ? media.title : 'Media'"
+        :title="stepTitles.media"
         icon="movie"
         :done="step > 1"
         :header-nav="false">
@@ -40,10 +40,10 @@
       <!-- Step 2: Channel -->
       <q-step
         :name="2"
-        :title="step > 2 ? payload.title : 'Channel'"
+        :title="stepTitles.channel"
         icon="video_library"
         :done="step > 2"
-        :header-nav="step === 1 && !!next">
+        :header-nav="canOpenStepFromHeader(2)">
         <ChannelStep
           class="step"
           :payload="payload"
@@ -59,10 +59,10 @@
       <!-- Step 3: Project -->
       <q-step
         :name="3"
-        :title="step > 3 ? project.title : 'Project'"
+        :title="stepTitles.project"
         icon="theaters"
         :done="step > 3"
-        :header-nav="step === 2 && !!next">
+        :header-nav="canOpenStepFromHeader(3)">
         <ProjectStep
           class="step"
           :payload="payload"
@@ -81,7 +81,7 @@
         active-icon="cloud_upload"
         data-cy="upload-step-upload"
         :done="step > 4"
-        :header-nav="step === 3 && !!next">
+        :header-nav="canOpenStepFromHeader(4)">
         <div class="text-center">
           <div class="upload-preview-container">
             <!-- Preview image/video background -->
@@ -102,7 +102,7 @@
                 class="upload-progress-spinner" />
               <!-- Media title -->
               <div class="upload-media-title q-mt-md">
-                {{ media.title || 'Untitled Media' }}
+                {{ media.title }}
               </div>
               <!-- Status text -->
               <div class="upload-status-text q-mt-sm">
@@ -119,7 +119,7 @@
         icon="settings"
         active-icon="settings"
         data-cy="upload-step-processing"
-        :header-nav="step === 4 && !!next">
+        :header-nav="false">
         <div class="text-center">
           <div class="q-mb-md">
             <MediaPreview
@@ -134,7 +134,7 @@
             <span class="text-h6" data-cy="upload-processing-text">Processing...</span>
           </div>
           <div class="q-pa-md text-body2">
-            Your media <strong>{{ media.title || 'Untitled Media' }}</strong> is processing and will
+            Your media <strong>{{ media.title }}</strong> is processing and will
             be available shortly. You'll receive an email once it's ready.
           </div>
           <div class="q-pt-md text-caption text-grey-6">You may now close this window.</div>
@@ -145,14 +145,14 @@
         <q-stepper-navigation>
           <!-- Back button for steps 2 and 3 -->
           <q-btn
-            v-if="step === 2 || step === 3"
+            v-if="canGoBack"
             icon="arrow_back"
             flat
             label="Back"
             @click="goBack" />
 
           <q-btn
-            v-if="step === 1 && quickUploadAvailable"
+            v-if="showQuickUploadButton"
             icon="bolt"
             flat
             label="Quick Upload"
@@ -160,15 +160,15 @@
             @click="quickUpload"
             :disabled="!next" />
           <q-btn
-            v-if="step < 3"
+            v-if="showNextButton"
             icon="arrow_forward"
             flat
             data-cy="upload-next-button"
             @click="goNext"
-            :label="step === 1 && quickUploadAvailable ? 'More Options' : 'Next'"
+            :label="nextButtonLabel"
             :disabled="!next" />
           <q-btn
-            v-if="step === 3"
+            v-if="showUploadButton"
             icon="cloud_upload"
             flat
             label="Upload"
@@ -176,20 +176,20 @@
             :disabled="!next"
             @click="goNext">
           </q-btn>
-          <q-btn v-if="step === 4 && isUploading" loading disabled flat label="Uploading">
+          <q-btn v-if="showUploadingButton" loading disabled flat label="Uploading">
             <template v-slot:loading>
               <q-spinner-hourglass />
             </template>
           </q-btn>
           <q-btn
-            v-if="step === 4 && isUploading"
+            v-if="showCancelUploadButton"
             flat
             icon="cancel"
             label="Cancel"
             color="negative"
             @click="cancelUpload" />
           <q-btn
-            v-if="step === 4 && !isUploading"
+            v-if="showRetryUploadButton"
             icon="refresh"
             flat
             label="Retry Upload"
@@ -267,10 +267,45 @@ const isPreviewProcessing = computed(() => {
   return extractingFrame.value || (preview && preview.processing === true)
 })
 
+const stepTitles = computed(() => ({
+  media: step.value > 1 ? media.value.title : 'Media',
+  channel: step.value > 2 ? payload.title : 'Channel',
+  project: step.value > 3 ? project.value.title : 'Project'
+}))
+
+const canGoBack = computed(() => step.value === 2 || step.value === 3)
+const showQuickUploadButton = computed(() => step.value === 1 && quickUploadAvailable.value)
+const showNextButton = computed(() => step.value < 3)
+const showUploadButton = computed(() => step.value === 3)
+const showUploadingButton = computed(() => step.value === 4 && isUploading.value)
+const showCancelUploadButton = computed(() => step.value === 4 && isUploading.value)
+const showRetryUploadButton = computed(() => step.value === 4 && !isUploading.value)
+const nextButtonLabel = computed(() =>
+  step.value === 1 && quickUploadAvailable.value ? 'More Options' : 'Next'
+)
+
+function canOpenStepFromHeader(targetStep) {
+  return step.value === targetStep - 1 && !!next.value
+}
+
 function clearUploadErrorNotify() {
   if (typeof dismissUploadErrorNotify === 'function') {
     dismissUploadErrorNotify()
     dismissUploadErrorNotify = null
+  }
+}
+
+function setSelectedFile(resourceType, file) {
+  if (resourceType === 'cover') coverFile.value = file
+  if (resourceType === 'poster') posterFile.value = file
+  if (resourceType === 'preview') previewFile.value = file
+  if (resourceType === 'upload') mediaFile.value = file
+}
+
+function clearUploadFile(resourceType) {
+  const uploadFileIndex = uploadFiles.value.findIndex(file => file.resourceType === resourceType)
+  if (uploadFileIndex !== -1) {
+    uploadFiles.value.splice(uploadFileIndex, 1)
   }
 }
 
@@ -279,19 +314,12 @@ async function handleFile(fileOrFiles, resourceType) {
   // normalize Quasar QFile which may pass an array
   const file = Array.isArray(fileOrFiles) ? fileOrFiles[0] : fileOrFiles
   if (!file) {
-    // clear relevant ref
-    if (resourceType === 'cover') coverFile.value = null
-    if (resourceType === 'poster') posterFile.value = null
-    if (resourceType === 'preview') previewFile.value = null
-    if (resourceType === 'upload') mediaFile.value = null
+    setSelectedFile(resourceType, null)
     return
   }
 
   // set the correct local ref so watchers and template stay in sync
-  if (resourceType === 'cover') coverFile.value = file
-  if (resourceType === 'poster') posterFile.value = file
-  if (resourceType === 'preview') previewFile.value = file
-  if (resourceType === 'upload') mediaFile.value = file
+  setSelectedFile(resourceType, file)
 
   // start processing in background so thumbnail appears immediately
   processFile(file, resourceType).catch(err => {
@@ -304,11 +332,14 @@ function incrementCounter() {
   counter.value += 1
 }
 
-function goNext() {
-  if (step.value === 3) {
+function scheduleUploadStart() {
+  // Wait one macrotask so the upload step is rendered before the flow mutates UI state.
+  setTimeout(() => {
     startUploadJourney()
-    return
-  }
+  }, 0)
+}
+
+function goNext() {
   stepper.value.next()
 }
 
@@ -319,12 +350,16 @@ async function startUploadJourney() {
 
   clearUploadErrorNotify()
   uploadTriggered.value = true
-  step.value = 4
   await nextTick()
 
-  factoryUpload().then(() => {
+  try {
+    await factoryUpload()
+    if (step.value === 4) {
+      throw new Error('Upload did not start. Please try again.')
+    }
+
     clearUploadErrorNotify()
-  }).catch(err => {
+  } catch (err) {
     statusText.value = getComponentApiErrorMessage(err, 'Something went wrong!')
     clearUploadErrorNotify()
     dismissUploadErrorNotify = Notify.create({
@@ -334,43 +369,37 @@ async function startUploadJourney() {
       icon: 'warning',
       actions: [{ label: 'Dismiss', color: 'white' }]
     })
-  }).finally(() => {
+  } finally {
     uploadTriggered.value = false
-  })
+  }
 }
 
 function goBack() {
   if (step.value === 2) {
-    // Going back from step 2 (Channel) to step 1 (Media)
-    // Clear channel-related state
-    payload.uuid = null
-    payload.coverType = 'profile'
-    payload.title = 'My Channel'
-    coverFile.value = null
-    coverThumb.value = null
-
-    // Clear any uploaded cover files from the upload processor
-    const coverIndex = uploadFiles.value.findIndex(f => f.resourceType === 'cover')
-    if (coverIndex !== -1) {
-      uploadFiles.value.splice(coverIndex, 1)
-    }
+    resetChannelStep()
   } else if (step.value === 3) {
-    // Going back from step 3 (Project) to step 2 (Channel)
-    // Clear project-related state
-    payload.project.id = null
-    payload.project.posterType = 'default'
-    payload.project.title = 'My Videos'
-    posterFile.value = null
-    posterThumb.value = null
-
-    // Clear any uploaded poster files from the upload processor
-    const posterIndex = uploadFiles.value.findIndex(f => f.resourceType === 'poster')
-    if (posterIndex !== -1) {
-      uploadFiles.value.splice(posterIndex, 1)
-    }
+    resetProjectStep()
   }
 
   stepper.value.previous()
+}
+
+function resetChannelStep() {
+  payload.uuid = null
+  payload.coverType = 'profile'
+  payload.title = 'My Channel'
+  coverFile.value = null
+  coverThumb.value = null
+  clearUploadFile('cover')
+}
+
+function resetProjectStep() {
+  payload.project.id = null
+  payload.project.posterType = 'default'
+  payload.project.title = 'My Videos'
+  posterFile.value = null
+  posterThumb.value = null
+  clearUploadFile('poster')
 }
 
 // computed
@@ -486,7 +515,11 @@ async function quickUpload() {
     } else {
       payload.project.id = { value: 0, label: 'New...' }
     }
-    await startUploadJourney()
+
+    // Quick upload skips the intermediate UI steps; explicitly enter
+    // the Upload step so tests and users can observe upload progress.
+    step.value = 4
+    scheduleUploadStart()
   } catch (err) {
     console.error('Quick upload setup failed:', err)
     Notify.create({
@@ -556,7 +589,7 @@ watch(projects, p => {
   }
 })
 
-watch(step, s => {
+watch(step, (s, previousStep) => {
   if (s === 3 && payload.uuid?.value !== 0 && payload.uuid?.value) {
     const requestToken = ++projectsLoadToken.value
     loadProjectsForChannelUuid(payload.uuid.value, requestToken).then(() => {
@@ -571,6 +604,12 @@ watch(step, s => {
     })
   } else if (projects.value.length === 0 && s === 3) {
     payload.project.id = { value: 0, label: 'New...' }
+  }
+
+  // Entering step 4 should behave the same whether it came from the button
+  // or by clicking the step header.
+  if (previousStep === 3 && s === 4) {
+    scheduleUploadStart()
   }
 })
 

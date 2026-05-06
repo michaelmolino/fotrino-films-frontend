@@ -193,8 +193,9 @@
           @hide="() => onItemHide('filesize')">
           <q-card>
             <q-card-section>
-              There is a 5GB file size limit for uploads; this is enough for about two hours of
-              1080p video at 5,400 kbps.
+              Very large uploads are currently supported, however to avoid your content and account
+              being deleted, please limit uploads to reasonable sizes (e.g. under 20GB). If you
+              have a specific use case that requires larger uploads, please contact support.
             </q-card-section>
           </q-card>
         </q-expansion-item>

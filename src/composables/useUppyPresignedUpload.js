@@ -1,4 +1,5 @@
 import { markRaw, reactive, ref, shallowRef } from 'vue'
+import { useStore } from 'vuex'
 import { createPresignedUppyClient } from '@libs/uppy-upload.js'
 
 /**
@@ -8,6 +9,7 @@ import { createPresignedUppyClient } from '@libs/uppy-upload.js'
  * @returns {Object} uppy instance, methods, progress, statusText, and state
  */
 export function useUppyPresignedUpload() {
+    const store = useStore()
     const progress = ref(0)
     const statusText = ref(null)
     const uppy = shallowRef(null)
@@ -24,6 +26,13 @@ export function useUppyPresignedUpload() {
         return uploadInstructions.value.find(instruction => instruction.resourceType === resourceType)
     }
 
+    function resetUploadState() {
+        state.uploadingFiles.clear()
+        state.completedCount = 0
+        state.totalCount = 0
+        state.hasError = false
+    }
+
     function getRequiredResourceTypes() {
         const fromMetadata = uploadInstructions.value[0]?.requiredResources
         if (Array.isArray(fromMetadata) && fromMetadata.length > 0) {
@@ -32,8 +41,27 @@ export function useUppyPresignedUpload() {
         return [...new Set(uploadInstructions.value.map(instruction => instruction.resourceType))]
     }
 
+    function updateOverallProgress() {
+        const entries = [...state.uploadingFiles.values()]
+        const totalBytes = entries.reduce((sum, info) => sum + (info.totalBytes || 0), 0)
+        if (totalBytes <= 0) {
+            return
+        }
+
+        const uploadedBytes = entries.reduce((sum, info) => sum + (info.uploadedBytes || 0), 0)
+        progress.value = Math.round((uploadedBytes / totalBytes) * 100)
+    }
+
+    function upsertUploadingFile(fileId, nextInfo) {
+        const existing = state.uploadingFiles.get(fileId) || {}
+        state.uploadingFiles.set(fileId, {
+            ...existing,
+            ...nextInfo
+        })
+    }
+
     /**
-     * Initialize Uppy with XHRUpload plugin for presigned URLs.
+     * Initialize Uppy for presigned uploads.
      * @param {Object[]} instructions - Array of {resourceType, url, reference}
      */
     function initializeUppy(instructions = []) {
@@ -46,26 +74,44 @@ export function useUppyPresignedUpload() {
         const nextClient = createPresignedUppyClient({
             id: 'presigned-uploader',
             instructions,
-            onProgress: progressData => {
-            const totalBytes = progressData?.bytesTotal || 0
-            if (!totalBytes) {
-                return
-            }
+            getCsrfToken: () => store?.state?.account?.profile?.csrfToken || '',
+            onProgress: (file, progressData) => {
+                if (!file?.id || !progressData) {
+                    return
+                }
 
-            progress.value = Math.round((progressData.bytesUploaded / totalBytes) * 100)
+                const existing = state.uploadingFiles.get(file.id)
+                if (!existing) {
+                    return
+                }
+
+                const uploadedBytes = progressData.bytesUploaded || 0
+                const totalBytes = progressData.bytesTotal || existing.totalBytes || file.size || 0
+
+                upsertUploadingFile(file.id, {
+                    progress: totalBytes > 0 ? Math.round((uploadedBytes / totalBytes) * 100) : existing.progress,
+                    uploadedBytes,
+                    totalBytes
+                })
+
+                updateOverallProgress()
             },
             onUploadSuccess: (file, instruction) => {
+                const existing = state.uploadingFiles.get(file.id)
                 state.completedCount += 1
-                state.uploadingFiles.set(file.id, {
+                upsertUploadingFile(file.id, {
                     resourceType: file.meta.resourceType,
                     progress: 100,
-                    reference: instruction?.reference || null
+                    reference: file.meta?.reference ?? instruction?.reference ?? null,
+                    uploadedBytes: existing?.totalBytes || file.size || 0,
+                    totalBytes: existing?.totalBytes || file.size || 0
                 })
+                updateOverallProgress()
                 statusText.value = `Uploaded ${state.completedCount} of ${state.totalCount} files.`
             },
             onUploadError: (file, error) => {
                 state.hasError = true
-                statusText.value = `Upload error: ${error.message}`
+                statusText.value = `Upload error: ${error?.message || 'Unknown error'}`
                 console.error('Error uploading:', file?.name, error)
             }
         })
@@ -85,9 +131,7 @@ export function useUppyPresignedUpload() {
             throw new Error('Uppy not initialized. Call initializeUppy() first.')
         }
 
-        state.uploadingFiles.clear()
-        state.completedCount = 0
-        state.hasError = false
+        resetUploadState()
 
         uploadItems.forEach(item => {
             const file = item?.file
@@ -104,10 +148,14 @@ export function useUppyPresignedUpload() {
                 source: 'file-uploader'
             })
 
+            const instruction = findInstruction(resourceType)
+
             state.uploadingFiles.set(fileID, {
                 resourceType,
                 progress: 0,
-                reference: null
+                reference: instruction?.reference ?? null,
+                uploadedBytes: 0,
+                totalBytes: file.size || 0
             })
         })
 
@@ -170,7 +218,6 @@ export function useUppyPresignedUpload() {
         if (uppy.value) {
             uppy.value.cancelAll()
         }
-        cleanup()
     }
 
     /**
@@ -182,10 +229,7 @@ export function useUppyPresignedUpload() {
             client.value = null
             uppy.value = null
         }
-        state.uploadingFiles.clear()
-        state.completedCount = 0
-        state.totalCount = 0
-        state.hasError = false
+        resetUploadState()
         uploadInstructions.value = []
     }
 
