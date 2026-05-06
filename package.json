@@ -25,7 +25,7 @@
     "i18n-iso-countries": "^7.14.0",
     "plyr": "^3.8.4",
     "quasar": "2.19.3",
-    "vue": "^3.5.33",
+    "vue": "^3.5.34",
     "vue-router": "^4.6.3",
     "vuex": "4",
     "vuex-cache": "^3.4.0"
@@ -43,7 +43,7 @@
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-promise": "^7.3.0",
     "eslint-plugin-quasar": "^1.0.0",
-    "eslint-plugin-vue": "^10.9.0",
+    "eslint-plugin-vue": "^10.9.1",
     "globals": "^16.5.0",
     "json-schema-to-typescript": "^15.0.4",
     "postcss": "^8.5.14",
