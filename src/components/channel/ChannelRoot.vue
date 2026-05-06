@@ -16,9 +16,9 @@
           <BreadCrumbs :channel="channel" :project="null" :media="null" />
           <q-space />
           <ViewToggle
+            v-if="showViewToggle"
             v-model="selectedView"
             :projectCount="projectCount"
-            :mainCount="mainCount"
             :allCount="allCount" />
         </div>
 
@@ -50,7 +50,7 @@
                 :media="item.media"
                 :to="`/${channel.uuid}/${channel.slug}/${item.project.slug}/${item.media.slug}`"
                 :detail="true"
-                :showMainAccent="selectedView !== 'main'"
+                :showMainAccent="true"
                 :priority="index === 0 ? 'high' : 'auto'" />
             </div>
             <NothingText v-if="sortedMedia.length === 0" text="No content available." />
@@ -83,7 +83,12 @@ const selectedView = ref(getViewPreference('all'))
 const { channel, loading } = useChannelLoading()
 
 watch(selectedView, val => {
-  setViewPreference(val)
+  const normalized = val === 'projects' || val === 'all' ? val : 'all'
+  if (normalized !== val) {
+    selectedView.value = normalized
+    return
+  }
+  setViewPreference(normalized)
 })
 
 const projects = computed(() => {
@@ -98,20 +103,20 @@ const allMedia = computed(() => {
   )
 })
 
-const mainMedia = computed(() => {
-  if (loading.value) return []
-  return allMedia.value.filter(f => f.media?.main)
-})
-
 const sortedMedia = computed(() => {
   if (loading.value) return []
-  const arr = selectedView.value === 'main' ? mainMedia.value : allMedia.value
-  return sortBy(arr, 'media.resourceDate', 'desc')
+  return sortBy(allMedia.value, 'media.resourceDate', 'desc')
 })
 
 const projectCount = computed(() => projects.value.length)
-const mainCount = computed(() => mainMedia.value.length)
 const allCount = computed(() => allMedia.value.length)
+const showViewToggle = computed(() => projectCount.value !== 1)
+
+watch(projectCount, count => {
+  if (count === 1 && selectedView.value !== 'all') {
+    selectedView.value = 'all'
+  }
+})
 </script>
 
 <style scoped>

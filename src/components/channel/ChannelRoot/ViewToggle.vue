@@ -12,7 +12,6 @@
     text-color="primary"
     :options="[
       { value: 'projects', slot: 'project' },
-      { value: 'main', slot: 'main' },
       { value: 'all', slot: 'all' }
     ]">
     <template #project>
@@ -20,14 +19,6 @@
         <span class="text-center">Projects</span>
         <q-avatar color="accent" text-color="white" size="sm" square class="q-ml-sm">{{
           projectCount
-        }}</q-avatar>
-      </div>
-    </template>
-    <template #main>
-      <div class="row items-center no-wrap" data-cy="channel-view-featured">
-        <span class="text-center">Featured Media</span>
-        <q-avatar color="accent" text-color="white" size="sm" square class="q-ml-sm">{{
-          mainCount
         }}</q-avatar>
       </div>
     </template>
@@ -48,7 +39,6 @@ import { computed } from 'vue'
 const props = defineProps({
   modelValue: { type: String, default: 'all' },
   projectCount: Number,
-  mainCount: Number,
   allCount: Number
 })
 
