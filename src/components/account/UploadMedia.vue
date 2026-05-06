@@ -251,10 +251,16 @@ const mediaFile = ref(null)
 const counter = ref(0)
 const projectsLoadToken = ref(0)
 const extractingFrame = ref(false)
+const frameExtractionToken = ref(0)
 const uploadTriggered = ref(false)
 let dismissUploadErrorNotify = null
 
-const { uploadFiles, handleFile: processFile, getRandomFrameFromFile } = useFileProcessor()
+const {
+  uploadFiles,
+  handleFile: processFile,
+  getRandomFrameFromFile,
+  disposeFrameSession
+} = useFileProcessor()
 const { factoryUpload, cancel: cancelUpload, progress, statusText, isUploading } = useUploadFlow({
   store,
   payload,
@@ -330,6 +336,13 @@ async function handleFile(fileOrFiles, resourceType) {
 
 function incrementCounter() {
   counter.value += 1
+}
+
+function setPreviewThumbRandom(url) {
+  if (previewThumbRandom.value && previewThumbRandom.value !== url) {
+    URL.revokeObjectURL(previewThumbRandom.value)
+  }
+  previewThumbRandom.value = url
 }
 
 function scheduleUploadStart() {
@@ -631,18 +644,32 @@ watchFileThumb(posterFile, posterThumb)
 watchFileThumb(previewFile, previewThumb)
 
 watch(mediaFile, file => {
-  if (file) payload.project.media.filename = file.name
-  else payload.project.media.filename = null
+  if (file) {
+    payload.project.media.filename = file.name
+  } else {
+    payload.project.media.filename = null
+    disposeFrameSession()
+  }
 })
 
 // when mediaFile + previewType='frame' changes, extract a random frame and add as preview
 // Only trigger extraction when mediaFile or the refresh counter changes.
 watch([() => mediaFile.value, () => counter.value], async ([mf]) => {
-  if (payload.project.media.previewType !== 'frame' || !mf) return
+  const token = ++frameExtractionToken.value
+  if (payload.project.media.previewType !== 'frame' || !mf) {
+    if (!mf) {
+      setPreviewThumbRandom(null)
+    }
+    return
+  }
   try {
     extractingFrame.value = true
     const result = await getRandomFrameFromFile(mf)
-    previewThumbRandom.value = result?.url || null
+    if (token !== frameExtractionToken.value) {
+      if (result?.url) URL.revokeObjectURL(result.url)
+      return
+    }
+    setPreviewThumbRandom(result?.url || null)
     if (result?.blob) {
       const file = new File([result.blob], 'frame.jpg', { type: 'image/jpeg' })
       await processFile(file, 'preview')
@@ -658,9 +685,22 @@ watch([() => mediaFile.value, () => counter.value], async ([mf]) => {
       actions: [{ label: 'Dismiss', color: 'white' }]
     })
   } finally {
-    extractingFrame.value = false
+    if (token === frameExtractionToken.value) {
+      extractingFrame.value = false
+    }
   }
 })
+
+watch(
+  () => payload.project.media.previewType,
+  previewType => {
+    if (previewType !== 'frame') {
+      frameExtractionToken.value += 1
+      setPreviewThumbRandom(null)
+      extractingFrame.value = false
+    }
+  }
+)
 
 // Step-specific helpers live in the step components now
 
@@ -701,7 +741,11 @@ onMounted(async () => {
   globalThis.addEventListener('beforeunload', beforeUnloadHandler)
 })
 
-onBeforeUnmount(() => globalThis.removeEventListener('beforeunload', beforeUnloadHandler))
+onBeforeUnmount(() => {
+  globalThis.removeEventListener('beforeunload', beforeUnloadHandler)
+  setPreviewThumbRandom(null)
+  disposeFrameSession()
+})
 
 // route guard
 onBeforeRouteLeave((to, from, next) => {
