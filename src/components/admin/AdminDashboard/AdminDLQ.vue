@@ -55,7 +55,12 @@ const outboxColumns = [
   { name: 'type', label: 'Type', field: 'type', align: 'left' },
   { name: 'attempts', label: 'Attempts', field: 'attempts', align: 'right' },
   { name: 'payload', label: 'Payload', field: 'payload', align: 'left' },
-  { name: 'last_error', label: 'Last Error', field: 'last_error', align: 'left' },
+  {
+    name: 'last_error',
+    label: 'Last Error',
+    field: 'lastError',
+    align: 'left'
+  },
   { name: 'actions', label: 'Actions', field: 'actions', align: 'center' }
 ]
 function pretty(obj) {

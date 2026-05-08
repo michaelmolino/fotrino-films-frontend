@@ -124,10 +124,10 @@ declare namespace ApiContractsInternal {
    */
   export type CoverType = 'profile' | 'new'
   export type Attempts = number
-  export type Availableat = string
+  export type AvailableAt = string
   export type Created9 = string
   export type Id9 = number
-  export type Lasterror = string | null
+  export type LastError = string | null
   export type Payload =
     | ObjectsDeleteNamePayload
     | MediaProcessPayload
@@ -489,10 +489,10 @@ declare namespace ApiContractsInternal {
    */
   export interface DeadLetterQueueItemResponse {
     attempts: Attempts
-    availableAt: Availableat
+    available_at: AvailableAt
     created: Created9
     id: Id9
-    lastError: Lasterror
+    last_error: LastError
     payload: Payload
     type: Type2
   }
