@@ -8,7 +8,7 @@
     data-cy="project-poster"
     :to="to"
     :aria-label="`View project: ${project.title}`">
-    <q-badge class="bg-accent q-pa-md z-top" floating transparent>
+    <q-badge class="text-white bg-accent q-pa-md z-top" floating>
       <span class="text-bold">{{ project.media.length }}</span>
     </q-badge>
     <q-img

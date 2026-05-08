@@ -60,13 +60,13 @@
           <q-btn
             flat
             label="Cancel"
-            color="primary"
+            color="accent"
             v-close-popup
             data-cy="cancel-edit-channel" />
           <q-btn
-            flat
+            unelevated
             label="Save"
-            color="primary"
+            color="accent"
             :disable="editCoverProcessing || !hasChanges"
             :loading="savingEdit"
             @click="saveEdit"

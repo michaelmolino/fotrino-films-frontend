@@ -1,5 +1,5 @@
 <template>
-  <q-page :class="[heroBgClass, 'q-pa-md', 'flex', 'flex-center']" data-cy="home-page">
+  <q-page class="q-pa-md flex flex-center" data-cy="home-page">
     <section class="text-right q-pa-lg rounded-borders" data-cy="home-hero">
       <div>
         <transition appear enter-active-class="animated zoomInDown slower">
@@ -42,15 +42,5 @@ import { useQuasar } from 'quasar'
 
 defineOptions({ name: 'Home-Page' })
 const $q = useQuasar()
-const darkClass = computed(() => ($q.dark.isActive ? 'text-white' : 'text-secondary'))
-const heroBgClass = computed(() => $q.dark.isActive && 'bg-hero-dark')
+const darkClass = computed(() => ($q.dark.isActive ? 'text-white' : 'text-primary'))
 </script>
-
-<style scoped>
-.bg-hero-dark {
-  background:
-    radial-gradient(1000px 480px at 85% 20%, rgba(2, 123, 227, 0.28), rgba(2, 123, 227, 0) 68%),
-    radial-gradient(780px 360px at 10% 88%, rgba(2, 123, 227, 0.14), rgba(2, 123, 227, 0) 62%),
-    linear-gradient(180deg, rgba(2, 123, 227, 0.08) 0%, rgba(2, 123, 227, 0) 45%);
-}
-</style>
