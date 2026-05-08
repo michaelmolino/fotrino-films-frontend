@@ -6,31 +6,72 @@
       <q-skeleton type="text" width="40%" />
     </template>
 
-    <template v-else-if="channel && project && (route.params.privateId || channel.uuid === route.params.uuid)">
+    <template v-else-if="channel && project && channel.uuid === route.params.uuid">
       <BreadCrumbs
         :channel="channel"
         :project="project"
-        :media="media?.main ? null : media"
-        :private="!!route.params.privateId" />
+        :media="null"
+        :private="false" />
 
-      <NothingText
-        v-if="!route.params.privateId && (project.media?.length || 0) === 0"></NothingText>
+      <!-- Scenario 1: No featured media - show list view -->
+      <template v-if="featuredMediaCount === 0">
+        <NothingText v-if="(project.media?.length || 0) === 0" text="No content available." />
+        <template v-else>
+          <div class="row q-pt-md">
+            <div
+              v-for="(item, index) in allMedia"
+              :key="item.id"
+              class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm text-center">
+              <MediaPreview
+                :channel="channel"
+                :project="project"
+                :media="item"
+                :to="`/${channel.uuid}/${channel.slug}/${project.slug}/${item.slug}`"
+                :detail="true"
+                :showMainAccent="false"
+                :priority="index === 0 ? 'high' : 'auto'" />
+            </div>
+          </div>
+        </template>
+      </template>
+
+      <!-- Scenario 2: Exactly one featured media - redirect to MediaRoot -->
+      <template v-else-if="featuredMediaCount === 1">
+        <q-skeleton type="rect" class="q-mb-md skeleton-large" />
+        <q-skeleton type="text" width="60%" />
+        <q-skeleton type="text" width="40%" />
+      </template>
+
+      <!-- Scenario 3: Multiple featured media -->
       <template v-else>
-        <PlyrPlayer
-          v-if="media"
-          :media="media"
-          :artist="channel?.ownerName"
-          class="q-py-md plyrplayer" />
-        <div v-if="media" class="plyrplayer" data-cy="media-description-container">
-          <MediaDescription :media="media" />
-        </div>
-
-        <template v-if="hasRelatedContent">
-          <div class="q-pt-md text-h6" data-cy="related-media-title">More from {{ project.title }}</div>
+        <!-- Featured media section (2+) -->
+        <template v-if="featuredMediaCount > 1">
+          <div class="q-pt-md text-h6" data-cy="featured-media-title">Featured</div>
           <q-separator spaced />
           <div class="row">
             <div
-              v-for="(related, index) in relatedMedia"
+              v-for="(item, index) in featuredMedia"
+              :key="item.id"
+              class="col-xs-12 col-sm-6 col-md-4 q-pa-sm">
+              <MediaPreview
+                :channel="channel"
+                :project="project"
+                :media="item"
+                :to="`/${channel.uuid}/${channel.slug}/${project.slug}/${item.slug}`"
+                :detail="true"
+                :showMainAccent="false"
+                :priority="index === 0 ? 'high' : 'auto'" />
+            </div>
+          </div>
+        </template>
+
+        <!-- Other media section -->
+        <template v-if="otherMedia.length > 0">
+          <div class="q-pt-md text-h6" data-cy="other-media-title">More from {{ project.title }}</div>
+          <q-separator spaced />
+          <div class="row">
+            <div
+              v-for="(related, index) in otherMedia"
               :key="related.id"
               class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm">
               <MediaPreview
@@ -46,7 +87,7 @@
     </template>
 
     <template v-else>
-      <NothingText text="Media not found or unavailable." />
+      <NothingText text="Project not found or unavailable." />
     </template>
   </div>
 </template>
@@ -58,8 +99,6 @@ import { useChannelLoading } from '@composables/useChannelLoading.js'
 
 import BreadCrumbs from '@components/shared/BreadCrumbs.vue'
 import MediaPreview from '@components/channel/MediaPreview.vue'
-import PlyrPlayer from '@components/channel/ProjectRoot/PlyrPlayer.vue'
-import MediaDescription from '@components/channel/ProjectRoot/MediaDescription.vue'
 const NothingText = defineAsyncComponent(() => import('@components/shared/NothingText.vue'))
 
 const route = useRoute()
@@ -75,37 +114,28 @@ function findProjectByParams() {
   if (route.params.uuid) {
     return channel.value?.projects?.find(p => p.slug === route.params.projectSlug) || null
   }
-  if (route.params.privateId && channel.value) {
-    return channel.value?.project || null
-  }
   return null
-}
-
-function findMediaByParams(project) {
-  if (!project) return null
-
-  if (route.params.privateId) {
-    return project.media || null
-  }
-  if (route.params.mediaSlug) {
-    return project.media?.find(m => m.slug === route.params.mediaSlug) || null
-  }
-  // Default to main media or first available
-  return project.media?.find(m => m.main) || project.media?.[0] || null
 }
 
 const project = computed(() => {
   return findProjectByParams()
 })
 
-const media = computed(() => {
-  return findMediaByParams(project.value)
+const allMedia = computed(() => {
+  return project.value?.media || []
 })
 
-const relatedMedia = computed(() => {
-  return (project.value?.media || []).filter(m => m.id !== media.value?.id)
+const featuredMedia = computed(() => {
+  return allMedia.value.filter(m => m.main === true)
 })
-const hasRelatedContent = computed(() => !!route.params.uuid && relatedMedia.value.length > 0)
+
+const featuredMediaCount = computed(() => {
+  return featuredMedia.value.length
+})
+
+const otherMedia = computed(() => {
+  return allMedia.value.filter(m => m.main !== true)
+})
 
 watch(
   project,
@@ -117,19 +147,14 @@ watch(
   { immediate: true }
 )
 
+// If exactly one featured media and we're on the project (not media) route, 
+// redirect to the media route to use MediaRoot instead
 watch(
-  media,
-  newMedia => {
-    if (
-      channel.value &&
-      project.value &&
-      (project.value.media?.length || 0) > 0 &&
-      !newMedia &&
-      !loading.value
-    ) {
-      redirect('/404')
-    } else if (newMedia && route.params.uuid && !route.params.mediaSlug) {
-      redirect({ params: { ...route.params, mediaSlug: newMedia.slug } })
+  [featuredMediaCount, project, loading],
+  ([count, proj, isLoading]) => {
+    if (!isLoading && channel.value && proj && count === 1 && route.params.uuid) {
+      const featured = featuredMedia.value[0]
+      redirect(`/${channel.value.uuid}/${channel.value.slug}/${proj.slug}/${featured.slug}`)
     }
   },
   { immediate: true }

@@ -13,17 +13,23 @@ export function getMetaData(route, channel) {
     image = channel?.cover || null
   }
 
-  // Case: Project + optional media
+  // Case: Project view (with optional media)
   if (route?.params.projectSlug) {
     const project = channel?.projects?.find(p => p.slug === route.params.projectSlug)
-    const media = route?.params.mediaSlug
-      ? project?.media?.find(m => m.slug === route.params.mediaSlug)
-      : project?.media?.find(m => m.main)
-
-    title = media?.title || null
-    description = sanitizeText(media?.descriptionUnsafe)
-    image = media?.preview || null
-    type = 'video'
+    
+    // If mediaSlug is present, show media metadata
+    if (route?.params.mediaSlug) {
+      const media = project?.media?.find(m => m.slug === route.params.mediaSlug)
+      title = media?.title || null
+      description = sanitizeText(media?.descriptionUnsafe)
+      image = media?.preview || null
+      type = 'video'
+    } else {
+      // If no mediaSlug, show project metadata
+      title = project?.title || null
+      description = sanitizeText(project?.subtitle || '')
+      image = project?.poster || null
+    }
   }
 
   // Case: Private media
