@@ -34,7 +34,6 @@
     </div>
     <div style="max-width: 220px; margin: 0 auto; width: 100%" class="row">
       <q-btn
-        to="/account/upload"
         align="left"
         flat
         no-caps
@@ -42,7 +41,8 @@
         label="Upload Media"
         aria-label="Upload a video"
         size="md"
-        class="col-xs-12" />
+        class="col-xs-12"
+        @click="goToUpload" />
     </div>
     <div style="max-width: 220px; margin: 0 auto; width: 100%" class="row">
       <q-btn
@@ -62,11 +62,20 @@
 
 <script setup>
 import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { logout } from '@utils/auth.js'
 
 const $q = useQuasar()
 const store = useStore()
+const router = useRouter()
+
+function goToUpload() {
+  router.push({
+    path: '/account/upload',
+    query: { u: String(Date.now()) }
+  })
+}
 
 defineProps({
   profile: {

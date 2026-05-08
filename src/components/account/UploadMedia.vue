@@ -83,14 +83,9 @@
         :done="step > 4"
         :header-nav="canOpenStepFromHeader(4)">
         <div class="text-center">
-          <div class="upload-preview-container">
-            <!-- Preview image/video background -->
-            <div
-              v-if="media.preview"
-              class="upload-preview-background"
-              :style="{ backgroundImage: `url(${media.preview})` }"></div>
-            <!-- Progress overlay -->
-            <div class="upload-progress-overlay">
+          <div class="upload-preview-shell">
+            <MediaPreview :media="media" :project="project" :detail="false" class="upload-preview" />
+            <div class="upload-progress-overlay" data-cy="upload-progress-overlay">
               <q-circular-progress
                 :indeterminate="progress === -1"
                 :instant-feedback="progress < 1"
@@ -115,29 +110,30 @@
 
       <q-step
         :name="5"
-        title="Processing"
-        icon="settings"
-        active-icon="settings"
+        title="Upload Complete"
+        icon="check_circle"
+        active-icon="check_circle"
         data-cy="upload-step-processing"
         :header-nav="false">
         <div class="text-center">
-          <div class="q-mb-md">
+          <div class="upload-preview-shell q-mb-md">
             <MediaPreview
               :media="media"
               :project="project"
-              :detail="false"
-              :showMainAccent="false"
+              :detail="true"
               class="processing-preview" />
+            <div class="upload-complete-overlay" data-cy="upload-complete-status">
+              <q-icon name="check_circle" size="64px" color="info" />
+            </div>
           </div>
           <div class="processing-status" data-cy="upload-processing-status">
-            <q-icon name="settings" size="24px" color="accent" class="q-mr-sm rotating-gears" />
-            <span class="text-h6" data-cy="upload-processing-text">Processing...</span>
+            <span class="text-h6" data-cy="upload-processing-text">Upload complete</span>
           </div>
           <div class="q-pa-md text-body2">
-            Your media <strong>{{ media.title }}</strong> is processing and will
-            be available shortly. You'll receive an email once it's ready.
+            <strong>{{ media.title }}</strong> was uploaded successfully.
+            Your media is being processed. We will email you when your video is live.
           </div>
-          <div class="q-pt-md text-caption text-grey-6">You may now close this window.</div>
+          <div class="q-pt-md text-caption text-grey-6">You can safely close this window.</div>
         </div>
       </q-step>
 
@@ -204,7 +200,7 @@
 <script setup>
 import { ref, reactive, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useStore } from 'vuex'
-import { onBeforeRouteLeave } from 'vue-router'
+import { onBeforeRouteLeave, useRoute } from 'vue-router'
 import ChannelStep from './UploadMedia/ChannelStep.vue'
 import ProjectStep from './UploadMedia/ProjectStep.vue'
 import MediaStep from './UploadMedia/MediaStep.vue'
@@ -217,28 +213,29 @@ import { useUploadFlow } from '@composables/useUploadFlow.js'
 
 // refs & reactive state
 const store = useStore()
+const route = useRoute()
 const step = ref(1)
 const stepper = ref(null)
 const projects = ref([])
 /** @type {import('src/types/api-contract').UploadMediaRequest} */
-const initialPayload = {
-  uuid: null,
-  coverType: 'profile',
-  title: 'My Channel',
-  project: {
-    id: null,
-    posterType: 'default',
-    title: 'My Videos',
-    media: {
-      main: false,
-      previewType: 'frame',
-      resourceDate: new Date().toISOString().split('T')[0]
+function createInitialPayload() {
+  return {
+    uuid: null,
+    coverType: 'profile',
+    title: 'My Channel',
+    project: {
+      id: null,
+      posterType: 'default',
+      title: 'My Videos',
+      media: {
+        main: false,
+        previewType: 'frame',
+        resourceDate: new Date().toISOString().split('T')[0]
+      }
     }
   }
 }
-const payload = reactive({
-  ...initialPayload
-})
+const payload = reactive(createInitialPayload())
 
 const coverFile = ref(null)
 const coverThumb = ref(null)
@@ -413,6 +410,38 @@ function resetProjectStep() {
   posterFile.value = null
   posterThumb.value = null
   clearUploadFile('poster')
+}
+
+function resetUploadFlow() {
+  if (isUploading.value) {
+    return
+  }
+
+  const freshPayload = createInitialPayload()
+  payload.uuid = freshPayload.uuid
+  payload.coverType = freshPayload.coverType
+  payload.title = freshPayload.title
+  payload.project = freshPayload.project
+
+  step.value = 1
+  coverFile.value = null
+  coverThumb.value = null
+  posterFile.value = null
+  posterThumb.value = null
+  previewFile.value = null
+  previewThumb.value = null
+  mediaFile.value = null
+  counter.value = 0
+  frameExtractionToken.value += 1
+  extractingFrame.value = false
+  uploadTriggered.value = false
+  progress.value = 0
+  statusText.value = 'Preparing upload...'
+
+  setPreviewThumbRandom(null)
+  clearUploadErrorNotify()
+  disposeFrameSession()
+  uploadFiles.value.splice(0, uploadFiles.value.length)
 }
 
 // computed
@@ -702,6 +731,16 @@ watch(
   }
 )
 
+watch(
+  () => route.query.u,
+  freshUploadToken => {
+    if (!freshUploadToken) {
+      return
+    }
+    resetUploadFlow()
+  }
+)
+
 // Step-specific helpers live in the step components now
 
 // lifecycle
@@ -769,37 +808,15 @@ onBeforeRouteLeave((to, from, next) => {
   min-width: 240px;
 }
 
-.upload-preview-container {
+.upload-preview-shell {
   position: relative;
   width: 100%;
-  max-width: 320px;
-  height: 240px;
+  max-width: 720px;
   margin: 0 auto;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Mobile responsive adjustments */
-@media (max-width: 360px) {
-  .upload-preview-container {
-    width: calc(100vw - 32px);
-    max-width: none;
-    height: calc((100vw - 32px) * 0.75);
-    margin: 0 auto;
-  }
-}
-
-.upload-preview-background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: brightness(0.7);
+.upload-preview {
+  width: 100%;
 }
 
 .upload-progress-overlay {
@@ -814,6 +831,19 @@ onBeforeRouteLeave((to, from, next) => {
   justify-content: center;
   background: rgba(0, 0, 0, 0.4);
   color: white;
+  pointer-events: none;
+}
+
+.upload-complete-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
 }
 
 .upload-progress-spinner {
@@ -856,7 +886,7 @@ onBeforeRouteLeave((to, from, next) => {
 }
 
 .processing-preview {
-  max-width: 320px;
+  width: 100%;
   margin: 0 auto;
 }
 
@@ -865,18 +895,5 @@ onBeforeRouteLeave((to, from, next) => {
   align-items: center;
   justify-content: center;
   margin-bottom: 16px;
-}
-
-.rotating-gears {
-  animation: spin 2s linear infinite;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
 </style>
