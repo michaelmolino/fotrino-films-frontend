@@ -16,8 +16,12 @@ const routes = [
     children: [
       { path: '', component: () => import('@components/channel/ChannelRoot.vue') },
       {
-        path: ':projectSlug([0-9a-zA-Z-]+)/:mediaSlug([0-9a-zA-Z-]+)?',
+        path: ':projectSlug([0-9a-zA-Z-]+)',
         component: () => import('@components/channel/ProjectRoot.vue')
+      },
+      {
+        path: ':projectSlug([0-9a-zA-Z-]+)/:mediaSlug([0-9a-zA-Z-]+)',
+        component: () => import('@components/channel/MediaRoot.vue')
       }
     ]
   },
@@ -27,7 +31,7 @@ const routes = [
     children: [
       {
         path: ':privateId([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})',
-        component: () => import('@components/channel/ProjectRoot.vue')
+        component: () => import('@components/channel/MediaRoot.vue')
       }
     ]
   },
