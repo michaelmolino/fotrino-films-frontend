@@ -45,8 +45,8 @@ export default {
 
 .bg-hero-dark {
   background:
-    radial-gradient(1000px 480px at 85% 20%, rgba($primary, 0.28), rgba($primary, 0) 68%),
-    radial-gradient(780px 360px at 10% 88%, rgba($primary, 0.14), rgba($primary, 0) 62%),
-    linear-gradient(180deg, rgba($accent, 0.08) 0%, rgba($accent, 0) 45%);
+    radial-gradient(1000px 480px at 85% 20%, rgba($primary, 0.45), rgba($primary, 0) 68%),
+    radial-gradient(780px 360px at 10% 88%, rgba($secondary, 0.14), rgba($secondary, 0) 62%);
+  background-attachment: fixed;
 }
 </style>
