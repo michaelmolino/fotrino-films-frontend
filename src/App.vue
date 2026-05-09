@@ -36,14 +36,14 @@ onMounted(async () => {
   }
   await accountStore.getProfile()
   showTerms.value = route.query?.showTerms?.toLowerCase() === 'true'
-  await loadChannel(route)
 })
 
 watch(
   [() => route.params.uuid, () => route.params.privateId],
   async () => {
     await loadChannel(route)
-  }
+  },
+  { immediate: true }
 )
 
 const onTermsClose = () => {

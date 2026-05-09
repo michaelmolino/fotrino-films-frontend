@@ -72,7 +72,10 @@ export default boot(({ app, router }) => {
 
       const apiError = getGlobalApiErrorPayload(error)
       const status = apiError?.status ?? error?.response?.status
-      const skipNotify = error?.config?.__skipGlobalErrorNotify === true
+      const requestCanceled = error?.code === 'ERR_CANCELED' || error?.name === 'CanceledError'
+      const skipNotify =
+        error?.config?.__skipGlobalErrorNotify === true ||
+        requestCanceled
 
       if (isGlobalApiError(error, 'not_found')) {
         router.replace('/404')
@@ -83,14 +86,8 @@ export default boot(({ app, router }) => {
       if (!apiError && status === 402) msg = 'You have exceeded a limit for your account type.'
       else if (!apiError && status === 501) msg = 'Not yet implemented.'
 
-      let timeout = 0
-      if (error.code === 'ERR_CANCELED') {
-        msg = 'Request cancelled.'
-        timeout = 3000
-      }
-
       if (!skipNotify) {
-        notifyError(msg, { timeout })
+        notifyError(msg, { timeout: 0 })
       }
 
       if (
