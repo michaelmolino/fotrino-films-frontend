@@ -1,5 +1,3 @@
-import { fetchGet } from 'src/stores/utils/fetch-get.js'
-
 /**
  * Fetch data and apply it to state with optional caching.
  * @param {Object} options
@@ -30,12 +28,14 @@ export const fetchAndApplyGet = async ({
       // Use Pinia Colada cache
       const { queryOptions, queryCache } = cache
       // Make the API call
-      value = await fetchGet({ api, url, extract, requestConfig })
+      const { data } = await api.get(url, requestConfig)
+      value = extract ? extract(data) : data
       // Update Colada cache with the result
       queryCache.setQueryData(queryOptions.key, value)
     } else {
       // Regular fetch without cache
-      value = await fetchGet({ api, url, extract, requestConfig })
+      const { data } = await api.get(url, requestConfig)
+      value = extract ? extract(data) : data
     }
 
     apply(value)

@@ -5,8 +5,7 @@ import { api } from 'boot/axios'
 import { sortBy } from '@utils/sort.js'
 import { getGlobalApiErrorPayload } from 'src/utils/api-errors.js'
 import { fetchAndApplyGet } from 'src/stores/utils/fetch-and-apply.js'
-import { withRequestGuard } from 'src/stores/utils/with-request-guard.js'
-import { createLatestRequestGuard } from 'src/stores/utils/latest-request-guard.js'
+import { createRequestCanceler, isRequestCanceled } from 'src/stores/utils/request-canceler.js'
 
 const DEFAULT_CACHE_TIMEOUT = 3600000
 
@@ -28,7 +27,7 @@ export const useChannelStore = defineStore('channel', () => {
     const upload = ref(null)
     const mediaToken = ref(null)
     const queryCache = useQueryCache()
-    const requestGuard = createLatestRequestGuard()
+    const requestCanceler = createRequestCanceler()
 
     const setChannelLoadStatus = status => {
         loadStatus.value = status
@@ -50,11 +49,6 @@ export const useChannelStore = defineStore('channel', () => {
         mediaToken.value = token
     }
 
-    const guardedFetch = (options) => {
-        const wrapper = withRequestGuard(requestGuard)
-        return wrapper(fetchAndApplyGet, options)
-    }
-
     const requestUploadInstruction = async url => {
         const res = await api.post(url, null, {
             __skipGlobalErrorNotify: true
@@ -62,11 +56,10 @@ export const useChannelStore = defineStore('channel', () => {
         return res.data
     }
 
-    const getChannels = deep => guardedFetch({
+    const getChannels = deep => fetchAndApplyGet({
         api,
         url: deep ? '/channels/deep' : '/channels',
         apply: setChannels,
-        requestKey: 'SET_CHANNELS',
         extract: data => (deep ? sortChannelsByTitle(data).map(sortChannelDetail) : sortChannelsByTitle(data))
     })
 
@@ -87,25 +80,33 @@ export const useChannelStore = defineStore('channel', () => {
 
     const getChannel = ({ uuid, pending = false }) => {
         const url = `/channels/${uuid}${pending ? '?pending=true' : ''}`
-        return guardedFetch({
+        return fetchAndApplyGet({
             api,
             url,
             apply: setChannel,
-            requestKey: 'SET_CHANNEL',
             extract: sortChannelDetail,
             onError: error => {
-                getGlobalApiErrorPayload(error)
+                if (!isRequestCanceled(error)) {
+                    getGlobalApiErrorPayload(error)
+                }
+            },
+            requestConfig: {
+                signal: requestCanceler.getSignal('SET_CHANNEL')
             }
         })
     }
 
-    const getPrivateMedia = privateId => guardedFetch({
+    const getPrivateMedia = privateId => fetchAndApplyGet({
         api,
         url: `/channels/media/private/${privateId}`,
         apply: setChannel,
-        requestKey: 'SET_CHANNEL',
         onError: error => {
-            getGlobalApiErrorPayload(error)
+            if (!isRequestCanceled(error)) {
+                getGlobalApiErrorPayload(error)
+            }
+        },
+        requestConfig: {
+            signal: requestCanceler.getSignal('SET_CHANNEL')
         }
     })
 
@@ -139,11 +140,10 @@ export const useChannelStore = defineStore('channel', () => {
         return queryCache.getQueryData(queryOptions.key)
     }
 
-    const getMediaToken = ({ privateId }) => guardedFetch({
+    const getMediaToken = ({ privateId }) => fetchAndApplyGet({
         api,
         url: `/channels/media/token/${privateId}`,
         apply: setMediaToken,
-        requestKey: 'SET_MEDIA_TOKEN',
         extract: data => data.token,
         onError: error => {
             getGlobalApiErrorPayload(error)
