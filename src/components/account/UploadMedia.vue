@@ -263,8 +263,7 @@ const { getRandomFrameFromFile, disposeFrameSession } = useVideoThumbnailProcess
 const { factoryUpload, cancel: cancelUpload, progress, statusText, isUploading } = useUploadFlow({
   channelStore,
   payload,
-  stepper,
-  uploadFiles
+  stepper
 })
 
 const isPreviewProcessing = computed(() => {
@@ -389,7 +388,14 @@ async function startUploadJourney() {
   await nextTick()
 
   try {
-    await factoryUpload()
+    const uploadItems = uploadFiles.value
+      .filter(item => item.file != null)
+      .map(item => ({
+        file: item.file,
+        resourceType: item.resourceType
+      }))
+
+    await factoryUpload(uploadItems)
     if (step.value === 4) {
       throw new Error('Upload did not start. Please try again.')
     }

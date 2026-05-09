@@ -1,86 +1,15 @@
-import { nextTick, ref, watch } from 'vue'
+import { ref } from 'vue'
 import { useUppyPresignedUpload } from './useUppyPresignedUpload.js'
-import {
-    acquirePendingUploadLock,
-    releasePendingUploadLock,
-    startPendingUploadLockHeartbeat
-} from '@utils/pendingUploadLocks.js'
-
-function getRequiredUploadTypes(uploadInstructions) {
-    return new Set(uploadInstructions.map(instruction => instruction.resourceType))
-}
-
-function getPendingUploadTypes(files, requiredTypes) {
-    return files
-        .filter(uf => requiredTypes.has(uf.resourceType) && uf.processing === true)
-        .map(uf => uf.resourceType)
-}
-
-async function waitForUploadItemsReady(uploadFiles, uploadInstructions, timeoutMs = 5000) {
-    const requiredTypes = getRequiredUploadTypes(uploadInstructions)
-    const currentPendingTypes = () => getPendingUploadTypes(uploadFiles.value, requiredTypes)
-
-    if (currentPendingTypes().length === 0) {
-        return
-    }
-
-    await new Promise((resolve, reject) => {
-        let settled = false
-        let stopWatching = null
-
-        const finish = callback => {
-            if (settled) {
-                return
-            }
-            settled = true
-            clearTimeout(timeoutId)
-            if (typeof stopWatching === 'function') {
-                stopWatching()
-            }
-            callback()
-        }
-
-        const timeoutId = setTimeout(() => {
-            const pendingTypes = currentPendingTypes()
-            finish(() => {
-                reject(new Error(`Files still processing: ${pendingTypes.join(', ')}`))
-            })
-        }, timeoutMs)
-
-        stopWatching = watch(
-            uploadFiles,
-            files => {
-                const pendingTypes = getPendingUploadTypes(files, requiredTypes)
-                if (pendingTypes.length === 0) {
-                    finish(resolve)
-                }
-            },
-            { deep: true, flush: 'post' }
-        )
-    })
-}
-
-function buildUploadItems(uploadFiles, uploadInstructions) {
-    const requiredTypes = getRequiredUploadTypes(uploadInstructions)
-
-    return uploadFiles.value
-        .filter(uploadFile => uploadFile.file && requiredTypes.has(uploadFile.resourceType))
-        .map(uploadFile => ({
-            file: uploadFile.file,
-            resourceType: uploadFile.resourceType
-        }))
-}
+import { usePendingUploadLock } from './usePendingUploadLock.js'
 
 export function useUploadFlow({
     channelStore,
     payload,
-    stepper,
-    uploadFiles
+    stepper
 }) {
     const isUploading = ref(false)
-    let cancelled = false
-    let activeMediaRef = null
-    let stopLockHeartbeat = null
+    const abortController = ref(null)
+    const uploadLock = usePendingUploadLock()
 
     const {
         progress,
@@ -93,65 +22,52 @@ export function useUploadFlow({
         cleanup
     } = useUppyPresignedUpload()
 
-    const startLock = mediaRef => {
-        if (mediaRef == null) {
-            return
-        }
-
-        activeMediaRef = mediaRef
-        acquirePendingUploadLock(mediaRef)
-        stopLockHeartbeat = startPendingUploadLockHeartbeat(mediaRef)
-    }
-
-    const stopLock = () => {
-        if (typeof stopLockHeartbeat === 'function') {
-            stopLockHeartbeat()
-            stopLockHeartbeat = null
-        }
-        if (activeMediaRef != null) {
-            releasePendingUploadLock(activeMediaRef)
-            activeMediaRef = null
-        }
-    }
-
-    async function factoryUpload() {
+    async function factoryUpload(uploadItems) {
         if (isUploading.value) {
             throw new Error('Upload already in progress.')
         }
 
-        cancelled = false
+        if (!uploadItems || uploadItems.length === 0) {
+            throw new Error('No files to upload')
+        }
+
+        abortController.value = new AbortController()
         isUploading.value = true
 
         try {
             const uploadInstructions = await channelStore.postUpload(payload)
 
-            // Allow any in-flight reactive updates to settle before reading uploadFiles.
-            await nextTick()
-            await waitForUploadItemsReady(uploadFiles, uploadInstructions)
-
-            const uploadItems = buildUploadItems(uploadFiles, uploadInstructions)
-            if (uploadItems.length === 0) {
-                throw new Error('No files to upload')
+            if (abortController.value.signal.aborted) {
+                throw new Error('Upload cancelled')
             }
 
             initializeUppy(uploadInstructions)
             addFilesToUppy(uploadItems)
 
             const mediaRef = getMediaReference()
-            startLock(mediaRef)
+            if (mediaRef == null) {
+                throw new Error('No media reference available after adding files')
+            }
+
+            uploadLock.acquire(mediaRef)
 
             await startUpload()
+
+            if (abortController.value.signal.aborted) {
+                throw new Error('Upload cancelled')
+            }
 
             const confirmMediaRef = getMediaReference()
             if (confirmMediaRef == null) {
                 throw new Error('Upload completed without a media reference. Confirm step aborted.')
             }
+
             await channelStore.confirmUpload(confirmMediaRef)
 
             statusText.value = 'Upload complete!'
             stepper.value?.next()
         } catch (err) {
-            if (cancelled) {
+            if (abortController.value.signal.aborted && err.message === 'Upload cancelled') {
                 return
             }
 
@@ -160,17 +76,18 @@ export function useUploadFlow({
             console.error('Error uploading:', err)
             throw err
         } finally {
-            stopLock()
+            uploadLock.release()
             cleanup()
             isUploading.value = false
+            abortController.value = null
         }
     }
 
     function cancel() {
-        cancelled = true
-        const mediaRef = getMediaReference() ?? activeMediaRef
+        abortController.value?.abort()
+        const mediaRef = uploadLock.activeMediaRef.value
 
-        stopLock()
+        uploadLock.release()
         cancelUploads()
         isUploading.value = false
         progress.value = 0

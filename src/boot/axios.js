@@ -31,6 +31,8 @@ export default boot(({ app, router }) => {
 
   api.interceptors.request.use(req => {
     const method = (req.method || '').toLowerCase()
+    const skipLoader = req.__skipRequestLoading === true
+    const skipDeleteConfirm = req.__skipDeleteConfirm === true
 
     // Attach CSRF only when available and required
     if (['post', 'put', 'delete'].includes(method)) {
@@ -41,7 +43,7 @@ export default boot(({ app, router }) => {
     }
 
     // Confirm destructive action
-    if (method === 'delete') {
+    if (method === 'delete' && !skipDeleteConfirm) {
       return confirmDestructiveAction({
         confirmAction: { 'data-cy': 'confirm-delete' },
         cancelAction: { 'data-cy': 'cancel-delete' }
@@ -53,22 +55,30 @@ export default boot(({ app, router }) => {
           throw err
         }
 
-        showLoader()
+        if (!skipLoader) {
+          showLoader()
+        }
         return req
       })
     }
 
-    showLoader()
+    if (!skipLoader) {
+      showLoader()
+    }
     return req
   })
 
   api.interceptors.response.use(
     response => {
-      hideLoader()
+      if (response?.config?.__skipRequestLoading !== true) {
+        hideLoader()
+      }
       return response
     },
     error => {
-      hideLoader()
+      if (error?.config?.__skipRequestLoading !== true) {
+        hideLoader()
+      }
 
       const apiError = getGlobalApiErrorPayload(error)
       const status = apiError?.status ?? error?.response?.status

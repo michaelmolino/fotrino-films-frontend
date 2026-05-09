@@ -1,5 +1,6 @@
 import Uppy from '@uppy/core'
 import AwsS3 from '@uppy/aws-s3'
+import { api } from 'boot/axios'
 
 /** Minimum file size (bytes) for multipart upload. Only applies to `upload` resource type. */
 const MULTIPART_THRESHOLD = 100 * 1024 * 1024 // 100 MB
@@ -70,30 +71,22 @@ function getMultipartMediaId(file) {
     return mediaId
 }
 
-function buildCsrfHeaders(getCsrfToken, extraHeaders = {}) {
-    return {
-        ...extraHeaders,
-        'X-CSRFToken': getCsrfToken()
+async function requestMultipartJson(url, { method = 'GET', body, headers = {} } = {}) {
+    try {
+        const response = await api.request({
+            url,
+            method,
+            data: body,
+            headers,
+            __skipGlobalErrorNotify: true,
+            __skipRequestLoading: true,
+            __skipDeleteConfirm: true
+        })
+        return response?.data ?? null
+    } catch (error) {
+        const status = error?.response?.status
+        throw new Error(`${method} ${url} failed: ${status ?? 'network error'}`)
     }
-}
-
-async function requestMultipartJson(url, { method = 'GET', getCsrfToken, body, headers = {} } = {}) {
-    const response = await fetch(url, {
-        method,
-        credentials: 'include',
-        headers: buildCsrfHeaders(getCsrfToken, headers),
-        body
-    })
-
-    if (!response.ok) {
-        throw new Error(`${method} ${url} failed: ${response.status}`)
-    }
-
-    if (response.status === 204) {
-        return null
-    }
-
-    return response.json()
 }
 
 /**
@@ -110,7 +103,7 @@ async function requestMultipartJson(url, { method = 'GET', getCsrfToken, body, h
  *   instructions: Array<{ resourceType: string, url: string, reference?: number }>,
  *   maxFileSize?: number,
  *   multipartBaseUrl?: string,
- *   getCsrfToken?: () => string,
+ *   onTotalProgress?: (percent: number) => void,
  *   onProgress?: (progressData: any) => void,
  *   onUploadSuccess?: (file: any, instruction: any) => void,
  *   onUploadError?: (file: any, error: Error) => void,
@@ -121,7 +114,7 @@ export function createPresignedUppyClient({
     instructions = [],
     maxFileSize = null,
     multipartBaseUrl = '/api/channels/media',
-    getCsrfToken = () => '',
+    onTotalProgress,
     onProgress,
     onUploadSuccess,
     onUploadError
@@ -164,8 +157,7 @@ export function createPresignedUppyClient({
         async createMultipartUpload(file) {
             const mediaId = getMultipartMediaId(file)
             return requestMultipartJson(`${multipartBaseUrl}/${mediaId}/multipart`, {
-                method: 'POST',
-                getCsrfToken
+                method: 'POST'
             })
         },
 
@@ -180,7 +172,7 @@ export function createPresignedUppyClient({
             const mediaId = getMultipartMediaId(file)
             const response = await requestMultipartJson(
                 `${multipartBaseUrl}/${mediaId}/multipart/${encodeURIComponent(uploadId)}/sign/${partNumber}`,
-                { getCsrfToken }
+                {}
             )
             const { url } = response
             return { url }
@@ -192,9 +184,8 @@ export function createPresignedUppyClient({
                 `${multipartBaseUrl}/${mediaId}/multipart/${encodeURIComponent(uploadId)}/complete`,
                 {
                     method: 'POST',
-                    getCsrfToken,
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ parts })
+                    body: { parts }
                 }
             )
             return {}
@@ -206,8 +197,7 @@ export function createPresignedUppyClient({
             await requestMultipartJson(
                 `${multipartBaseUrl}/${mediaId}/multipart/${encodeURIComponent(uploadId)}`,
                 {
-                    method: 'DELETE',
-                    getCsrfToken
+                    method: 'DELETE'
                 }
             ).catch(() => { })
         }
@@ -215,6 +205,10 @@ export function createPresignedUppyClient({
 
     if (onProgress) {
         uppy.on('upload-progress', (file, progressData) => onProgress(file, progressData))
+    }
+
+    if (onTotalProgress) {
+        uppy.on('progress', percent => onTotalProgress(percent))
     }
 
     if (onUploadSuccess) {
