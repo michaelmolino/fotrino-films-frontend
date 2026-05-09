@@ -5,6 +5,7 @@ import { sortBy } from '@utils/sort.js'
 import { getGlobalApiErrorPayload } from 'src/utils/api-errors.js'
 import { fetchAndApplyGet } from 'src/stores/utils/fetch-and-apply.js'
 import { createRequestCanceler, isRequestCanceled } from 'src/stores/utils/request-canceler.js'
+import { useQueryCache } from '@pinia/colada'
 
 // Sort functions - apply sorting transformations to data structures
 const sortChannels = (channels, field = 'title', direction = 'desc') =>
@@ -26,6 +27,8 @@ export const useChannelStore = defineStore('channel', () => {
     const upload = ref(null)
     const mediaToken = ref(null)
     const requestCanceler = createRequestCanceler()
+
+    const queryCache = useQueryCache()
 
     // Computed property: returns all media across all projects, flattened and sorted
     const sortedAllMedia = computed(() => {
@@ -87,7 +90,7 @@ export const useChannelStore = defineStore('channel', () => {
         }
     }
 
-    const getChannel = ({ uuid, pending = false }) => {
+    const getChannel = ({ uuid, pending = false, cache = true }) => {
         const url = `/channels/${uuid}${pending ? '?pending=true' : ''}`
         return fetchAndApplyGet({
             api,
@@ -101,7 +104,13 @@ export const useChannelStore = defineStore('channel', () => {
             },
             requestConfig: {
                 signal: requestCanceler.getSignal('SET_CHANNEL')
-            }
+            },
+            ...(cache && {
+                cache: {
+                    queryOptions: channelQueryOptions(uuid),
+                    queryCache
+                }
+            })
         })
     }
 
@@ -267,6 +276,11 @@ export const useChannelStore = defineStore('channel', () => {
         return res.data
     }
 
+    const channelQueryOptions = uuid => ({
+        key: ['channel', uuid],
+        staleTime: 3600000 // 1 hour, adjust as needed
+    })
+
     return {
         channels,
         channel,
@@ -294,6 +308,7 @@ export const useChannelStore = defineStore('channel', () => {
         confirmMediaPreviewUpload,
         confirmProjectPosterUpload,
         confirmChannelCoverUpload,
-        reportMedia
+        reportMedia,
+        channelQueryOptions
     }
 })
