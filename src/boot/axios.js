@@ -1,8 +1,9 @@
 import { boot } from 'quasar/wrappers'
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
-import { Notify, Loading } from 'quasar'
+import { Notify } from 'quasar'
 import { useAccountStore } from 'src/stores/account-store'
+import { useRequestLoading } from 'src/composables/useRequestLoading'
 import {
   getGlobalApiErrorMessage,
   getGlobalApiErrorPayload,
@@ -26,15 +27,7 @@ axiosRetry(api, {
 })
 
 export default boot(({ app, router }) => {
-  let pending = 0
-  const showLoader = () => {
-    if (pending === 0) Loading.show()
-    pending++
-  }
-  const hideLoader = () => {
-    pending = Math.max(0, pending - 1)
-    if (pending === 0) Loading.hide()
-  }
+  const { increment: showLoader, decrement: hideLoader } = useRequestLoading()
 
   api.interceptors.request.use(req => {
     const method = (req.method || '').toLowerCase()
