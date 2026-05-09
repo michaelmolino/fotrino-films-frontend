@@ -3,6 +3,10 @@ function asValidDate(val) {
   return Number.isNaN(d.getTime()) ? null : d
 }
 
+function getNestedValue(obj, path) {
+  return path.split('.').reduce((current, prop) => current?.[prop], obj)
+}
+
 export function sortBy(items, field, direction = 'desc') {
   const dir = direction === 'desc' ? -1 : 1
 
@@ -30,8 +34,8 @@ export function sortBy(items, field, direction = 'desc') {
 
   const list = Array.isArray(items) ? [...items] : []
   return list.sort((a, b) => {
-    const aValue = a?.[field]
-    const bValue = b?.[field]
+    const aValue = getNestedValue(a, field)
+    const bValue = getNestedValue(b, field)
 
     const nullCmp = compareNulls(aValue, bValue)
     if (nullCmp !== null) return nullCmp

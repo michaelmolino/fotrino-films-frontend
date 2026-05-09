@@ -1,10 +1,14 @@
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { api } from 'boot/axios'
 import { sortBy } from '@utils/sort.js'
 import { getGlobalApiErrorPayload } from 'src/utils/api-errors.js'
 import { fetchAndApplyGet } from 'src/stores/utils/fetch-and-apply.js'
 import { createRequestCanceler, isRequestCanceled } from 'src/stores/utils/request-canceler.js'
+
+// Sort functions - apply sorting transformations to data structures
+const sortChannels = (channels, field = 'title', direction = 'desc') =>
+    sortBy(channels, field, direction)
 
 const sortChannelDetail = channel => {
     if (!channel) return channel
@@ -15,8 +19,6 @@ const sortChannelDetail = channel => {
     return { ...channel, projects }
 }
 
-const sortChannelsByTitle = channels => sortBy(channels, 'title', 'desc')
-
 export const useChannelStore = defineStore('channel', () => {
     const channels = ref([])
     const channel = ref(null)
@@ -24,6 +26,14 @@ export const useChannelStore = defineStore('channel', () => {
     const upload = ref(null)
     const mediaToken = ref(null)
     const requestCanceler = createRequestCanceler()
+
+    // Computed property: returns all media across all projects, flattened and sorted
+    const sortedAllMedia = computed(() => {
+        if (!channel.value?.projects) return []
+        return channel.value.projects.flatMap(project =>
+            (project.media || []).map(media => ({ media, project }))
+        )
+    })
 
     const setChannelLoadStatus = status => {
         loadStatus.value = status
@@ -56,7 +66,10 @@ export const useChannelStore = defineStore('channel', () => {
         api,
         url: deep ? '/channels/deep' : '/channels',
         apply: setChannels,
-        extract: data => (deep ? sortChannelsByTitle(data).map(sortChannelDetail) : sortChannelsByTitle(data))
+        extract: data => {
+            const sorted = sortChannels(data)
+            return deep ? sorted.map(sortChannelDetail) : sorted
+        }
     })
 
     const resolveHistoryChannels = async items => {
@@ -257,6 +270,7 @@ export const useChannelStore = defineStore('channel', () => {
     return {
         channels,
         channel,
+        sortedAllMedia,
         loadStatus,
         upload,
         mediaToken,
