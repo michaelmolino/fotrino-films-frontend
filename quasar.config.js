@@ -13,7 +13,7 @@ const __dirname = path.dirname(__filename)
 
 export default defineConfig(() => ({
   supportTS: false,
-  boot: ['install-colada', 'resize-observer-patch', 'passive-events', 'axios'],
+  boot: ['install-colada', 'axios'],
   css: [],
   extras: ['material-icons'],
 
