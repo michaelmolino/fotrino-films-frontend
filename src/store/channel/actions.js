@@ -17,8 +17,8 @@ function isLatestRequest(requestKey, requestId) {
 // Helpers
 
 /**
- * @param {import('src/types/api-contract').ChannelDetail} channel
- * @returns {import('src/types/api-contract').ChannelDetail}
+ * @param {import('src/types/api-contract').ApiContracts['ChannelDetail']} channel
+ * @returns {import('src/types/api-contract').ApiContracts['ChannelDetail']}
  */
 function sortChannelDetail(channel) {
   if (!channel) return channel
@@ -30,8 +30,8 @@ function sortChannelDetail(channel) {
 }
 
 /**
- * @param {import('src/types/api-contract').ChannelSummary[] | import('src/types/api-contract').ChannelDetail[]} channels
- * @returns {import('src/types/api-contract').ChannelSummary[] | import('src/types/api-contract').ChannelDetail[]}
+ * @param {import('src/types/api-contract').ApiContracts['ChannelSummary'][] | import('src/types/api-contract').ApiContracts['ChannelDetail'][]} channels
+ * @returns {import('src/types/api-contract').ApiContracts['ChannelSummary'][] | import('src/types/api-contract').ApiContracts['ChannelDetail'][]}
  */
 function sortChannelsByTitle(channels) {
   return sortBy(channels, 'title', 'desc')
@@ -75,7 +75,7 @@ async function requestUploadInstruction(url) {
 /**
  * @param {import('vuex').ActionContext<any, any>} context
  * @param {boolean} [deep=false]
- * @returns {Promise<import('src/types/api-contract').ChannelSummary[] | import('src/types/api-contract').ChannelDetail[]>}
+ * @returns {Promise<import('src/types/api-contract').ApiContracts['ChannelSummary'][] | import('src/types/api-contract').ApiContracts['ChannelDetail'][]>}
  */
 export function getChannels(context, deep = false) {
   return fetchAndCommit(context, {
@@ -114,7 +114,7 @@ export async function resolveHistoryChannels(_, items = []) {
 /**
  * @param {import('vuex').ActionContext<any, any>} context
  * @param {{ uuid: string, pending?: boolean }} options
- * @returns {Promise<import('src/types/api-contract').ChannelDetail>}
+ * @returns {Promise<import('src/types/api-contract').ApiContracts['ChannelDetail']>}
  */
 export function getChannel(context, { uuid, pending = false }) {
   const url = `/channels/${uuid}${pending ? '?pending=true' : ''}`
@@ -128,7 +128,7 @@ export function getChannel(context, { uuid, pending = false }) {
 /**
  * @param {import('vuex').ActionContext<any, any>} context
  * @param {string} privateId
- * @returns {Promise<import('src/types/api-contract').PrivateMediaChannel>}
+ * @returns {Promise<import('src/types/api-contract').ApiContracts['PrivateMediaChannel']>}
  */
 export function getPrivateMedia(context, privateId) {
   return fetchAndCommit(context, {
@@ -141,7 +141,7 @@ export function getPrivateMedia(context, privateId) {
  * Raw fetch variant that does not mutate shared state.
  * @param {import('vuex').ActionContext<any, any>} _
  * @param {{ uuid: string, pending?: boolean }} options
- * @returns {Promise<import('src/types/api-contract').ChannelDetail>}
+ * @returns {Promise<import('src/types/api-contract').ApiContracts['ChannelDetail']>}
  */
 export async function fetchChannelRaw(_, { uuid, pending = false }) {
   const url = `/channels/${uuid}${pending ? '?pending=true' : ''}`
@@ -153,7 +153,7 @@ export async function fetchChannelRaw(_, { uuid, pending = false }) {
  * Raw fetch variant that does not mutate shared state.
  * @param {import('vuex').ActionContext<any, any>} _
  * @param {string} privateId
- * @returns {Promise<import('src/types/api-contract').PrivateMediaChannel>}
+ * @returns {Promise<import('src/types/api-contract').ApiContracts['PrivateMediaChannel']>}
  */
 export async function fetchPrivateMediaRaw(_, privateId) {
   const { data } = await api.get(`/channels/media/private/${privateId}`)
@@ -169,7 +169,7 @@ export function getMediaToken(context, privateId) {
   return fetchAndCommit(context, {
     url: `/channels/media/token/${privateId}`,
     mutation: 'SET_MEDIA_TOKEN',
-    /** @param {import('src/types/api-contract').MediaTokenResponse} data */
+    /** @param {import('src/types/api-contract').ApiContracts['MediaTokenResponse']} data */
     extract: data => data.token
   })
 }
@@ -198,8 +198,8 @@ export async function deleteResource(context, resource) {
 
 /**
  * @param {import('vuex').ActionContext<any, any>} context
- * @param {import('src/types/api-contract').UploadMediaRequest} payload
- * @returns {Promise<import('src/types/api-contract').UploadInstruction[]>}
+ * @param {import('src/types/api-contract').ApiContracts['UploadMediaRequest']} payload
+ * @returns {Promise<import('src/types/api-contract').ApiContracts['UploadInstruction'][]>}
  */
 export async function postUpload(context, payload) {
   try {
@@ -247,7 +247,7 @@ export function abortUpload(_, mediaId) {
 /**
  * @param {import('vuex').ActionContext<any, any>} _
  * @param {{ mediaId: number, description?: string | null, resourceDate?: string | null, main: boolean }} payload
- * @returns {Promise<import('src/types/api-contract').ChannelMedia>}
+ * @returns {Promise<import('src/types/api-contract').ApiContracts['ChannelMedia']>}
  */
 export async function updateMedia(_, { mediaId, description = null, resourceDate = null, main }) {
   try {
@@ -272,7 +272,7 @@ export async function updateMedia(_, { mediaId, description = null, resourceDate
 /**
  * @param {import('vuex').ActionContext<any, any>} _
  * @param {{ projectId: number, subtitle?: string | null, posterType: 'default' | 'new', posterColor?: string | null }} payload
- * @returns {Promise<import('src/types/api-contract').ChannelProject>}
+ * @returns {Promise<import('src/types/api-contract').ApiContracts['ChannelProject']>}
  */
 export async function updateProject(_, { projectId, subtitle = null, posterType, posterColor = null }) {
   try {
@@ -297,7 +297,7 @@ export async function updateProject(_, { projectId, subtitle = null, posterType,
 /**
  * @param {import('vuex').ActionContext<any, any>} _
  * @param {{ channelUuid: string, title: string }} payload
- * @returns {Promise<import('src/types/api-contract').ChannelSummary>}
+ * @returns {Promise<import('src/types/api-contract').ApiContracts['ChannelSummary']>}
  */
 export async function updateChannel(_, { channelUuid, title }) {
   try {
@@ -320,7 +320,7 @@ export async function updateChannel(_, { channelUuid, title }) {
 /**
  * @param {import('vuex').ActionContext<any, any>} _
  * @param {{ mediaId: number }} payload
- * @returns {Promise<import('src/types/api-contract').UploadInstruction & { objectName: string }}
+ * @returns {Promise<import('src/types/api-contract').ApiContracts['UploadInstruction'] & { objectName: string }}
  */
 export async function requestMediaPreviewUpload(_, { mediaId }) {
   return requestUploadInstruction(`/channels/media/${mediaId}/preview`)
@@ -329,7 +329,7 @@ export async function requestMediaPreviewUpload(_, { mediaId }) {
 /**
  * @param {import('vuex').ActionContext<any, any>} _
  * @param {{ projectId: number }} payload
- * @returns {Promise<import('src/types/api-contract').UploadInstruction & { objectName: string }}
+ * @returns {Promise<import('src/types/api-contract').ApiContracts['UploadInstruction'] & { objectName: string }}
  */
 export async function requestProjectPosterUpload(_, { projectId }) {
   return requestUploadInstruction(`/channels/project/${projectId}/poster`)
@@ -338,7 +338,7 @@ export async function requestProjectPosterUpload(_, { projectId }) {
 /**
  * @param {import('vuex').ActionContext<any, any>} _
  * @param {{ channelUuid: string }} payload
- * @returns {Promise<import('src/types/api-contract').UploadInstruction & { objectName: string }}
+ * @returns {Promise<import('src/types/api-contract').ApiContracts['UploadInstruction'] & { objectName: string }}
  */
 export async function requestChannelCoverUpload(_, { channelUuid }) {
   return requestUploadInstruction(`/channels/${channelUuid}/cover`)
@@ -399,7 +399,7 @@ export async function confirmChannelCoverUpload(_, { channelUuid, objectName, ti
 /**
  * @param {import('vuex').ActionContext<any, any>} _
  * @param {{ privateId: string, reason?: string | null }} payload
- * @returns {Promise<import('src/types/api-contract').ReportMediaResponse>}
+ * @returns {Promise<import('src/types/api-contract').ApiContracts['ReportMediaResponse']>}
  */
 export async function reportMedia(_, { privateId, reason }) {
   const res = await api.post(

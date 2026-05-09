@@ -217,7 +217,7 @@ const route = useRoute()
 const step = ref(1)
 const stepper = ref(null)
 const projects = ref([])
-/** @type {import('src/types/api-contract').UploadMediaRequest} */
+/** @type {import('src/types/api-contract').ApiContracts['UploadMediaRequest']} */
 function createInitialPayload() {
   return {
     uuid: null,

@@ -19,20 +19,20 @@ const DEFAULT_GLOBAL_API_ERROR_MESSAGES = {
 }
 
 /**
- * @typedef {import('src/types/api-contract').BadRequestErrorResponse |
- * import('src/types/api-contract').UnauthorizedErrorResponse |
- * import('src/types/api-contract').ForbiddenErrorResponse |
- * import('src/types/api-contract').NotFoundErrorResponse |
- * import('src/types/api-contract').ConflictErrorResponse |
- * import('src/types/api-contract').UnprocessableEntityErrorResponse |
- * import('src/types/api-contract').InternalServerErrorResponse} GlobalApiErrorResponse
+ * @typedef {import('src/types/api-contract').ApiContracts['BadRequestErrorResponse'] |
+ * import('src/types/api-contract').ApiContracts['UnauthorizedErrorResponse'] |
+ * import('src/types/api-contract').ApiContracts['ForbiddenErrorResponse'] |
+ * import('src/types/api-contract').ApiContracts['NotFoundErrorResponse'] |
+ * import('src/types/api-contract').ApiContracts['ConflictErrorResponse'] |
+ * import('src/types/api-contract').ApiContracts['UnprocessableEntityErrorResponse'] |
+ * import('src/types/api-contract').ApiContracts['InternalServerErrorResponse']} GlobalApiErrorResponse
  */
 
 /** @typedef {GlobalApiErrorResponse['error']} GlobalApiErrorCode */
 
 /**
- * @typedef {import('src/types/api-contract').ErrorDetailResponse |
- * import('src/types/api-contract').ErrorResponse} ComponentApiErrorResponse
+ * @typedef {import('src/types/api-contract').ApiContracts['ErrorDetailResponse'] |
+ * import('src/types/api-contract').ApiContracts['ErrorResponse']} ComponentApiErrorResponse
  */
 
 function isPlainObject(value) {
@@ -75,15 +75,15 @@ export function getComponentApiErrorPayload(error) {
     }
 
     if (Array.isArray(data.detail) && data.error === 'Invalid upload request') {
-        return /** @type {import('src/types/api-contract').UploadValidationErrorResponse} */ (data)
+        return /** @type {import('src/types/api-contract').ApiContracts['UploadValidationErrorResponse']} */ (data)
     }
 
     if (typeof data.detail === 'string' && data.error === 'Upload not complete') {
-        return /** @type {import('src/types/api-contract').UploadStorageConflictResponse} */ (data)
+        return /** @type {import('src/types/api-contract').ApiContracts['UploadStorageConflictResponse']} */ (data)
     }
 
     if (data.detail == null && !('status' in data)) {
-        return /** @type {import('src/types/api-contract').DeletionBlockedResponse} */ (data)
+        return /** @type {import('src/types/api-contract').ApiContracts['DeletionBlockedResponse']} */ (data)
     }
 
     return null

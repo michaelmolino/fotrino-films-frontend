@@ -20,7 +20,7 @@ async function fetchAndCommit(context, { url, mutation, extract }) {
 
 /**
  * @param {import('vuex').ActionContext<any, any>} context
- * @returns {Promise<import('src/types/api-contract').AccountProfile | null>}
+ * @returns {Promise<import('src/types/api-contract').ApiContracts['AccountProfile'] | null>}
  */
 export function getProfile(context) {
   return fetchAndCommit(context, {
@@ -31,13 +31,13 @@ export function getProfile(context) {
 
 /**
  * @param {import('vuex').ActionContext<any, any>} context
- * @returns {Promise<import('src/types/api-contract').OAuthProvider[]>}
+ * @returns {Promise<import('src/types/api-contract').ApiContracts['OAuthProvider'][]>}
  */
 export function getProviders(context) {
   return fetchAndCommit(context, {
     url: '/account/providers',
     mutation: 'SET_PROVIDERS',
-    /** @param {import('src/types/api-contract').AccountProvidersResponse} data */
+    /** @param {import('src/types/api-contract').ApiContracts['AccountProvidersResponse']} data */
     extract: data => data.providers
   })
 }

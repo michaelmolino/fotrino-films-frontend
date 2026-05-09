@@ -14,10 +14,6 @@ This project is actively being developed and is not yet ready for use.
 
 Note that I regularly delete the DB and content so please don't upload important files.
 
-## Architecture
-
-![Architecture](./architecture.png "Architecture")
-
 ### Frontend
 
 - The frontend is an [SPA](https://en.wikipedia.org/wiki/Single-page_application) built with [Quasar](https://quasar.dev/), a framework based on [Vue](https://vuejs.org/).
@@ -35,7 +31,7 @@ Note that I regularly delete the DB and content so please don't upload important
 
 - To avoid blocking backend threads with long-running uploads, files are uploaded directly to a private S3 bucket
  via [presigned URLs](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html).
-- Currently, uploads have a maximum file size limit and cannot be resumed. Multipart uploads will be implemented to solve this problem in the future.
+- Large diles are supported by multipart uploads.
 
 ### Media Processing
 
@@ -46,13 +42,14 @@ Note that I regularly delete the DB and content so please don't upload important
   - Transforming it to HLS using code based on Vincent Bernat's [video2hls](https://github.com/vincentbernat/video2hls) tool which itself uses [ffmpeg](https://ffmpeg.org/)
   - Uploading each segment back to the bucket
   - Publishing the media and sending a notification to the uploader.
-- If an error occurs, work is retried with an exponetial backoff. After exhausting retries, a [DLQ](https://en.wikipedia.org/wiki/Dead_letter_queue) message is created.
+- If an error occurs, work is retried with an exponetial backoff. After exhausting retries, a [DLQ](https://en.wikipedia.org/wiki/Dead_letter_queue) message is created for the Admin to remediate.
 
 ### Streaming
 
 - All media is served from a private bucket behind a global [CDN](https://www.cloudflare.com/en-gb/).
 - To request a video segment, a [JWT](https://en.wikipedia.org/wiki/JSON_Web_Token) (provided by the backend API) must be provided.
 - The JWT is validated by an [Edge Function](https://developers.cloudflare.com/workers/reference/how-workers-works/) which will either serve the segment from cache or add authentication headers and fetch the segment from the origin.
+- Airplay from iOS devices is natively supported.
 
 ### Testing
 
@@ -61,8 +58,6 @@ Note that I regularly delete the DB and content so please don't upload important
 ## Development
 
 [![Sonar Violations (short format)](https://img.shields.io/sonar/violations/michaelmolino_fotrino-films-frontend?label=sonar%20violations&server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge)](https://sonarcloud.io/dashboard?id=michaelmolino_fotrino-films-frontend)
-[![Lighthouse Performance](https://img.shields.io/badge/dynamic/json?color=blue&style=for-the-badge&label=Performance&query=lighthouseResult.categories.performance.score&url=https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=https://films.fotrino.com/9944fa03-8a73-4e52-84bc-e8a514bd1271/Sample-Channel/Nature/The-Endless-Ocean)](https://pagespeed.web.dev/analysis/https-films-fotrino-com-9944fa03-8a73-4e52-84bc-e8a514bd1271-Sample-Channel-Nature-Majestic-Mountains/qoi6uczygb?hl=en-GB&form_factor=mobile)
-[![Lighthouse Accessibility](https://img.shields.io/badge/dynamic/json?color=blue&style=for-the-badge&label=Accessibility&query=lighthouseResult.categories.accessibility.score&url=https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=https://films.fotrino.com/9944fa03-8a73-4e52-84bc-e8a514bd1271/Sample-Channel/Nature/The-Endless-Ocean)](https://pagespeed.web.dev/analysis/https-films-fotrino-com-9944fa03-8a73-4e52-84bc-e8a514bd1271-Sample-Channel-Nature-Majestic-Mountains/qoi6uczygb?hl=en-GB&form_factor=mobile)
 
 ### Dependencies
 
@@ -86,11 +81,3 @@ Frontend API contract types are generated from backend contract schemas.
 ```bash
 yarn generate:api-contracts
 ```
-
-This updates `src/types/api.generated.d.ts`. The public wrapper file `src/types/api-contract.d.ts`
-re-exports the generated types and keeps only the frontend-only helper types. Clean public contract
-aliases are generated automatically from the backend schema bundle, so new backend contract additions
-do not need handwritten wrapper aliases. The raw generator internals are kept behind an internal
-namespace in `src/types/api.generated.d.ts`, which keeps the public type surface free of helper names
-like `Id1` and `Created7`. Shared parsing for the backend's global error-handler payloads lives in
-`src/utils/api-errors.js` and is used by the axios client and Vuex store actions.

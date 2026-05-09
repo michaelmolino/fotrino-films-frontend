@@ -5,8 +5,8 @@ import { getGlobalApiErrorPayload, isGlobalApiError } from 'src/utils/api-errors
 // Helpers
 
 /**
- * @param {import('src/types/api-contract').AdminUser[]} users
- * @returns {import('src/types/api-contract').AdminUser[]}
+ * @param {import('src/types/api-contract').ApiContracts['AdminUser'][]} users
+ * @returns {import('src/types/api-contract').ApiContracts['AdminUser'][]}
  */
 function sortUsers(users) {
   const sortedUsers = sortBy(users, 'lastLogin', 'desc')
@@ -42,21 +42,21 @@ async function fetchAndCommit(context, { url, mutation, extract, skipGlobalError
 
 /**
  * @param {import('vuex').ActionContext<any, any>} context
- * @returns {Promise<import('src/types/api-contract').AdminUser[] | null>}
+ * @returns {Promise<import('src/types/api-contract').ApiContracts['AdminUser'][] | null>}
  */
 export function getAllUsers(context) {
   return fetchAndCommit(context, {
     url: '/admin/users',
     mutation: 'SET_USERS',
     skipGlobalErrorNotify: true,
-    /** @param {import('src/types/api-contract').AdminUsersResponse} data */
+    /** @param {import('src/types/api-contract').ApiContracts['AdminUsersResponse']} data */
     extract: data => sortUsers(data)
   })
 }
 
 /**
  * @param {import('vuex').ActionContext<any, any>} context
- * @returns {Promise<import('src/types/api-contract').DeadLetterQueueItem[] | null>}
+ * @returns {Promise<import('src/types/api-contract').ApiContracts['DeadLetterQueueItem'][] | null>}
  */
 export function getDLQ(context) {
   return fetchAndCommit(context, {
@@ -101,7 +101,7 @@ export async function deleteUser(context, userId) {
 
 /**
  * @param {import('vuex').ActionContext<any, any>} context
- * @returns {Promise<import('src/types/api-contract').ReportedMediaItem[] | null>}
+ * @returns {Promise<import('src/types/api-contract').ApiContracts['ReportedMediaItem'][] | null>}
  */
 export function getReportedMedia(context) {
   return fetchAndCommit(context, {
