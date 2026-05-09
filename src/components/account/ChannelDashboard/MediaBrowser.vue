@@ -23,12 +23,12 @@
 </template>
 
 <script setup>
-import { Notify } from 'quasar'
 import { useChannelStore } from 'src/stores/channel-store.js'
 import ChannelItem from './MediaBrowser/ChannelItem.vue'
 import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
 import { uploadPresignedFileWithUppy } from '@libs/uppy-upload.js'
 import { isPendingUploadLockedByAnotherTab } from '@utils/pendingUploadLocks.js'
+import { notifyError, notifySuccess, notifyWarning } from 'src/utils/notify.js'
 
 const channelStore = useChannelStore()
 const props = defineProps({
@@ -82,29 +82,17 @@ async function deleteResource(type, id) {
   try {
     const deleted = await channelStore.deleteResource({ type, id })
     if (deleted === false) return
-    Notify.create({
-      type: 'positive',
-      message: 'Deletion queued.',
-      icon: 'check',
-      timeout: 2000
-    })
+    notifySuccess('Deletion queued.')
   } catch (error) {
-    Notify.create({
-      type: 'negative',
-      message: getComponentApiErrorMessage(error, 'Unable to delete this resource.'),
-      icon: 'warning',
-      timeout: 0,
-      actions: [{ label: 'Dismiss', color: 'white' }]
+    notifyError(getComponentApiErrorMessage(error, 'Unable to delete this resource.'), {
+      timeout: 0
     })
   }
 }
 
 async function abortPendingMedia(mediaId) {
   if (isPendingUploadLockedByAnotherTab(mediaId)) {
-    Notify.create({
-      type: 'warning',
-      message: 'This upload is currently active in another tab. Cancel there first.',
-      icon: 'warning',
+    notifyWarning('This upload is currently active in another tab. Cancel there first.', {
       timeout: 3500
     })
     return
@@ -113,22 +101,13 @@ async function abortPendingMedia(mediaId) {
   try {
     await channelStore.abortUpload(mediaId)
     await channelStore.getChannels(true)
-    Notify.create({
-      type: 'positive',
-      message: 'Pending upload aborted.',
-      icon: 'check',
-      timeout: 2000
-    })
+    notifySuccess('Pending upload aborted.')
   } catch (error) {
     if (error?.__userCancelled || error?.code === 'ERR_CANCELED') {
       return
     }
-    Notify.create({
-      type: 'negative',
-      message: getComponentApiErrorMessage(error, 'Unable to abort this pending upload.'),
-      icon: 'warning',
-      timeout: 0,
-      actions: [{ label: 'Dismiss', color: 'white' }]
+    notifyError(getComponentApiErrorMessage(error, 'Unable to abort this pending upload.'), {
+      timeout: 0
     })
   }
 }
@@ -162,20 +141,9 @@ async function runEditJourney({
     }
 
     await channelStore.getChannels(true)
-    Notify.create({
-      type: 'positive',
-      message: successMessage,
-      icon: 'check',
-      timeout: 2000
-    })
+    notifySuccess(successMessage)
   } catch (error) {
-    Notify.create({
-      type: 'negative',
-      message: getComponentApiErrorMessage(error, errorMessage),
-      icon: 'warning',
-      timeout: 0,
-      actions: [{ label: 'Dismiss', color: 'white' }]
-    })
+    notifyError(getComponentApiErrorMessage(error, errorMessage), { timeout: 0 })
   }
 }
 

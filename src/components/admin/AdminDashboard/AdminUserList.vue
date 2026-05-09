@@ -148,11 +148,11 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { Notify } from 'quasar'
 import { useAdminStore } from 'src/stores/admin-store.js'
 import { daysSince } from '@utils/date.js'
 import { getCountry } from '@utils/countries.js'
 import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
+import { notifyError, notifySuccess } from 'src/utils/notify.js'
 import googleIcon from '@assets/icons/google.svg'
 import microsoftIcon from '@assets/icons/microsoft.svg'
 import facebookIcon from '@assets/icons/facebook.svg'
@@ -176,18 +176,10 @@ const deleteUser = async user => {
   try {
     const deleted = await adminStore.deleteUser(user.id)
     if (deleted === false) return
-    Notify.create({
-      type: 'positive',
-      message: `Deleted ${user.name}.`,
-      icon: 'check',
-      timeout: 2000
-    })
+    notifySuccess(`Deleted ${user.name}.`)
   } catch (err) {
     console.error('Failed to delete user:', err)
-    Notify.create({
-      type: 'negative',
-      message: getComponentApiErrorMessage(err, `Failed to delete ${user.name}.`),
-      icon: 'warning',
+    notifyError(getComponentApiErrorMessage(err, `Failed to delete ${user.name}.`), {
       timeout: 0
     })
   }
@@ -199,12 +191,7 @@ onMounted(async () => {
     await adminStore.getAllUsers()
   } catch (err) {
     console.error('Failed to load users:', err)
-    Notify.create({
-      type: 'negative',
-      message: getComponentApiErrorMessage(err, 'Failed to load users.'),
-      icon: 'warning',
-      timeout: 0
-    })
+    notifyError(getComponentApiErrorMessage(err, 'Failed to load users.'), { timeout: 0 })
   } finally {
     loading.value = false
   }

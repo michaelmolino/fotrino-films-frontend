@@ -1,7 +1,7 @@
 import { ref } from 'vue'
-import { Notify } from 'quasar'
 import imageCompression from 'browser-image-compression'
 import imageCompressionLibUrl from 'browser-image-compression/dist/browser-image-compression.js?url'
+import { notifyError } from 'src/utils/notify.js'
 
 async function compressImage(file) {
   const options = {
@@ -259,11 +259,7 @@ export function useFileProcessor() {
       // keep original file but mark processing false and notify user
       markProcessing(resourceType, false)
       console.error('Error processing file:', error)
-      Notify.create({
-        type: 'negative',
-        message: 'Error processing image. Using original file.',
-        timeout: 5000
-      })
+      notifyError('Error processing image. Using original file.', { timeout: 5000 })
       return file
     }
   }

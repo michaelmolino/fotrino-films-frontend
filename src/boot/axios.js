@@ -1,9 +1,9 @@
 import { boot } from 'quasar/wrappers'
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
-import { Notify } from 'quasar'
 import { useAccountStore } from 'src/stores/account-store'
 import { useRequestLoading } from 'src/composables/useRequestLoading'
+import { confirmDestructiveAction, notifyError } from 'src/utils/notify.js'
 import {
   getGlobalApiErrorMessage,
   getGlobalApiErrorPayload,
@@ -42,39 +42,19 @@ export default boot(({ app, router }) => {
 
     // Confirm destructive action
     if (method === 'delete') {
-      return new Promise((resolve, reject) => {
-        Notify.create({
-          type: 'negative',
-          timeout: 0,
-          message: 'This is a destructive action. Are you sure you want to continue?',
-          position: 'center',
-          icon: 'info',
-          multiLine: true,
-          actions: [
-            {
-              icon: 'error',
-              label: 'Confirm delete',
-              color: 'white',
-              'data-cy': 'confirm-delete',
-              handler: () => {
-                showLoader()
-                resolve(req)
-              }
-            },
-            {
-              icon: 'undo',
-              label: 'Go Back',
-              color: 'white',
-              'data-cy': 'cancel-delete',
-              handler: () => {
-                const err = new Error('User cancelled delete')
-                err.__userCancelled = true
-                err.code = 'ERR_CANCELED'
-                reject(err)
-              }
-            }
-          ]
-        })
+      return confirmDestructiveAction({
+        confirmAction: { 'data-cy': 'confirm-delete' },
+        cancelAction: { 'data-cy': 'cancel-delete' }
+      }).then(confirmed => {
+        if (!confirmed) {
+          const err = new Error('User cancelled delete')
+          err.__userCancelled = true
+          err.code = 'ERR_CANCELED'
+          throw err
+        }
+
+        showLoader()
+        return req
       })
     }
 
@@ -110,13 +90,7 @@ export default boot(({ app, router }) => {
       }
 
       if (!skipNotify) {
-        Notify.create({
-          type: 'negative',
-          timeout: timeout,
-          message: msg,
-          icon: 'warning',
-          actions: timeout === 0 ? [{ label: 'Dismiss', color: 'white' }] : []
-        })
+        notifyError(msg, { timeout })
       }
 
       if (
