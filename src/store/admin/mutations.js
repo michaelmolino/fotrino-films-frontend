@@ -1,11 +1,4 @@
 export function SET_USERS(state, users) {
-  if (Array.isArray(users)) {
-    for (const user of users) {
-      if (!user.avatar) {
-        user.avatar = '/images/profile.png'
-      }
-    }
-  }
   state.users = users
 }
 
