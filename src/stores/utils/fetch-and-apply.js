@@ -25,12 +25,17 @@ export const fetchAndApplyGet = async ({
     let value
 
     if (cache) {
-      // Use Pinia Colada cache
       const { queryOptions, queryCache } = cache
-      // Make the API call
+      // Try to get from cache first
+      const cached = queryCache.getQueryData(queryOptions.key)
+      if (cached !== undefined && cached !== null) {
+        value = cached
+        apply(value)
+        return value
+      }
+      // Not in cache, fetch from API
       const { data } = await api.get(url, requestConfig)
       value = extract ? extract(data) : data
-      // Update Colada cache with the result
       queryCache.setQueryData(queryOptions.key, value)
     } else {
       // Regular fetch without cache
