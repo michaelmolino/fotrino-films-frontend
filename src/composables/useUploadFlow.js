@@ -72,7 +72,7 @@ function buildUploadItems(uploadFiles, uploadInstructions) {
 }
 
 export function useUploadFlow({
-    store,
+    channelStore,
     payload,
     stepper,
     uploadFiles
@@ -123,7 +123,7 @@ export function useUploadFlow({
         isUploading.value = true
 
         try {
-            const uploadInstructions = await store.dispatch('channel/postUpload', payload)
+            const uploadInstructions = await channelStore.postUpload(payload)
 
             // Allow any in-flight reactive updates to settle before reading uploadFiles.
             await nextTick()
@@ -146,7 +146,7 @@ export function useUploadFlow({
             if (confirmMediaRef == null) {
                 throw new Error('Upload completed without a media reference. Confirm step aborted.')
             }
-            await store.dispatch('channel/confirmUpload', confirmMediaRef)
+            await channelStore.confirmUpload(confirmMediaRef)
 
             statusText.value = 'Upload complete!'
             stepper.value?.next()
@@ -177,7 +177,7 @@ export function useUploadFlow({
         statusText.value = 'Upload cancelled.'
 
         if (mediaRef != null) {
-            store.dispatch('channel/abortUpload', mediaRef).catch(err => {
+            channelStore.abortUpload(mediaRef).catch(err => {
                 console.warn('Failed to abort pending upload on cancel:', err)
             })
         }

@@ -149,7 +149,7 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { Notify } from 'quasar'
-import { useStore } from 'vuex'
+import { useAdminStore } from 'src/stores/admin-store.js'
 import { daysSince } from '@utils/date.js'
 import { getCountry } from '@utils/countries.js'
 import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
@@ -160,9 +160,9 @@ import githubIcon from '@assets/icons/github.svg'
 import appleIcon from '@assets/icons/apple.svg'
 import yahooIcon from '@assets/icons/yahoo.svg'
 
-const store = useStore()
+const adminStore = useAdminStore()
 const loading = ref(true)
-const users = computed(() => store.state.admin.users || [])
+const users = computed(() => adminStore.users || [])
 const providerIcons = {
   google: `img:${googleIcon}`,
   microsoft: `img:${microsoftIcon}`,
@@ -174,7 +174,7 @@ const providerIcons = {
 
 const deleteUser = async user => {
   try {
-    const deleted = await store.dispatch('admin/deleteUser', user.id)
+    const deleted = await adminStore.deleteUser(user.id)
     if (deleted === false) return
     Notify.create({
       type: 'positive',
@@ -196,7 +196,7 @@ const deleteUser = async user => {
 onMounted(async () => {
   loading.value = true
   try {
-    await store.dispatch('admin/getAllUsers')
+    await adminStore.getAllUsers()
   } catch (err) {
     console.error('Failed to load users:', err)
     Notify.create({

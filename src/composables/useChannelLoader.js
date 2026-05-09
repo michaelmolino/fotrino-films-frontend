@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { useStore } from 'vuex'
+import { useChannelStore } from 'src/stores/channel-store.js'
 import { useRouter } from 'vue-router'
 import { useMeta } from 'quasar'
 import { getMetaData } from '@utils/meta.js'
@@ -11,7 +11,7 @@ import { addPrivateHistory } from '@utils/history.js'
  * @returns {Object} - Object with loadChannel method and metaData ref
  */
 export function useChannelLoader() {
-  const store = useStore()
+  const channelStore = useChannelStore()
   const router = useRouter()
   const metaData = ref(getMetaData(null, null))
   const loadVersion = ref(0)
@@ -28,24 +28,24 @@ export function useChannelLoader() {
     const requestVersion = ++loadVersion.value
     const isStale = () => requestVersion !== loadVersion.value
 
-    store.commit('channel/SET_CHANNEL_LOAD_STATUS', 'loading')
+    channelStore.setChannelLoadStatus('loading')
 
     try {
       let channel = null
 
       if (route.params?.uuid) {
-        channel = await store.cache.dispatch('channel/fetchChannelRaw', {
+        channel = await channelStore.fetchChannelRaw({
           uuid: route.params.uuid
         })
       } else if (route.params?.privateId) {
-        channel = await store.cache.dispatch('channel/fetchPrivateMediaRaw', route.params.privateId)
+        channel = await channelStore.fetchPrivateMediaRaw(route.params.privateId)
       }
 
       if (isStale()) {
         return null
       }
 
-      store.commit('channel/SET_CHANNEL', channel)
+      channelStore.setChannel(channel)
 
       if (route.params?.privateId && channel) {
         addPrivateHistory(route.params.privateId, {
@@ -62,15 +62,15 @@ export function useChannelLoader() {
       }
 
       metaData.value = getMetaData(route, channel)
-      store.commit('channel/SET_CHANNEL_LOAD_STATUS', 'success')
+      channelStore.setChannelLoadStatus('success')
       return channel
     } catch (error) {
       if (isStale()) {
         return null
       }
 
-      store.commit('channel/SET_CHANNEL', null)
-      store.commit('channel/SET_CHANNEL_LOAD_STATUS', 'error')
+      channelStore.setChannel(null)
+      channelStore.setChannelLoadStatus('error')
       metaData.value = getMetaData(null, null)
       console.error('Failed to load channel:', error)
       return null

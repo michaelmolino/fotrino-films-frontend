@@ -2,6 +2,7 @@ import { boot } from 'quasar/wrappers'
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
 import { Notify, Loading } from 'quasar'
+import { useAccountStore } from 'src/stores/account-store'
 import {
   getGlobalApiErrorMessage,
   getGlobalApiErrorPayload,
@@ -24,11 +25,7 @@ axiosRetry(api, {
   retryCondition: shouldRetryApi
 })
 
-export default boot(({ app, router, store }) => {
-  // Access the store reliably even if not passed in boot context
-  // This feels like a hack; ideally Quasar should do this
-  const getStore = () => app?.config?.globalProperties?.$store || store
-
+export default boot(({ app, router }) => {
   let pending = 0
   const showLoader = () => {
     if (pending === 0) Loading.show()
@@ -44,8 +41,7 @@ export default boot(({ app, router, store }) => {
 
     // Attach CSRF only when available and required
     if (['post', 'put', 'delete'].includes(method)) {
-      const s = getStore()
-      const token = s?.state?.account?.profile?.csrfToken
+      const token = useAccountStore()?.profile?.csrfToken
       if (token) {
         req.headers['X-CSRFToken'] = token
       }

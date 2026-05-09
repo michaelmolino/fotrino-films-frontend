@@ -51,11 +51,11 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { Notify } from 'quasar'
-import { useStore } from 'vuex'
+import { useAdminStore } from 'src/stores/admin-store.js'
 import { daysSince } from '@utils/date.js'
 import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
 
-const store = useStore()
+const adminStore = useAdminStore()
 const loading = ref(true)
 const reportedMediaColumns = [
   { name: 'createdAt', label: 'Reported', field: 'createdAt', align: 'left' },
@@ -66,7 +66,7 @@ const reportedMediaColumns = [
 ]
 const flattenedReportedMediaRows = computed(() => {
   const rows = []
-  const reported = store.state.admin.reportedMedia || []
+  const reported = adminStore.reportedMedia || []
   for (const media of reported) {
     const reports = media.reports || []
     let idx = 0
@@ -90,7 +90,7 @@ const flattenedReportedMediaRows = computed(() => {
 async function fetchReportedMedia() {
   loading.value = true
   try {
-    await store.dispatch('admin/getReportedMedia')
+    await adminStore.getReportedMedia()
   } catch (err) {
     console.error('Failed to fetch reported media:', err)
     Notify.create({
@@ -106,7 +106,7 @@ async function fetchReportedMedia() {
 
 async function deleteMedia(privateId) {
   try {
-    await store.dispatch('admin/deleteMedia', privateId)
+    await adminStore.deleteMedia(privateId)
     Notify.create({
       type: 'positive',
       message: 'Reported media deleted.',

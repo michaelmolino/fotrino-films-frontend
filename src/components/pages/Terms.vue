@@ -190,15 +190,14 @@
 defineOptions({ name: 'Terms-Page' })
 
 import { ref, onMounted } from 'vue'
-import { useStore } from 'vuex'
+import { useAccountStore } from 'src/stores/account-store.js'
 
-const store = useStore()
+const accountStore = useAccountStore()
 
 const oAuthProviders = ref([])
 
 onMounted(async () => {
-  const providers = await store.cache.dispatch('account/getProviders')
-  store.commit('account/SET_PROVIDERS', providers)
+  const providers = await accountStore.getProviders()
   oAuthProviders.value = providers
 })
 </script>

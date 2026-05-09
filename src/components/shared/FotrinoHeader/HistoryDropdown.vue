@@ -36,7 +36,7 @@
 <script setup>
 import { onBeforeUnmount, onMounted } from 'vue'
 import { Notify } from 'quasar'
-import { useStore } from 'vuex'
+import { useChannelStore } from 'src/stores/channel-store.js'
 import {
   historyChannels,
   watchChannelHistory,
@@ -44,8 +44,8 @@ import {
   resolveHistoryFromBackend
 } from '@utils/history.js'
 
-const $store = useStore()
-const stopWatchingHistory = watchChannelHistory($store)
+const channelStore = useChannelStore()
+const stopWatchingHistory = watchChannelHistory(channelStore)
 
 onBeforeUnmount(() => {
   if (typeof stopWatchingHistory === 'function') {
@@ -54,7 +54,7 @@ onBeforeUnmount(() => {
 })
 
 onMounted(async () => {
-  const result = await resolveHistoryFromBackend($store)
+  const result = await resolveHistoryFromBackend(channelStore)
   const removedCount = result?.deletedUuids?.length || 0
 
   if (removedCount > 0) {

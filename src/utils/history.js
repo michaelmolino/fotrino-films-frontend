@@ -119,7 +119,7 @@ export function removeHistory(uuid) {
   historyChannels.value = historyChannels.value.filter(item => item.uuid !== uuid)
 }
 
-export async function resolveHistoryFromBackend(store, { force = false } = {}) {
+export async function resolveHistoryFromBackend(channelStore, { force = false } = {}) {
   if (hasResolvedHistory && !force) {
     return { channels: historyChannels.value, deletedUuids: [] }
   }
@@ -138,7 +138,7 @@ export async function resolveHistoryFromBackend(store, { force = false } = {}) {
     }
 
     try {
-      const response = await store.dispatch('channel/resolveHistoryChannels', entries)
+      const response = await channelStore.resolveHistoryChannels(entries)
       const items = Array.isArray(response?.items) ? response.items : []
       const deletedUuids = Array.isArray(response?.deletedUuids) ? response.deletedUuids : []
 
@@ -182,9 +182,9 @@ export async function resolveHistoryFromBackend(store, { force = false } = {}) {
   }
 }
 
-export function watchChannelHistory(store) {
+export function watchChannelHistory(channelStore) {
   return watch(
-    () => store.state.channel.channel,
+    () => channelStore.channel,
     newChannel => {
       if (newChannel?.uuid) {
         addHistory(newChannel)

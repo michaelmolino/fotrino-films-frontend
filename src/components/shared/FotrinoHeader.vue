@@ -14,7 +14,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useStore } from 'vuex'
+import { useAccountStore } from 'src/stores/account-store.js'
 
 import LogoBranding from './FotrinoHeader/LogoBranding.vue'
 import HistoryDropdown from './FotrinoHeader/HistoryDropdown.vue'
@@ -22,6 +22,6 @@ import DarkModeDropdown from './FotrinoHeader/DarkModeDropdown.vue'
 import LoginDropdown from './FotrinoHeader/LoginDropdown.vue'
 import AccountDropdown from './FotrinoHeader/AccountDropdown.vue'
 
-const store = useStore()
-const profile = computed(() => store.state.account?.profile || null)
+const accountStore = useAccountStore()
+const profile = computed(() => accountStore.profile || null)
 </script>

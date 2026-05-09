@@ -15,13 +15,13 @@
 
 <script setup>
 import { ref, watch, defineAsyncComponent, onMounted } from 'vue'
-import { useStore } from 'vuex'
+import { useAccountStore } from 'src/stores/account-store.js'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
 
 const Terms = defineAsyncComponent(() => import('@components/pages/Terms.vue'))
 
-const store = useStore()
+const accountStore = useAccountStore()
 const route = useRoute()
 const router = useRouter()
 const { loadChannel } = useChannelLoader()
@@ -34,7 +34,7 @@ onMounted(async () => {
       'WARNING: This is a development server and should not be exposed to the internet.'
     )
   }
-  await store.dispatch('account/getProfile')
+  await accountStore.getProfile()
   showTerms.value = route.query?.showTerms?.toLowerCase() === 'true'
   await loadChannel(route)
 })

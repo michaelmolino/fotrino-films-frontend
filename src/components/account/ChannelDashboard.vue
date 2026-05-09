@@ -11,17 +11,19 @@
 
 <script setup>
 import { computed, onMounted } from 'vue'
-import { useStore } from 'vuex'
+import { useAccountStore } from 'src/stores/account-store.js'
+import { useChannelStore } from 'src/stores/channel-store.js'
 import ProfileCard from '@components/account/ChannelDashboard/ProfileCard.vue'
 import MediaBrowser from '@components/account/ChannelDashboard/MediaBrowser.vue'
 import NothingText from '@components/shared/NothingText.vue'
 import AuthRequired from '@components/shared/AuthRequired.vue'
 import { getGlobalApiErrorPayload } from 'src/utils/api-errors.js'
 
-const store = useStore()
+const accountStore = useAccountStore()
+const channelStore = useChannelStore()
 
-const profile = computed(() => store.state.account.profile)
-const channels = computed(() => store.state.channel.channels || [])
+const profile = computed(() => accountStore.profile)
+const channels = computed(() => channelStore.channels || [])
 const hasChannels = computed(() => channels.value.length > 0)
 const mediaCount = computed(() =>
   channels.value.reduce((total, ch) => {
@@ -35,7 +37,7 @@ const mediaCount = computed(() =>
 
 onMounted(async () => {
   try {
-    await store.dispatch('channel/getChannels', true)
+    await channelStore.getChannels(true)
   } catch (error) {
     const apiError = getGlobalApiErrorPayload(error)
     console.debug('Dashboard API call failed:', apiError?.error || error?.response?.status)

@@ -46,7 +46,7 @@
     </div>
     <div style="max-width: 220px; margin: 0 auto; width: 100%" class="row">
       <q-btn
-        @click="logout(store)"
+        @click="logout(accountStore)"
         align="left"
         flat
         no-caps
@@ -61,13 +61,13 @@
 </template>
 
 <script setup>
-import { useStore } from 'vuex'
+import { useAccountStore } from 'src/stores/account-store.js'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { logout } from '@utils/auth.js'
 
 const $q = useQuasar()
-const store = useStore()
+const accountStore = useAccountStore()
 const router = useRouter()
 
 function goToUpload() {

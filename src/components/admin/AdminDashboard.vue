@@ -13,14 +13,14 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useStore } from 'vuex'
+import { useAccountStore } from 'src/stores/account-store.js'
 import AdminUserList from './AdminDashboard/AdminUserList.vue'
 import AdminDLQ from './AdminDashboard/AdminDLQ.vue'
 import AdminReportedMedia from './AdminDashboard/AdminReportedMedia.vue'
 import AuthRequired from '@components/shared/AuthRequired.vue'
 
-const store = useStore()
-const profile = computed(() => store.state.account.profile)
+const accountStore = useAccountStore()
+const profile = computed(() => accountStore.profile)
 const isAuthenticated = computed(() => !!profile.value?.id)
 const isAdmin = computed(() => profile.value?.isAdmin === true)
 </script>

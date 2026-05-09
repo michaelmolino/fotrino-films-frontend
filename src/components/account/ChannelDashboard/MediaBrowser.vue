@@ -24,13 +24,13 @@
 
 <script setup>
 import { Notify } from 'quasar'
-import { useStore } from 'vuex'
+import { useChannelStore } from 'src/stores/channel-store.js'
 import ChannelItem from './MediaBrowser/ChannelItem.vue'
 import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
 import { uploadPresignedFileWithUppy } from '@libs/uppy-upload.js'
 import { isPendingUploadLockedByAnotherTab } from '@utils/pendingUploadLocks.js'
 
-const store = useStore()
+const channelStore = useChannelStore()
 const props = defineProps({
   channels: { type: Array, default: () => [] }
 })
@@ -80,7 +80,7 @@ function getMediaItemLink(channels, id) {
 
 async function deleteResource(type, id) {
   try {
-    const deleted = await store.dispatch('channel/deleteResource', { type, id })
+    const deleted = await channelStore.deleteResource({ type, id })
     if (deleted === false) return
     Notify.create({
       type: 'positive',
@@ -111,8 +111,8 @@ async function abortPendingMedia(mediaId) {
   }
 
   try {
-    await store.dispatch('channel/abortUpload', mediaId)
-    await store.dispatch('channel/getChannels', true)
+    await channelStore.abortUpload(mediaId)
+    await channelStore.getChannels(true)
     Notify.create({
       type: 'positive',
       message: 'Pending upload aborted.',
@@ -134,7 +134,7 @@ async function abortPendingMedia(mediaId) {
 }
 
 async function runEditJourney({
-  updateAction,
+  update,
   updatePayload,
   upload = null,
   successMessage,
@@ -142,7 +142,7 @@ async function runEditJourney({
 }) {
   try {
     if (upload?.shouldUpload) {
-      const instruction = await store.dispatch(upload.prepareAction, upload.preparePayload)
+      const instruction = await upload.prepare(upload.preparePayload)
       if (!instruction?.url || !instruction?.objectName) {
         throw new Error('Invalid upload instruction returned by backend.')
       }
@@ -152,16 +152,16 @@ async function runEditJourney({
         resourceType: instruction.resourceType || 'upload'
       })
       // Confirm + metadata update atomically in one backend call
-      await store.dispatch(upload.confirmAction, {
+      await upload.confirm({
         ...upload.confirmPayload,
         ...updatePayload,
         objectName: instruction.objectName
       })
     } else {
-      await store.dispatch(updateAction, updatePayload)
+      await update(updatePayload)
     }
 
-    await store.dispatch('channel/getChannels', true)
+    await channelStore.getChannels(true)
     Notify.create({
       type: 'positive',
       message: successMessage,
@@ -181,7 +181,7 @@ async function runEditJourney({
 
 async function saveMediaEdit(payload) {
   return runEditJourney({
-    updateAction: 'channel/updateMedia',
+    update: channelStore.updateMedia,
     updatePayload: {
       mediaId: payload?.id,
       description: payload?.description ?? null,
@@ -190,12 +190,12 @@ async function saveMediaEdit(payload) {
     },
     upload: {
       shouldUpload: !!payload?.previewFile,
-      prepareAction: 'channel/requestMediaPreviewUpload',
+      prepare: channelStore.requestMediaPreviewUpload,
       preparePayload: {
         mediaId: payload?.id
       },
       file: payload?.previewFile,
-      confirmAction: 'channel/confirmMediaPreviewUpload',
+      confirm: channelStore.confirmMediaPreviewUpload,
       confirmPayload: {
         mediaId: payload?.id,
       }
@@ -207,7 +207,7 @@ async function saveMediaEdit(payload) {
 
 async function saveProjectEdit(payload) {
   return runEditJourney({
-    updateAction: 'channel/updateProject',
+    update: channelStore.updateProject,
     updatePayload: {
       projectId: payload?.id,
       subtitle: payload?.subtitle ?? null,
@@ -216,12 +216,12 @@ async function saveProjectEdit(payload) {
     },
     upload: {
       shouldUpload: payload?.posterType === 'new' && !!payload?.posterFile,
-      prepareAction: 'channel/requestProjectPosterUpload',
+      prepare: channelStore.requestProjectPosterUpload,
       preparePayload: {
         projectId: payload?.id
       },
       file: payload?.posterFile,
-      confirmAction: 'channel/confirmProjectPosterUpload',
+      confirm: channelStore.confirmProjectPosterUpload,
       confirmPayload: {
         projectId: payload?.id,
       }
@@ -233,19 +233,19 @@ async function saveProjectEdit(payload) {
 
 async function saveChannelEdit(payload) {
   return runEditJourney({
-    updateAction: 'channel/updateChannel',
+    update: channelStore.updateChannel,
     updatePayload: {
       channelUuid: payload?.channelUuid,
       title: payload?.title
     },
     upload: {
       shouldUpload: !!payload?.coverFile,
-      prepareAction: 'channel/requestChannelCoverUpload',
+      prepare: channelStore.requestChannelCoverUpload,
       preparePayload: {
         channelUuid: payload?.channelUuid
       },
       file: payload?.coverFile,
-      confirmAction: 'channel/confirmChannelCoverUpload',
+      confirm: channelStore.confirmChannelCoverUpload,
       confirmPayload: {
         channelUuid: payload?.channelUuid,
       }

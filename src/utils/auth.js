@@ -3,7 +3,7 @@ import { LocalStorage } from 'quasar'
 const REDIRECT_KEY = 'fotrino-films-redirect'
 
 export async function logout(store) {
-  await store.dispatch('account/logout')
+  await store.logout()
 }
 
 export function storeRedirect() {

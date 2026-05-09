@@ -93,7 +93,7 @@ import { useRoute } from 'vue-router'
 import { Notify, copyToClipboard } from 'quasar'
 import { sanitizeHtml } from '@utils/text.js'
 import { daysSince } from '@utils/date.js'
-import { useStore } from 'vuex'
+import { useChannelStore } from 'src/stores/channel-store.js'
 import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
 
 const props = defineProps({
@@ -111,7 +111,7 @@ const descriptionSafe = computed(() => sanitizeHtml(props.media?.descriptionUnsa
 const reportDialog = ref(false)
 const reason = ref('')
 const submitting = ref(false)
-const store = useStore()
+const channelStore = useChannelStore()
 
 function openReportDialog() {
   if (!props.media?.privateId) return
@@ -122,7 +122,7 @@ async function submitReport() {
   if (!props.media?.privateId) return
   submitting.value = true
   try {
-    const res = await store.dispatch('channel/reportMedia', {
+    const res = await channelStore.reportMedia({
       privateId: props.media.privateId,
       reason: reason.value
     })

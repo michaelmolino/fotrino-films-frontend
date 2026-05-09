@@ -1,5 +1,5 @@
 import { markRaw, reactive, ref, shallowRef } from 'vue'
-import { useStore } from 'vuex'
+import { useAccountStore } from 'src/stores/account-store.js'
 import { createPresignedUppyClient } from '@libs/uppy-upload.js'
 
 /**
@@ -9,7 +9,7 @@ import { createPresignedUppyClient } from '@libs/uppy-upload.js'
  * @returns {Object} uppy instance, methods, progress, statusText, and state
  */
 export function useUppyPresignedUpload() {
-    const store = useStore()
+    const accountStore = useAccountStore()
     const progress = ref(0)
     const statusText = ref(null)
     const uppy = shallowRef(null)
@@ -74,7 +74,7 @@ export function useUppyPresignedUpload() {
         const nextClient = createPresignedUppyClient({
             id: 'presigned-uploader',
             instructions,
-            getCsrfToken: () => store?.state?.account?.profile?.csrfToken || '',
+            getCsrfToken: () => accountStore?.profile?.csrfToken || '',
             onProgress: (file, progressData) => {
                 if (!file?.id || !progressData) {
                     return

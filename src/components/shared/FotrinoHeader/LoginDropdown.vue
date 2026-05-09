@@ -29,7 +29,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useStore } from 'vuex'
+import { useAccountStore } from 'src/stores/account-store.js'
 import { useQuasar } from 'quasar'
 import { storeRedirect } from '@utils/auth.js'
 import googleIcon from '@assets/icons/google.svg'
@@ -40,12 +40,11 @@ import appleIcon from '@assets/icons/apple.svg'
 import yahooIcon from '@assets/icons/yahoo.svg'
 
 const $q = useQuasar()
-const store = useStore()
+const accountStore = useAccountStore()
 const oauthProviders = ref([])
 
 onMounted(async () => {
-  const providers = await store.cache.dispatch('account/getProviders')
-  store.commit('account/SET_PROVIDERS', providers)
+  const providers = await accountStore.getProviders()
   const providerMap = {
     google: {
       name: 'Google',

@@ -199,7 +199,8 @@
 
 <script setup>
 import { ref, reactive, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import { useStore } from 'vuex'
+import { useAccountStore } from 'src/stores/account-store.js'
+import { useChannelStore } from 'src/stores/channel-store.js'
 import { onBeforeRouteLeave, useRoute } from 'vue-router'
 import ChannelStep from './UploadMedia/ChannelStep.vue'
 import ProjectStep from './UploadMedia/ProjectStep.vue'
@@ -212,7 +213,8 @@ import { useFileProcessor } from '@composables/useFileProcessor.js'
 import { useUploadFlow } from '@composables/useUploadFlow.js'
 
 // refs & reactive state
-const store = useStore()
+const accountStore = useAccountStore()
+const channelStore = useChannelStore()
 const route = useRoute()
 const step = ref(1)
 const stepper = ref(null)
@@ -259,7 +261,7 @@ const {
   disposeFrameSession
 } = useFileProcessor()
 const { factoryUpload, cancel: cancelUpload, progress, statusText, isUploading } = useUploadFlow({
-  store,
+  channelStore,
   payload,
   stepper,
   uploadFiles
@@ -445,8 +447,8 @@ function resetUploadFlow() {
 }
 
 // computed
-const profile = computed(() => store.state.account.profile)
-const channels = computed(() => store.state.channel.channels)
+const profile = computed(() => accountStore.profile)
+const channels = computed(() => channelStore.channels)
 
 const project = computed(() => {
   // If selecting an existing project, return it from the list
@@ -544,7 +546,7 @@ async function quickUpload() {
     // Resolve projects if channel exists
     projects.value = []
     if (payload.uuid && payload.uuid.value && payload.uuid.value !== 0) {
-      const chan = await store.cache.dispatch('channel/getChannel', {
+      const chan = await channelStore.getChannel({
         uuid: payload.uuid.value,
         pending: true
       })
@@ -746,7 +748,7 @@ watch(
 // lifecycle
 async function loadProjectsForChannelUuid(uuid, requestToken = projectsLoadToken.value) {
   try {
-    const chan = await store.cache.dispatch('channel/getChannel', { uuid, pending: true })
+    const chan = await channelStore.getChannel({ uuid, pending: true })
     if (requestToken !== projectsLoadToken.value) return
     projects.value = chan?.projects || []
   } catch (err) {
@@ -768,8 +770,8 @@ const beforeUnloadHandler = event => {
 }
 
 onMounted(async () => {
-  await store.dispatch('channel/getChannels')
-  const list = store.state.channel.channels || []
+  await channelStore.getChannels()
+  const list = channelStore.channels || []
   if (list.length === 1) {
     const requestToken = ++projectsLoadToken.value
     await loadProjectsForChannelUuid(list[0].uuid, requestToken)

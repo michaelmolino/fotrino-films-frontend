@@ -33,7 +33,7 @@
 
 <script setup>
 import { computed, onMounted, onBeforeUnmount, watch, ref, nextTick } from 'vue'
-import { useStore } from 'vuex'
+import { useChannelStore } from 'src/stores/channel-store.js'
 import Hls from 'hls.js'
 import 'plyr/dist/plyr.css'
 import { addPreconnectForUrl, addPreloadImageOnce } from '@utils/preconnect'
@@ -44,7 +44,7 @@ const props = defineProps({
   artist: String
 })
 
-const store = useStore()
+const channelStore = useChannelStore()
 const player = ref(null)
 const hls = ref(null)
 let playHandler = null
@@ -74,7 +74,7 @@ async function refreshAudioPreviewSource() {
 
 async function fetchMediaToken() {
   if (!props.media?.privateId) return null
-  return await store.dispatch('channel/getMediaToken', props.media.privateId)
+  return await channelStore.getMediaToken({ privateId: props.media.privateId })
 }
 
 function destroyPlayers() {

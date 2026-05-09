@@ -43,13 +43,13 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { Notify } from 'quasar'
-import { useStore } from 'vuex'
+import { useAdminStore } from 'src/stores/admin-store.js'
 import { daysSince } from '@utils/date.js'
 import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
 
-const store = useStore()
+const adminStore = useAdminStore()
 const loading = ref(true)
-const outboxDLQ = computed(() => store.state.admin.outboxDLQ || [])
+const outboxDLQ = computed(() => adminStore.outboxDLQ || [])
 const outboxColumns = [
   { name: 'created', label: 'Created', field: 'created', align: 'left' },
   { name: 'type', label: 'Type', field: 'type', align: 'left' },
@@ -72,7 +72,7 @@ function pretty(obj) {
 }
 async function requeue(eventId) {
   try {
-    await store.dispatch('admin/requeueDLQItem', eventId)
+    await adminStore.requeueDLQItem(eventId)
     Notify.create({
       type: 'positive',
       message: 'Dead-letter event requeued.',
@@ -93,7 +93,7 @@ async function requeue(eventId) {
 onMounted(async () => {
   loading.value = true
   try {
-    await store.dispatch('admin/getDLQ')
+    await adminStore.getDLQ()
   } catch (err) {
     console.error('Failed to load DLQ:', err)
     Notify.create({
