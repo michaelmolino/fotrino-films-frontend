@@ -189,5 +189,5 @@ function emitCounterIncrement() {
 }
 
 // Use composable for media metadata extraction
-import { extractExifDate } from '@/composables/useMediaMetadata.js'
+import { extractExifDate } from '@composables/useMediaMetadata.js'
 </script>
