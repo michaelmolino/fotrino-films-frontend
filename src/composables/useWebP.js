@@ -60,15 +60,9 @@ async function resolvePreviewSource(url) {
   }
 }
 
-// Backward-compatible helper for existing call sites.
-async function checkWebPVersion(url) {
-  const source = await resolvePreviewSource(url)
-  return source.primaryUrl || url
-}
 
 export function useWebP() {
   return {
-    checkWebPVersion,
     resolvePreviewSource,
     getWebPUrl,
     supportsWebP
