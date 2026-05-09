@@ -34,18 +34,16 @@ export function useChannelLoader() {
       let channel = null
 
       if (route.params?.uuid) {
-        channel = await channelStore.fetchChannelRaw({
+        channel = await channelStore.getChannel({
           uuid: route.params.uuid
         })
       } else if (route.params?.privateId) {
-        channel = await channelStore.fetchPrivateMediaRaw(route.params.privateId)
+        channel = await channelStore.getPrivateMedia(route.params.privateId)
       }
 
       if (isStale()) {
         return null
       }
-
-      channelStore.setChannel(channel)
 
       if (route.params?.privateId && channel) {
         addPrivateHistory(route.params.privateId, {

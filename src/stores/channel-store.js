@@ -1,13 +1,10 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { defineQueryOptions, useQueryCache } from '@pinia/colada'
 import { api } from 'boot/axios'
 import { sortBy } from '@utils/sort.js'
 import { getGlobalApiErrorPayload } from 'src/utils/api-errors.js'
 import { fetchAndApplyGet } from 'src/stores/utils/fetch-and-apply.js'
 import { createRequestCanceler, isRequestCanceled } from 'src/stores/utils/request-canceler.js'
-
-const DEFAULT_CACHE_TIMEOUT = 3600000
 
 const sortChannelDetail = channel => {
     if (!channel) return channel
@@ -26,7 +23,6 @@ export const useChannelStore = defineStore('channel', () => {
     const loadStatus = ref('idle')
     const upload = ref(null)
     const mediaToken = ref(null)
-    const queryCache = useQueryCache()
     const requestCanceler = createRequestCanceler()
 
     const setChannelLoadStatus = status => {
@@ -109,36 +105,6 @@ export const useChannelStore = defineStore('channel', () => {
             signal: requestCanceler.getSignal('SET_CHANNEL')
         }
     })
-
-    const fetchChannelRaw = async ({ uuid, pending = false }, timeout = DEFAULT_CACHE_TIMEOUT) => {
-        const payload = { uuid, pending }
-        const queryOptions = defineQueryOptions(() => ({
-            key: ['channel', 'fetchChannelRaw', payload.uuid, payload.pending],
-            staleTime: timeout,
-            query: async () => {
-                const url = `/channels/${payload.uuid}${payload.pending ? '?pending=true' : ''}`
-                const { data } = await api.get(url)
-                return sortChannelDetail(data)
-            }
-        }))()
-
-        await queryCache.refresh(queryCache.ensure(queryOptions))
-        return queryCache.getQueryData(queryOptions.key)
-    }
-
-    const fetchPrivateMediaRaw = async (privateId, timeout = DEFAULT_CACHE_TIMEOUT) => {
-        const queryOptions = defineQueryOptions(() => ({
-            key: ['channel', 'fetchPrivateMediaRaw', privateId],
-            staleTime: timeout,
-            query: async () => {
-                const { data } = await api.get(`/channels/media/private/${privateId}`)
-                return data
-            }
-        }))()
-
-        await queryCache.refresh(queryCache.ensure(queryOptions))
-        return queryCache.getQueryData(queryOptions.key)
-    }
 
     const getMediaToken = ({ privateId }) => fetchAndApplyGet({
         api,
@@ -300,8 +266,6 @@ export const useChannelStore = defineStore('channel', () => {
         resolveHistoryChannels,
         getChannel,
         getPrivateMedia,
-        fetchChannelRaw,
-        fetchPrivateMediaRaw,
         getMediaToken,
         deleteResource,
         postUpload,
