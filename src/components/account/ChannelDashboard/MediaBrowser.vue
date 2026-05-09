@@ -26,7 +26,7 @@
 import { useChannelStore } from 'src/stores/channel-store.js'
 import ChannelItem from './MediaBrowser/ChannelItem.vue'
 import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
-import { uploadPresignedFileWithUppy } from '@libs/uppy-upload.js'
+import { useUppyPresignedUpload } from 'src/composables/useUppyPresignedUpload.js'
 import { isPendingUploadLockedByAnotherTab } from '@utils/pendingUploadLocks.js'
 import { notifyError, notifySuccess, notifyWarning } from 'src/utils/notify.js'
 
@@ -112,6 +112,13 @@ async function abortPendingMedia(mediaId) {
   }
 }
 
+const {
+  initializeUppy,
+  addFilesToUppy,
+  startUpload,
+  cleanup
+} = useUppyPresignedUpload()
+
 async function runEditJourney({
   update,
   updatePayload,
@@ -125,11 +132,11 @@ async function runEditJourney({
       if (!instruction?.url || !instruction?.objectName) {
         throw new Error('Invalid upload instruction returned by backend.')
       }
-      await uploadPresignedFileWithUppy({
-        url: instruction.url,
-        file: upload.file,
-        resourceType: instruction.resourceType || 'upload'
-      })
+      // Use unified composable for upload orchestration
+      initializeUppy([{ resourceType: instruction.resourceType || 'upload', url: instruction.url }])
+      addFilesToUppy([{ file: upload.file, resourceType: instruction.resourceType || 'upload' }])
+      await startUpload()
+      cleanup()
       // Confirm + metadata update atomically in one backend call
       await upload.confirm({
         ...upload.confirmPayload,

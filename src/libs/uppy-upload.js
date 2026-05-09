@@ -1,6 +1,10 @@
 import Uppy from '@uppy/core'
 import AwsS3 from '@uppy/aws-s3'
-import { api } from 'boot/axios'
+import {
+    createMultipartCompanionApi,
+    getMultipartMediaId
+} from './uppy-upload-companion-api.js'
+import { uploadAndAssert } from './uppy-upload-policy.js'
 
 /** Minimum file size (bytes) for multipart upload. Only applies to `upload` resource type. */
 const MULTIPART_THRESHOLD = 100 * 1024 * 1024 // 100 MB
@@ -24,69 +28,12 @@ function buildInstructionMap(instructions = []) {
     return map
 }
 
-function assertUploadResult(result, requiredResourceTypes = []) {
-    if (result.failed?.length) {
-        const failedNames = result.failed
-            .map(file => {
-                const message = file?.error?.message
-                return message ? `${file.name} (${message})` : file.name
-            })
-            .join(', ')
-        throw new Error(`Upload failed for: ${failedNames}`)
-    }
-
-    const successful = result.successful || []
-    if (successful.length === 0) {
-        throw new Error('Uploader reported zero successful uploads.')
-    }
-
-    if (requiredResourceTypes.length > 0) {
-        const successfulTypes = new Set(successful.map(file => file.meta?.resourceType))
-        const missingTypes = requiredResourceTypes.filter(type => !successfulTypes.has(type))
-        if (missingTypes.length > 0) {
-            throw new Error(`Missing successful uploads for: ${missingTypes.join(', ')}`)
-        }
-    }
-}
-
-function isEmptyUploadResult(result) {
-    const successful = result?.successful || []
-    const failed = result?.failed || []
-    return successful.length === 0 && failed.length === 0
-}
-
 function getInstructionOrThrow(instructionByType, resourceType) {
     const instruction = instructionByType.get(resourceType)
     if (!instruction) {
         throw new Error(`No upload instruction found for ${resourceType}`)
     }
     return instruction
-}
-
-function getMultipartMediaId(file) {
-    const mediaId = file.meta?.reference
-    if (!mediaId) {
-        throw new Error('Missing media reference for multipart upload')
-    }
-    return mediaId
-}
-
-async function requestMultipartJson(url, { method = 'GET', body, headers = {} } = {}) {
-    try {
-        const response = await api.request({
-            url,
-            method,
-            data: body,
-            headers,
-            __skipGlobalErrorNotify: true,
-            __skipRequestLoading: true,
-            __skipDeleteConfirm: true
-        })
-        return response?.data ?? null
-    } catch (error) {
-        const status = error?.response?.status
-        throw new Error(`${method} ${url} failed: ${status ?? 'network error'}`)
-    }
 }
 
 /**
@@ -120,6 +67,7 @@ export function createPresignedUppyClient({
     onUploadError
 }) {
     const instructionByType = buildInstructionMap(instructions)
+    const multipartApi = createMultipartCompanionApi({ multipartBaseUrl })
 
     const restrictions = {}
     if (Number.isFinite(maxFileSize) && maxFileSize > 0) {
@@ -156,50 +104,31 @@ export function createPresignedUppyClient({
 
         async createMultipartUpload(file) {
             const mediaId = getMultipartMediaId(file)
-            return requestMultipartJson(`${multipartBaseUrl}/${mediaId}/multipart`, {
-                method: 'POST'
-            })
+            return multipartApi.createMultipartUpload(mediaId)
         },
 
         async listParts(file, { uploadId }) {
             const mediaId = getMultipartMediaId(file)
-            return requestMultipartJson(
-                `${multipartBaseUrl}/${mediaId}/multipart/${encodeURIComponent(uploadId)}`
-            )
+            return multipartApi.listParts(mediaId, uploadId)
         },
 
         async signPart(file, { uploadId, partNumber }) {
             const mediaId = getMultipartMediaId(file)
-            const response = await requestMultipartJson(
-                `${multipartBaseUrl}/${mediaId}/multipart/${encodeURIComponent(uploadId)}/sign/${partNumber}`,
-                {}
-            )
+            const response = await multipartApi.signPart(mediaId, uploadId, partNumber)
             const { url } = response
             return { url }
         },
 
         async completeMultipartUpload(file, { uploadId, parts }) {
             const mediaId = getMultipartMediaId(file)
-            await requestMultipartJson(
-                `${multipartBaseUrl}/${mediaId}/multipart/${encodeURIComponent(uploadId)}/complete`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: { parts }
-                }
-            )
+            await multipartApi.completeMultipartUpload(mediaId, uploadId, parts)
             return {}
         },
 
         async abortMultipartUpload(file, { uploadId }) {
             const mediaId = getMultipartMediaId(file)
             // Best-effort; ignore errors so Uppy can clean up its own state.
-            await requestMultipartJson(
-                `${multipartBaseUrl}/${mediaId}/multipart/${encodeURIComponent(uploadId)}`,
-                {
-                    method: 'DELETE'
-                }
-            ).catch(() => { })
+            await multipartApi.abortMultipartUpload(mediaId, uploadId).catch(() => { })
         }
     })
 
@@ -236,17 +165,7 @@ export function createPresignedUppyClient({
             })
         },
         async uploadAndAssert(requiredResourceTypes = []) {
-            let result = await uppy.upload()
-
-            // Occasionally the first call can resolve before files transition
-            // into a started upload state. Retry once, which mirrors the manual
-            // "Retry Upload" behavior users reported as successful.
-            if (isEmptyUploadResult(result)) {
-                result = await uppy.upload()
-            }
-
-            assertUploadResult(result, requiredResourceTypes)
-            return result
+            return uploadAndAssert(uppy, requiredResourceTypes)
         },
         destroy() {
             destroyUppy(uppy)
@@ -254,27 +173,3 @@ export function createPresignedUppyClient({
     }
 }
 
-/**
- * Upload a single file to a presigned URL using Uppy.
- *
- * @param {{ url: string, file: File | Blob, resourceType?: string }} payload
- * @returns {Promise<void>}
- */
-export async function uploadPresignedFileWithUppy({ url, file, resourceType = 'upload' }) {
-    const client = createPresignedUppyClient({
-        id: `presigned-single-${resourceType}`,
-        instructions: [{ resourceType, url }],
-        maxFileSize: file?.size || 5368709120
-    })
-
-    try {
-        client.addFile({
-            file,
-            resourceType,
-            source: 'presigned-upload'
-        })
-        await client.uploadAndAssert([resourceType])
-    } finally {
-        client.destroy()
-    }
-}
