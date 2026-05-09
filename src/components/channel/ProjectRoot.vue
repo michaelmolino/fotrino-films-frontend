@@ -95,7 +95,7 @@
 <script setup>
 import { computed, watch, defineAsyncComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useChannelLoading } from '@composables/useChannelLoading.js'
+import { useChannelLoader } from '@composables/useChannelLoader.js'
 
 import BreadCrumbs from '@components/shared/BreadCrumbs.vue'
 import MediaPreview from '@components/channel/MediaPreview.vue'
@@ -104,7 +104,7 @@ const NothingText = defineAsyncComponent(() => import('@components/shared/Nothin
 const route = useRoute()
 const router = useRouter()
 
-const { channel, loading } = useChannelLoading()
+const { channel, loading } = useChannelLoader()
 
 function redirect(pathOrObj) {
   setTimeout(() => router.replace(pathOrObj), 0)

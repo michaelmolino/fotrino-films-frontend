@@ -1,6 +1,6 @@
-import { ref } from 'vue'
+import { computed, ref, toRef } from 'vue'
 import { useChannelStore } from 'src/stores/channel-store.js'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useMeta } from 'quasar'
 import { getMetaData } from '@utils/meta.js'
 import { addPrivateHistory } from '@utils/history.js'
@@ -12,9 +12,17 @@ import { addPrivateHistory } from '@utils/history.js'
  */
 export function useChannelLoader() {
   const channelStore = useChannelStore()
+  const route = useRoute()
   const router = useRouter()
+  const channel = toRef(channelStore, 'channel')
+  const sortedAllMedia = toRef(channelStore, 'sortedAllMedia')
+  const loadStatus = toRef(channelStore, 'loadStatus')
   const metaData = ref(getMetaData(null, null))
   const loadVersion = ref(0)
+  const needsChannelData = computed(() => !!(route.params?.uuid || route.params?.privateId))
+  const loading = computed(
+    () => loadStatus.value === 'loading' || (loadStatus.value === 'idle' && needsChannelData.value)
+  )
 
   // Setup Quasar meta management
   useMeta(() => metaData.value)
@@ -76,6 +84,10 @@ export function useChannelLoader() {
   }
 
   return {
+    channel,
+    sortedAllMedia,
+    loadStatus,
+    loading,
     loadChannel,
     metaData
   }

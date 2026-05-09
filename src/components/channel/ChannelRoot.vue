@@ -69,7 +69,7 @@
 import { ref, computed, defineAsyncComponent, watch } from 'vue'
 import { getViewPreference, setViewPreference } from '@utils/viewPreference.js'
 import { useRoute } from 'vue-router'
-import { useChannelLoading } from '@composables/useChannelLoading.js'
+import { useChannelLoader } from '@composables/useChannelLoader.js'
 
 import BreadCrumbs from '@components/shared/BreadCrumbs.vue'
 import ProjectPoster from '@components/channel/ProjectPoster.vue'
@@ -79,7 +79,7 @@ const NothingText = defineAsyncComponent(() => import('@components/shared/Nothin
 
 const route = useRoute()
 const selectedView = ref(getViewPreference('all'))
-const { channel, sortedAllMedia, loading } = useChannelLoading()
+const { channel, sortedAllMedia, loading } = useChannelLoader()
 
 watch(selectedView, val => {
   const normalized = val === 'projects' || val === 'all' ? val : 'all'
