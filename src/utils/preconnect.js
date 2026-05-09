@@ -1,6 +1,7 @@
 // Utilities to add preconnect/dns-prefetch hints at runtime
 // Safe to call multiple times; no-ops if tags already exist
 
+// Add a <link> tag only if it doesn't already exist
 function addLinkOnce(rel, href, attrs = {}) {
   try {
     const selector = `link[rel="${rel}"][href="${href}"]`
@@ -17,6 +18,7 @@ function addLinkOnce(rel, href, attrs = {}) {
   }
 }
 
+// Add preconnect and dns-prefetch for a given URL
 export function addPreconnectForUrl(urlLike) {
   try {
     if (!urlLike) return
@@ -33,6 +35,7 @@ export function addPreconnectForUrl(urlLike) {
   }
 }
 
+// Add preconnect and dns-prefetch for a given origin
 export function addPreconnectForOrigin(origin) {
   try {
     if (!origin) return

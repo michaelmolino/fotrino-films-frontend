@@ -1,47 +1,67 @@
 import { sanitizeText } from '@utils/text.js'
 
-export function getMetaData(route, channel) {
-  let title = null
-  let description = ''
-  let image = null
-  let type = 'website'
-
-  // Case: Channel
-  if (route?.params.uuid) {
-    title = channel?.title || null
-    description = title || ''
-    image = channel?.cover || null
+// Helpers for each route type
+function getChannelMeta(route, channel) {
+  return {
+    title: channel?.title || null,
+    description: channel?.title || '',
+    image: channel?.cover || null,
+    type: 'website',
   }
+}
 
-  // Case: Project view (with optional media)
-  if (route?.params.projectSlug) {
-    const project = channel?.projects?.find(p => p.slug === route.params.projectSlug)
-    
-    // If mediaSlug is present, show media metadata
-    if (route?.params.mediaSlug) {
-      const media = project?.media?.find(m => m.slug === route.params.mediaSlug)
-      title = media?.title || null
-      description = sanitizeText(media?.descriptionUnsafe)
-      image = media?.preview || null
-      type = 'video'
-    } else {
-      // If no mediaSlug, show project metadata
-      title = project?.title || null
-      description = sanitizeText(project?.subtitle || '')
-      image = project?.poster || null
+function getProjectMeta(route, channel) {
+  const project = channel?.projects?.find(p => p.slug === route.params.projectSlug)
+  if (route?.params.mediaSlug) {
+    // Media metadata
+    const media = project?.media?.find(m => m.slug === route.params.mediaSlug)
+    return {
+      title: media?.title || null,
+      description: sanitizeText(media?.descriptionUnsafe),
+      image: media?.preview || null,
+      type: 'video',
+    }
+  } else {
+    // Project metadata
+    return {
+      title: project?.title || null,
+      description: sanitizeText(project?.subtitle || ''),
+      image: project?.poster || null,
+      type: 'website',
     }
   }
+}
 
-  // Case: Private media
+function getPrivateMediaMeta(route, channel) {
+  const media = channel?.project?.media
+  return {
+    title: media?.title || null,
+    description: sanitizeText(media?.descriptionUnsafe),
+    image: media?.preview || null,
+    type: 'video',
+  }
+}
+
+// Main meta generator
+export function getMetaData(route, channel) {
+  let meta = { title: null, description: '', image: null, type: 'website' }
+
+  // Route type detection
+  if (route?.params.uuid) {
+    meta = getChannelMeta(route, channel)
+  }
+  if (route?.params.projectSlug) {
+    meta = getProjectMeta(route, channel)
+  }
   if (route?.params.privateId) {
-    const media = channel?.project?.media
-    title = media?.title || null
-    description = sanitizeText(media?.descriptionUnsafe)
-    image = media?.preview || null
-    type = 'video'
+    meta = getPrivateMediaMeta(route, channel)
   }
 
   // Branding
+  let title = meta.title
+  let description = meta.description
+  let image = meta.image
+  let type = meta.type
   if (title) {
     title += ' | Fotrino Films'
   } else {
@@ -49,8 +69,10 @@ export function getMetaData(route, channel) {
     description = title
   }
 
+  // Open Graph URL
   const ogUrl = 'https://films.fotrino.com' + (route?.href?.split('?')[0] || '')
 
+  // Compose meta tags
   return {
     title,
     meta: {

@@ -1,8 +1,10 @@
+// Pending upload lock logic for multi-tab safety
 const LOCK_PREFIX = 'fotrino.pending-upload.lock.'
 const TAB_ID_KEY = 'fotrino.upload.tab-id'
 const LOCK_TTL_MS = 45000
 const HEARTBEAT_MS = 10000
 
+// Generate a unique tab ID for this browser tab
 function createTabId() {
     if (globalThis.crypto?.randomUUID) {
         return globalThis.crypto.randomUUID()
@@ -10,6 +12,7 @@ function createTabId() {
     return `${Date.now()}-${Math.random().toString(36).slice(2)}`
 }
 
+// Get or create the tab ID for this tab
 function getTabId() {
     try {
         const existing = globalThis.sessionStorage?.getItem(TAB_ID_KEY)
@@ -22,10 +25,12 @@ function getTabId() {
     }
 }
 
+// Get the localStorage key for a mediaId
 function getLockKey(mediaId) {
     return `${LOCK_PREFIX}${mediaId}`
 }
 
+// Read the lock object from localStorage
 function readLock(mediaId) {
     const raw = globalThis.localStorage?.getItem(getLockKey(mediaId))
     if (!raw) return null
@@ -36,11 +41,13 @@ function readLock(mediaId) {
     }
 }
 
+// Check if a lock is still alive (not stale)
 function isLockAlive(lock) {
     if (!lock?.heartbeatAt) return false
     return Date.now() - Number(lock.heartbeatAt) <= LOCK_TTL_MS
 }
 
+// Remove stale lock if expired, otherwise return lock
 function clearStaleLock(mediaId) {
     const lock = readLock(mediaId)
     if (!lock) return null
@@ -49,6 +56,7 @@ function clearStaleLock(mediaId) {
     return null
 }
 
+// Acquire a lock for a pending upload
 export function acquirePendingUploadLock(mediaId) {
     if (mediaId == null) return null
     const lock = {
@@ -61,6 +69,7 @@ export function acquirePendingUploadLock(mediaId) {
     return lock
 }
 
+// Update the heartbeat for a lock if owned by this tab
 export function touchPendingUploadLock(mediaId) {
     const lock = clearStaleLock(mediaId)
     if (!lock) return false
@@ -74,6 +83,7 @@ export function touchPendingUploadLock(mediaId) {
     return true
 }
 
+// Start a heartbeat interval for a lock; returns a cleanup function
 export function startPendingUploadLockHeartbeat(mediaId) {
     if (mediaId == null) {
         return () => { }
@@ -87,6 +97,7 @@ export function startPendingUploadLockHeartbeat(mediaId) {
     }
 }
 
+// Release a lock if owned by this tab
 export function releasePendingUploadLock(mediaId) {
     if (mediaId == null) return
     const lock = clearStaleLock(mediaId)
@@ -95,6 +106,7 @@ export function releasePendingUploadLock(mediaId) {
     globalThis.localStorage?.removeItem(getLockKey(mediaId))
 }
 
+// Check if a lock is held by another tab
 export function isPendingUploadLockedByAnotherTab(mediaId) {
     if (mediaId == null) return false
     const lock = clearStaleLock(mediaId)

@@ -11,6 +11,7 @@ export const darkModeIcons = {
   dark: 'nights_stay'
 }
 
+// Apply dark mode based on preference and system
 function applyDarkMode($q) {
   if (darkModePref.value === 'auto') {
     $q.dark.set(systemDark.value)
@@ -19,16 +20,19 @@ function applyDarkMode($q) {
   }
 }
 
+// Set the dark mode preference
 export function setDarkMode(mode) {
   darkModePref.value = mode
 }
 
 export function useDarkMode($q) {
+  // Watch for changes in preference
   watch(darkModePref, val => {
     LocalStorage.set(DARK_KEY, val)
     applyDarkMode($q)
   })
 
+  // On mount, apply mode and listen for system changes
   onMounted(() => {
     applyDarkMode($q)
     const mediaQuery = globalThis.matchMedia('(prefers-color-scheme: dark)')
