@@ -188,13 +188,6 @@ function emitCounterIncrement() {
   emit('increment:counter')
 }
 
-// Attempt to read a capture date from metadata; for videos, browsers often expose limited metadata.
-// We optimistically try to read from the file's blob as text looking for common date markers.
-// If not found, resolve null and the caller will fallback to lastModified.
-async function extractExifDate(file) {
-  // Some containers (like MP4) won’t expose EXIF via browser APIs. Without extra deps, we fallback quickly.
-  // If the file is an image with EXIF, we could parse via a library; to avoid deps, return null here.
-  console.debug(file)
-  return null
-}
+// Use composable for media metadata extraction
+import { extractExifDate } from '@/composables/useMediaMetadata.js'
 </script>
