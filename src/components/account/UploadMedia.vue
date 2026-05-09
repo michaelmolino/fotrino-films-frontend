@@ -209,8 +209,11 @@ import MediaPreview from '@components/channel/MediaPreview.vue'
 import AuthRequired from '@components/shared/AuthRequired.vue'
 import { Notify } from 'quasar'
 import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
-import { useFileProcessor } from '@composables/useFileProcessor.js'
+import { useImageFileProcessor } from '@composables/useImageFileProcessor.js'
+import { useVideoThumbnailProcessor } from '@composables/useVideoThumbnailProcessor.js'
 import { useUploadFlow } from '@composables/useUploadFlow.js'
+
+const IMAGE_RESOURCE_TYPES = new Set(['cover', 'poster', 'preview'])
 
 // refs & reactive state
 const accountStore = useAccountStore()
@@ -254,12 +257,9 @@ const frameExtractionToken = ref(0)
 const uploadTriggered = ref(false)
 let dismissUploadErrorNotify = null
 
-const {
-  uploadFiles,
-  handleFile: processFile,
-  getRandomFrameFromFile,
-  disposeFrameSession
-} = useFileProcessor()
+const uploadFiles = ref([])
+const { compressImageFile } = useImageFileProcessor()
+const { getRandomFrameFromFile, disposeFrameSession } = useVideoThumbnailProcessor()
 const { factoryUpload, cancel: cancelUpload, progress, statusText, isUploading } = useUploadFlow({
   channelStore,
   payload,
@@ -314,23 +314,47 @@ function clearUploadFile(resourceType) {
   }
 }
 
+function upsertUploadFile(resourceType, file, processing) {
+  const uploadFileIndex = uploadFiles.value.findIndex(entry => entry.resourceType === resourceType)
+  const entry = processing === undefined ? { resourceType, file } : { resourceType, file, processing }
+  if (uploadFileIndex === -1) {
+    uploadFiles.value.push(entry)
+    return
+  }
+  uploadFiles.value[uploadFileIndex] = { ...uploadFiles.value[uploadFileIndex], ...entry }
+}
+
+async function compressAndStoreImage(resourceType, file) {
+  upsertUploadFile(resourceType, file, true)
+  const processed = await compressImageFile(file)
+  upsertUploadFile(resourceType, processed, false)
+  return processed
+}
+
 // Keep a template-friendly handleFile function name (wrapper)
 async function handleFile(fileOrFiles, resourceType) {
   // normalize Quasar QFile which may pass an array
   const file = Array.isArray(fileOrFiles) ? fileOrFiles[0] : fileOrFiles
   if (!file) {
     setSelectedFile(resourceType, null)
+    clearUploadFile(resourceType)
     return
   }
 
   // set the correct local ref so watchers and template stay in sync
   setSelectedFile(resourceType, file)
 
-  // start processing in background so thumbnail appears immediately
-  processFile(file, resourceType).catch(err => {
-    // processFile already notifies on error, but keep console log here
-    console.error('Background file processing error:', err)
-  })
+  if (resourceType === 'upload') {
+    upsertUploadFile('upload', file)
+    return
+  }
+
+  if (IMAGE_RESOURCE_TYPES.has(resourceType)) {
+    // start processing in background so thumbnail appears immediately
+    compressAndStoreImage(resourceType, file).catch(err => {
+      console.error('Background file processing error:', err)
+    })
+  }
 }
 
 function incrementCounter() {
@@ -703,7 +727,7 @@ watch([() => mediaFile.value, () => counter.value], async ([mf]) => {
     setPreviewThumbRandom(result?.url || null)
     if (result?.blob) {
       const file = new File([result.blob], 'frame.jpg', { type: 'image/jpeg' })
-      await processFile(file, 'preview')
+      await compressAndStoreImage('preview', file)
     }
   } catch (err) {
     console.error(err)

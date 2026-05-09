@@ -83,7 +83,7 @@ import ResourceActions from './ResourceActions.vue'
 import ProjectItem from './ProjectItem.vue'
 import EditableChannelFields from '@components/account/shared/EditableChannelFields.vue'
 import { daysSince } from '@utils/date.js'
-import { useProcessedImageFile } from '@composables/useProcessedImageFile.js'
+import { useImageSelectionProcessing } from '@composables/useImageFileProcessor.js'
 
 const props = defineProps({
   channel: Object,
@@ -109,9 +109,9 @@ const editForm = ref({
 const {
   selectedFile: editCoverFile,
   processing: editCoverProcessing,
-  processSelectedFile: processCoverFile,
+  setAndCompressImage: processCoverFile,
   reset: resetCoverFile
-} = useProcessedImageFile('cover')
+} = useImageSelectionProcessing()
 const editCoverPreview = ref(null)
 const savingEdit = ref(false)
 
@@ -135,7 +135,8 @@ const resetEditForm = () => {
   savingEdit.value = false
 }
 
-const handleCoverFileSelected = async (file) => {
+const handleCoverFileSelected = async fileOrFiles => {
+  const file = Array.isArray(fileOrFiles) ? fileOrFiles[0] : fileOrFiles
   if (!file) {
     resetCoverFile()
     editCoverPreview.value = null

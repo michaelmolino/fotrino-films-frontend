@@ -72,7 +72,7 @@ import ResourceActions from './ResourceActions.vue'
 import { daysSince } from '@utils/date.js'
 import MediaMetadataFields from '@components/account/shared/MediaMetadataFields.vue'
 import MediaPreviewSelectorFields from '@components/account/shared/MediaPreviewSelectorFields.vue'
-import { useProcessedImageFile } from '@composables/useProcessedImageFile.js'
+import { useImageSelectionProcessing } from '@composables/useImageFileProcessor.js'
 
 const props = defineProps({
   media: Object,
@@ -93,9 +93,9 @@ const editPreviewFile = ref(null)
 const editPreviewImage = ref(null)
 const {
   processing: editPreviewProcessing,
-  processSelectedFile: processPreviewFile,
+  setAndCompressImage: processPreviewFile,
   reset: resetPreviewFile
-} = useProcessedImageFile('preview')
+} = useImageSelectionProcessing()
 
 function setLocalPreviewImage(url) {
   editPreviewImage.value = url || props.media?.preview || null

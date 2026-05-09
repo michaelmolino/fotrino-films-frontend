@@ -87,7 +87,7 @@ import ResourceActions from './ResourceActions.vue'
 import MediaItem from './MediaItem.vue'
 import { daysSince } from '@utils/date.js'
 import ProjectPosterFields from '@components/account/shared/ProjectPosterFields.vue'
-import { useProcessedImageFile } from '@composables/useProcessedImageFile.js'
+import { useImageSelectionProcessing } from '@composables/useImageFileProcessor.js'
 
 const props = defineProps({
   project: Object,
@@ -101,9 +101,9 @@ const editDialog = ref(false)
 const {
   selectedFile: editPosterFile,
   processing: editPosterProcessing,
-  processSelectedFile: processPosterFile,
+  setAndCompressImage: processPosterFile,
   reset: resetPosterFile
-} = useProcessedImageFile('poster')
+} = useImageSelectionProcessing()
 const editForm = ref({
   subtitle: null,
   posterType: 'default',
