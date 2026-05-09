@@ -27,7 +27,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 .skip-to-content {
   position: absolute;
   left: -9999px;

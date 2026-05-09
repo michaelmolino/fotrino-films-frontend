@@ -306,8 +306,8 @@ watch(
 )
 </script>
 
-<style>
-:root {
+<style scoped>
+:global(:root) {
   --plyr-color-main: #8d6a9f;
 }
 .audio-container {
