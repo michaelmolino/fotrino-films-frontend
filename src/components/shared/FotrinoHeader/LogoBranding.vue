@@ -1,6 +1,6 @@
 <template>
   <q-btn
-    icon="img:/images/logo.png"
+    icon="img:/icons/favicon-32x32.png"
     :label="$q.screen.gt.xs ? 'Fotrino Films' : ''"
     flat
     no-caps
