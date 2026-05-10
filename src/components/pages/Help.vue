@@ -14,8 +14,7 @@
           @hide="() => onItemHide('about')">
           <q-card>
             <q-card-section>
-              Fotrino Films is a platform for hosting video content, allowing users to upload media
-              and share it easily with family and friends.
+              Fotrino Films is a platform for hosting video content and sharing with family and friends.
             </q-card-section>
           </q-card>
         </q-expansion-item>
@@ -31,7 +30,7 @@
           <q-card>
             <q-card-section data-cy="help-answer-different">
               <div>
-                Fotrino Films focuses on private, ad-free video hosting. It’s not built for
+                The aim of Fotrino Films is to provide private, ad-free video hosting. It’s not built for
                 monetization or content discovery — there are no ads, algorithms, or data tracking.
                 Unlike platforms designed to pay creators for views, Fotrino Films lets you pay to
                 securely host your content and share it directly with people you know.
@@ -50,8 +49,7 @@
           @hide="() => onItemHide('opensource')">
           <q-card>
             <q-card-section data-cy="help-answer-opensource">
-              The frontend of Fotrino Films is open source. The backend might be open-sourced in the
-              future.
+              Only the frontend of Fotrino Films is open source.
             </q-card-section>
           </q-card>
         </q-expansion-item>
@@ -68,10 +66,9 @@
             <q-card-section>
               <div>
                 By default, your content is only accessible to those with the specific link to your
-                channel. It is not indexed by search engines, and the URLs are not easily guessable.
-                To share a specific media file privately, you can use the private link option from
-                the share icon below the video preview, ensuring the rest of your channel remains
-                undisclosed.
+                channel. It is not indexed by search engines and the URLs are cannot be guessed.
+                There are no mechanisms in place to prevent someone from sharing your links, so
+                please only share with trusted individuals.
               </div>
             </q-card-section>
           </q-card>
@@ -101,7 +98,11 @@
           @show="onItemSelect('mobilesupport')"
           @hide="() => onItemHide('mobilesupport')">
           <q-card>
-            <q-card-section> Yes! </q-card-section>
+            <q-card-section>
+              Fotrino Films is designed to work on all modern browsers and devices, including mobile
+              phones and tablets. The upload experience is optimized for desktop; for mobile uploads,
+              you must ensure the device does not enter sleep mode.
+            </q-card-section>
           </q-card>
         </q-expansion-item>
         <q-separator />
@@ -135,7 +136,8 @@
               Fotrino Films uses a global CDN and adaptive bitrate streaming to optimize video
               quality based on your internet speed and device size. If you're experiencing buffering
               or poor quality, it may be due to a weak signal in your area. Ensure you have a stable
-              connection for the best experience.
+              connection for the best experience. Depending on your device, sometimes the video may
+              start at a lower resolution, but it should improve after a few moments of buffering.
             </q-card-section>
           </q-card>
         </q-expansion-item>
@@ -168,7 +170,7 @@
         <q-expansion-item
           data-cy="help-item-login"
           group="faq"
-          label="Why can I only login with Google?"
+          label="Can I create an account without using Google or another service?"
           header-class="text-bold"
           :default-opened="selectedItem === 'login'"
           @show="onItemSelect('login')"
@@ -177,8 +179,8 @@
             <q-card-section>
               Third-party identity providers, such as Google, enhance security by protecting you
               from hackers and other threats. No content or usage data is shared with third parties
-              beyond what’s necessary for login. Additional identity providers, including Apple,
-              GitHub, Microsoft, Live, and Amazon, will be supported in the future.
+              beyond what’s necessary for login. Additional identity providers may be supported in
+              the future.
             </q-card-section>
           </q-card>
         </q-expansion-item>
@@ -217,11 +219,10 @@
                 </li>
                 <li>
                   Projects are contained within channels and act as organizational folders for your
-                  media.
+                  media. You can think of them as albums.
                 </li>
                 <li>
-                  Media (videos and audio files) are organized within projects. You can feature
-                  certain media for easier navigation.
+                  Media (videos and audio files) exist within projects.
                 </li>
               </ul>
             </q-card-section>
