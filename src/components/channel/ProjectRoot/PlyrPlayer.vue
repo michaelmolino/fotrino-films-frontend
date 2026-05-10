@@ -306,32 +306,28 @@ watch(
 )
 </script>
 
-<style scoped>
-:global(:root) {
-  --plyr-color-main: #8d6a9f;
-}
-.audio-container {
-  position: relative;
-  width: 100%;
-}
-.audio-preview {
-  display: block;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-}
-.audio-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-.videoEl {
-  display: block;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-}
-.audioEl {
-  width: 100%;
-}
+<style lang="sass" scoped>
+.audio-container
+  position: relative
+  width: 100%
+
+.audio-preview
+  display: block
+  width: 100%
+  aspect-ratio: 16 / 9
+  overflow: hidden
+
+.audio-img
+  width: 100%
+  height: 100%
+  object-fit: cover
+  display: block
+
+.videoEl
+  display: block
+  width: 100%
+  aspect-ratio: 16 / 9
+
+.audioEl
+  width: 100%
 </style>

@@ -76,11 +76,11 @@
     /* Ensure page background reflects Quasar dark mode classes even if core CSS load order changes */
     body.body--light {
       background-color: #ffffff;
-      color: #121212;
+      color: var(--q-dark, #2D2D2D);
     }
 
     body.body--dark {
-      background-color: #121212;
+      background-color: var(--q-dark, #2D2D2D);
       color: #e0e0e0;
     }
   </style>

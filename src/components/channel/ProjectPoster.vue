@@ -90,7 +90,6 @@ const contrastTextColor = computed(() => getContrastColor(props.project?.posterC
   aspect-ratio: 2 / 3; /* match q-img ratio for consistency */
 }
 .poster-center-overlay {
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
   pointer-events: none; /* allow click-through to the button */
 }
 </style>
