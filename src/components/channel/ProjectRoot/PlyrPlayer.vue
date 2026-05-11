@@ -34,9 +34,9 @@
 <script setup>
 import { computed, onMounted, onBeforeUnmount, watch, ref, nextTick } from 'vue'
 import { useChannelStore } from 'src/stores/channel-store.js'
-import Hls from 'hls.js'
 import 'plyr/dist/plyr.css'
 import { addPreconnectForUrl, addPreloadImageOnce } from '@utils/preconnect'
+import { setupTokenizedVideoPlayback } from '@utils/videoPlayback'
 import { useWebP } from '@composables/useWebP'
 
 const props = defineProps({
@@ -46,7 +46,8 @@ const props = defineProps({
 
 const channelStore = useChannelStore()
 const player = ref(null)
-const hls = ref(null)
+const teardownVideoPlayback = ref(null)
+const plyrEndedHandler = ref(null)
 let playHandler = null
 let PlyrCtor = null
 const { resolvePreviewSource } = useWebP()
@@ -78,15 +79,17 @@ async function fetchMediaToken() {
 }
 
 function destroyPlayers() {
-  if (Hls.isSupported() && hls.value) {
+  if (teardownVideoPlayback.value) {
     try {
-      hls.value.destroy()
+      teardownVideoPlayback.value()
     } catch (e) {
       console.debug(e)
     }
-    hls.value = null
+    teardownVideoPlayback.value = null
   }
+
   if (player.value) {
+    detachPlyrEndedHandler()
     try {
       player.value.destroy()
     } catch (e) {
@@ -130,35 +133,39 @@ async function setupPlayer() {
   } else {
     setupAudioPlayer(el)
   }
-  setupPlyrEndedHandler()
+  attachPlyrEndedHandler()
 }
 
-function setupPlyrEndedHandler() {
+function attachPlyrEndedHandler() {
   if (view.value !== 'video' || !player.value || typeof player.value.on !== 'function') return
-  const _onEnded = () => {
+
+  detachPlyrEndedHandler()
+
+  plyrEndedHandler.value = () => {
     try {
       player.value.stop()
     } catch (e) {
       console.error('Error stopping player:', e)
     }
   }
+
   try {
-    player.value.on('ended', _onEnded)
+    player.value.on('ended', plyrEndedHandler.value)
   } catch (e) {
     console.error('Error attaching ended event:', e)
   }
+}
 
-  const _origDestroy = player.value.destroy?.bind(player.value)
-  if (_origDestroy) {
-    player.value.destroy = function () {
-      try {
-        player.value.off && player.value.off('ended', _onEnded)
-      } catch (e) {
-        console.error('Error detaching ended event:', e)
-      }
-      _origDestroy()
-    }
+function detachPlyrEndedHandler() {
+  if (!player.value || !plyrEndedHandler.value || typeof player.value.off !== 'function') return
+
+  try {
+    player.value.off('ended', plyrEndedHandler.value)
+  } catch (e) {
+    console.error('Error detaching ended event:', e)
   }
+
+  plyrEndedHandler.value = null
 }
 
 async function setupAudioPlayer(el) {
@@ -172,97 +179,16 @@ async function setupAudioPlayer(el) {
 
 async function setupVideoPlayer(el) {
   const video = el.tagName.toLowerCase() === 'video' ? el : document.querySelector('video')
-  const source = props.media.src
-  const nativeHlsMimeTypes = ['application/vnd.apple.mpegurl', 'application/x-mpegURL']
-  // Mutable token state shared by xhrSetup and the play-guard.
-  const tokenState = { value: null, issuedAt: 0, exp: 0 }
+  if (!video || !props.media?.src) return
 
-  function supportsNativeHls() {
-    return nativeHlsMimeTypes.some((mimeType) => video.canPlayType(mimeType))
-  }
-
-  function getExpFromJwt(t) {
-    try {
-      const part = t.split('.')[1]
-      const base64 = part.replaceAll('-', '+').replaceAll('_', '/')
-      const json = JSON.parse(decodeURIComponent(escape(globalThis.atob(base64))))
-      return json?.exp ? json.exp * 1000 : null
-    } catch {
-      return null
-    }
-  }
-
-  function isTokenStale() {
-    if (!tokenState.value || !tokenState.exp) return true
-    const halfLife = (tokenState.exp - tokenState.issuedAt) / 2
-    return Date.now() >= tokenState.issuedAt + halfLife
-  }
-
-  async function refreshToken() {
-    const t = await fetchMediaToken()
-    if (t) {
-      tokenState.value = t
-      tokenState.issuedAt = Date.now()
-      tokenState.exp = getExpFromJwt(t) ?? 0
-    }
-  }
-
-  function buildTokenUrl(url) {
-    if (!tokenState.value) return url
-    const [base, query] = url.split('?')
-    const params = new URLSearchParams(query)
-    params.delete('token')
-    params.set('token', tokenState.value)
-    return `${base}?${params.toString()}`
-  }
-
-  await refreshToken()
-
-  if (supportsNativeHls()) {
-    video.src = buildTokenUrl(source)
-    video.load()
-    // On play, if the token is at or past its half-life, reload the manifest
-    // with a fresh token and seek back to where the user left off.
-    video.addEventListener('play', async function onPlayGuard() {
-      if (!isTokenStale()) return
-      video.pause()
-      const resumeAt = video.currentTime
-      await refreshToken()
-      video.src = buildTokenUrl(source)
-      video.load()
-      await new Promise((resolve) => video.addEventListener('loadedmetadata', resolve, { once: true }))
-      video.currentTime = resumeAt
-      video.play().catch(() => {})
-    })
-    return
-  }
-
-  if (!Hls.isSupported()) {
-    console.error('HLS is not supported in this browser.')
-    return
-  }
-
-  hls.value = new Hls({
-    capLevelToPlayerSize: false,
-    abrEwmaDefaultEstimate: 3000000,
-    // xhrSetup reads tokenState.value on every request, so a token refreshed
-    // by the play-guard is picked up automatically without reloading anything.
-    xhrSetup: function (xhr, url) {
-      xhr.open('GET', buildTokenUrl(url), true)
-    }
+  const { cleanup } = await setupTokenizedVideoPlayback({
+    videoEl: video,
+    sourceUrl: props.media.src,
+    fetchToken: fetchMediaToken,
+    exposeHlsGlobally: true
   })
 
-  hls.value.loadSource(buildTokenUrl(source))
-  hls.value.attachMedia(video)
-  globalThis.hls = hls.value
-
-  // On play, if the token is at or past its half-life, refresh it.
-  // xhrSetup will use the new value for all subsequent segment/manifest requests.
-  // No source reload needed — the buffer is untouched.
-  video.addEventListener('play', async function onPlayGuard() {
-    if (!isTokenStale()) return
-    await refreshToken()
-  })
+  teardownVideoPlayback.value = cleanup
 }
 
 function attachMediaSessionHandler() {
@@ -284,13 +210,13 @@ async function rebuild() {
   addPreloadImageOnce(audioPreviewUrl.value, 'high')
   destroyPlayers()
   await nextTick()
-  setupPlayer()
+  await setupPlayer()
   attachMediaSessionHandler()
 }
 
 onMounted(async () => {
   await refreshAudioPreviewSource()
-  rebuild()
+  await rebuild()
 })
 
 onBeforeUnmount(() => {
