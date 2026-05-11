@@ -60,7 +60,7 @@ export function createPresignedUppyClient({
     id = 'presigned-uploader',
     instructions = [],
     maxFileSize = null,
-    multipartBaseUrl = '/api/channels/media',
+    multipartBaseUrl = '/channels/media',
     onTotalProgress,
     onProgress,
     onUploadSuccess,

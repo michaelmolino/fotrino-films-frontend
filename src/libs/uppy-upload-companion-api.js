@@ -26,7 +26,7 @@ async function requestMultipartJson(url, { method = 'GET', body, headers = {} } 
     }
 }
 
-export function createMultipartCompanionApi({ multipartBaseUrl = '/api/channels/media' } = {}) {
+export function createMultipartCompanionApi({ multipartBaseUrl = '/channels/media' } = {}) {
     return {
         createMultipartUpload(mediaId) {
             return requestMultipartJson(`${multipartBaseUrl}/${mediaId}/multipart`, {

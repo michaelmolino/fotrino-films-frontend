@@ -4,7 +4,7 @@ import { Notify } from 'quasar'
 const DISMISS_ACTION = Object.freeze([{ label: 'Dismiss', color: 'white' }])
 const CONFIRM_ACTION = (label = 'Confirm delete', action = {}) => ({
     label,
-    color: 'negative',
+    color: 'white',
     ...action,
     handler: action.handler || (() => { })
 })
