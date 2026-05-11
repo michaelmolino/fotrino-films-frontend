@@ -39,7 +39,7 @@ Note that I regularly delete the DB and content so please don't upload important
 - This is an async process. Jobs are published using [RQ](https://python-rq.org/) for workers to consume.
 - Each worker is responsible for:
   - Downloading the original file
-  - Transforming it to HLS using code based on Vincent Bernat's [video2hls](https://github.com/vincentbernat/video2hls) tool which itself uses [ffmpeg](https://ffmpeg.org/)
+  - Transforming it to HLS manifests with CMAF/fMP4 segments using [ffmpeg](https://ffmpeg.org/)
   - Uploading each segment back to the bucket
   - Publishing the media and sending a notification to the uploader.
 - If an error occurs, work is retried with an exponetial backoff. After exhausting retries, a [DLQ](https://en.wikipedia.org/wiki/Dead_letter_queue) message is created for the Admin to remediate.
