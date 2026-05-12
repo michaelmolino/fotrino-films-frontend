@@ -36,7 +36,7 @@ import { computed, onMounted, onBeforeUnmount, watch, ref, nextTick } from 'vue'
 import { useChannelStore } from 'src/stores/channel-store.js'
 import 'plyr/dist/plyr.css'
 import { addPreconnectForUrl, addPreloadImageOnce } from '@utils/preconnect'
-import { setupTokenizedVideoPlayback } from '@utils/videoPlayback'
+import { setupVideoPlayback } from '@utils/videoPlayback'
 import { useWebP } from '@composables/useWebP'
 
 const props = defineProps({
@@ -54,6 +54,7 @@ const audioPreviewSource = ref({ strategy: 'original-only', primaryUrl: null, fa
 const audioPreviewUrl = ref(null)
 const view = computed(() => (props.media?.type?.startsWith('audio/') ? 'audio' : 'video'))
 const videoPosterUrl = computed(() => props.media?.preview || null)
+const UUID_V4ISH_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
 function onAudioPreviewError() {
   if (audioPreviewSource.value.fallbackUrl && audioPreviewUrl.value !== audioPreviewSource.value.fallbackUrl) {
@@ -70,11 +71,6 @@ async function refreshAudioPreviewSource() {
   audioPreviewUrl.value = source.primaryUrl || props.media.preview
 }
 
-async function fetchMediaToken() {
-  if (!props.media?.privateId) return null
-  return await channelStore.getMediaToken({ privateId: props.media.privateId })
-}
-
 function destroyPlayers() {
   if (teardownPlayback.value) {
     try { teardownPlayback.value() } catch (e) { console.debug(e) }
@@ -83,6 +79,18 @@ function destroyPlayers() {
   if (player.value) {
     try { player.value.destroy() } catch (e) { console.debug(e) }
     player.value = null
+  }
+}
+
+async function ensureMediaSession() {
+  const privateId = props.media?.privateId
+  if (!privateId || !UUID_V4ISH_REGEX.test(privateId)) return
+
+  try {
+    await channelStore.createMediaSession({ privateId })
+  } catch (error) {
+    // Avoid surfacing uncaught rejections for non-private fixtures or stale media IDs.
+    console.debug('Skipping media session bootstrap:', error)
   }
 }
 
@@ -116,17 +124,17 @@ async function setupPlayer() {
   })
 
   if (view.value === 'video') {
-    const { cleanup } = await setupTokenizedVideoPlayback({
+    await ensureMediaSession()
+    const { cleanup } = await setupVideoPlayback({
       videoEl: el,
       sourceUrl: props.media.src,
-      fetchToken: fetchMediaToken,
       exposeHlsGlobally: import.meta.env.DEV
     })
     teardownPlayback.value = cleanup
   } else {
-    // Audio: just set src with token
-    const audioToken = await fetchMediaToken()
-    el.src = props.media.src + (audioToken ? `?token=${audioToken}` : '')
+    // Audio: set src directly; cookie auth is handled by the browser
+    await ensureMediaSession()
+    el.src = props.media.src
   }
 }
 

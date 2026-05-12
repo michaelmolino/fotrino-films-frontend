@@ -25,7 +25,6 @@ export const useChannelStore = defineStore('channel', () => {
     const channel = ref(null)
     const loadStatus = ref('idle')
     const upload = ref(null)
-    const mediaToken = ref(null)
     const requestCanceler = createRequestCanceler()
 
     const queryCache = useQueryCache()
@@ -52,10 +51,6 @@ export const useChannelStore = defineStore('channel', () => {
 
     const setUpload = nextUpload => {
         upload.value = nextUpload
-    }
-
-    const setMediaToken = token => {
-        mediaToken.value = token
     }
 
     const requestUploadInstruction = async url => {
@@ -128,15 +123,7 @@ export const useChannelStore = defineStore('channel', () => {
         }
     })
 
-    const getMediaToken = ({ privateId }) => fetchAndApplyGet({
-        api,
-        url: `/channels/media/token/${privateId}`,
-        apply: setMediaToken,
-        extract: data => data.token,
-        onError: error => {
-            getGlobalApiErrorPayload(error)
-        }
-    })
+    const createMediaSession = ({ privateId }) => api.post(`/channels/media/session/${privateId}`)
 
     const deleteResource = async resource => {
         const url = resource.type === 'channel'
@@ -287,14 +274,13 @@ export const useChannelStore = defineStore('channel', () => {
         sortedAllMedia,
         loadStatus,
         upload,
-        mediaToken,
         setChannelLoadStatus,
         setChannel,
         getChannels,
         resolveHistoryChannels,
         getChannel,
         getPrivateMedia,
-        getMediaToken,
+        createMediaSession,
         deleteResource,
         postUpload,
         confirmUpload,

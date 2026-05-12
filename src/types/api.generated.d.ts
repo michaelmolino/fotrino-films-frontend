@@ -163,9 +163,6 @@ export type Message4 = string | null
 export type Status5 = 500
 export type Label = string | null
 export type Value = number | string
-export type Expiresat = string
-export type Src2 = string
-export type Token = string
 export type Description1 = string | null
 export type Main2 = boolean
 export type Resourcedate = string
@@ -269,7 +266,6 @@ export interface ApiContracts {
   HealthResponse: HealthResponse
   InternalServerErrorResponse: InternalServerErrorResponse
   LabeledValue: LabeledValue
-  MediaTokenResponse: MediaTokenResponse
   MediaUpdateRequest: MediaUpdateRequest
   MediaUploadPayload: MediaUploadPayload
   NotFoundErrorResponse: NotFoundErrorResponse
@@ -605,15 +601,6 @@ export interface InternalServerErrorResponse {
 export interface LabeledValue {
   label?: Label
   value: Value
-}
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "MediaTokenResponse".
- */
-export interface MediaTokenResponse {
-  expiresAt: Expiresat
-  src: Src2
-  token: Token
 }
 /**
  * This interface was referenced by `ApiContracts`'s JSON-Schema
