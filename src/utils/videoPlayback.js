@@ -1,21 +1,13 @@
 import Hls from 'hls.js'
 
-const NATIVE_HLS_MIME_TYPES = ['application/vnd.apple.mpegurl', 'application/x-mpegURL']
-
-function supportsNativeHls(videoEl) {
-    return NATIVE_HLS_MIME_TYPES.some((mimeType) => videoEl.canPlayType(mimeType))
-}
-
 function parseJwtExpMs(token) {
     try {
         const payload = token.split('.')[1]
         if (!payload) return null
-
         const base64 = payload.replaceAll('-', '+').replaceAll('_', '/')
         const paddedBase64 = `${base64}${'='.repeat((4 - (base64.length % 4)) % 4)}`
         const decodedPayload = globalThis.atob(paddedBase64)
         const parsedPayload = JSON.parse(decodedPayload)
-
         return typeof parsedPayload?.exp === 'number' ? parsedPayload.exp * 1000 : null
     } catch {
         return null
@@ -24,36 +16,41 @@ function parseJwtExpMs(token) {
 
 function withToken(url, token) {
     if (!token) return url
-
     const [base, query] = url.split('?')
     const params = new URLSearchParams(query)
     params.delete('token')
     params.set('token', token)
-
     return `${base}?${params.toString()}`
+}
+
+function supportsNativeHls(videoEl) {
+    const support = videoEl.canPlayType('application/vnd.apple.mpegurl')
+    if (support !== 'probably' && support !== 'maybe') return false
+
+    // Favor native when AirPlay APIs exist; otherwise use hls.js.
+    const hasAirPlayApi = typeof videoEl.webkitShowPlaybackTargetPicker === 'function' ||
+        'WebKitPlaybackTargetAvailabilityEvent' in globalThis
+
+    return hasAirPlayApi
 }
 
 function createTokenManager(fetchToken) {
     const state = {
         value: null,
-        issuedAt: 0,
         exp: 0
     }
 
     async function refresh() {
         const token = await fetchToken()
         if (!token) return
-
         state.value = token
-        state.issuedAt = Date.now()
         state.exp = parseJwtExpMs(token) ?? 0
     }
 
-    function isStale() {
+    function isExpired() {
         if (!state.value || !state.exp) return true
-
-        const halfLife = (state.exp - state.issuedAt) / 2
-        return Date.now() >= state.issuedAt + halfLife
+        // Consider token expired if less than 30s left
+        return Date.now() >= state.exp - 30000
     }
 
     function buildUrl(url) {
@@ -62,38 +59,8 @@ function createTokenManager(fetchToken) {
 
     return {
         refresh,
-        isStale,
+        isExpired,
         buildUrl
-    }
-}
-
-async function setupNativeHlsPlayback({ videoEl, sourceUrl, tokenManager }) {
-    videoEl.src = tokenManager.buildUrl(sourceUrl)
-    videoEl.load()
-
-    const onPlayGuard = async () => {
-        if (!tokenManager.isStale()) return
-
-        videoEl.pause()
-        const resumeAt = videoEl.currentTime
-
-        await tokenManager.refresh()
-
-        videoEl.src = tokenManager.buildUrl(sourceUrl)
-        videoEl.load()
-        await new Promise((resolve) => videoEl.addEventListener('loadedmetadata', resolve, { once: true }))
-
-        videoEl.currentTime = resumeAt
-        videoEl.play().catch(() => { })
-    }
-
-    videoEl.addEventListener('play', onPlayGuard)
-
-    return {
-        hlsInstance: null,
-        cleanup: () => {
-            videoEl.removeEventListener('play', onPlayGuard)
-        }
     }
 }
 
@@ -108,40 +75,63 @@ async function setupHlsJsPlayback({ videoEl, sourceUrl, tokenManager, exposeHlsG
 
     const hlsInstance = new Hls({
         capLevelToPlayerSize: false,
-        abrEwmaDefaultEstimate: 3000000,
         xhrSetup: (xhr, url) => {
             xhr.open('GET', tokenManager.buildUrl(url), true)
         }
     })
 
+    hlsInstance.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
+        if (Array.isArray(data?.levels) && data.levels.length > 0) {
+            // Prefer highest at startup; ABR can still adapt if needed.
+            const highestLevel = data.levels.length - 1
+            hlsInstance.startLevel = highestLevel
+            hlsInstance.nextLevel = highestLevel
+        }
+    })
+
+    const onHlsError = (_, data) => {
+        if (!data?.fatal) return
+
+        switch (data.type) {
+            case Hls.ErrorTypes.NETWORK_ERROR:
+                hlsInstance.startLoad()
+                break
+            case Hls.ErrorTypes.MEDIA_ERROR:
+                hlsInstance.recoverMediaError()
+                break
+            default:
+                hlsInstance.destroy()
+                break
+        }
+    }
+
+    hlsInstance.on(Hls.Events.ERROR, onHlsError)
+
     hlsInstance.loadSource(tokenManager.buildUrl(sourceUrl))
     hlsInstance.attachMedia(videoEl)
-
     if (exposeHlsGlobally) {
         globalThis.hls = hlsInstance
     }
 
-    const onPlayGuard = async () => {
-        if (!tokenManager.isStale()) return
-        await tokenManager.refresh()
-    }
-
-    videoEl.addEventListener('play', onPlayGuard)
-
     return {
         hlsInstance,
         cleanup: () => {
-            videoEl.removeEventListener('play', onPlayGuard)
-            try {
-                hlsInstance.destroy()
-            } catch (e) {
-                console.debug(e)
-            }
-
+            hlsInstance.off(Hls.Events.ERROR, onHlsError)
+            hlsInstance.destroy()
             if (exposeHlsGlobally && globalThis.hls === hlsInstance) {
                 delete globalThis.hls
             }
         }
+    }
+}
+
+async function setupNativeHlsPlayback({ videoEl, sourceUrl, tokenManager }) {
+    videoEl.src = tokenManager.buildUrl(sourceUrl)
+    videoEl.load()
+
+    return {
+        hlsInstance: null,
+        cleanup: () => { }
     }
 }
 
@@ -157,7 +147,6 @@ export async function setupTokenizedVideoPlayback({
             cleanup: () => { }
         }
     }
-
     const tokenManager = createTokenManager(fetchToken)
     await tokenManager.refresh()
 

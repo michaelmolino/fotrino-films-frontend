@@ -46,9 +46,8 @@ const props = defineProps({
 
 const channelStore = useChannelStore()
 const player = ref(null)
-const teardownVideoPlayback = ref(null)
-const plyrEndedHandler = ref(null)
-let playHandler = null
+const teardownPlayback = ref(null)
+let rebuildRunId = 0
 let PlyrCtor = null
 const { resolvePreviewSource } = useWebP()
 const audioPreviewSource = ref({ strategy: 'original-only', primaryUrl: null, fallbackUrl: null })
@@ -65,9 +64,7 @@ function onAudioPreviewError() {
 async function refreshAudioPreviewSource() {
   audioPreviewSource.value = { strategy: 'original-only', primaryUrl: null, fallbackUrl: null }
   audioPreviewUrl.value = null
-  if (!props.media?.preview) {
-    return
-  }
+  if (!props.media?.preview) return
   const source = await resolvePreviewSource(props.media.preview)
   audioPreviewSource.value = source
   audioPreviewUrl.value = source.primaryUrl || props.media.preview
@@ -79,22 +76,12 @@ async function fetchMediaToken() {
 }
 
 function destroyPlayers() {
-  if (teardownVideoPlayback.value) {
-    try {
-      teardownVideoPlayback.value()
-    } catch (e) {
-      console.debug(e)
-    }
-    teardownVideoPlayback.value = null
+  if (teardownPlayback.value) {
+    try { teardownPlayback.value() } catch (e) { console.debug(e) }
+    teardownPlayback.value = null
   }
-
   if (player.value) {
-    detachPlyrEndedHandler()
-    try {
-      player.value.destroy()
-    } catch (e) {
-      console.debug(e)
-    }
+    try { player.value.destroy() } catch (e) { console.debug(e) }
     player.value = null
   }
 }
@@ -129,88 +116,42 @@ async function setupPlayer() {
   })
 
   if (view.value === 'video') {
-    await setupVideoPlayer(el)
+    const { cleanup } = await setupTokenizedVideoPlayback({
+      videoEl: el,
+      sourceUrl: props.media.src,
+      fetchToken: fetchMediaToken,
+      exposeHlsGlobally: import.meta.env.DEV
+    })
+    teardownPlayback.value = cleanup
   } else {
-    setupAudioPlayer(el)
-  }
-  attachPlyrEndedHandler()
-}
-
-function attachPlyrEndedHandler() {
-  if (view.value !== 'video' || !player.value || typeof player.value.on !== 'function') return
-
-  detachPlyrEndedHandler()
-
-  plyrEndedHandler.value = () => {
-    try {
-      player.value.stop()
-    } catch (e) {
-      console.error('Error stopping player:', e)
-    }
-  }
-
-  try {
-    player.value.on('ended', plyrEndedHandler.value)
-  } catch (e) {
-    console.error('Error attaching ended event:', e)
-  }
-}
-
-function detachPlyrEndedHandler() {
-  if (!player.value || !plyrEndedHandler.value || typeof player.value.off !== 'function') return
-
-  try {
-    player.value.off('ended', plyrEndedHandler.value)
-  } catch (e) {
-    console.error('Error detaching ended event:', e)
-  }
-
-  plyrEndedHandler.value = null
-}
-
-async function setupAudioPlayer(el) {
-  const audio = el.tagName.toLowerCase() === 'audio' ? el : document.querySelector('audio')
-  if (audio) {
+    // Audio: just set src with token
     const audioToken = await fetchMediaToken()
-    audio.src = props.media.src + `?token=${audioToken}`
-    audio.type = props.media.type
+    el.src = props.media.src + (audioToken ? `?token=${audioToken}` : '')
   }
-}
-
-async function setupVideoPlayer(el) {
-  const video = el.tagName.toLowerCase() === 'video' ? el : document.querySelector('video')
-  if (!video || !props.media?.src) return
-
-  const { cleanup } = await setupTokenizedVideoPlayback({
-    videoEl: video,
-    sourceUrl: props.media.src,
-    fetchToken: fetchMediaToken,
-    exposeHlsGlobally: true
-  })
-
-  teardownVideoPlayback.value = cleanup
 }
 
 function attachMediaSessionHandler() {
   const el = document.getElementById(view.value === 'video' ? 'video-player' : 'audio-player')
   if (!('mediaSession' in navigator) || !el || !props.media) return
-  if (playHandler) el.removeEventListener('play', playHandler)
-  playHandler = () => {
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: props.media.title,
-      artist: props.artist,
-      artwork: [{ src: audioPreviewUrl.value || '', type: 'image/jpeg' }]
-    })
-  }
-  el.addEventListener('play', playHandler, { once: true })
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title: props.media.title,
+    artist: props.artist,
+    artwork: [{ src: audioPreviewUrl.value || '', type: 'image/jpeg' }]
+  })
 }
 
 async function rebuild() {
+  const runId = ++rebuildRunId
   addPreconnectForUrl(props.media?.src)
   addPreloadImageOnce(audioPreviewUrl.value, 'high')
   destroyPlayers()
   await nextTick()
+  if (runId !== rebuildRunId) return
   await setupPlayer()
+  if (runId !== rebuildRunId) {
+    destroyPlayers()
+    return
+  }
   attachMediaSessionHandler()
 }
 
@@ -220,6 +161,7 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
+  rebuildRunId += 1
   destroyPlayers()
 })
 
