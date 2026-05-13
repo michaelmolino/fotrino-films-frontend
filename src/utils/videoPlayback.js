@@ -34,6 +34,7 @@ async function setupHlsJsPlayback({ videoEl, sourceUrl, exposeHlsGlobally }) {
 
     const onHlsError = (_, data) => {
         if (!data?.fatal) return
+
         switch (data.type) {
             case Hls.ErrorTypes.NETWORK_ERROR:
                 hlsInstance.startLoad()
@@ -77,7 +78,11 @@ function setupNativeHlsPlayback({ videoEl, sourceUrl }) {
     }
 }
 
-export async function setupVideoPlayback({ videoEl, sourceUrl, exposeHlsGlobally = false }) {
+export async function setupVideoPlayback({
+    videoEl,
+    sourceUrl,
+    exposeHlsGlobally = false
+}) {
     if (!videoEl || !sourceUrl) {
         return { hlsInstance: null, cleanup: () => { } }
     }
@@ -86,5 +91,9 @@ export async function setupVideoPlayback({ videoEl, sourceUrl, exposeHlsGlobally
         return setupNativeHlsPlayback({ videoEl, sourceUrl })
     }
 
-    return setupHlsJsPlayback({ videoEl, sourceUrl, exposeHlsGlobally })
+    return setupHlsJsPlayback({
+        videoEl,
+        sourceUrl,
+        exposeHlsGlobally
+    })
 }

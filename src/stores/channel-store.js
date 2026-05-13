@@ -123,7 +123,10 @@ export const useChannelStore = defineStore('channel', () => {
         }
     })
 
-    const createMediaSession = ({ privateId }) => api.post(`/channels/media/session/${privateId}`)
+    const createMediaSession = async ({ privateId }) => {
+        const res = await api.post(`/channels/media/session/${privateId}`)
+        return res.data
+    }
 
     const deleteResource = async resource => {
         const url = resource.type === 'channel'

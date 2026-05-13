@@ -52,9 +52,9 @@ let PlyrCtor = null
 const { resolvePreviewSource } = useWebP()
 const audioPreviewSource = ref({ strategy: 'original-only', primaryUrl: null, fallbackUrl: null })
 const audioPreviewUrl = ref(null)
+const playbackUrl = ref(null)
 const view = computed(() => (props.media?.type?.startsWith('audio/') ? 'audio' : 'video'))
 const videoPosterUrl = computed(() => props.media?.preview || null)
-const UUID_V4ISH_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
 function onAudioPreviewError() {
   if (audioPreviewSource.value.fallbackUrl && audioPreviewUrl.value !== audioPreviewSource.value.fallbackUrl) {
@@ -82,21 +82,25 @@ function destroyPlayers() {
   }
 }
 
-async function ensureMediaSession() {
-  const privateId = props.media?.privateId
-  if (!privateId || !UUID_V4ISH_REGEX.test(privateId)) return
+async function refreshPlaybackUrl() {
+  if (!props.media?.privateId) {
+    playbackUrl.value = props.media?.src || null
+    return
+  }
 
   try {
-    await channelStore.createMediaSession({ privateId })
+    const session = await channelStore.createMediaSession({ privateId: props.media.privateId })
+    playbackUrl.value = session?.playbackUrl || props.media?.src || null
   } catch (error) {
-    // Avoid surfacing uncaught rejections for non-private fixtures or stale media IDs.
-    console.debug('Skipping media session bootstrap:', error)
+    console.debug('Failed to initialize playback URL:', error)
+    playbackUrl.value = props.media?.src || null
   }
 }
 
 async function setupPlayer() {
   const el = document.getElementById(view.value === 'video' ? 'video-player' : 'audio-player')
   if (!el || !props.media) return
+  const sourceUrl = playbackUrl.value || props.media.src
   if (view.value === 'video') {
     el.setAttribute('poster', videoPosterUrl.value)
   }
@@ -124,17 +128,14 @@ async function setupPlayer() {
   })
 
   if (view.value === 'video') {
-    await ensureMediaSession()
     const { cleanup } = await setupVideoPlayback({
       videoEl: el,
-      sourceUrl: props.media.src,
+      sourceUrl,
       exposeHlsGlobally: import.meta.env.DEV
     })
     teardownPlayback.value = cleanup
   } else {
-    // Audio: set src directly; cookie auth is handled by the browser
-    await ensureMediaSession()
-    el.src = props.media.src
+    el.src = sourceUrl
   }
 }
 
@@ -150,7 +151,8 @@ function attachMediaSessionHandler() {
 
 async function rebuild() {
   const runId = ++rebuildRunId
-  addPreconnectForUrl(props.media?.src)
+  await refreshPlaybackUrl()
+  addPreconnectForUrl(playbackUrl.value || props.media?.src)
   addPreloadImageOnce(audioPreviewUrl.value, 'high')
   destroyPlayers()
   await nextTick()
