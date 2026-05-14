@@ -26,56 +26,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
   <link rel="icon" type="image/ico" href="favicon.ico">
-
-  <!-- Inline critical styles (migrated from src/css/app.sass) to avoid a render-blocking request -->
-  <style>
-    body {
-      font-family:
-        system-ui,
-        -apple-system,
-        Segoe UI,
-        Roboto,
-        Helvetica,
-        Arial,
-        'Apple Color Emoji',
-        'Segoe UI Emoji',
-        'Segoe UI Symbol',
-        sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-
-    .width250 {
-      width: 250px;
-    }
-
-    .width480 {
-      max-width: 480px;
-    }
-
-    .width720 {
-      max-width: 720px;
-    }
-
-    .height250 {
-      height: 250px;
-    }
-
-    .my-history-dropdown-menu.q-menu[role='menu'] {
-      max-width: none !important;
-    }
-
-    /* Ensure page background reflects Quasar dark mode classes even if core CSS load order changes */
-    body.body--light {
-      background-color: #ffffff;
-      color: var(--q-dark, #2D2D2D);
-    }
-
-    body.body--dark {
-      background-color: var(--q-dark, #2D2D2D);
-      color: #e0e0e0;
-    }
-  </style>
+  <link rel="stylesheet" href="/css/global-critical.css">
 </head>
 
 <body>

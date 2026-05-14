@@ -1,7 +1,7 @@
 <template>
   <div class="header-content">
     <q-item-section avatar>
-      <div class="relative-position" style="display: flex; align-items: center; gap: 8px">
+      <div class="relative-position resource-actions-row">
         <q-avatar :square="square" :size="avatarSize">
           <template v-if="image">
             <q-img :src="image" class="cover" />
@@ -150,6 +150,11 @@ const canDelete = computed(() => !props.pending && !props.hasPendingChildren)
 }
 
 .title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.resource-actions-row {
   display: flex;
   align-items: center;
   gap: 8px;

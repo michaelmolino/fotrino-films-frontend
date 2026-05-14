@@ -40,8 +40,8 @@
       :style="{ backgroundColor: project.posterColor || '#000000' }">
       <!-- Centered overlay in the main body for color fallback -->
       <div
-        class="absolute-center text-center q-pa-sm poster-center-overlay"
-        :style="{ color: contrastTextColor }">
+        class="absolute-center text-center q-pa-sm poster-center-overlay contrast-text"
+        >
         <div class="ellipsis text-weight-bold">{{ project.title }}</div>
         <div class="ellipsis">{{ project.subtitle }}</div>
       </div>
@@ -50,7 +50,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 
 const props = defineProps({
   project: Object,
@@ -81,6 +81,16 @@ function getContrastColor(hex) {
 }
 
 const contrastTextColor = computed(() => getContrastColor(props.project?.posterColor || '#000000'))
+
+// Add dynamic color via CSS variable for .contrast-text
+onMounted(() => {
+  const el = document.querySelector('.contrast-text')
+  if (el) el.style.setProperty('--contrast-text', contrastTextColor.value)
+})
+watch(contrastTextColor, (val) => {
+  const el = document.querySelector('.contrast-text')
+  if (el) el.style.setProperty('--contrast-text', val)
+})
 </script>
 
 <style scoped>
@@ -91,5 +101,8 @@ const contrastTextColor = computed(() => getContrastColor(props.project?.posterC
 }
 .poster-center-overlay {
   pointer-events: none; /* allow click-through to the button */
+}
+.contrast-text {
+  color: var(--contrast-text, #fff);
 }
 </style>
