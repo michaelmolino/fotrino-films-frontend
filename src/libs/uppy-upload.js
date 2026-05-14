@@ -3,7 +3,7 @@ import AwsS3 from '@uppy/aws-s3'
 import {
     createMultipartCompanionApi,
     getMultipartMediaId
-} from './uppy-upload-companion-api.js'
+} from './uppy-upload-multipart.js'
 import { uploadAndAssert } from './uppy-upload-policy.js'
 
 /** Minimum file size (bytes) for multipart upload. Only applies to `upload` resource type. */

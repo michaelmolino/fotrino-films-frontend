@@ -76,7 +76,7 @@
               animation="none" />
             <q-img
               v-if="payload.uuid && payload.uuid.value !== 0"
-              :src="channels.find(ch => ch.uuid === payload.uuid.value).cover"
+              :src="selectedChannelCover"
               class="width250"
               :ratio="1 / 1"
               fit="cover"
@@ -100,14 +100,20 @@
 <script setup>
 import { computed, onMounted, watch } from 'vue'
 const props = defineProps({
-  payload: Object,
-  channels: Array,
-  profile: Object,
-  coverFile: [File, Array, null],
-  coverThumb: [String, null],
-  handleFile: Function
+  payload: { type: Object, required: true },
+  channels: { type: Array, default: () => [] },
+  profile: { type: Object, default: () => ({}) },
+  coverFile: { type: [File, Array], default: null },
+  coverThumb: { type: String, default: null },
+  handleFile: { type: Function, default: null }
 })
 const emit = defineEmits(['update:payload', 'update:coverFile'])
+
+const selectedChannelCover = computed(() => {
+  const selectedUuid = props.payload?.uuid?.value
+  if (!selectedUuid) return null
+  return props.channels.find(ch => ch.uuid === selectedUuid)?.cover || null
+})
 
 const localCoverType = computed({
   get: () => props.payload.coverType,

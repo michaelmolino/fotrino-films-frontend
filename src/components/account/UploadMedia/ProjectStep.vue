@@ -62,14 +62,14 @@
 
 <script setup>
 import { computed, onMounted, watch } from 'vue'
-import ProjectPoster from '@components/channel/ProjectPoster.vue'
+import ProjectPoster from '@components/channel/shared/ProjectPoster.vue'
 import ProjectPosterFields from '@components/account/shared/ProjectPosterFields.vue'
 const props = defineProps({
-  payload: Object,
-  projects: Array,
-  project: Object,
-  posterFile: [File, Array, null],
-  handleFile: Function
+  payload: { type: Object, required: true },
+  projects: { type: Array, default: () => [] },
+  project: { type: Object, default: () => ({}) },
+  posterFile: { type: [File, Array], default: null },
+  handleFile: { type: Function, default: null }
 })
 const emit = defineEmits(['update:payload', 'update:posterFile'])
 const defaultColor = '#000000'

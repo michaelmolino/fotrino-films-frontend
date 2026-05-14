@@ -47,23 +47,26 @@
 </template>
 
 <script setup>
-import { computed, watch, defineAsyncComponent } from 'vue'
+import { computed, watch, defineAsyncComponent, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
 
 import BreadCrumbs from '@components/shared/BreadCrumbs.vue'
-import MediaPreview from '@components/channel/MediaPreview.vue'
-import PlyrPlayer from '@components/channel/ProjectRoot/PlyrPlayer.vue'
-import MediaDescription from '@components/channel/ProjectRoot/MediaDescription.vue'
+import MediaPreview from '@components/channel/shared/MediaPreview.vue'
+import PlyrPlayer from '@components/channel/MediaRoot/PlyrPlayer.vue'
+import MediaDescription from '@components/channel/MediaRoot/MediaDescription.vue'
 const NothingText = defineAsyncComponent(() => import('@components/shared/NothingText.vue'))
 
 const route = useRoute()
 const router = useRouter()
+const redirecting = ref(false)
 
 const { channel, loading } = useChannelLoader()
 
 function redirect(pathOrObj) {
-  setTimeout(() => router.replace(pathOrObj), 0)
+  if (redirecting.value) return
+  redirecting.value = true
+  router.replace(pathOrObj)
 }
 
 function findProjectByParams() {

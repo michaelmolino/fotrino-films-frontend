@@ -11,44 +11,66 @@ import * as exifr from 'exifr'
 export async function extractExifDate(file) {
     if (!file) return null
     try {
-        let date = null
-        const meta = await exifr.parse(file, [
-            'DateTimeOriginal',
-            'CreateDate',
-            'MediaCreateDate',
-            'TrackCreateDate',
-            'ModifyDate',
-            'CreationTime',
-            'date',
-            'creation_time',
-        ])
-        if (meta) {
-            date = meta.DateTimeOriginal || meta.CreateDate || meta.MediaCreateDate || meta.TrackCreateDate || meta.ModifyDate || meta.CreationTime || meta.date || meta.creation_time || null
-        }
-        if (date && typeof date === 'string') {
-            const parsed = new Date(date)
-            if (!Number.isNaN(parsed.getTime())) return parsed
-        } else if (date instanceof Date && !Number.isNaN(date.getTime())) {
-            return date
-        }
-        // If no date found in metadata, fall back to lastModified
-        if (file.lastModified) {
-            const fallback = new Date(file.lastModified)
-            if (!Number.isNaN(fallback.getTime())) return fallback
-        }
-        return null
+        const date = await getExifDate(file)
+        if (date) return date
+        return getFallbackDate(file)
     } catch (e) {
         // Only log unexpected errors
         if (!String(e).includes('Unknown file format')) {
             console.debug('exifr error', e)
         }
-        // Fallback to lastModified if available
-        if (file.lastModified) {
-            const fallback = new Date(file.lastModified)
-            if (!Number.isNaN(fallback.getTime())) return fallback
-        }
-        return null
+        return getFallbackDate(file)
     }
+}
+
+/**
+ * Attempts to extract date from EXIF metadata
+ * @param {File|Blob} file
+ * @returns {Promise<Date|null>}
+ */
+async function getExifDate(file) {
+    const meta = await exifr.parse(file, [
+        'DateTimeOriginal',
+        'CreateDate',
+        'MediaCreateDate',
+        'TrackCreateDate',
+        'ModifyDate',
+        'CreationTime',
+        'date',
+        'creation_time',
+    ])
+    if (!meta) return null
+
+    const date = meta.DateTimeOriginal || meta.CreateDate || meta.MediaCreateDate || meta.TrackCreateDate || meta.ModifyDate || meta.CreationTime || meta.date || meta.creation_time
+    return validateDate(date)
+}
+
+/**
+ * Validates and converts date to Date object
+ * @param {string|Date|null} date
+ * @returns {Date|null}
+ */
+function validateDate(date) {
+    if (!date) return null
+    if (typeof date === 'string') {
+        const parsed = new Date(date)
+        return Number.isNaN(parsed.getTime()) ? null : parsed
+    }
+    if (date instanceof Date && !Number.isNaN(date.getTime())) {
+        return date
+    }
+    return null
+}
+
+/**
+ * Gets fallback date from file.lastModified
+ * @param {File|Blob} file
+ * @returns {Date|null}
+ */
+function getFallbackDate(file) {
+    if (!file.lastModified) return null
+    const fallback = new Date(file.lastModified)
+    return Number.isNaN(fallback.getTime()) ? null : fallback
 }
 
 // Future: add more metadata extraction helpers as needed

@@ -2,18 +2,15 @@ import { Notify } from 'quasar'
 
 // Action button configs for reuse
 const DISMISS_ACTION = Object.freeze([{ label: 'Dismiss', color: 'white' }])
-const CONFIRM_ACTION = (label = 'Confirm delete', action = {}) => ({
+const createAction = (label, action = {}) => ({
     label,
     color: 'white',
     ...action,
     handler: action.handler || (() => { })
 })
-const CANCEL_ACTION = (label = 'Go Back', action = {}) => ({
-    label,
-    color: 'white',
-    ...action,
-    handler: action.handler || (() => { })
-})
+
+const CONFIRM_ACTION = (label = 'Confirm delete', action = {}) => createAction(label, action)
+const CANCEL_ACTION = (label = 'Go Back', action = {}) => createAction(label, action)
 
 // Add persistent dismiss button if timeout is 0 and no actions
 function withPersistentDismiss(options) {

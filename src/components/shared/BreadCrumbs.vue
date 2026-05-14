@@ -29,10 +29,10 @@
 import { computed } from 'vue'
 
 const props = defineProps({
-  channel: Object,
-  project: Object,
-  media: Object,
-  private: Boolean
+  channel: { type: Object, required: true },
+  project: { type: Object, default: null },
+  media: { type: Object, default: null },
+  private: { type: Boolean, default: false }
 })
 
 const breadcrumbs = computed(() => {

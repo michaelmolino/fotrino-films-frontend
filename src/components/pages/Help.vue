@@ -2,19 +2,18 @@
   <div class="q-pa-md flex flex-center" data-cy="help-page">
     <q-card flat bordered class="q-pa-xl card-terms" data-cy="help-card">
       <div class="text-h4 text-center q-mb-md" data-cy="help-title">Frequently Asked Questions</div>
-      <div class="text-caption text-center q-mb-lg">Frequently asked questions and answers</div>
+      <div class="text-caption text-center q-mb-lg">Helpful answers to common questions about Fotrino Films</div>
       <q-list bordered data-cy="help-faq-list">
         <q-expansion-item
           data-cy="help-item-about"
           group="faq"
           label="What is Fotrino Films?"
-          :default-opened="!selectedItem || selectedItem === 'about'"
+          :model-value="selectedItem === 'about'"
           header-class="text-bold"
-          @show="onItemSelect('about')"
-          @hide="() => onItemHide('about')">
+          @update:model-value="value => onItemToggle('about', value)">
           <q-card>
             <q-card-section>
-              Fotrino Films is a platform for hosting video content and sharing with family and friends.
+              Fotrino Films is a video hosting platform built for sharing personal content with family and friends.
             </q-card-section>
           </q-card>
         </q-expansion-item>
@@ -22,18 +21,17 @@
         <q-expansion-item
           data-cy="help-item-different"
           group="faq"
-          label="How is it different from other video hosts?"
+          label="What makes it different from other video platforms?"
           header-class="text-bold"
-          :default-opened="selectedItem === 'different'"
-          @show="onItemSelect('different')"
-          @hide="() => onItemHide('different')">
+          :model-value="selectedItem === 'different'"
+          @update:model-value="value => onItemToggle('different', value)">
           <q-card>
             <q-card-section data-cy="help-answer-different">
               <div>
-                The aim of Fotrino Films is to provide private, ad-free video hosting. It’s not built for
-                monetization or content discovery — there are no ads, algorithms, or data tracking.
-                Unlike platforms designed to pay creators for views, Fotrino Films lets you pay to
-                securely host your content and share it directly with people you know.
+                Fotrino Films is meant to be simple, private, and ad-free. It is not built around
+                discovery, monetization, or engagement metrics, so there are no ads, recommendation
+                algorithms, or tracking designed to keep people watching. The focus is on giving you a
+                secure place to host your videos and share them directly with the people you choose.
               </div>
             </q-card-section>
           </q-card>
@@ -44,12 +42,11 @@
           group="faq"
           label="Is Fotrino Films open source?"
           header-class="text-bold"
-          :default-opened="selectedItem === 'opensource'"
-          @show="onItemSelect('opensource')"
-          @hide="() => onItemHide('opensource')">
+          :model-value="selectedItem === 'opensource'"
+          @update:model-value="value => onItemToggle('opensource', value)">
           <q-card>
             <q-card-section data-cy="help-answer-opensource">
-              Only the frontend of Fotrino Films is open source.
+              The frontend is open source. The rest of the platform is not.
             </q-card-section>
           </q-card>
         </q-expansion-item>
@@ -59,16 +56,15 @@
           group="faq"
           label="Is my content public or private?"
           header-class="text-bold"
-          :default-opened="selectedItem === 'privacy'"
-          @show="onItemSelect('privacy')"
-          @hide="() => onItemHide('privacy')">
+          :model-value="selectedItem === 'privacy'"
+          @update:model-value="value => onItemToggle('privacy', value)">
           <q-card>
             <q-card-section>
               <div>
-                By default, your content is only accessible to those with the specific link to your
-                channel. It is not indexed by search engines and the URLs are cannot be guessed.
-                There are no mechanisms in place to prevent someone from sharing your links, so
-                please only share with trusted individuals.
+                By default, your content is only available to people who have the direct link to your
+                channel. It is not indexed by search engines, and the URLs are not easy to guess.
+                That said, anyone you share a link with can pass it along, so it is best to share
+                only with people you trust.
               </div>
             </q-card-section>
           </q-card>
@@ -79,12 +75,11 @@
           group="faq"
           label="Is it ready to use?"
           header-class="text-bold"
-          :default-opened="selectedItem === 'production'"
-          @show="onItemSelect('production')"
-          @hide="() => onItemHide('production')">
+          :model-value="selectedItem === 'production'"
+          @update:model-value="value => onItemToggle('production', value)">
           <q-card>
             <q-card-section>
-              At the moment, it's mostly a personal project for me and my family.
+              It is usable today, but it is still primarily a personal project built for me and my family.
             </q-card-section>
           </q-card>
         </q-expansion-item>
@@ -94,14 +89,14 @@
           group="faq"
           label="Does it work on mobile?"
           header-class="text-bold"
-          :default-opened="selectedItem === 'mobilesupport'"
-          @show="onItemSelect('mobilesupport')"
-          @hide="() => onItemHide('mobilesupport')">
+          :model-value="selectedItem === 'mobilesupport'"
+          @update:model-value="value => onItemToggle('mobilesupport', value)">
           <q-card>
             <q-card-section>
-              Fotrino Films is designed to work on all modern browsers and devices, including mobile
-              phones and tablets. The upload experience is optimized for desktop; for mobile uploads,
-              you must ensure the device does not enter sleep mode.
+              Fotrino Films works on modern browsers across desktop, tablet, and mobile devices.
+              Watching videos on mobile is fully supported. Uploading is more reliable on desktop;
+              if you upload from a phone or tablet, you will need to keep the device awake until
+              the upload finishes.
             </q-card-section>
           </q-card>
         </q-expansion-item>
@@ -109,16 +104,15 @@
         <q-expansion-item
           data-cy="help-item-download"
           group="faq"
-          label="Do videos have any DRM?  Can I download a video?"
+          label="Are videos protected by DRM, and can they be downloaded?"
           header-class="text-bold"
-          :default-opened="selectedItem === 'download'"
-          @show="onItemSelect('download')"
-          @hide="() => onItemHide('download')">
+          :model-value="selectedItem === 'download'"
+          @update:model-value="value => onItemToggle('download', value)">
           <q-card>
             <q-card-section>
-              Videos on Fotrino Films are not protected by DRM. While downloading videos is not
-              officially supported, it is possible for advanced users to do so if they have your
-              private link.
+              Videos on Fotrino Films do not use DRM. Downloads are not offered as a built-in
+              feature, but someone with the private link and enough technical knowledge may still be
+              able to save a copy.
             </q-card-section>
           </q-card>
         </q-expansion-item>
@@ -126,18 +120,17 @@
         <q-expansion-item
           data-cy="help-item-buffering"
           group="faq"
-          label="What can I do if I'm experiencing buffering or poor video quality?"
+          label="What should I do if I am seeing buffering or poor video quality?"
           header-class="text-bold"
-          :default-opened="selectedItem === 'buffering'"
-          @show="onItemSelect('buffering')"
-          @hide="() => onItemHide('buffering')">
+          :model-value="selectedItem === 'buffering'"
+          @update:model-value="value => onItemToggle('buffering', value)">
           <q-card>
             <q-card-section>
-              Fotrino Films uses a global CDN and adaptive bitrate streaming to optimize video
-              quality based on your internet speed and device size. If you're experiencing buffering
-              or poor quality, it may be due to a weak signal in your area. Ensure you have a stable
-              connection for the best experience. Depending on your device, sometimes the video may
-              start at a lower resolution, but it should improve after a few moments of buffering.
+              Fotrino Films uses adaptive streaming, so video quality adjusts based on your device
+              and connection speed. If playback is buffering or looks blurry, the most common cause
+              is an unstable or slow connection. If possible, switch to a stronger Wi-Fi or mobile
+              signal and give the video a moment to settle. Some devices also start at a lower
+              quality before stepping up automatically.
             </q-card-section>
           </q-card>
         </q-expansion-item>
@@ -145,11 +138,10 @@
         <q-expansion-item
           data-cy="help-item-facebook"
           group="faq"
-          label="When I share a link on Facebook, I'm not getting a preview image.  What should I do?"
+          label="Why is Facebook not showing a preview image for my link?"
           header-class="text-bold"
-          :default-opened="selectedItem === 'facebook'"
-          @show="onItemSelect('facebook')"
-          @hide="() => onItemHide('facebook')">
+          :model-value="selectedItem === 'facebook'"
+          @update:model-value="value => onItemToggle('facebook', value)">
           <q-card>
             <q-card-section>
               Use the
@@ -161,8 +153,8 @@
                 href="https://developers.facebook.com/tools/debug/"
                 aria-label="Open Facebook Link Debugger tool"
                 target="_blank" />
-              to check and manage how your link appears on Facebook. This tool lets you confirm the
-              preview image and other metadata before sharing your link.
+              to refresh and inspect how Facebook reads your link. It can help pull in the preview
+              image and confirm the metadata before you share it again.
             </q-card-section>
           </q-card>
         </q-expansion-item>
@@ -170,17 +162,16 @@
         <q-expansion-item
           data-cy="help-item-login"
           group="faq"
-          label="Can I create an account without using Google or another service?"
+          label="Can I create an account without using Google or another provider?"
           header-class="text-bold"
-          :default-opened="selectedItem === 'login'"
-          @show="onItemSelect('login')"
-          @hide="() => onItemHide('login')">
+          :model-value="selectedItem === 'login'"
+          @update:model-value="value => onItemToggle('login', value)">
           <q-card>
             <q-card-section>
-              Third-party identity providers, such as Google, enhance security by protecting you
-              from hackers and other threats. No content or usage data is shared with third parties
-              beyond what’s necessary for login. Additional identity providers may be supported in
-              the future.
+              At the moment, sign-in relies on third-party identity providers such as Google. That
+              approach helps offload account security to providers that are better equipped to handle
+              authentication safely. No content or viewing data is shared beyond what is needed to
+              support login, and additional sign-in options may be added over time.
             </q-card-section>
           </q-card>
         </q-expansion-item>
@@ -190,14 +181,14 @@
           group="faq"
           label="Is there a file size limit for uploads?"
           header-class="text-bold"
-          :default-opened="selectedItem === 'filesize'"
-          @show="onItemSelect('filesize')"
-          @hide="() => onItemHide('filesize')">
+          :model-value="selectedItem === 'filesize'"
+          @update:model-value="value => onItemToggle('filesize', value)">
           <q-card>
             <q-card-section>
-              Very large uploads are currently supported, however to avoid your content and account
-              being deleted, please limit uploads to reasonable sizes (e.g. under 20GB). If you
-              have a specific use case that requires larger uploads, please contact support.
+              Large uploads are supported, but please keep them to reasonable sizes, such as under
+              20GB. Extremely large uploads may trigger manual review and could put your content or
+              account at risk if they appear abusive. If you have a legitimate need for larger
+              uploads, contact support first.
             </q-card-section>
           </q-card>
         </q-expansion-item>
@@ -205,24 +196,23 @@
         <q-expansion-item
           data-cy="help-item-terminology"
           group="faq"
-          label="Terminology"
+          label="What do channels, projects, and media mean?"
           header-class="text-bold"
-          :default-opened="selectedItem === 'terminology'"
-          @show="onItemSelect('terminology')"
-          @hide="() => onItemHide('terminology')">
+          :model-value="selectedItem === 'terminology'"
+          @update:model-value="value => onItemToggle('terminology', value)">
           <q-card>
             <q-card-section>
               <ul>
                 <li>
-                  Channels are the highest organizational level, with separate, independent spaces
-                  for each. Users typically have one, but multiple channels can be created.
+                  A channel is the top-level space where your content lives. Most people only need
+                  one, but you can create more than one if you want to keep things separate.
                 </li>
                 <li>
-                  Projects are contained within channels and act as organizational folders for your
-                  media. You can think of them as albums.
+                  Projects live inside channels and help you organize your media. You can think of
+                  them like albums or folders.
                 </li>
                 <li>
-                  Media (videos and audio files) exist within projects.
+                  Media refers to the individual video or audio files inside a project.
                 </li>
               </ul>
             </q-card-section>
@@ -236,39 +226,37 @@
 
 <script setup>
 import facebookIcon from '@assets/icons/facebook.svg'
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 defineOptions({ name: 'Help-Page' })
 const route = useRoute()
 const router = useRouter()
 const selectedItem = computed(() => route.query.item)
-let hideTimer = null
 
-function onItemSelect(item) {
-  router.replace({
-    query: {
-      ...route.query,
-      item
-    }
-  })
-}
+onMounted(() => {
+  if (!selectedItem.value) {
+    router.replace({
+      query: {
+        ...route.query,
+        item: 'about'
+      }
+    })
+  }
+})
 
-function onItemHide(item) {
-  if (hideTimer) {
-    clearTimeout(hideTimer)
+function onItemToggle(item, isOpen) {
+  const nextItem = isOpen ? item : undefined
+  if (selectedItem.value === nextItem) return
+
+  const query = { ...route.query }
+  if (nextItem) {
+    query.item = nextItem
+  } else {
+    delete query.item
   }
 
-  // A short delay prevents races with the next expansion item's @show event.
-  hideTimer = setTimeout(() => {
-    if (selectedItem.value === item) {
-      const otherQuery = { ...route.query }
-      delete otherQuery.item
-      router.replace({
-        query: otherQuery
-      })
-    }
-  }, 100)
+  router.replace({ query })
 }
 </script>
 

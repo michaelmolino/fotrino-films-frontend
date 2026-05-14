@@ -61,12 +61,12 @@ import { useQuasar } from 'quasar'
 import MediaMetadataFields from '@components/account/shared/MediaMetadataFields.vue'
 import MediaPreviewSelectorFields from '@components/account/shared/MediaPreviewSelectorFields.vue'
 const props = defineProps({
-  payload: Object,
-  media: Object,
-  mediaFile: [File, Array, null],
-  previewFile: [File, Array, null],
-  handleFile: Function,
-  previewProcessing: Boolean
+  payload: { type: Object, required: true },
+  media: { type: Object, default: () => ({}) },
+  mediaFile: { type: [File, Array], default: null },
+  previewFile: { type: [File, Array], default: null },
+  handleFile: { type: Function, default: null },
+  previewProcessing: { type: Boolean, default: false }
 })
 const emit = defineEmits([
   'update:payload',

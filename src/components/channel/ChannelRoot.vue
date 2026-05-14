@@ -72,8 +72,8 @@ import { useRoute } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
 
 import BreadCrumbs from '@components/shared/BreadCrumbs.vue'
-import ProjectPoster from '@components/channel/ProjectPoster.vue'
-import MediaPreview from '@components/channel/MediaPreview.vue'
+import ProjectPoster from '@components/channel/shared/ProjectPoster.vue'
+import MediaPreview from '@components/channel/shared/MediaPreview.vue'
 import ViewToggle from './ChannelRoot/ViewToggle.vue'
 const NothingText = defineAsyncComponent(() => import('@components/shared/NothingText.vue'))
 

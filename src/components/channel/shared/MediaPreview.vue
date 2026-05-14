@@ -58,23 +58,30 @@ import { addPreconnectForUrl } from '@utils/preconnect'
 import { useWebP } from '@composables/useWebP'
 
 const { media, project, detail, showMainAccent, priority, to } = defineProps({
-  media: Object,
-  project: Object,
-  detail: Boolean,
+  media: { type: Object, required: true },
+  project: { type: Object, default: null },
+  detail: { type: Boolean, default: false },
   showMainAccent: { type: Boolean, default: true },
   priority: { type: String, default: 'auto' }, // 'high', 'low', or 'auto'
-  to: String
+  to: { type: [String, Object], default: null }
 })
 
 const { resolvePreviewSource } = useWebP()
 const previewSource = ref({ strategy: 'original-only', primaryUrl: null, fallbackUrl: null })
 const finalUrl = ref(null)
 const ready = ref(false)
+let previewResolveToken = 0
 
 // Watch media.preview to re-resolve whenever it changes (e.g., thumbnail refresh)
 watch(
   () => media?.preview,
-  async newPreview => {
+  async (newPreview, _oldPreview, onCleanup) => {
+    const token = ++previewResolveToken
+    let active = true
+    onCleanup(() => {
+      active = false
+    })
+
     if (!newPreview) {
       previewSource.value = { strategy: 'original-only', primaryUrl: null, fallbackUrl: null }
       finalUrl.value = null
@@ -85,6 +92,7 @@ watch(
     ready.value = false
     // Resolve explicit source strategy: primary first, fallback on error.
     const resolved = await resolvePreviewSource(newPreview)
+    if (!active || token !== previewResolveToken) return
     previewSource.value = resolved
     finalUrl.value = resolved.primaryUrl || newPreview
     ready.value = true

@@ -15,8 +15,7 @@
           no-caps
           :aria-label="`Sign in with ${provider.name}`"
           size="md"
-          class="col-xs-12"
-          @click="storeRedirect">
+          class="col-xs-12">
           <q-icon
             :name="provider.icon"
             :class="$q.dark.isActive ? 'oauth-icon--white q-mr-md' : 'q-mr-md'" />
@@ -28,10 +27,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { useAccountStore } from 'src/stores/account-store.js'
 import { useQuasar } from 'quasar'
-import { storeRedirect } from '@utils/auth.js'
 import googleIcon from '@assets/icons/google.svg'
 import microsoftIcon from '@assets/icons/microsoft.svg'
 import facebookIcon from '@assets/icons/facebook.svg'
@@ -41,43 +40,56 @@ import yahooIcon from '@assets/icons/yahoo.svg'
 
 const $q = useQuasar()
 const accountStore = useAccountStore()
-const oauthProviders = ref([])
+const route = useRoute()
+const providerKeys = ref([])
+
+const providerMap = {
+  google: {
+    name: 'Google',
+    icon: `img:${googleIcon}`
+  },
+  microsoft: {
+    name: 'Microsoft',
+    icon: `img:${microsoftIcon}`
+  },
+  apple: {
+    name: 'Apple',
+    icon: `img:${appleIcon}`
+  },
+  facebook: {
+    name: 'Facebook',
+    icon: `img:${facebookIcon}`
+  },
+  github: {
+    name: 'Github',
+    icon: `img:${githubIcon}`
+  },
+  yahoo: {
+    name: 'Yahoo',
+    icon: `img:${yahooIcon}`
+  }
+}
+
+function getProviderLoginHref(providerKey) {
+  const returnTo = route.fullPath || '/'
+  return `${process.env.API}/account/login/${providerKey}?redirect_to=${encodeURIComponent(returnTo)}`
+}
+
+const oauthProviders = computed(() => {
+  return providerKeys.value
+    .map(providerKey => {
+      const base = providerMap[providerKey]
+      if (!base) return null
+      return {
+        ...base,
+        login: getProviderLoginHref(providerKey)
+      }
+    })
+    .filter(Boolean)
+})
 
 onMounted(async () => {
-  const providers = await accountStore.getProviders()
-  const providerMap = {
-    google: {
-      name: 'Google',
-      icon: `img:${googleIcon}`,
-      login: process.env.API + '/account/login/google'
-    },
-    microsoft: {
-      name: 'Microsoft',
-      icon: `img:${microsoftIcon}`,
-      login: process.env.API + '/account/login/microsoft'
-    },
-    apple: {
-      name: 'Apple',
-      icon: `img:${appleIcon}`,
-      login: process.env.API + '/account/login/apple'
-    },
-    facebook: {
-      name: 'Facebook',
-      icon: `img:${facebookIcon}`,
-      login: process.env.API + '/account/login/facebook'
-    },
-    github: {
-      name: 'Github',
-      icon: `img:${githubIcon}`,
-      login: process.env.API + '/account/login/github'
-    },
-    yahoo: {
-      name: 'Yahoo',
-      icon: `img:${yahooIcon}`,
-      login: process.env.API + '/account/login/yahoo'
-    }
-  }
-  oauthProviders.value = providers.map(p => providerMap[p]).filter(Boolean)
+  providerKeys.value = await accountStore.getProviders()
 })
 </script>
 

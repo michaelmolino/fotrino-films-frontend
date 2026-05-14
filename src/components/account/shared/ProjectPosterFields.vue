@@ -95,7 +95,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import ProjectPoster from '@components/channel/ProjectPoster.vue'
+import ProjectPoster from '@components/channel/shared/ProjectPoster.vue'
 
 defineProps({
   subtitle: {
