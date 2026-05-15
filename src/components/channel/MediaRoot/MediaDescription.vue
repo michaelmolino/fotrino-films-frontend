@@ -1,51 +1,57 @@
 <template>
   <q-card flat bordered class="description" data-cy="media-description-card">
     <q-card-section vertical>
-      <q-icon :name="isPublic ? 'public' : 'public_off'" size="md" class="q-pr-sm" />
-      <span class="text-h6">{{ media?.title || '' }}</span>
-      <q-btn
-        flat
-        class="q-pa-sm float-right"
-        icon="flag"
-        color="warning"
-        aria-label="Report this content"
-        data-cy="report-button"
-        @click="openReportDialog">
-        <q-tooltip>Report</q-tooltip>
-      </q-btn>
-      <q-btn-dropdown
-        dropdown-icon="share"
-        class="q-pa-sm float-right"
-        color="info"
-        aria-label="Share this video"
-        data-cy="share-button"
-        flat>
-        <q-list>
-          <q-item v-if="isPublic" clickable v-close-popup data-cy="share-within-channel" @click="copyLink('public')">
-            <q-item-section avatar>
-              <q-avatar icon="public" color="accent" text-color="white" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>Share within this channel</q-item-label>
-            </q-item-section>
-            <q-item-section side>
-              <q-icon name="content_copy" color="accent" />
-            </q-item-section>
-          </q-item>
-          <q-item clickable v-close-popup data-cy="share-only-video" @click="copyLink('private')">
-            <q-item-section avatar>
-              <q-avatar icon="public_off" color="accent" text-color="white" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label v-if="isPublic">Share only this video</q-item-label>
-              <q-item-label v-else>Share this video</q-item-label>
-            </q-item-section>
-            <q-item-section side>
-              <q-icon name="content_copy" color="accent" />
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-btn-dropdown>
+      <div class="description-header">
+        <div class="description-title-wrap">
+          <q-icon :name="isPublic ? 'public' : 'public_off'" size="md" class="q-pr-sm description-visibility-icon" />
+          <span class="text-h6 description-title">{{ media?.title || '' }}</span>
+        </div>
+        <div class="description-actions">
+          <q-btn
+            flat
+            class="q-pa-sm"
+            icon="flag"
+            color="warning"
+            aria-label="Report this content"
+            data-cy="report-button"
+            @click="openReportDialog">
+            <q-tooltip>Report</q-tooltip>
+          </q-btn>
+          <q-btn-dropdown
+            dropdown-icon="share"
+            class="q-pa-sm"
+            color="info"
+            aria-label="Share this video"
+            data-cy="share-button"
+            flat>
+            <q-list>
+              <q-item v-if="isPublic" clickable v-close-popup data-cy="share-within-channel" @click="copyLink('public')">
+                <q-item-section avatar>
+                  <q-avatar icon="public" color="accent" text-color="white" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Share within this channel</q-item-label>
+                </q-item-section>
+                <q-item-section side>
+                  <q-icon name="content_copy" color="accent" />
+                </q-item-section>
+              </q-item>
+              <q-item clickable v-close-popup data-cy="share-only-video" @click="copyLink('private')">
+                <q-item-section avatar>
+                  <q-avatar icon="public_off" color="accent" text-color="white" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label v-if="isPublic">Share only this video</q-item-label>
+                  <q-item-label v-else>Share this video</q-item-label>
+                </q-item-section>
+                <q-item-section side>
+                  <q-icon name="content_copy" color="accent" />
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
+        </div>
+      </div>
       <div class="text-subtitle2 q-pl-xl">Captured {{ sinceCaptured }}</div>
       <div class="text-subtitle2 q-pl-xl">Published {{ sincePublished }}</div>
     </q-card-section>
@@ -183,5 +189,47 @@ function copyLink(val) {
   width: 100%;
   max-width: 720px;
   min-width: 240px;
+}
+
+.description-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.description-title-wrap {
+  display: flex;
+  align-items: flex-start;
+  min-width: 0;
+  flex: 1 1 320px;
+}
+
+.description-visibility-icon {
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+
+.description-title {
+  min-width: 0;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.description-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+@media (max-width: 600px) {
+  .description-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
 }
 </style>
