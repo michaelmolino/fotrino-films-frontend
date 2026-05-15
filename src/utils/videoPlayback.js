@@ -26,8 +26,17 @@ async function setupHlsJsPlayback({ videoEl, sourceUrl, exposeHlsGlobally }) {
 
     hlsInstance.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
         if (Array.isArray(data?.levels) && data.levels.length > 0) {
-            const highestLevel = data.levels.length - 1
-            // Bias startup toward the top rendition but keep ABR in auto mode.
+            const highestLevel = data.levels.reduce((bestIndex, level, index, levels) => {
+                if (bestIndex < 0) return index
+
+                const bestLevel = levels[bestIndex] || {}
+                const currentScore = Number(level?.bitrate || 0)
+                const bestScore = Number(bestLevel?.bitrate || 0)
+
+                return currentScore > bestScore ? index : bestIndex
+            }, -1)
+
+            // Bias startup toward the highest-bitrate rendition while keeping ABR in auto mode.
             hlsInstance.firstLevel = highestLevel
             hlsInstance.startLevel = highestLevel
         }
