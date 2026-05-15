@@ -51,7 +51,7 @@ export const useAccountStore = defineStore('account', () => {
     }
 
     const logout = async () => {
-        await api.get('/account/logout')
+        await api.post('/account/logout')
         setProfile(null)
         return true
     }
