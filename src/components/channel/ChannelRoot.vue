@@ -24,7 +24,7 @@
 
         <q-separator spaced />
 
-        <template v-if="selectedView === 'projects'">
+        <template v-if="effectiveSelectedView === 'projects'">
           <div class="row q-mt-sm">
             <div
               class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
@@ -98,11 +98,9 @@ const projects = computed(() => {
 const projectCount = computed(() => projects.value.length)
 const showViewToggle = computed(() => projectCount.value !== 1)
 
-watch(projectCount, count => {
-  if (count === 1 && selectedView.value !== 'all') {
-    selectedView.value = 'all'
-  }
-})
+// For single-project channels, force the rendered view to media without
+// mutating the persisted user preference.
+const effectiveSelectedView = computed(() => (projectCount.value === 1 ? 'all' : selectedView.value))
 
 const allCount = computed(() => sortedAllMedia.value.length)
 </script>
