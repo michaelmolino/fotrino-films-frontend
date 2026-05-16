@@ -45,9 +45,18 @@ export default {
 }
 
 .bg-hero-dark {
+  position: relative;
+  isolation: isolate;
+}
+
+.bg-hero-dark::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
   background:
     radial-gradient(1000px 480px at 85% 20%, rgba($primary, 0.45), rgba($primary, 0) 68%),
     radial-gradient(780px 360px at 10% 88%, rgba($secondary, 0.14), rgba($secondary, 0) 62%);
-  background-attachment: fixed;
 }
 </style>
