@@ -24,7 +24,7 @@ const Terms = defineAsyncComponent(() => import('@components/pages/Terms.vue'))
 const accountStore = useAccountStore()
 const route = useRoute()
 const router = useRouter()
-const { loadChannel } = useChannelLoader()
+const { loadChannel } = useChannelLoader({ manageMeta: true })
 
 const showTerms = ref(false)
 

@@ -7,10 +7,12 @@ import { addPrivateHistory } from '@utils/history.js'
 
 /**
  * Composable for loading and setting channel data based on route parameters
- * Also manages page metadata updates
+ * Can optionally manage page metadata updates
+ * @param {Object} [options]
+ * @param {boolean} [options.manageMeta=false] - Whether this instance should register and update page meta tags
  * @returns {Object} - Object with loadChannel method and metaData ref
  */
-export function useChannelLoader() {
+export function useChannelLoader({ manageMeta = false } = {}) {
   const channelStore = useChannelStore()
   const route = useRoute()
   const router = useRouter()
@@ -24,8 +26,10 @@ export function useChannelLoader() {
     () => loadStatus.value === 'loading' || (loadStatus.value === 'idle' && needsChannelData.value)
   )
 
-  // Setup Quasar meta management
-  useMeta(() => metaData.value)
+  // Only one owner should register meta updates to avoid conflicting page titles.
+  if (manageMeta) {
+    useMeta(() => metaData.value)
+  }
 
   /**
    * Load channel data from route params and update store/router/metadata
