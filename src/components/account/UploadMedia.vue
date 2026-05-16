@@ -5,7 +5,15 @@
         <q-item-label class="text-h5">Upload Media</q-item-label>
       </q-item-section>
     </q-item>
+    <q-banner
+      v-if="isNewUserProfile"
+      rounded
+      class="bg-orange-1 text-orange-10 q-pa-md"
+      data-cy="upload-verification-pending-message">
+      Uploads are currently disabled pending account verification, which usually happens within 24 hours.
+    </q-banner>
     <q-stepper
+      v-else
       v-model="step"
       ref="stepper"
       flat
@@ -478,6 +486,12 @@ function resetUploadFlow() {
 
 // computed
 const profile = computed(() => accountStore.profile)
+const isNewUserProfile = computed(() => {
+  if (!profile.value) {
+    return false
+  }
+  return profile.value.newUser === true
+})
 const channels = computed(() => channelStore.channels)
 
 const project = computed(() => {

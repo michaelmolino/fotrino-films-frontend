@@ -86,6 +86,22 @@ export const useAdminStore = defineStore('admin', () => {
         await getAllUsers()
     }
 
+    const approveUser = async userId => {
+        try {
+            await api.post(`/admin/users/${userId}/approve`, null, {
+                __skipGlobalErrorNotify: true
+            })
+        } catch (error) {
+            if (error?.__userCancelled) {
+                return false
+            }
+            throw error
+        }
+
+        setUsers([])
+        await getAllUsers()
+    }
+
     const getReportedMedia = () => fetchAndApplyGet({
         api,
         url: '/admin/media/reported',
@@ -125,6 +141,7 @@ export const useAdminStore = defineStore('admin', () => {
         getDLQ,
         requeueDLQItem,
         deleteUser,
+        approveUser,
         getReportedMedia,
         deleteMedia
     }

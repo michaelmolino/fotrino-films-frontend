@@ -25,7 +25,20 @@ const compilerOptions = {
         tabWidth: 2,
         printWidth: 100,
     },
-    unreachableDefinitions: true,
+    // Keep output focused on root ApiContracts references.
+    unreachableDefinitions: false,
+    // Emit declarations for referenced schemas so generated typings stay complete.
+    declareExternallyReferenced: true,
+    // Prefer schema titles for named declarations when available.
+    customName: (linkedSchema, keyName) => {
+        const title = typeof linkedSchema?.title === 'string'
+            ? linkedSchema.title.trim()
+            : ''
+        if (title.length > 0) {
+            return title.replace(/\W/g, '')
+        }
+        return keyName
+    },
 }
 
 async function generateContracts() {

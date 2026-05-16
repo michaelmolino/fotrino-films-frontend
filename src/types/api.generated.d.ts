@@ -12,6 +12,7 @@ export type Provider = string
 export type IsAdmin = boolean
 export type LastLogin = string
 export type Name = string
+export type NewUser = boolean
 export type Providers = string[]
 export type Avatar1 = string
 export type Cover = string
@@ -29,11 +30,8 @@ export type Id2 = number
 export type IsAdmin1 = boolean
 export type LastLogin1 = string
 export type Name1 = string
+export type NewUser1 = boolean
 export type Providers1 = UserProviderResponse[]
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "AdminUsersResponse".
- */
 export type AdminUsersResponse = UserResponse[]
 export type Error = 'bad_request'
 export type Message = string | null
@@ -117,10 +115,6 @@ export type Uuid2 = string
 export type Error1 = 'conflict'
 export type Message1 = string | null
 export type Status1 = 409
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "CoverType".
- */
 export type CoverType = 'profile' | 'new'
 export type Attempts = number
 export type AvailableAt = string
@@ -175,10 +169,6 @@ export type Title7 = string
 export type Error8 = 'not_found'
 export type Message5 = string | null
 export type Status6 = 404
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "OAuthProvider".
- */
 export type OAuthProvider =
   | 'apple'
   | 'facebook'
@@ -187,15 +177,7 @@ export type OAuthProvider =
   | 'microsoft'
   | 'yahoo'
   | 'test'
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "PosterType".
- */
 export type PosterType = 'default' | 'new'
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "PreviewType".
- */
 export type PreviewType = 'frame' | 'new'
 export type Cover3 = string
 export type Ownername1 = string
@@ -230,10 +212,6 @@ export type Resourcetype = 'cover' | 'poster' | 'preview' | 'upload'
 export type Url = string
 export type Covertype = 'profile' | 'new'
 export type Title13 = string | null
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "UploadResourceType".
- */
 export type UploadResourceType = 'cover' | 'poster' | 'preview' | 'upload'
 export type Error11 = string
 export type Error12 = string
@@ -287,10 +265,6 @@ export interface ApiContracts {
   UploadValidationErrorResponse: ErrorDetailResponse2
   WorkerStatusResponse: WorkerStatusResponse
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "AccountProfile".
- */
 export interface AccountProfileResponse {
   avatar: Avatar
   country: Country
@@ -303,26 +277,15 @@ export interface AccountProfileResponse {
   is_admin: IsAdmin
   last_login: LastLogin
   name: Name
+  new_user: NewUser
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "UserProviderResponse".
- */
 export interface UserProviderResponse {
   external_id: ExternalId
   provider: Provider
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "AccountProvidersResponse".
- */
 export interface AccountProvidersResponse {
   providers: Providers
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "AdminUser".
- */
 export interface UserResponse {
   avatar: Avatar1
   channels: Channels
@@ -334,12 +297,9 @@ export interface UserResponse {
   is_admin: IsAdmin1
   last_login: LastLogin1
   name: Name1
+  new_user: NewUser1
   providers: Providers1
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "ChannelCoreResponse".
- */
 export interface ChannelCoreResponse {
   cover: Cover
   created: Created1
@@ -348,19 +308,11 @@ export interface ChannelCoreResponse {
   title: Title
   uuid: Uuid
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "BadRequestErrorResponse".
- */
 export interface BadRequestErrorResponse {
   error: Error
   message?: Message
   status: Status
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "ChannelDetail".
- */
 export interface ChannelDetailResponse {
   cover: Cover1
   created: Created3
@@ -374,10 +326,6 @@ export interface ChannelDetailResponse {
   title: Title3
   uuid: Uuid1
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "ProjectResponse".
- */
 export interface ProjectResponse {
   channel: Channel
   created: Created4
@@ -393,10 +341,6 @@ export interface ProjectResponse {
   title: Title2
   updated_at: UpdatedAt1
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "MediaResponse".
- */
 export interface MediaResponse {
   created: Created5
   deleted?: Deleted4
@@ -414,10 +358,6 @@ export interface MediaResponse {
   type: Type
   updated_at: UpdatedAt
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "ChannelMedia".
- */
 export interface MediaResponse1 {
   created: Created6
   deleted?: Deleted5
@@ -435,10 +375,6 @@ export interface MediaResponse1 {
   type: Type1
   updated_at: UpdatedAt2
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "ChannelProject".
- */
 export interface ProjectResponse1 {
   channel: Channel1
   created: Created7
@@ -454,10 +390,6 @@ export interface ProjectResponse1 {
   title: Title5
   updated_at: UpdatedAt3
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "ChannelSummary".
- */
 export interface ChannelSummaryResponse {
   cover: Cover2
   created: Created8
@@ -469,19 +401,11 @@ export interface ChannelSummaryResponse {
   title: Title6
   uuid: Uuid2
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "ConflictErrorResponse".
- */
 export interface ConflictErrorResponse {
   error: Error1
   message?: Message1
   status: Status1
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "DeadLetterQueueItem".
- */
 export interface DeadLetterQueueItemResponse {
   attempts: Attempts
   available_at: AvailableAt
@@ -491,61 +415,33 @@ export interface DeadLetterQueueItemResponse {
   payload: Payload
   type: Type2
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "ObjectsDeleteNamePayload".
- */
 export interface ObjectsDeleteNamePayload {
   name: Name2
   objectType: Objecttype
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "MediaProcessPayload".
- */
 export interface MediaProcessPayload {
   media: Media2
   owner: Owner2
   source: Source
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "NotificationSendPayload".
- */
 export interface NotificationSendPayload {
   description: Description
   event: Event
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "EmailSendPayload".
- */
 export interface EmailSendPayload {
   htmlBody: Htmlbody
   subject: Subject
   toEmail: Toemail
   toName: Toname
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "DatabaseHardDeletePayload".
- */
 export interface DatabaseHardDeletePayload {
   entityType: Entitytype
   owner: Owner3
   reference: Reference
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "DeletionBlockedResponse".
- */
 export interface ErrorResponse {
   error: Error2
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "ErrorDetailResponse".
- */
 export interface ErrorDetailResponse {
   detail: Detail
   error: Error3
@@ -553,68 +449,36 @@ export interface ErrorDetailResponse {
 export interface Detail {
   [k: string]: unknown
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "ErrorResponse".
- */
 export interface ErrorResponse1 {
   error: Error4
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "ForbiddenErrorResponse".
- */
 export interface ForbiddenErrorResponse {
   error: Error5
   message?: Message2
   status: Status2
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "GlobalHttpErrorResponse".
- */
 export interface GlobalHttpErrorResponse {
   error: Error6
   message?: Message3
   status: Status3
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "HealthResponse".
- */
 export interface HealthResponse {
   status: Status4
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "InternalServerErrorResponse".
- */
 export interface InternalServerErrorResponse {
   error: Error7
   message?: Message4
   status: Status5
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "LabeledValue".
- */
 export interface LabeledValue {
   label?: Label
   value: Value
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "MediaUpdateRequest".
- */
 export interface MediaUpdateRequest {
   description?: Description1
   main: Main2
   resourceDate: Resourcedate
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "MediaUploadPayload".
- */
 export interface MediaUploadPayload {
   description?: Description2
   filename: Filename
@@ -623,45 +487,25 @@ export interface MediaUploadPayload {
   resourceDate: Resourcedate1
   title: Title7
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "NotFoundErrorResponse".
- */
 export interface NotFoundErrorResponse {
   error: Error8
   message?: Message5
   status: Status6
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "PrivateMediaChannel".
- */
 export interface PrivateMediaChannelResponse {
   cover: Cover3
   ownername: Ownername1
   project: PrivateMediaProjectResponse
   title: Title9
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "PrivateMediaProjectResponse".
- */
 export interface PrivateMediaProjectResponse {
   media: MediaResponse
   title: Title8
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "PrivateMediaProject".
- */
 export interface PrivateMediaProjectResponse1 {
   media: MediaResponse
   title: Title10
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "ProjectUploadPayload".
- */
 export interface ProjectUploadPayload {
   id: LabeledValue
   media: MediaUploadPayload
@@ -670,84 +514,48 @@ export interface ProjectUploadPayload {
   subtitle?: Subtitle2
   title?: Title11
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "ReportMediaResponse".
- */
 export interface ReportMediaResponse {
   message?: Message6
   reported: Reported
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "ReportedMediaItem".
- */
 export interface ReportedMediaItemResponse {
   mediaId: Mediaid
   privateId: Privateid
   reports: Reports
   title: Title12
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "ReportedMediaReportResponse".
- */
 export interface ReportedMediaReportResponse {
   createdAt: Createdat
   reason: Reason
   reporter: Reporter
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "ReportedMediaReport".
- */
 export interface ReportedMediaReportResponse1 {
   createdAt: Createdat1
   reason: Reason1
   reporter: Reporter1
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "UnauthorizedErrorResponse".
- */
 export interface UnauthorizedErrorResponse {
   error: Error9
   message?: Message7
   status: Status7
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "UnprocessableEntityErrorResponse".
- */
 export interface UnprocessableEntityErrorResponse {
   error: Error10
   message?: Message8
   status: Status8
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "UploadInstruction".
- */
 export interface UploadInstruction {
   reference: Reference1
   requiredResources?: Requiredresources
   resourceType: Resourcetype
   url: Url
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "UploadMediaRequest".
- */
 export interface UploadMediaRequest {
   coverType?: Covertype
   project: ProjectUploadPayload
   title?: Title13
   uuid: LabeledValue
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "UploadStorageConflictResponse".
- */
 export interface ErrorDetailResponse1 {
   detail: Detail1
   error: Error11
@@ -755,10 +563,6 @@ export interface ErrorDetailResponse1 {
 export interface Detail1 {
   [k: string]: unknown
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "UploadValidationErrorResponse".
- */
 export interface ErrorDetailResponse2 {
   detail: Detail2
   error: Error12
@@ -766,10 +570,6 @@ export interface ErrorDetailResponse2 {
 export interface Detail2 {
   [k: string]: unknown
 }
-/**
- * This interface was referenced by `ApiContracts`'s JSON-Schema
- * via the `definition` "WorkerStatusResponse".
- */
 export interface WorkerStatusResponse {
   idle: Idle
   jobsQueued: Jobsqueued

@@ -1,5 +1,16 @@
 <template>
   <div>
+    <div class="q-mb-md flex items-center gap-sm">
+      <span class="text-body2 text-weight-medium">Filter:</span>
+      <q-option-group
+        v-model="filterMode"
+        :options="[
+          { label: 'All Users', value: 'all' },
+          { label: 'New Users', value: 'new' }
+        ]"
+        color="primary"
+        inline />
+    </div>
     <div v-if="loading">
       <q-skeleton type="rect" height="48px" class="q-mb-sm" />
       <q-skeleton type="rect" height="48px" class="q-mb-sm" />
@@ -7,7 +18,7 @@
     </div>
     <q-list v-else bordered class="rounded-borders">
       <q-expansion-item
-        v-for="user in users"
+        v-for="user in filteredUsers"
         :key="user.id"
         group="users"
         expand-icon-toggle
@@ -33,6 +44,15 @@
                 <q-icon name="security" size="12px" />
               </q-badge>
               <q-badge
+                v-if="user.newUser"
+                floating
+                color="warning"
+                text-color="white"
+                class="new-user-badge"
+                style="top: 2px; right: 30px;">
+                <q-icon name="person_add" size="12px" />
+              </q-badge>
+              <q-badge
                 v-if="user.deleted"
                 floating
                 color="negative"
@@ -51,6 +71,17 @@
                 :title="getCountry(user.country).name">
                 {{ getCountry(user.country).flag }}
               </span>
+              <q-btn
+                v-if="user.newUser && !user.deleted"
+                icon="check_circle"
+                flat
+                dense
+                round
+                size="sm"
+                color="positive"
+                class="q-ml-sm"
+                @click.stop="approveUser(user)"
+                :title="`Approve ${user.name}`" />
               <q-btn
                 v-if="!user.deleted"
                 icon="delete"
@@ -140,7 +171,7 @@
         <div v-else class="q-pa-md text-grey-6 text-center">No channels</div>
       </q-expansion-item>
     </q-list>
-    <div v-if="!loading && users.length === 0" class="q-pa-md text-grey-6 text-center">
+    <div v-if="!loading && filteredUsers.length === 0" class="q-pa-md text-grey-6 text-center">
       No users found
     </div>
   </div>
@@ -162,7 +193,14 @@ import yahooIcon from '@assets/icons/yahoo.svg'
 
 const adminStore = useAdminStore()
 const loading = ref(true)
+const filterMode = ref('new')
 const users = computed(() => adminStore.users || [])
+const filteredUsers = computed(() => {
+  if (filterMode.value === 'new') {
+    return users.value.filter(user => user.newUser === true)
+  }
+  return users.value
+})
 const providerIcons = {
   google: `img:${googleIcon}`,
   microsoft: `img:${microsoftIcon}`,
@@ -170,6 +208,19 @@ const providerIcons = {
   github: `img:${githubIcon}`,
   apple: `img:${appleIcon}`,
   yahoo: `img:${yahooIcon}`
+}
+
+const approveUser = async user => {
+  try {
+    const approved = await adminStore.approveUser(user.id)
+    if (approved === false) return
+    notifySuccess(`Approved ${user.name}. Welcome email sent.`)
+  } catch (err) {
+    console.error('Failed to approve user:', err)
+    notifyError(getComponentApiErrorMessage(err, `Failed to approve ${user.name}.`), {
+      timeout: 0
+    })
+  }
 }
 
 const deleteUser = async user => {
@@ -207,6 +258,9 @@ onMounted(async () => {
   margin-left: 1rem;
 }
 .admin-badge {
+  z-index: 1;
+}
+.new-user-badge {
   z-index: 1;
 }
 .deleted-badge {
