@@ -6,7 +6,8 @@ const routes = [
       { path: '', component: () => import('@components/pages/Home.vue') },
       { path: 'help', component: () => import('@components/pages/Help.vue') },
       { path: 'terms', component: () => import('@components/pages/Terms.vue') },
-      { path: '404', component: () => import('@components/errors/404.vue') }
+      { path: '404', component: () => import('@components/errors/404.vue') },
+      { path: 'account-deleted', component: () => import('@components/errors/AccountDeleted.vue') }
     ]
   },
   {
