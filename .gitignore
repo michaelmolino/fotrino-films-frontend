@@ -2,7 +2,7 @@
 .thumbs.db
 node_modules
 *.tar
-*.sh
+./*.sh
 coverage/
 .nyc_output/
 

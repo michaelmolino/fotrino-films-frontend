@@ -42,7 +42,10 @@ import { useQuasar } from 'quasar'
 
 defineOptions({ name: 'Home-Page' })
 const $q = useQuasar()
-const sampleChannelPath = `/c/${process.env.SAMPLE_CHANNEL_ID}/${process.env.SAMPLE_CHANNEL_SLUG}`
+const runtimeConfig = globalThis.__APP_CONFIG__ || {}
+const sampleChannelId = runtimeConfig.SAMPLE_CHANNEL_ID || process.env.SAMPLE_CHANNEL_ID || ''
+const sampleChannelSlug = runtimeConfig.SAMPLE_CHANNEL_SLUG || process.env.SAMPLE_CHANNEL_SLUG || 'Sample-Channel'
+const sampleChannelPath = `/c/${sampleChannelId}/${sampleChannelSlug}`
 
 const darkClass = computed(() => ($q.dark.isActive ? 'text-white' : 'text-primary'))
 </script>
