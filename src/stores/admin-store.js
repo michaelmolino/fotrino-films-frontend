@@ -124,13 +124,14 @@ export const useAdminStore = defineStore('admin', () => {
             })
         } catch (error) {
             if (error?.__userCancelled) {
-                return
+                return false
             }
             throw error
         }
 
         setReportedMedia([])
         await getReportedMedia()
+        return true
     }
 
     return {

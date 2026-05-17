@@ -62,6 +62,7 @@ export type Src = string | null
 export type Title1 = string
 export type Type = string | null
 export type UpdatedAt = string
+export type Uuid1 = string
 export type Media = MediaResponse[]
 export type Pending2 = boolean
 export type Poster = string | null
@@ -71,10 +72,11 @@ export type Slug2 = string
 export type Subtitle = string | null
 export type Title2 = string
 export type UpdatedAt1 = string
+export type Uuid2 = string
 export type Projects = ProjectResponse[]
 export type Slug3 = string
 export type Title3 = string
-export type Uuid1 = string
+export type Uuid3 = string
 export type Created6 = string
 export type Deleted5 = boolean
 export type DescriptionUnsafe1 = string | null
@@ -90,6 +92,7 @@ export type Src1 = string | null
 export type Title4 = string
 export type Type1 = string | null
 export type UpdatedAt2 = string
+export type Uuid4 = string
 export type Channel1 = number
 export type Created7 = string
 export type Deleted6 = boolean
@@ -103,6 +106,7 @@ export type Slug5 = string
 export type Subtitle1 = string | null
 export type Title5 = string
 export type UpdatedAt3 = string
+export type Uuid5 = string
 export type Cover2 = string
 export type Created8 = string
 export type Deleted7 = boolean
@@ -111,7 +115,7 @@ export type Owner1 = number
 export type Pending5 = boolean
 export type Slug6 = string
 export type Title6 = string
-export type Uuid2 = string
+export type Uuid6 = string
 export type Error1 = 'conflict'
 export type Message1 = string | null
 export type Status1 = 409
@@ -182,8 +186,11 @@ export type PreviewType = 'frame' | 'new'
 export type Cover3 = string
 export type Ownername1 = string
 export type Title8 = string
+export type Uuid7 = string
 export type Title9 = string
+export type Uuid8 = string
 export type Title10 = string
+export type Uuid9 = string
 export type Postercolor = string | null
 export type Postertype = 'default' | 'new'
 export type Subtitle2 = string | null
@@ -196,7 +203,9 @@ export type Createdat = string
 export type Reason = string | null
 export type Reporter = string
 export type Reports = ReportedMediaReportResponse[]
+export type Slug7 = string
 export type Title12 = string
+export type Uuid10 = string
 export type Createdat1 = string
 export type Reason1 = string | null
 export type Reporter1 = string
@@ -324,7 +333,7 @@ export interface ChannelDetailResponse {
   projects?: Projects
   slug: Slug3
   title: Title3
-  uuid: Uuid1
+  uuid: Uuid3
 }
 export interface ProjectResponse {
   channel: Channel
@@ -340,6 +349,7 @@ export interface ProjectResponse {
   subtitle: Subtitle
   title: Title2
   updated_at: UpdatedAt1
+  uuid: Uuid2
 }
 export interface MediaResponse {
   created: Created5
@@ -357,6 +367,7 @@ export interface MediaResponse {
   title: Title1
   type: Type
   updated_at: UpdatedAt
+  uuid: Uuid1
 }
 export interface MediaResponse1 {
   created: Created6
@@ -374,6 +385,7 @@ export interface MediaResponse1 {
   title: Title4
   type: Type1
   updated_at: UpdatedAt2
+  uuid: Uuid4
 }
 export interface ProjectResponse1 {
   channel: Channel1
@@ -389,6 +401,7 @@ export interface ProjectResponse1 {
   subtitle: Subtitle1
   title: Title5
   updated_at: UpdatedAt3
+  uuid: Uuid5
 }
 export interface ChannelSummaryResponse {
   cover: Cover2
@@ -399,7 +412,7 @@ export interface ChannelSummaryResponse {
   pending?: Pending5
   slug: Slug6
   title: Title6
-  uuid: Uuid2
+  uuid: Uuid6
 }
 export interface ConflictErrorResponse {
   error: Error1
@@ -497,14 +510,17 @@ export interface PrivateMediaChannelResponse {
   ownername: Ownername1
   project: PrivateMediaProjectResponse
   title: Title9
+  uuid: Uuid8
 }
 export interface PrivateMediaProjectResponse {
   media: MediaResponse
   title: Title8
+  uuid: Uuid7
 }
 export interface PrivateMediaProjectResponse1 {
   media: MediaResponse
   title: Title10
+  uuid: Uuid9
 }
 export interface ProjectUploadPayload {
   id: LabeledValue
@@ -522,7 +538,9 @@ export interface ReportedMediaItemResponse {
   mediaId: Mediaid
   privateId: Privateid
   reports: Reports
+  slug: Slug7
   title: Title12
+  uuid: Uuid10
 }
 export interface ReportedMediaReportResponse {
   createdAt: Createdat

@@ -20,7 +20,7 @@
         <q-td :props="props">
           <q-btn
             :label="props.row.title"
-            :to="`/private/${props.row.privateId}`"
+            :to="`/private/m/${props.row.uuid}/${props.row.slug}`"
             icon="link"
             flat
             dense
@@ -106,7 +106,8 @@ async function fetchReportedMedia() {
 
 async function deleteMedia(privateId) {
   try {
-    await adminStore.deleteMedia(privateId)
+    const deleted = await adminStore.deleteMedia(privateId)
+    if (deleted === false) return
     Notify.create({
       type: 'positive',
       message: 'Reported media deleted.',

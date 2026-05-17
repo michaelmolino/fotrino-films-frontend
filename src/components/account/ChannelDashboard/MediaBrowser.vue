@@ -51,7 +51,7 @@ function getMediaLink(type, id) {
 
 function getChannelLink(channels, id) {
   const ch = channels.find(c => c.id === id)
-  return ch && !ch.pending ? `/${[ch.uuid, ch.slug].join('/')}` : null
+  return ch && !ch.pending ? `/c/${ch.uuid}/${ch.slug}` : null
 }
 
 function getProjectLink(channels, id) {
@@ -59,7 +59,7 @@ function getProjectLink(channels, id) {
     const projects = ch.projects || []
     const project = projects.find(p => p.id === id)
     if (project && !project.pending) {
-      return `/${[ch.uuid, ch.slug, project.slug].join('/')}`
+      return `/p/${project.uuid}/${project.slug}`
     }
   }
   return null
@@ -71,7 +71,7 @@ function getMediaItemLink(channels, id) {
     for (const project of projects) {
       const media = (project.media || []).find(m => m.id === id)
       if (media && !media.pending) {
-        return `/${[ch.uuid, ch.slug, project.slug, media.slug].join('/')}`
+        return `/m/${media.uuid}/${media.slug}`
       }
     }
   }

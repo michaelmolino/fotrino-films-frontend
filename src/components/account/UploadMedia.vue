@@ -591,7 +591,7 @@ async function quickUpload() {
     projects.value = []
     if (payload.uuid && payload.uuid.value && payload.uuid.value !== 0) {
       const chan = await channelStore.getChannel({
-        uuid: payload.uuid.value,
+        channelId: payload.uuid.value,
         pending: true
       })
       projects.value = chan.projects || []
@@ -792,7 +792,7 @@ watch(
 // lifecycle
 async function loadProjectsForChannelUuid(uuid, requestToken = projectsLoadToken.value) {
   try {
-    const chan = await channelStore.getChannel({ uuid, pending: true })
+    const chan = await channelStore.getChannel({ channelId: uuid, pending: true })
     if (requestToken !== projectsLoadToken.value) return
     projects.value = chan?.projects || []
   } catch (err) {

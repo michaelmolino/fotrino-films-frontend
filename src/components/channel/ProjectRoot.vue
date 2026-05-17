@@ -6,7 +6,7 @@
       <q-skeleton type="text" width="40%" />
     </template>
 
-    <template v-else-if="channel && project && channel.uuid === route.params.uuid">
+    <template v-else-if="channel && project && route.params.projectId">
       <BreadCrumbs
         :channel="channel"
         :project="project"
@@ -26,7 +26,7 @@
                 :channel="channel"
                 :project="project"
                 :media="item"
-                :to="`/${channel.uuid}/${channel.slug}/${project.slug}/${item.slug}`"
+                :to="`/m/${item.uuid}/${item.slug}`"
                 :detail="true"
                 :showMainAccent="false"
                 :priority="index === 0 ? 'high' : 'auto'" />
@@ -57,7 +57,7 @@
                 :channel="channel"
                 :project="project"
                 :media="item"
-                :to="`/${channel.uuid}/${channel.slug}/${project.slug}/${item.slug}`"
+                :to="`/m/${item.uuid}/${item.slug}`"
                 :detail="true"
                 :showMainAccent="false"
                 :priority="index === 0 ? 'high' : 'auto'" />
@@ -78,7 +78,7 @@
                 :channel="channel"
                 :project="project"
                 :media="related"
-                :to="`/${channel.uuid}/${channel.slug}/${project.slug}/${related.slug}`"
+                :to="`/m/${related.uuid}/${related.slug}`"
                 :priority="index === 0 ? 'high' : 'auto'" />
             </div>
           </div>
@@ -114,8 +114,8 @@ function redirect(pathOrObj) {
 }
 
 function findProjectByParams() {
-  if (route.params.uuid) {
-    return channel.value?.projects?.find(p => p.slug === route.params.projectSlug) || null
+  if (route.params.projectId) {
+    return channel.value?.projects?.find(p => p.uuid === route.params.projectId) || null
   }
   return null
 }
@@ -143,7 +143,11 @@ const otherMedia = computed(() => {
 watch(
   project,
   newProject => {
-    if (channel.value && !newProject && route.params.uuid && !loading.value) {
+    if (channel.value && newProject && route.params.projectSlug && newProject.slug !== route.params.projectSlug && !loading.value) {
+      redirect(`/p/${newProject.uuid}/${newProject.slug}`)
+      return
+    }
+    if (channel.value && !newProject && route.params.projectId && !loading.value) {
       redirect('/404')
     }
   },
@@ -155,9 +159,9 @@ watch(
 watch(
   [featuredMediaCount, project, loading],
   ([count, proj, isLoading]) => {
-    if (!isLoading && channel.value && proj && count === 1 && route.params.uuid) {
+    if (!isLoading && channel.value && proj && count === 1 && route.params.projectId) {
       const featured = featuredMedia.value[0]
-      redirect(`/${channel.value.uuid}/${channel.value.slug}/${proj.slug}/${featured.slug}`)
+      redirect(`/m/${featured.uuid}/${featured.slug}`)
     }
   },
   { immediate: true }

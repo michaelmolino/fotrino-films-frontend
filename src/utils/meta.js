@@ -10,25 +10,26 @@ function getChannelMeta(route, channel) {
   }
 }
 
-function getProjectMeta(route, channel) {
-  const project = channel?.projects?.find(p => p.slug === route.params.projectSlug)
-  if (route?.params.mediaSlug) {
-    // Media metadata
-    const media = project?.media?.find(m => m.slug === route.params.mediaSlug)
-    return {
-      title: media?.title || null,
-      description: sanitizeText(media?.descriptionUnsafe),
-      image: media?.preview || null,
-      type: 'video',
-    }
-  } else {
-    // Project metadata
-    return {
-      title: project?.title || null,
-      description: sanitizeText(project?.subtitle || ''),
-      image: project?.poster || null,
-      type: 'website',
-    }
+function getProjectMeta(projectId, channel) {
+  const projects = Array.isArray(channel?.projects) ? channel.projects : []
+  const project = projects.find(p => p.uuid === projectId)
+  return {
+    title: project?.title || null,
+    description: sanitizeText(project?.subtitle || ''),
+    image: project?.poster || null,
+    type: 'website',
+  }
+}
+
+function getMediaMeta(mediaId, channel) {
+  const projects = Array.isArray(channel?.projects) ? channel.projects : []
+  const mediaProject = projects.find(p => Array.isArray(p?.media) && p.media.some(m => m.uuid === mediaId))
+  const media = mediaProject?.media?.find(m => m.uuid === mediaId)
+  return {
+    title: media?.title || null,
+    description: sanitizeText(media?.descriptionUnsafe),
+    image: media?.preview || null,
+    type: 'video',
   }
 }
 
@@ -47,13 +48,16 @@ export function getMetaData(route, channel) {
   let meta = { title: null, description: '', image: null, type: 'website' }
 
   // Route type detection
-  if (route?.params.uuid) {
+  if (route?.params.channelId) {
     meta = getChannelMeta(route, channel)
   }
-  if (route?.params.projectSlug) {
-    meta = getProjectMeta(route, channel)
+  if (route?.params.projectId) {
+    meta = getProjectMeta(route.params.projectId, channel)
   }
-  if (route?.params.privateId) {
+  if (route?.params.mediaId) {
+    meta = getMediaMeta(route.params.mediaId, channel)
+  }
+  if (route?.params.privateMediaId) {
     meta = getPrivateMediaMeta(route, channel)
   }
 

@@ -10,7 +10,7 @@
       </div>
     </template>
 
-    <template v-else-if="channel?.uuid === route.params.uuid">
+    <template v-else-if="channel?.uuid === route.params.channelId">
       <div :key="channel?.uuid || route.fullPath">
         <div class="row items-center q-mb-sm">
           <BreadCrumbs :channel="channel" :project="null" :media="null" />
@@ -32,7 +32,7 @@
               :key="project.id">
               <ProjectPoster
                 :project="project"
-                :to="`/${channel.uuid}/${channel.slug}/${project.slug}`" />
+                :to="`/p/${project.uuid}/${project.slug}`" />
             </div>
             <NothingText v-if="projects.length === 0" text="No content available." />
           </div>
@@ -48,7 +48,7 @@
                 :channel="channel"
                 :project="item.project"
                 :media="item.media"
-                :to="`/${channel.uuid}/${channel.slug}/${item.project.slug}/${item.media.slug}`"
+                :to="`/m/${item.media.uuid}/${item.media.slug}`"
                 :detail="true"
                 :showMainAccent="true"
                 :priority="index === 0 ? 'high' : 'auto'" />

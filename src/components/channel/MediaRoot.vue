@@ -6,12 +6,12 @@
       <q-skeleton type="text" width="40%" />
     </template>
 
-    <template v-else-if="channel && project && media && (route.params.privateId || channel.uuid === route.params.uuid)">
+    <template v-else-if="channel && project && media && (route.params.privateMediaId || route.params.mediaId)">
       <BreadCrumbs
         :channel="channel"
         :project="project"
         :media="media?.main ? null : media"
-        :private="!!route.params.privateId" />
+        :private="!!route.params.privateMediaId" />
 
       <PlyrPlayer
         :media="media"
@@ -33,7 +33,7 @@
               :channel="channel"
               :project="project"
               :media="related"
-              :to="`/${channel.uuid}/${channel.slug}/${project.slug}/${related.slug}`"
+                :to="`/m/${related.uuid}/${related.slug}`"
               :priority="index === 0 ? 'high' : 'auto'" />
           </div>
         </div>
@@ -70,10 +70,12 @@ function redirect(pathOrObj) {
 }
 
 function findProjectByParams() {
-  if (route.params.uuid) {
-    return channel.value?.projects?.find(p => p.slug === route.params.projectSlug) || null
+  if (route.params.mediaId) {
+    return channel.value?.projects?.find(project =>
+      (project.media || []).some(item => item.uuid === route.params.mediaId)
+    ) || null
   }
-  if (route.params.privateId && channel.value) {
+  if (route.params.privateMediaId && channel.value) {
     return channel.value?.project || null
   }
   return null
@@ -82,11 +84,11 @@ function findProjectByParams() {
 function findMediaByParams(project) {
   if (!project) return null
 
-  if (route.params.privateId) {
+  if (route.params.privateMediaId) {
     return project.media || null
   }
-  if (route.params.mediaSlug) {
-    return project.media?.find(m => m.slug === route.params.mediaSlug) || null
+  if (route.params.mediaId) {
+    return project.media?.find(m => m.uuid === route.params.mediaId) || null
   }
   return null
 }
@@ -100,15 +102,18 @@ const media = computed(() => {
 })
 
 const relatedMedia = computed(() => {
-  return (project.value?.media || []).filter(m => m.id !== media.value?.id)
+  if (!Array.isArray(project.value?.media)) {
+    return []
+  }
+  return project.value.media.filter(m => m.id !== media.value?.id)
 })
 
-const hasRelatedContent = computed(() => !!route.params.uuid && relatedMedia.value.length > 0)
+const hasRelatedContent = computed(() => !!route.params.mediaId && relatedMedia.value.length > 0)
 
 watch(
   project,
   newProject => {
-    if (channel.value && !newProject && route.params.uuid && !loading.value) {
+    if (channel.value && !newProject && (route.params.mediaId || route.params.privateMediaId) && !loading.value) {
       redirect('/404')
     }
   },
@@ -126,6 +131,21 @@ watch(
       !loading.value
     ) {
       redirect('/404')
+    }
+  },
+  { immediate: true }
+)
+
+watch(
+  media,
+  newMedia => {
+    if (!newMedia || loading.value) return
+    if (route.params.mediaId && route.params.mediaSlug && newMedia.slug !== route.params.mediaSlug) {
+      redirect(`/m/${newMedia.uuid}/${newMedia.slug}`)
+      return
+    }
+    if (route.params.privateMediaId && route.params.mediaSlug && newMedia.slug !== route.params.mediaSlug) {
+      redirect(`/private/m/${newMedia.uuid}/${newMedia.slug}`)
     }
   },
   { immediate: true }

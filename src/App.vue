@@ -39,7 +39,12 @@ onMounted(async () => {
 })
 
 watch(
-  [() => route.params.uuid, () => route.params.privateId],
+  [
+    () => route.params.channelId,
+    () => route.params.projectId,
+    () => route.params.mediaId,
+    () => route.params.privateMediaId
+  ],
   async () => {
     await loadChannel(route)
   },

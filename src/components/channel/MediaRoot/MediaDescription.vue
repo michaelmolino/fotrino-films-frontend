@@ -107,7 +107,7 @@ const props = defineProps({
 })
 
 const route = useRoute()
-const isPublic = computed(() => !!route.params.uuid)
+const isPublic = computed(() => !!route.params.mediaId)
 const sinceCaptured = computed(() =>
   props.media?.resourceDate ? daysSince(props.media.resourceDate, false) : ''
 )
@@ -170,9 +170,9 @@ function copyLink(val) {
       })
     })
   } else if (val === 'private') {
-    const id = props.media?.privateId
+    const id = props.media?.uuid
     if (!id) return
-    copyToClipboard(`${globalThis.location.origin}/private/${id}`).then(() => {
+    copyToClipboard(`${globalThis.location.origin}/private/m/${id}/${props.media?.slug || ''}`).then(() => {
       Notify.create({
         message: 'URL copied to clipboard',
         color: 'accent',

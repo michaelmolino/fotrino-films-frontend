@@ -85,8 +85,8 @@ export const useChannelStore = defineStore('channel', () => {
         }
     }
 
-    const getChannel = ({ uuid, pending = false, cache = true }) => {
-        const url = `/channels/${uuid}${pending ? '?pending=true' : ''}`
+    const getChannel = ({ channelId, pending = false, cache = true }) => {
+        const url = `/channels/${channelId}${pending ? '?pending=true' : ''}`
         return fetchAndApplyGet({
             api,
             url,
@@ -102,16 +102,46 @@ export const useChannelStore = defineStore('channel', () => {
             },
             ...(cache && {
                 cache: {
-                    queryOptions: channelQueryOptions(uuid),
+                    queryOptions: channelQueryOptions(channelId),
                     queryCache
                 }
             })
         })
     }
 
-    const getPrivateMedia = privateId => fetchAndApplyGet({
+    const getChannelByProject = projectId => fetchAndApplyGet({
         api,
-        url: `/channels/media/private/${privateId}`,
+        url: `/channels/project/public/${projectId}`,
+        apply: setChannel,
+        extract: sortChannelDetail,
+        onError: error => {
+            if (!isRequestCanceled(error)) {
+                getGlobalApiErrorPayload(error)
+            }
+        },
+        requestConfig: {
+            signal: requestCanceler.getSignal('SET_CHANNEL')
+        }
+    })
+
+    const getChannelByMedia = mediaId => fetchAndApplyGet({
+        api,
+        url: `/channels/media/public/${mediaId}`,
+        apply: setChannel,
+        extract: sortChannelDetail,
+        onError: error => {
+            if (!isRequestCanceled(error)) {
+                getGlobalApiErrorPayload(error)
+            }
+        },
+        requestConfig: {
+            signal: requestCanceler.getSignal('SET_CHANNEL')
+        }
+    })
+
+    const getPrivateMedia = privateMediaId => fetchAndApplyGet({
+        api,
+        url: `/channels/media/private/${privateMediaId}`,
         apply: setChannel,
         onError: error => {
             if (!isRequestCanceled(error)) {
@@ -282,6 +312,8 @@ export const useChannelStore = defineStore('channel', () => {
         getChannels,
         resolveHistoryChannels,
         getChannel,
+        getChannelByProject,
+        getChannelByMedia,
         getPrivateMedia,
         createMediaSession,
         deleteResource,

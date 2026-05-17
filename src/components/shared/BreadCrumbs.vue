@@ -41,20 +41,20 @@ const breadcrumbs = computed(() => {
   arr.push({
     id: 0,
     label: props.channel.title,
-    to: `/${props.channel.uuid}/${props.channel.slug}`
+    to: `/c/${props.channel.uuid}/${props.channel.slug}`
   })
   if (props.project?.id) {
     arr.push({
       id: 1,
       label: props.project.title,
-      to: `/${props.channel.uuid}/${props.channel.slug}/${props.project.slug}`
+      to: `/p/${props.project.uuid}/${props.project.slug}`
     })
   }
   if (props.project?.id && props.media?.id) {
     arr.push({
       id: 2,
       label: props.media.title,
-      to: `/${props.channel.uuid}/${props.channel.slug}/${props.project.slug}/${props.media.slug}`
+      to: `/m/${props.media.uuid}/${props.media.slug}`
     })
   }
   // Last breadcrumb is not a link

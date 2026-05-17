@@ -21,7 +21,12 @@ export function useChannelLoader({ manageMeta = false } = {}) {
   const loadStatus = toRef(channelStore, 'loadStatus')
   const metaData = ref(getMetaData(null, null))
   const loadVersion = ref(0)
-  const needsChannelData = computed(() => !!(route.params?.uuid || route.params?.privateId))
+  const needsChannelData = computed(() => !!(
+    route.params?.channelId ||
+    route.params?.projectId ||
+    route.params?.mediaId ||
+    route.params?.privateMediaId
+  ))
   const loading = computed(
     () => loadStatus.value === 'loading' || (loadStatus.value === 'idle' && needsChannelData.value)
   )
@@ -29,6 +34,62 @@ export function useChannelLoader({ manageMeta = false } = {}) {
   // Only one owner should register meta updates to avoid conflicting page titles.
   if (manageMeta) {
     useMeta(() => metaData.value)
+  }
+
+  const fetchChannelByRoute = route => {
+    if (route.params?.channelId) {
+      return channelStore.getChannel({
+        channelId: route.params.channelId
+      })
+    }
+    if (route.params?.projectId) {
+      return channelStore.getChannelByProject(route.params.projectId)
+    }
+    if (route.params?.mediaId) {
+      return channelStore.getChannelByMedia(route.params.mediaId)
+    }
+    if (route.params?.privateMediaId) {
+      return channelStore.getPrivateMedia(route.params.privateMediaId)
+    }
+    return Promise.resolve(null)
+  }
+
+  const syncPrivateHistory = (route, channel) => {
+    if (!route.params?.privateMediaId || !channel) return
+    addPrivateHistory(route.params.privateMediaId, {
+      title: channel?.project?.media?.title || channel?.title || '',
+      cover: channel?.project?.media?.preview || channel?.cover || null,
+      slug: channel?.project?.media?.slug || route.params.mediaSlug || null
+    })
+  }
+
+  const replacePath = (path, query) => {
+    router.replace({ path, query })
+  }
+
+  const syncCanonicalSlugs = (route, channel) => {
+    if (route.params?.channelId && channel?.uuid && channel.slug && channel.slug !== route.params.channelSlug) {
+      replacePath(`/c/${channel.uuid}/${channel.slug}`, route.query)
+      return
+    }
+
+    if (route.params?.projectId && channel?.projects?.length) {
+      const project = channel.projects.find(item => item.uuid === route.params.projectId)
+      if (project?.uuid && project.slug && project.slug !== route.params.projectSlug) {
+        replacePath(`/p/${project.uuid}/${project.slug}`, route.query)
+        return
+      }
+    }
+
+    if (route.params?.mediaId && channel?.projects?.length) {
+      const project = channel.projects.find(item =>
+        Array.isArray(item.media) && item.media.some(media => media.uuid === route.params.mediaId)
+      )
+      const media = project?.media?.find(item => item.uuid === route.params.mediaId)
+      if (media?.uuid && media.slug && media.slug !== route.params.mediaSlug) {
+        replacePath(`/m/${media.uuid}/${media.slug}`, route.query)
+      }
+    }
   }
 
   /**
@@ -43,33 +104,14 @@ export function useChannelLoader({ manageMeta = false } = {}) {
     channelStore.setChannelLoadStatus('loading')
 
     try {
-      let channel = null
-
-      if (route.params?.uuid) {
-        channel = await channelStore.getChannel({
-          uuid: route.params.uuid
-        })
-      } else if (route.params?.privateId) {
-        channel = await channelStore.getPrivateMedia(route.params.privateId)
-      }
+      const channel = await fetchChannelByRoute(route)
 
       if (isStale()) {
         return null
       }
 
-      if (route.params?.privateId && channel) {
-        addPrivateHistory(route.params.privateId, {
-          title: channel?.project?.media?.title || channel?.title || '',
-          cover: channel?.project?.media?.preview || channel?.cover || null
-        })
-      }
-
-      if (route.params?.uuid && channel?.uuid && channel.slug && channel.slug !== route.params.channelSlug) {
-        router.replace({
-          params: { channelSlug: channel.slug },
-          query: route.query
-        })
-      }
+      syncPrivateHistory(route, channel)
+      syncCanonicalSlugs(route, channel)
 
       metaData.value = getMetaData(route, channel)
       channelStore.setChannelLoadStatus('success')

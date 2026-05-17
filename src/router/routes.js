@@ -11,28 +11,31 @@ const routes = [
     ]
   },
   {
-    path: '/:uuid([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})/:channelSlug([0-9a-zA-Z-]+)',
+    path: '/c/:channelId([0-9A-Za-z_-]+)/:channelSlug([0-9a-zA-Z-]+)',
     component: () => import('@layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('@components/channel/ChannelRoot.vue') },
-      {
-        path: ':projectSlug([0-9a-zA-Z-]+)',
-        component: () => import('@components/channel/ProjectRoot.vue')
-      },
-      {
-        path: ':projectSlug([0-9a-zA-Z-]+)/:mediaSlug([0-9a-zA-Z-]+)',
-        component: () => import('@components/channel/MediaRoot.vue')
-      }
     ]
   },
   {
-    path: '/private',
+    path: '/p/:projectId([0-9A-Za-z_-]+)/:projectSlug([0-9a-zA-Z-]+)',
     component: () => import('@layouts/MainLayout.vue'),
     children: [
-      {
-        path: ':privateId([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})',
-        component: () => import('@components/channel/MediaRoot.vue')
-      }
+      { path: '', component: () => import('@components/channel/ProjectRoot.vue') }
+    ]
+  },
+  {
+    path: '/m/:mediaId([0-9A-Za-z_-]+)/:mediaSlug([0-9a-zA-Z-]+)',
+    component: () => import('@layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('@components/channel/MediaRoot.vue') }
+    ]
+  },
+  {
+    path: '/private/m/:privateMediaId([0-9A-Za-z_-]+)/:mediaSlug([0-9a-zA-Z-]+)',
+    component: () => import('@layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('@components/channel/MediaRoot.vue') }
     ]
   },
   {

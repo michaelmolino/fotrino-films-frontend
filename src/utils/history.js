@@ -10,8 +10,13 @@ const parsedHistory = parseStoredHistory(LocalStorage.getItem(HISTORY_KEY))
 export const history = ref(parsedHistory.entries)
 export const historyChannels = ref([])
 
+function persistHistory(entries) {
+  history.value = entries
+  writeHistory(entries)
+}
+
 if (parsedHistory.needsMigration) {
-  writeHistory(parsedHistory.entries)
+  persistHistory(parsedHistory.entries)
 }
 
 export function addHistory(channel) {
@@ -31,7 +36,7 @@ function _addEntry(entry, channelData) {
   if (isDupe) return
 
   const updated = [...current, entry]
-  writeHistory(updated)
+  persistHistory(updated)
 
   // Optimistically append when resolve has completed or is in-flight —
   // we already have all display data so there is no need to wait.
@@ -49,10 +54,18 @@ function _addEntry(entry, channelData) {
   }
 }
 
-export function removeHistory(uuid) {
-  const updated = history.value.filter(item => item.uuid !== uuid)
-  writeHistory(updated)
-  historyChannels.value = historyChannels.value.filter(item => item.uuid !== uuid)
+export function removeHistory(uuid, type = null) {
+  const updated = history.value.filter(item => {
+    if (item.uuid !== uuid) return true
+    if (type == null) return false
+    return item.type !== type
+  })
+  persistHistory(updated)
+  historyChannels.value = historyChannels.value.filter(item => {
+    if (item.uuid !== uuid) return true
+    if (type == null) return false
+    return item.type !== type
+  })
 }
 
 export async function resolveHistoryFromBackend(channelStore, { force = false } = {}) {
@@ -82,11 +95,23 @@ export async function resolveHistoryFromBackend(channelStore, { force = false } 
         const deletedSet = new Set(deletedUuids)
         const remaining = entries.filter(e => !deletedSet.has(e.uuid))
         if (remaining.length !== entries.length) {
-          writeHistory(remaining)
+          persistHistory(remaining)
         }
       }
 
-      const activeEntries = [...history.value]
+      const uniqueActiveEntries = []
+      const seenEntryKeys = new Set()
+      for (const entry of history.value) {
+        const entryKey = `${entry.type}:${entry.uuid}`
+        if (seenEntryKeys.has(entryKey)) continue
+        seenEntryKeys.add(entryKey)
+        uniqueActiveEntries.push(entry)
+      }
+
+      if (uniqueActiveEntries.length !== history.value.length) {
+        persistHistory(uniqueActiveEntries)
+      }
+
       const itemsByKey = new Map(
         items.filter(item => item?.uuid).map(item => [`${item.type}:${item.uuid}`, item])
       )
@@ -97,7 +122,7 @@ export async function resolveHistoryFromBackend(channelStore, { force = false } 
       const optimisticByKey = new Map(
         historyChannels.value.map(h => [`${h.type}:${h.uuid}`, h])
       )
-      historyChannels.value = activeEntries
+      historyChannels.value = uniqueActiveEntries
         .map(e => {
           const key = `${e.type}:${e.uuid}`
           return itemsByKey.get(key) || optimisticByKey.get(key) || null
@@ -122,7 +147,7 @@ export function watchChannelHistory(channelStore) {
   return watch(
     () => channelStore.channel,
     newChannel => {
-      if (newChannel?.uuid) {
+      if (newChannel?.uuid && Array.isArray(newChannel?.projects)) {
         addHistory(newChannel)
       }
     },

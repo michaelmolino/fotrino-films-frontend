@@ -21,7 +21,9 @@ export default defineConfig(() => ({
     vueRouterMode: 'history',
     publicPath: '/',
     env: {
-      API: process.env.NODE_ENV === 'production' ? 'https://films.fotrino.com/api' : '/api'
+      API: process.env.NODE_ENV === 'production' ? 'https://films.fotrino.com/api' : '/api',
+      SAMPLE_CHANNEL_ID: process.env.SAMPLE_CHANNEL_ID || '',
+      SAMPLE_CHANNEL_SLUG: process.env.SAMPLE_CHANNEL_SLUG || 'Sample-Channel'
     },
     sourcemap: process.env.NODE_ENV !== 'production',
     extendViteConf(viteConf) {

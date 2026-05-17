@@ -29,7 +29,7 @@
             icon="play_circle"
             label="Explore Sample Channel"
             data-cy="home-explore-sample-channel"
-            to="/9944fa03-8a73-4e52-84bc-e8a514bd1271/Sample-Channel" />
+            :to="sampleChannelPath" />
         </div>
       </div>
     </section>
@@ -42,5 +42,7 @@ import { useQuasar } from 'quasar'
 
 defineOptions({ name: 'Home-Page' })
 const $q = useQuasar()
+const sampleChannelPath = `/c/${process.env.SAMPLE_CHANNEL_ID}/${process.env.SAMPLE_CHANNEL_SLUG}`
+
 const darkClass = computed(() => ($q.dark.isActive ? 'text-white' : 'text-primary'))
 </script>

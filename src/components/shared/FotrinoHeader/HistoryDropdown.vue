@@ -8,7 +8,7 @@
     no-caps
     size="md"
     content-class="my-history-dropdown-menu">
-    <div v-for="channel in historyChannels" :key="channel.uuid" class="row">
+    <div v-for="channel in historyChannels" :key="`${channel.type}:${channel.uuid}`" class="row">
       <q-btn
         :icon="channel.cover ? 'img:' + channel.cover : 'movie'"
         align="left"
@@ -19,7 +19,7 @@
         :label="channel.title"
         :aria-label="`Visit ${channel.title}`"
         size="md"
-        :to="channel.type === 'private' ? `/private/${channel.uuid}` : `/${channel.uuid}/${channel.slug}`" />
+        :to="channel.type === 'private' ? `/private/m/${channel.uuid}/${channel.slug}` : `/c/${channel.uuid}/${channel.slug}`" />
       <q-btn
         icon="remove_circle"
         flat
@@ -28,7 +28,7 @@
         class="col-xs-2"
         :aria-label="`Remove ${channel.title} from history`"
         size="md"
-        @click="removeHistory(channel.uuid)" />
+        @click="removeHistory(channel.uuid, channel.type)" />
     </div>
   </q-btn-dropdown>
 </template>

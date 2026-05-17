@@ -150,7 +150,7 @@
               </q-item-section>
               <q-item-section side>
                 <q-btn
-                  :to="`/${channel.uuid}/${channel.slug}`"
+                  :to="`/c/${channel.uuid}/${channel.slug}`"
                   icon="link"
                   flat
                   dense
