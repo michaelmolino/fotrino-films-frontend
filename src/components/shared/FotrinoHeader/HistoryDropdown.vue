@@ -70,3 +70,9 @@ onMounted(async () => {
   }
 })
 </script>
+
+<style scoped lang="scss">
+.my-history-dropdown-menu.q-menu[role='menu'] {
+  max-width: none !important;
+}
+</style>
