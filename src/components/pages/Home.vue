@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-md flex flex-center" data-cy="home-page">
+  <q-page :class="isDark ? 'bg-hero-dark' : ''" class="q-pa-md flex flex-center" data-cy="home-page">
     <section class="text-right q-pa-lg rounded-borders" data-cy="home-hero">
       <div>
         <transition appear enter-active-class="animated zoomInDown slower">
@@ -42,10 +42,25 @@ import { useQuasar } from 'quasar'
 
 defineOptions({ name: 'Home-Page' })
 const $q = useQuasar()
-const runtimeConfig = globalThis.__APP_CONFIG__ || {}
-const sampleChannelId = runtimeConfig.SAMPLE_CHANNEL_ID || process.env.SAMPLE_CHANNEL_ID || ''
-const sampleChannelSlug = runtimeConfig.SAMPLE_CHANNEL_SLUG || process.env.SAMPLE_CHANNEL_SLUG || 'Sample-Channel'
-const sampleChannelPath = `/c/${sampleChannelId}/${sampleChannelSlug}`
-
+const sampleChannelPath = `/c/${process.env.SAMPLE_CHANNEL_ID}/${process.env.SAMPLE_CHANNEL_SLUG}`
 const darkClass = computed(() => ($q.dark.isActive ? 'text-white' : 'text-primary'))
+const isDark = computed(() => $q.dark.isActive)
 </script>
+
+<style scoped lang="scss">
+.bg-hero-dark {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(1000px 480px at 85% 20%, rgba(var(--q-primary-rgb), 0.45), rgba(var(--q-primary-rgb), 0) 68%),
+      radial-gradient(780px 360px at 10% 88%, rgba(var(--q-secondary-rgb), 0.14), rgba(var(--q-secondary-rgb), 0) 62%);
+  }
+}
+</style>

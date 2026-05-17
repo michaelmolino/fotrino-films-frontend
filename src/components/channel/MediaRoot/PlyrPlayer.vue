@@ -35,6 +35,7 @@
 import { computed, onMounted, onBeforeUnmount, watch, ref, nextTick } from 'vue'
 import { useChannelStore } from 'src/stores/channel-store.js'
 import 'plyr/dist/plyr.css'
+import '@css/plyr.sass'
 import { addPreconnectForUrl, addPreloadImageOnce } from '@utils/preconnect'
 import { setupVideoPlayback } from '@utils/videoPlayback'
 import { useWebP } from '@composables/useWebP'

@@ -1,5 +1,5 @@
 <template>
-  <q-layout :class="isDark ? 'bg-hero-dark' : ''" view="hHh lpR fFf">
+  <q-layout view="hHh lpR fFf">
     <a href="#main-content" class="skip-to-content">Skip to main content</a>
     <FotrinoHeader />
     <main id="main-content">
@@ -12,17 +12,11 @@
 </template>
 
 <script>
-import { computed } from 'vue'
-import { useQuasar } from 'quasar'
 import FotrinoHeader from '@components/shared/FotrinoHeader.vue'
 import FotrinoFooter from '@components/shared/FotrinoFooter.vue'
 
 export default {
   name: 'MainLayout',
-  setup() {
-    const $q = useQuasar()
-    return { isDark: computed(() => $q.dark.isActive) }
-  },
   components: { FotrinoHeader, FotrinoFooter }
 }
 </script>
@@ -42,21 +36,5 @@ export default {
   left: 50%;
   top: 8px;
   transform: translateX(-50%);
-}
-
-.bg-hero-dark {
-  position: relative;
-  isolation: isolate;
-}
-
-.bg-hero-dark::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(1000px 480px at 85% 20%, rgba($primary, 0.45), rgba($primary, 0) 68%),
-    radial-gradient(780px 360px at 10% 88%, rgba($secondary, 0.14), rgba($secondary, 0) 62%);
 }
 </style>
