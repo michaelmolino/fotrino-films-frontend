@@ -37,6 +37,7 @@ export default defineConfig(() => ({
         '@utils': path.resolve(__dirname, 'src/utils'),
         '@libs': path.resolve(__dirname, 'src/libs'),
         '@assets': path.resolve(__dirname, 'src/assets'),
+        '@css': path.resolve(__dirname, 'src/css'),
         '@deps': path.resolve(__dirname, 'node_modules')
       }
       viteConf.optimizeDeps = viteConf.optimizeDeps || {}
