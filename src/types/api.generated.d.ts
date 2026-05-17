@@ -197,16 +197,16 @@ export type Subtitle2 = string | null
 export type Title11 = string | null
 export type Message6 = string | null
 export type Reported = boolean
-export type Mediaid = number
-export type Privateid = string
-export type Createdat = string
+export type MediaId = number
+export type PrivateId2 = string
+export type CreatedAt = string
 export type Reason = string | null
 export type Reporter = string
 export type Reports = ReportedMediaReportResponse[]
 export type Slug7 = string
 export type Title12 = string
 export type Uuid10 = string
-export type Createdat1 = string
+export type CreatedAt1 = string
 export type Reason1 = string | null
 export type Reporter1 = string
 export type Error9 = 'unauthorized'
@@ -535,20 +535,20 @@ export interface ReportMediaResponse {
   reported: Reported
 }
 export interface ReportedMediaItemResponse {
-  mediaId: Mediaid
-  privateId: Privateid
+  media_id: MediaId
+  private_id: PrivateId2
   reports: Reports
   slug: Slug7
   title: Title12
   uuid: Uuid10
 }
 export interface ReportedMediaReportResponse {
-  createdAt: Createdat
+  created_at: CreatedAt
   reason: Reason
   reporter: Reporter
 }
 export interface ReportedMediaReportResponse1 {
-  createdAt: Createdat1
+  created_at: CreatedAt1
   reason: Reason1
   reporter: Reporter1
 }
