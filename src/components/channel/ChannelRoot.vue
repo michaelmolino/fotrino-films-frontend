@@ -27,7 +27,7 @@
         <template v-if="effectiveSelectedView === 'projects'">
           <div class="row q-mt-sm">
             <div
-              class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
+              class="col-xs-6 col-sm-6 col-md-4 col-lg-3 col-xl-2"
               v-for="project in projects"
               :key="project.id">
               <ProjectPoster
