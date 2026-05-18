@@ -137,7 +137,7 @@
           <q-list dense>
             <q-item
               v-for="channel in user.channels"
-              :key="channel.uuid"
+              :key="channel.publicId"
               class="channel-item q-pl-lg">
               <q-item-section avatar>
                 <q-avatar size="32px">
@@ -150,7 +150,7 @@
               </q-item-section>
               <q-item-section side>
                 <q-btn
-                  :to="`/c/${channel.uuid}/${channel.slug}`"
+                  :to="`/c/${channel.publicId}/${channel.slug}`"
                   icon="link"
                   flat
                   dense

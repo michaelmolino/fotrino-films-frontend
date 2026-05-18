@@ -4,18 +4,18 @@
       outlined
       :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
       label="Channel *"
-      :model-value="payload.uuid"
-      @update:model-value="onUpdateUuid"
+      :model-value="payload.publicId"
+      @update:model-value="onUpdatePublicId"
       data-cy="upload-channel-select"
       :options="
         channels
-          .map(({ uuid, title }) => ({ value: uuid, label: title }))
+          .map(({ publicId, title }) => ({ value: publicId, label: title }))
           .concat({ value: 0, label: 'New...' })
       "
       class="q-pb-lg" />
     <div>
       <q-input
-        v-if="payload.uuid?.value === 0"
+        v-if="payload.publicId?.value === 0"
         outlined
         :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
         class="q-pb-md"
@@ -30,13 +30,13 @@
         <q-card-section>
           <div class="text-overline">Channel Cover</div>
           <q-radio
-            v-if="payload.uuid?.value === 0"
+            v-if="payload.publicId?.value === 0"
             v-model="localCoverType"
             val="profile"
             label="Profile Photo"
             color="accent" /><br />
           <q-radio
-            v-if="payload.uuid?.value === 0"
+            v-if="payload.publicId?.value === 0"
             v-model="localCoverType"
             val="new"
             label="Upload Photo"
@@ -44,7 +44,7 @@
             data-cy="upload-channel-cover-type-new"
             class="q-pb-md" /><br />
           <q-file
-            v-if="payload.uuid?.value === 0 && localCoverType === 'new'"
+            v-if="payload.publicId?.value === 0 && localCoverType === 'new'"
             label="Channel Cover (Image)"
             appendoutlined
             :model-value="coverFile"
@@ -66,16 +66,16 @@
           <q-avatar size="150px" class="q-pl-lg">
             <q-skeleton
               v-if="
-                !payload.uuid ||
-                (payload.uuid &&
-                  payload.uuid.value === 0 &&
+                !payload.publicId ||
+                (payload.publicId &&
+                  payload.publicId.value === 0 &&
                   payload.coverType === 'new' &&
                   !coverFile)
               "
               class="cursor-not-allowed width250 height250"
               animation="none" />
             <q-img
-              v-if="payload.uuid && payload.uuid.value !== 0"
+              v-if="payload.publicId && payload.publicId.value !== 0"
               :src="selectedChannelCover"
               class="width250"
               :ratio="1 / 1"
@@ -83,7 +83,7 @@
               loading="lazy"
               decoding="async" />
             <q-img
-              v-if="payload.uuid && payload.uuid.value === 0"
+              v-if="payload.publicId && payload.publicId.value === 0"
               :src="payload.coverType === 'profile' ? profile.avatar : coverThumb"
               class="width250"
               :ratio="1 / 1"
@@ -109,10 +109,20 @@ const props = defineProps({
 })
 const emit = defineEmits(['update:payload', 'update:coverFile'])
 
+const channelCoverByPublicId = computed(() => {
+  const map = {}
+  for (const channel of props.channels || []) {
+    if (channel?.publicId) {
+      map[channel.publicId] = channel.cover || null
+    }
+  }
+  return map
+})
+
 const selectedChannelCover = computed(() => {
-  const selectedUuid = props.payload?.uuid?.value
-  if (!selectedUuid) return null
-  return props.channels.find(ch => ch.uuid === selectedUuid)?.cover || null
+  const selectedPublicId = props.payload?.publicId?.value
+  if (!selectedPublicId) return null
+  return channelCoverByPublicId.value[selectedPublicId] || null
 })
 
 const localCoverType = computed({
@@ -120,8 +130,8 @@ const localCoverType = computed({
   set: v => emit('update:payload', { ...props.payload, coverType: v })
 })
 
-function onUpdateUuid(val) {
-  emit('update:payload', { ...props.payload, uuid: val })
+function onUpdatePublicId(val) {
+  emit('update:payload', { ...props.payload, publicId: val })
 }
 function onUpdateTitle(val) {
   emit('update:payload', { ...props.payload, title: val })
@@ -148,17 +158,17 @@ function restoreDefaultChannelTitle() {
 // - >1 channels: leave blank to force explicit selection
 function ensureDefaultChannelSelection() {
   const ch = Array.isArray(props.channels) ? props.channels : []
-  const current = props.payload?.uuid
+  const current = props.payload?.publicId
   const hasCurrent = current && (current.value || current.value === 0)
   if (hasCurrent) return
 
   if (ch.length === 0) {
-    emit('update:payload', { ...props.payload, uuid: { value: 0, label: 'New...' } })
+    emit('update:payload', { ...props.payload, publicId: { value: 0, label: 'New...' } })
   } else if (ch.length === 1) {
-    const { uuid, title } = ch[0]
-    emit('update:payload', { ...props.payload, uuid: { value: uuid, label: title } })
+    const { publicId, title } = ch[0]
+    emit('update:payload', { ...props.payload, publicId: { value: publicId, label: title } })
   } else {
-    emit('update:payload', { ...props.payload, uuid: null })
+    emit('update:payload', { ...props.payload, publicId: null })
   }
 }
 

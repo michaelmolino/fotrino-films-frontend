@@ -3,7 +3,8 @@ import { useChannelStore } from 'src/stores/channel-store.js'
 import { useRoute, useRouter } from 'vue-router'
 import { useMeta } from 'quasar'
 import { getMetaData } from '@utils/meta.js'
-import { addPrivateHistory } from '@utils/history.js'
+import { addHistory, addPrivateHistory } from '@utils/history.js'
+import { getCanonicalChannelRoutePath, hasLoadedChannelRouteTarget, getChannelRouteTarget } from '@utils/channel-route.js'
 
 /**
  * Composable for loading and setting channel data based on route parameters
@@ -17,6 +18,7 @@ export function useChannelLoader({ manageMeta = false } = {}) {
   const route = useRoute()
   const router = useRouter()
   const channel = toRef(channelStore, 'channel')
+  const readModel = toRef(channelStore, 'readModel')
   const sortedAllMedia = toRef(channelStore, 'sortedAllMedia')
   const loadStatus = toRef(channelStore, 'loadStatus')
   const metaData = ref(getMetaData(null, null))
@@ -37,58 +39,53 @@ export function useChannelLoader({ manageMeta = false } = {}) {
   }
 
   const fetchChannelByRoute = route => {
-    if (route.params?.channelId) {
-      return channelStore.getChannel({
-        channelId: route.params.channelId
-      })
+    const target = getChannelRouteTarget(route)
+    if (!target) {
+      return Promise.resolve(null)
     }
-    if (route.params?.projectId) {
-      return channelStore.getChannelByProject(route.params.projectId)
+
+    if (hasLoadedChannelRouteTarget(route, channelStore)) {
+      return Promise.resolve(channelStore.channel)
     }
-    if (route.params?.mediaId) {
-      return channelStore.getChannelByMedia(route.params.mediaId)
+
+    if (target.type === 'channel') {
+      return channelStore.getChannel({ channelId: target.id })
     }
-    if (route.params?.privateMediaId) {
-      return channelStore.getPrivateMedia(route.params.privateMediaId)
+    if (target.type === 'project') {
+      return channelStore.getChannelByProject(target.id)
+    }
+    if (target.type === 'media') {
+      return channelStore.getChannelByMedia(target.id)
+    }
+    if (target.type === 'privateMedia') {
+      return channelStore.getPrivateMedia(target.id)
     }
     return Promise.resolve(null)
   }
 
   const syncPrivateHistory = (route, channel) => {
     if (!route.params?.privateMediaId || !channel) return
+    const media = channel?.project?.media
     addPrivateHistory(route.params.privateMediaId, {
-      title: channel?.project?.media?.title || channel?.title || '',
-      cover: channel?.project?.media?.preview || channel?.cover || null,
-      slug: channel?.project?.media?.slug || route.params.mediaSlug || null
+      title: media?.title || channel?.project?.media?.title || channel?.title || '',
+      cover: media?.preview || channel?.project?.media?.preview || channel?.cover || null,
+      slug: media?.slug || channel?.project?.media?.slug || route.params.mediaSlug || null
     })
+  }
+
+  const syncChannelHistory = (route, channel) => {
+    if (route.params?.privateMediaId || !channel) return
+    addHistory(channel)
   }
 
   const replacePath = (path, query) => {
     router.replace({ path, query })
   }
 
-  const syncCanonicalSlugs = (route, channel) => {
-    if (route.params?.channelId && channel?.uuid && channel.slug && channel.slug !== route.params.channelSlug) {
-      replacePath(`/c/${channel.uuid}/${channel.slug}`, route.query)
-      return
-    }
-
-    if (route.params?.projectId && channel?.projects?.length) {
-      const project = channel.projects.find(item => item.uuid === route.params.projectId)
-      if (project?.uuid && project.slug && project.slug !== route.params.projectSlug) {
-        replacePath(`/p/${project.uuid}/${project.slug}`, route.query)
-        return
-      }
-    }
-
-    if (route.params?.mediaId && channel?.projects?.length) {
-      const project = channel.projects.find(item =>
-        Array.isArray(item.media) && item.media.some(media => media.uuid === route.params.mediaId)
-      )
-      const media = project?.media?.find(item => item.uuid === route.params.mediaId)
-      if (media?.uuid && media.slug && media.slug !== route.params.mediaSlug) {
-        replacePath(`/m/${media.uuid}/${media.slug}`, route.query)
-      }
+  const syncCanonicalSlugs = route => {
+    const canonicalPath = getCanonicalChannelRoutePath(route, channelStore)
+    if (canonicalPath) {
+      replacePath(canonicalPath, route.query)
     }
   }
 
@@ -104,18 +101,20 @@ export function useChannelLoader({ manageMeta = false } = {}) {
     channelStore.setChannelLoadStatus('loading')
 
     try {
-      const channel = await fetchChannelByRoute(route)
+      await fetchChannelByRoute(route)
+      const loadedChannel = channelStore.channel
 
       if (isStale()) {
         return null
       }
 
-      syncPrivateHistory(route, channel)
-      syncCanonicalSlugs(route, channel)
+      syncChannelHistory(route, loadedChannel)
+      syncPrivateHistory(route, loadedChannel)
+      syncCanonicalSlugs(route)
 
-      metaData.value = getMetaData(route, channel)
+      metaData.value = getMetaData(route, loadedChannel, readModel.value)
       channelStore.setChannelLoadStatus('success')
-      return channel
+      return loadedChannel
     } catch (error) {
       if (isStale()) {
         return null
@@ -123,7 +122,7 @@ export function useChannelLoader({ manageMeta = false } = {}) {
 
       channelStore.setChannel(null)
       channelStore.setChannelLoadStatus('error')
-      metaData.value = getMetaData(null, null)
+      metaData.value = getMetaData(null, null, null)
       console.error('Failed to load channel:', error)
       return null
     }

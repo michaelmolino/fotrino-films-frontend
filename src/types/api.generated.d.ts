@@ -18,9 +18,9 @@ export type Avatar1 = string
 export type Cover = string
 export type Created1 = string
 export type Id1 = number
+export type Publicid = string
 export type Slug = string
 export type Title = string
-export type Uuid = string
 export type Channels = ChannelCoreResponse[]
 export type Country1 = string | null
 export type Created2 = string
@@ -56,27 +56,27 @@ export type Pending1 = boolean
 export type Preview = string
 export type PrivateId = string
 export type Project = number
+export type Publicid1 = string
 export type ResourceDate = string
 export type Slug1 = string
 export type Src = string | null
 export type Title1 = string
 export type Type = string | null
 export type UpdatedAt = string
-export type Uuid1 = string
 export type Media = MediaResponse[]
 export type Pending2 = boolean
 export type Poster = string | null
 export type PosterColor = string | null
+export type Publicid2 = string
 export type ResourceDate1 = string
 export type Slug2 = string
 export type Subtitle = string | null
 export type Title2 = string
 export type UpdatedAt1 = string
-export type Uuid2 = string
 export type Projects = ProjectResponse[]
+export type Publicid3 = string
 export type Slug3 = string
 export type Title3 = string
-export type Uuid3 = string
 export type Created6 = string
 export type Deleted5 = boolean
 export type DescriptionUnsafe1 = string | null
@@ -86,13 +86,13 @@ export type Pending3 = boolean
 export type Preview1 = string
 export type PrivateId1 = string
 export type Project1 = number
+export type Publicid4 = string
 export type ResourceDate2 = string
 export type Slug4 = string
 export type Src1 = string | null
 export type Title4 = string
 export type Type1 = string | null
 export type UpdatedAt2 = string
-export type Uuid4 = string
 export type Channel1 = number
 export type Created7 = string
 export type Deleted6 = boolean
@@ -101,21 +101,21 @@ export type Media1 = MediaResponse[]
 export type Pending4 = boolean
 export type Poster1 = string | null
 export type PosterColor1 = string | null
+export type Publicid5 = string
 export type ResourceDate3 = string
 export type Slug5 = string
 export type Subtitle1 = string | null
 export type Title5 = string
 export type UpdatedAt3 = string
-export type Uuid5 = string
 export type Cover2 = string
 export type Created8 = string
 export type Deleted7 = boolean
 export type Id8 = number
 export type Owner1 = number
 export type Pending5 = boolean
+export type Publicid6 = string
 export type Slug6 = string
 export type Title6 = string
-export type Uuid6 = string
 export type Error1 = 'conflict'
 export type Message1 = string | null
 export type Status1 = 409
@@ -185,27 +185,31 @@ export type PosterType = 'default' | 'new'
 export type PreviewType = 'frame' | 'new'
 export type Cover3 = string
 export type Ownername1 = string
+export type Created10 = string | null
+export type DescriptionUnsafe2 = string | null
+export type Preview2 = string | null
+export type PrivateId2 = string
+export type ResourceDate4 = string | null
+export type Slug7 = string
+export type Src2 = string | null
 export type Title8 = string
-export type Uuid7 = string
-export type Title9 = string
-export type Uuid8 = string
-export type Title10 = string
-export type Uuid9 = string
+export type Type3 = string | null
+export type UpdatedAt4 = string | null
 export type Postercolor = string | null
 export type Postertype = 'default' | 'new'
 export type Subtitle2 = string | null
-export type Title11 = string | null
+export type Title9 = string | null
 export type Message6 = string | null
 export type Reported = boolean
 export type MediaId = number
-export type PrivateId2 = string
+export type PrivateId3 = string
+export type Publicid7 = string
 export type CreatedAt = string
 export type Reason = string | null
 export type Reporter = string
 export type Reports = ReportedMediaReportResponse[]
-export type Slug7 = string
-export type Title12 = string
-export type Uuid10 = string
+export type Slug8 = string
+export type Title10 = string
 export type CreatedAt1 = string
 export type Reason1 = string | null
 export type Reporter1 = string
@@ -220,7 +224,7 @@ export type Requiredresources = ('cover' | 'poster' | 'preview' | 'upload')[]
 export type Resourcetype = 'cover' | 'poster' | 'preview' | 'upload'
 export type Url = string
 export type Covertype = 'profile' | 'new'
-export type Title13 = string | null
+export type Title11 = string | null
 export type UploadResourceType = 'cover' | 'poster' | 'preview' | 'upload'
 export type Error11 = string
 export type Error12 = string
@@ -313,9 +317,9 @@ export interface ChannelCoreResponse {
   cover: Cover
   created: Created1
   id: Id1
+  publicId: Publicid
   slug: Slug
   title: Title
-  uuid: Uuid
 }
 export interface BadRequestErrorResponse {
   error: Error
@@ -331,9 +335,9 @@ export interface ChannelDetailResponse {
   ownername: Ownername
   pending?: Pending
   projects?: Projects
+  publicId: Publicid3
   slug: Slug3
   title: Title3
-  uuid: Uuid3
 }
 export interface ProjectResponse {
   channel: Channel
@@ -344,12 +348,12 @@ export interface ProjectResponse {
   pending?: Pending2
   poster: Poster
   poster_color: PosterColor
+  publicId: Publicid2
   resource_date: ResourceDate1
   slug: Slug2
   subtitle: Subtitle
   title: Title2
   updated_at: UpdatedAt1
-  uuid: Uuid2
 }
 export interface MediaResponse {
   created: Created5
@@ -361,13 +365,13 @@ export interface MediaResponse {
   preview: Preview
   private_id: PrivateId
   project: Project
+  publicId: Publicid1
   resource_date: ResourceDate
   slug: Slug1
   src: Src
   title: Title1
   type: Type
   updated_at: UpdatedAt
-  uuid: Uuid1
 }
 export interface MediaResponse1 {
   created: Created6
@@ -379,13 +383,13 @@ export interface MediaResponse1 {
   preview: Preview1
   private_id: PrivateId1
   project: Project1
+  publicId: Publicid4
   resource_date: ResourceDate2
   slug: Slug4
   src: Src1
   title: Title4
   type: Type1
   updated_at: UpdatedAt2
-  uuid: Uuid4
 }
 export interface ProjectResponse1 {
   channel: Channel1
@@ -396,12 +400,12 @@ export interface ProjectResponse1 {
   pending?: Pending4
   poster: Poster1
   poster_color: PosterColor1
+  publicId: Publicid5
   resource_date: ResourceDate3
   slug: Slug5
   subtitle: Subtitle1
   title: Title5
   updated_at: UpdatedAt3
-  uuid: Uuid5
 }
 export interface ChannelSummaryResponse {
   cover: Cover2
@@ -410,9 +414,9 @@ export interface ChannelSummaryResponse {
   id: Id8
   owner: Owner1
   pending?: Pending5
+  publicId: Publicid6
   slug: Slug6
   title: Title6
-  uuid: Uuid6
 }
 export interface ConflictErrorResponse {
   error: Error1
@@ -509,18 +513,24 @@ export interface PrivateMediaChannelResponse {
   cover: Cover3
   ownername: Ownername1
   project: PrivateMediaProjectResponse
-  title: Title9
-  uuid: Uuid8
 }
 export interface PrivateMediaProjectResponse {
-  media: MediaResponse
+  media: PrivateMediaItemResponse
+}
+export interface PrivateMediaItemResponse {
+  created?: Created10
+  description_unsafe: DescriptionUnsafe2
+  preview?: Preview2
+  private_id: PrivateId2
+  resource_date?: ResourceDate4
+  slug: Slug7
+  src?: Src2
   title: Title8
-  uuid: Uuid7
+  type?: Type3
+  updated_at?: UpdatedAt4
 }
 export interface PrivateMediaProjectResponse1 {
-  media: MediaResponse
-  title: Title10
-  uuid: Uuid9
+  media: PrivateMediaItemResponse
 }
 export interface ProjectUploadPayload {
   id: LabeledValue
@@ -528,7 +538,7 @@ export interface ProjectUploadPayload {
   posterColor?: Postercolor
   posterType?: Postertype
   subtitle?: Subtitle2
-  title?: Title11
+  title?: Title9
 }
 export interface ReportMediaResponse {
   message?: Message6
@@ -536,11 +546,11 @@ export interface ReportMediaResponse {
 }
 export interface ReportedMediaItemResponse {
   media_id: MediaId
-  private_id: PrivateId2
+  private_id: PrivateId3
+  publicId: Publicid7
   reports: Reports
-  slug: Slug7
-  title: Title12
-  uuid: Uuid10
+  slug: Slug8
+  title: Title10
 }
 export interface ReportedMediaReportResponse {
   created_at: CreatedAt
@@ -571,8 +581,8 @@ export interface UploadInstruction {
 export interface UploadMediaRequest {
   coverType?: Covertype
   project: ProjectUploadPayload
-  title?: Title13
-  uuid: LabeledValue
+  publicId: LabeledValue
+  title?: Title11
 }
 export interface ErrorDetailResponse1 {
   detail: Detail1

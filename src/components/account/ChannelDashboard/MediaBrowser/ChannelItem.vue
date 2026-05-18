@@ -21,7 +21,7 @@
         :editable="true"
         :editDataCy="'edit-channel'"
         @edit="openEditDialog"
-        @delete="$emit('deleteChannel', channel.uuid)" />
+        @delete="$emit('deleteChannel', channel.publicId)" />
     </template>
 
     <ProjectItem
@@ -93,12 +93,17 @@ const props = defineProps({
 const emit = defineEmits(['deleteChannel', 'deleteProject', 'deleteMedia', 'abortMedia', 'editMedia', 'editProject', 'editChannel'])
 
 const hasPendingChildren = computed(() => {
-  if (props.channel.projects?.some(project => project.pending)) {
-    return true
+  for (const project of props.channel.projects || []) {
+    if (project?.pending) {
+      return true
+    }
+    for (const media of project?.media || []) {
+      if (media?.pending) {
+        return true
+      }
+    }
   }
-  return (
-    props.channel.projects?.some(project => project.media?.some(media => media.pending)) || false
-  )
+  return false
 })
 
 // Edit state
@@ -152,7 +157,7 @@ const saveEdit = () => {
   savingEdit.value = true
   try {
     const payload = {
-      channelUuid: props.channel.uuid,
+      channelPublicId: props.channel.publicId,
       title: editForm.value.title,
       coverFile: editCoverFile.value
     }

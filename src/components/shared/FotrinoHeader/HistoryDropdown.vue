@@ -8,7 +8,7 @@
     no-caps
     size="md"
     content-class="my-history-dropdown-menu">
-    <div v-for="channel in historyChannels" :key="`${channel.type}:${channel.uuid}`" class="row">
+    <div v-for="channel in historyChannels" :key="`${channel.type}:${channel.publicId}`" class="row">
       <q-btn
         :icon="channel.cover ? 'img:' + channel.cover : 'movie'"
         align="left"
@@ -19,7 +19,7 @@
         :label="channel.title"
         :aria-label="`Visit ${channel.title}`"
         size="md"
-        :to="channel.type === 'private' ? `/private/m/${channel.uuid}/${channel.slug}` : `/c/${channel.uuid}/${channel.slug}`" />
+        :to="channel.type === 'private' ? `/private/m/${channel.publicId}/${channel.slug}` : `/c/${channel.publicId}/${channel.slug}`" />
       <q-btn
         icon="remove_circle"
         flat
@@ -28,7 +28,7 @@
         class="col-xs-2"
         :aria-label="`Remove ${channel.title} from history`"
         size="md"
-        @click="removeHistory(channel.uuid, channel.type)" />
+        @click="removeHistory(channel.publicId, channel.type)" />
     </div>
   </q-btn-dropdown>
 </template>
@@ -55,7 +55,7 @@ onBeforeUnmount(() => {
 
 onMounted(async () => {
   const result = await resolveHistoryFromBackend(channelStore)
-  const removedCount = result?.deletedUuids?.length || 0
+  const removedCount = result?.deletedPublicIds?.length || 0
 
   if (removedCount > 0) {
     Notify.create({

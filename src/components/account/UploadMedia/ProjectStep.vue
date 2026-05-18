@@ -173,6 +173,7 @@ function restoreDefaultProjectTitle() {
 function ensureDefaultProjectSelection() {
   const list = Array.isArray(props.projects) ? props.projects : []
   const current = props.payload?.project?.id
+  const projectIdSet = new Set(list.map(project => project.id))
 
   if (list.length === 0) {
     // No projects available, default to New...
@@ -193,7 +194,7 @@ function ensureDefaultProjectSelection() {
     }
   } else {
     // Multiple projects, force blank selection unless user has made a valid choice
-    const hasValidSelection = current && list.some(p => p.id === current.value)
+    const hasValidSelection = current && projectIdSet.has(current.value)
     if (!hasValidSelection && (!current || current.value === 0)) {
       emit('update:payload', {
         ...props.payload,

@@ -233,7 +233,7 @@ const projects = ref([])
 /** @type {import('src/types/api-contract').ApiContracts['UploadMediaRequest']} */
 function createInitialPayload() {
   return {
-    uuid: null,
+    publicId: null,
     coverType: 'profile',
     title: 'My Channel',
     project: {
@@ -275,8 +275,18 @@ const { factoryUpload, cancel: cancelUpload, progress, statusText, isUploading }
 })
 
 const isPreviewProcessing = computed(() => {
-  const preview = uploadFiles.value.find(r => r.resourceType === 'preview')
+  const preview = uploadFilesByType.value.preview
   return extractingFrame.value || (preview && preview.processing === true)
+})
+
+const uploadFilesByType = computed(() => {
+  const byType = {}
+  for (const item of uploadFiles.value) {
+    if (item?.resourceType) {
+      byType[item.resourceType] = item
+    }
+  }
+  return byType
 })
 
 const stepTitles = computed(() => ({
@@ -435,7 +445,7 @@ function goBack() {
 }
 
 function resetChannelStep() {
-  payload.uuid = null
+  payload.publicId = null
   payload.coverType = 'profile'
   payload.title = 'My Channel'
   coverFile.value = null
@@ -458,7 +468,7 @@ function resetUploadFlow() {
   }
 
   const freshPayload = createInitialPayload()
-  payload.uuid = freshPayload.uuid
+  payload.publicId = freshPayload.publicId
   payload.coverType = freshPayload.coverType
   payload.title = freshPayload.title
   payload.project = freshPayload.project
@@ -493,11 +503,20 @@ const isNewUserProfile = computed(() => {
   return profile.value.newUser === true
 })
 const channels = computed(() => channelStore.channels)
+const projectsById = computed(() => {
+  const map = {}
+  for (const item of projects.value || []) {
+    if (item?.id != null) {
+      map[item.id] = item
+    }
+  }
+  return map
+})
 
 const project = computed(() => {
   // If selecting an existing project, return it from the list
   if (payload.project.id?.value && payload.project.id.value !== 0) {
-    return projects.value.find(p => p.id === payload.project.id.value)
+    return projectsById.value[payload.project.id.value]
   }
 
   // Creating a new project - determine poster
@@ -550,8 +569,8 @@ const next = computed(() => {
       )
     case 2: // Channel
       return (
-        payload.uuid !== null &&
-        (!!payload.uuid?.value ||
+        payload.publicId !== null &&
+        (!!payload.publicId?.value ||
           (!!payload.title && (!!coverFile.value || payload.coverType === 'profile')))
       )
     case 3: // Project
@@ -583,18 +602,14 @@ async function quickUpload() {
     // Resolve channel selection: use the single existing or set to New (0)
     const ch = channels.value || []
     if (ch.length === 1) {
-      payload.uuid = { value: ch[0].uuid, label: ch[0].title }
+      payload.publicId = { value: ch[0].publicId, label: ch[0].title }
     } else if (ch.length === 0) {
-      payload.uuid = { value: 0, label: 'New...' }
+      payload.publicId = { value: 0, label: 'New...' }
     }
     // Resolve projects if channel exists
     projects.value = []
-    if (payload.uuid && payload.uuid.value && payload.uuid.value !== 0) {
-      const chan = await channelStore.getChannel({
-        channelId: payload.uuid.value,
-        pending: true
-      })
-      projects.value = chan.projects || []
+    if (payload.publicId && payload.publicId.value && payload.publicId.value !== 0) {
+      await loadProjectsForChannelUuid(payload.publicId.value)
     }
     // Select or create project
     if (projects.value.length === 1) {
@@ -620,10 +635,10 @@ async function quickUpload() {
 // watchers
 // Keep projects in sync with the selected channel. If 'New...' is selected, there are no projects.
 watch(
-  () => payload.uuid?.value,
-  async newUuid => {
+  () => payload.publicId?.value,
+  async newPublicId => {
     try {
-      if (!newUuid || newUuid === 0) {
+      if (!newPublicId || newPublicId === 0) {
         projectsLoadToken.value++
         projects.value = []
         // Ensure the Project step defaults to creating a new project
@@ -634,11 +649,11 @@ watch(
       }
 
       const requestToken = ++projectsLoadToken.value
-      await loadProjectsForChannelUuid(newUuid, requestToken)
+      await loadProjectsForChannelUuid(newPublicId, requestToken)
       if (requestToken !== projectsLoadToken.value) return
       // If the previously selected project isn't part of this channel, reset selection
       const currentId = payload.project?.id?.value
-      const found = currentId && projects.value.some(p => p.id === currentId)
+      const found = currentId && projectsById.value[currentId] != null
       if (!found) {
         if (projects.value.length === 1) {
           const p = projects.value[0]
@@ -656,14 +671,14 @@ watch(
 )
 
 watch(channels, ch => {
-  if (ch.length === 0 && step.value === 2) payload.uuid = { value: 0, label: 'New...' }
+  if (ch.length === 0 && step.value === 2) payload.publicId = { value: 0, label: 'New...' }
   if (ch.length === 1 && step.value === 2) {
-    payload.uuid = ch.map(({ uuid, title }) => ({ value: uuid, label: title }))[0]
+    payload.publicId = ch.map(({ publicId, title }) => ({ value: publicId, label: title }))[0]
   }
   // Keep projects in sync for quick upload checks
   if (ch.length === 1) {
     const requestToken = ++projectsLoadToken.value
-    loadProjectsForChannelUuid(ch[0].uuid, requestToken)
+    loadProjectsForChannelUuid(ch[0].publicId, requestToken)
   } else {
     projectsLoadToken.value++
     projects.value = []
@@ -678,9 +693,9 @@ watch(projects, p => {
 })
 
 watch(step, (s, previousStep) => {
-  if (s === 3 && payload.uuid?.value !== 0 && payload.uuid?.value) {
+  if (s === 3 && payload.publicId?.value !== 0 && payload.publicId?.value) {
     const requestToken = ++projectsLoadToken.value
-    loadProjectsForChannelUuid(payload.uuid.value, requestToken).then(() => {
+    loadProjectsForChannelUuid(payload.publicId.value, requestToken).then(() => {
       if (requestToken !== projectsLoadToken.value) return
       if (projects.value.length === 0) payload.project.id = { value: 0, label: 'New...' }
       if (projects.value.length === 1) {
@@ -790,11 +805,26 @@ watch(
 // Step-specific helpers live in the step components now
 
 // lifecycle
-async function loadProjectsForChannelUuid(uuid, requestToken = projectsLoadToken.value) {
+async function loadProjectsForChannelUuid(publicId, requestToken = projectsLoadToken.value) {
   try {
-    const chan = await channelStore.getChannel({ channelId: uuid, pending: true })
+    const existing = (channels.value || []).find(ch => ch?.publicId === publicId)
+    if (Array.isArray(existing?.projects)) {
+      if (requestToken !== projectsLoadToken.value) return
+      projects.value = existing.projects
+      return
+    }
+
+    // Avoid cache key collisions between pending/non-pending variants.
+    let chan = await channelStore.getChannel({ channelId: publicId, pending: true, cache: false })
+    let projectList = Array.isArray(chan?.projects) ? chan.projects : []
+
+    if (projectList.length === 0) {
+      chan = await channelStore.getChannel({ channelId: publicId, pending: false, cache: false })
+      projectList = Array.isArray(chan?.projects) ? chan.projects : []
+    }
+
     if (requestToken !== projectsLoadToken.value) return
-    projects.value = chan?.projects || []
+    projects.value = projectList
   } catch (err) {
     if (requestToken !== projectsLoadToken.value) return
     console.error('Failed to load channel projects:', err)
@@ -814,11 +844,11 @@ const beforeUnloadHandler = event => {
 }
 
 onMounted(async () => {
-  await channelStore.getChannels()
+  await channelStore.getChannels(true)
   const list = channelStore.channels || []
   if (list.length === 1) {
     const requestToken = ++projectsLoadToken.value
-    await loadProjectsForChannelUuid(list[0].uuid, requestToken)
+    await loadProjectsForChannelUuid(list[0].publicId, requestToken)
   } else {
     projectsLoadToken.value++
     projects.value = []

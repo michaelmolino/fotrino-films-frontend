@@ -2,7 +2,11 @@
   <nav class="breadcrumb-nav" data-cy="breadcrumbs">
     <div class="row items-center q-gutter-md q-pa-md">
       <q-avatar v-if="$q.screen.gt.xs">
-        <img :src="channel.cover" :alt="channel.title" loading="lazy" decoding="async" />
+        <img
+          :src="channel.cover"
+          :alt="channel.title || media?.title || 'Media cover'"
+          loading="lazy"
+          decoding="async" />
       </q-avatar>
       <div class="col">
         <q-breadcrumbs active-color="primary" data-cy="breadcrumbs-list">
@@ -36,31 +40,39 @@ const props = defineProps({
 })
 
 const breadcrumbs = computed(() => {
+  if (props.private) {
+    return [
+      {
+        id: 'private-media',
+        label: props.media?.title || 'Private Media',
+        to: null
+      }
+    ]
+  }
+
   const arr = []
   if (!props.channel) return arr
   arr.push({
     id: 0,
     label: props.channel.title,
-    to: `/c/${props.channel.uuid}/${props.channel.slug}`
+    to: `/c/${props.channel.publicId}/${props.channel.slug}`
   })
   if (props.project?.id) {
     arr.push({
       id: 1,
       label: props.project.title,
-      to: `/p/${props.project.uuid}/${props.project.slug}`
+      to: `/p/${props.project.publicId}/${props.project.slug}`
     })
   }
   if (props.project?.id && props.media?.id) {
     arr.push({
       id: 2,
       label: props.media.title,
-      to: `/m/${props.media.uuid}/${props.media.slug}`
+      to: `/m/${props.media.publicId}/${props.media.slug}`
     })
   }
   // Last breadcrumb is not a link
   if (arr.length) arr[arr.length - 1].to = null
-  // If private, only show last
-  if (props.private) return arr.slice(-1)
   return arr
 })
 </script>

@@ -32,7 +32,7 @@ const routes = [
     ]
   },
   {
-    path: '/private/m/:privateMediaId([0-9A-Za-z_-]+)/:mediaSlug([0-9a-zA-Z-]+)',
+    path: '/private/m/:privateMediaId([0-9a-fA-F-]{36})/:mediaSlug([0-9a-zA-Z-]+)',
     component: () => import('@layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('@components/channel/MediaRoot.vue') }

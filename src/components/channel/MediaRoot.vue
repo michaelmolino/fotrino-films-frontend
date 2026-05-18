@@ -33,7 +33,7 @@
               :channel="channel"
               :project="project"
               :media="related"
-                :to="`/m/${related.uuid}/${related.slug}`"
+                :to="`/m/${related.publicId}/${related.slug}`"
               :priority="index === 0 ? 'high' : 'auto'" />
           </div>
         </div>
@@ -50,6 +50,7 @@
 import { computed, watch, defineAsyncComponent, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
+import { useChannelStore } from 'src/stores/channel-store.js'
 
 import BreadCrumbs from '@components/shared/BreadCrumbs.vue'
 import MediaPreview from '@components/channel/shared/MediaPreview.vue'
@@ -60,6 +61,7 @@ const NothingText = defineAsyncComponent(() => import('@components/shared/Nothin
 const route = useRoute()
 const router = useRouter()
 const redirecting = ref(false)
+const channelStore = useChannelStore()
 
 const { channel, loading } = useChannelLoader()
 
@@ -71,9 +73,7 @@ function redirect(pathOrObj) {
 
 function findProjectByParams() {
   if (route.params.mediaId) {
-    return channel.value?.projects?.find(project =>
-      (project.media || []).some(item => item.uuid === route.params.mediaId)
-    ) || null
+    return channelStore.getProjectByMediaPublicId(route.params.mediaId)
   }
   if (route.params.privateMediaId && channel.value) {
     return channel.value?.project || null
@@ -88,7 +88,7 @@ function findMediaByParams(project) {
     return project.media || null
   }
   if (route.params.mediaId) {
-    return project.media?.find(m => m.uuid === route.params.mediaId) || null
+    return channelStore.getMediaByPublicId(route.params.mediaId)
   }
   return null
 }
@@ -141,11 +141,13 @@ watch(
   newMedia => {
     if (!newMedia || loading.value) return
     if (route.params.mediaId && route.params.mediaSlug && newMedia.slug !== route.params.mediaSlug) {
-      redirect(`/m/${newMedia.uuid}/${newMedia.slug}`)
+      redirect(`/m/${newMedia.publicId}/${newMedia.slug}`)
       return
     }
     if (route.params.privateMediaId && route.params.mediaSlug && newMedia.slug !== route.params.mediaSlug) {
-      redirect(`/private/m/${newMedia.uuid}/${newMedia.slug}`)
+      if (newMedia.privateId) {
+        redirect(`/private/m/${newMedia.privateId}/${newMedia.slug}`)
+      }
     }
   },
   { immediate: true }

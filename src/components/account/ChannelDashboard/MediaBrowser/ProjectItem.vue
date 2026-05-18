@@ -112,7 +112,12 @@ const editForm = ref({
 })
 
 const hasPendingChildren = computed(() => {
-  return props.project.media?.some(media => media.pending) || false
+  for (const media of props.project.media || []) {
+    if (media?.pending) {
+      return true
+    }
+  }
+  return false
 })
 
 const editProjectPreview = computed(() => {

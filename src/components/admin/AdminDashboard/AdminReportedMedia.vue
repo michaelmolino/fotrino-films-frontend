@@ -20,7 +20,7 @@
         <q-td :props="props">
           <q-btn
             :label="props.row.title"
-            :to="`/private/m/${props.row.uuid}/${props.row.slug}`"
+            :to="`/private/m/${props.row.privateId}/${props.row.slug}`"
             icon="link"
             flat
             dense

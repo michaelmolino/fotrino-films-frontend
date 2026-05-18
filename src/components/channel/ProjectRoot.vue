@@ -26,7 +26,7 @@
                 :channel="channel"
                 :project="project"
                 :media="item"
-                :to="`/m/${item.uuid}/${item.slug}`"
+                :to="`/m/${item.publicId}/${item.slug}`"
                 :detail="true"
                 :showMainAccent="false"
                 :priority="index === 0 ? 'high' : 'auto'" />
@@ -57,7 +57,7 @@
                 :channel="channel"
                 :project="project"
                 :media="item"
-                :to="`/m/${item.uuid}/${item.slug}`"
+                :to="`/m/${item.publicId}/${item.slug}`"
                 :detail="true"
                 :showMainAccent="false"
                 :priority="index === 0 ? 'high' : 'auto'" />
@@ -78,7 +78,7 @@
                 :channel="channel"
                 :project="project"
                 :media="related"
-                :to="`/m/${related.uuid}/${related.slug}`"
+                :to="`/m/${related.publicId}/${related.slug}`"
                 :priority="index === 0 ? 'high' : 'auto'" />
             </div>
           </div>
@@ -96,6 +96,7 @@
 import { computed, watch, defineAsyncComponent, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
+import { useChannelStore } from 'src/stores/channel-store.js'
 
 import BreadCrumbs from '@components/shared/BreadCrumbs.vue'
 import MediaPreview from '@components/channel/shared/MediaPreview.vue'
@@ -104,6 +105,7 @@ const NothingText = defineAsyncComponent(() => import('@components/shared/Nothin
 const route = useRoute()
 const router = useRouter()
 const redirecting = ref(false)
+const channelStore = useChannelStore()
 
 const { channel, loading } = useChannelLoader()
 
@@ -115,7 +117,7 @@ function redirect(pathOrObj) {
 
 function findProjectByParams() {
   if (route.params.projectId) {
-    return channel.value?.projects?.find(p => p.uuid === route.params.projectId) || null
+    return channelStore.getProjectByPublicId(route.params.projectId)
   }
   return null
 }
@@ -144,7 +146,7 @@ watch(
   project,
   newProject => {
     if (channel.value && newProject && route.params.projectSlug && newProject.slug !== route.params.projectSlug && !loading.value) {
-      redirect(`/p/${newProject.uuid}/${newProject.slug}`)
+      redirect(`/p/${newProject.publicId}/${newProject.slug}`)
       return
     }
     if (channel.value && !newProject && route.params.projectId && !loading.value) {
@@ -161,7 +163,7 @@ watch(
   ([count, proj, isLoading]) => {
     if (!isLoading && channel.value && proj && count === 1 && route.params.projectId) {
       const featured = featuredMedia.value[0]
-      redirect(`/m/${featured.uuid}/${featured.slug}`)
+      redirect(`/m/${featured.publicId}/${featured.slug}`)
     }
   },
   { immediate: true }

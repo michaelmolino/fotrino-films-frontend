@@ -170,7 +170,7 @@ function copyLink(val) {
       })
     })
   } else if (val === 'private') {
-    const id = props.media?.uuid
+    const id = props.media?.privateId
     if (!id) return
     copyToClipboard(`${globalThis.location.origin}/private/m/${id}/${props.media?.slug || ''}`).then(() => {
       Notify.create({

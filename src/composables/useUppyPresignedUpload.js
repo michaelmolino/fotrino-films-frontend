@@ -17,8 +17,18 @@ export function useUppyPresignedUpload() {
     const totalCount = ref(0)
     const hasError = ref(false)
 
+    const instructionByResourceType = () => {
+        const byType = {}
+        for (const instruction of uploadInstructions.value) {
+            if (instruction?.resourceType) {
+                byType[instruction.resourceType] = instruction
+            }
+        }
+        return byType
+    }
+
     function findInstruction(resourceType) {
-        return uploadInstructions.value.find(instruction => instruction.resourceType === resourceType)
+        return instructionByResourceType()[resourceType]
     }
 
     function resetUploadState() {

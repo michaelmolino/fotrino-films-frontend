@@ -1,5 +1,10 @@
 import { sanitizeText } from '@utils/text.js'
 
+const getReadModelLookups = readModel => ({
+  projectsByPublicId: readModel?.entities?.projectsByPublicId || {},
+  mediaByPublicId: readModel?.entities?.mediaByPublicId || {},
+})
+
 // Helpers for each route type
 function getChannelMeta(route, channel) {
   return {
@@ -10,9 +15,9 @@ function getChannelMeta(route, channel) {
   }
 }
 
-function getProjectMeta(projectId, channel) {
-  const projects = Array.isArray(channel?.projects) ? channel.projects : []
-  const project = projects.find(p => p.uuid === projectId)
+function getProjectMeta(projectId, readModel) {
+  const { projectsByPublicId } = getReadModelLookups(readModel)
+  const project = projectsByPublicId[projectId] || null
   return {
     title: project?.title || null,
     description: sanitizeText(project?.subtitle || ''),
@@ -21,10 +26,9 @@ function getProjectMeta(projectId, channel) {
   }
 }
 
-function getMediaMeta(mediaId, channel) {
-  const projects = Array.isArray(channel?.projects) ? channel.projects : []
-  const mediaProject = projects.find(p => Array.isArray(p?.media) && p.media.some(m => m.uuid === mediaId))
-  const media = mediaProject?.media?.find(m => m.uuid === mediaId)
+function getMediaMeta(mediaId, readModel) {
+  const { mediaByPublicId } = getReadModelLookups(readModel)
+  const media = mediaByPublicId[mediaId] || null
   return {
     title: media?.title || null,
     description: sanitizeText(media?.descriptionUnsafe),
@@ -33,8 +37,8 @@ function getMediaMeta(mediaId, channel) {
   }
 }
 
-function getPrivateMediaMeta(route, channel) {
-  const media = channel?.project?.media
+function getPrivateMediaMeta(route, channel, readModel) {
+  const media = channel?.project?.media || null
   return {
     title: media?.title || null,
     description: sanitizeText(media?.descriptionUnsafe),
@@ -44,7 +48,7 @@ function getPrivateMediaMeta(route, channel) {
 }
 
 // Main meta generator
-export function getMetaData(route, channel) {
+export function getMetaData(route, channel, readModel = null) {
   let meta = { title: null, description: '', image: null, type: 'website' }
 
   // Route type detection
@@ -52,13 +56,13 @@ export function getMetaData(route, channel) {
     meta = getChannelMeta(route, channel)
   }
   if (route?.params.projectId) {
-    meta = getProjectMeta(route.params.projectId, channel)
+    meta = getProjectMeta(route.params.projectId, readModel)
   }
   if (route?.params.mediaId) {
-    meta = getMediaMeta(route.params.mediaId, channel)
+    meta = getMediaMeta(route.params.mediaId, readModel)
   }
   if (route?.params.privateMediaId) {
-    meta = getPrivateMediaMeta(route, channel)
+    meta = getPrivateMediaMeta(route, channel, readModel)
   }
 
   // Branding

@@ -4,7 +4,7 @@
     <q-list bordered class="rounded-borders">
       <ChannelItem
         v-for="channel in channels"
-        :key="channel.uuid"
+        :key="channel.publicId"
         :channel="channel"
         :getMediaLink="getMediaLink"
         data-cy="channel-item"
@@ -23,6 +23,7 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useChannelStore } from 'src/stores/channel-store.js'
 import ChannelItem from './MediaBrowser/ChannelItem.vue'
 import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
@@ -35,46 +36,51 @@ const props = defineProps({
   channels: { type: Array, default: () => [] }
 })
 
+function buildEmptyLinks() {
+  return {
+    channel: {},
+    project: {},
+    media: {}
+  }
+}
+
+function addChannelLink(links, channel) {
+  if (channel?.id && !channel?.pending) {
+    links.channel[channel.id] = `/c/${channel.publicId}/${channel.slug}`
+  }
+}
+
+function addProjectAndMediaLinks(links, project) {
+  if (project?.id && !project?.pending) {
+    links.project[project.id] = `/p/${project.publicId}/${project.slug}`
+  }
+
+  for (const media of project?.media || []) {
+    if (media?.id && !media?.pending) {
+      links.media[media.id] = `/m/${media.publicId}/${media.slug}`
+    }
+  }
+}
+
+const resourceLinks = computed(() => {
+  const links = buildEmptyLinks()
+
+  for (const channel of props.channels || []) {
+    addChannelLink(links, channel)
+
+    for (const project of channel?.projects || []) {
+      addProjectAndMediaLinks(links, project)
+    }
+  }
+
+  return links
+})
+
 function getMediaLink(type, id) {
-  const channels = props.channels || []
-  if (type === 'channel') {
-    return getChannelLink(channels, id)
-  }
-  if (type === 'project') {
-    return getProjectLink(channels, id)
-  }
-  if (type === 'media') {
-    return getMediaItemLink(channels, id)
-  }
-  return null
-}
-
-function getChannelLink(channels, id) {
-  const ch = channels.find(c => c.id === id)
-  return ch && !ch.pending ? `/c/${ch.uuid}/${ch.slug}` : null
-}
-
-function getProjectLink(channels, id) {
-  for (const ch of channels) {
-    const projects = ch.projects || []
-    const project = projects.find(p => p.id === id)
-    if (project && !project.pending) {
-      return `/p/${project.uuid}/${project.slug}`
-    }
-  }
-  return null
-}
-
-function getMediaItemLink(channels, id) {
-  for (const ch of channels) {
-    const projects = ch.projects || []
-    for (const project of projects) {
-      const media = (project.media || []).find(m => m.id === id)
-      if (media && !media.pending) {
-        return `/m/${media.uuid}/${media.slug}`
-      }
-    }
-  }
+  if (!type || id == null) return null
+  if (type === 'channel') return resourceLinks.value.channel[id] || null
+  if (type === 'project') return resourceLinks.value.project[id] || null
+  if (type === 'media') return resourceLinks.value.media[id] || null
   return null
 }
 
@@ -210,19 +216,19 @@ async function saveChannelEdit(payload) {
   return runEditJourney({
     update: channelStore.updateChannel,
     updatePayload: {
-      channelUuid: payload?.channelUuid,
+      channelPublicId: payload?.channelPublicId,
       title: payload?.title
     },
     upload: {
       shouldUpload: !!payload?.coverFile,
       prepare: channelStore.requestChannelCoverUpload,
       preparePayload: {
-        channelUuid: payload?.channelUuid
+        channelPublicId: payload?.channelPublicId
       },
       file: payload?.coverFile,
       confirm: channelStore.confirmChannelCoverUpload,
       confirmPayload: {
-        channelUuid: payload?.channelUuid,
+        channelPublicId: payload?.channelPublicId,
       }
     },
     successMessage: 'Channel updated.',

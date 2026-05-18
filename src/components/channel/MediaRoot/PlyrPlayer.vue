@@ -110,8 +110,12 @@ async function setupPlayer() {
     PlyrCtor = mod.default
   }
   player.value = new PlyrCtor(el, {
+    iconUrl: `${import.meta.env.BASE_URL}icons/plyr.svg`,
+    loadSprite: true,
+    blankVideo: `${import.meta.env.BASE_URL}media/blank.mp4`,
     settings: [],
     fullscreen: { iosNative: true },
+    keyboard: { focused: true, global: true },
     controls: [
       'play-large',
       'restart',
