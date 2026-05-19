@@ -124,10 +124,6 @@
               </tr>
             </tbody>
           </q-markup-table>
-          <div class="text-caption text-grey-7 q-mt-sm">
-            Shortcuts work while the player has focus. When the global player shortcut mode is active,
-            they also work anywhere except inside text inputs.
-          </div>
         </q-card-section>
         <q-card-actions align="right" class="q-pt-none">
           <q-btn flat label="Close" color="primary" v-close-popup />
@@ -167,15 +163,12 @@ const channelStore = useChannelStore()
 
 const keyboardShortcuts = [
   { keys: 'Space', action: 'Toggle playback' },
-  { keys: 'K', action: 'Toggle playback' },
   { keys: '←', action: 'Seek backward 10 seconds' },
   { keys: '→', action: 'Seek forward 10 seconds' },
   { keys: '↑', action: 'Increase volume' },
   { keys: '↓', action: 'Decrease volume' },
   { keys: 'M', action: 'Toggle mute' },
   { keys: 'F', action: 'Toggle fullscreen' },
-  { keys: 'C', action: 'Toggle captions' },
-  { keys: 'L', action: 'Toggle loop' },
   { keys: '0-9', action: 'Seek to 0-90% of the media' }
 ]
 
@@ -185,7 +178,6 @@ function openReportDialog() {
 }
 
 function openShortcutsDialog() {
-  if (!$q.screen.gt.sm) return
   shortcutsDialog.value = true
 }
 
