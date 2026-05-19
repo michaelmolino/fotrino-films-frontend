@@ -52,6 +52,7 @@ export type Deleted4 = boolean
 export type DescriptionUnsafe = string | null
 export type Id5 = number
 export type Main = boolean
+export type Orientation = 'landscape' | 'portrait'
 export type Pending1 = boolean
 export type Preview = string
 export type PrivateId = string
@@ -82,6 +83,7 @@ export type Deleted5 = boolean
 export type DescriptionUnsafe1 = string | null
 export type Id6 = number
 export type Main1 = boolean
+export type Orientation1 = 'landscape' | 'portrait'
 export type Pending3 = boolean
 export type Preview1 = string
 export type PrivateId1 = string
@@ -188,6 +190,7 @@ export type Cover3 = string
 export type Ownername1 = string
 export type Created10 = string | null
 export type DescriptionUnsafe2 = string | null
+export type Orientation2 = ('landscape' | 'portrait') | null
 export type Preview2 = string | null
 export type PrivateId2 = string
 export type ResourceDate4 = string | null
@@ -362,6 +365,7 @@ export interface MediaResponse {
   description_unsafe: DescriptionUnsafe
   id: Id5
   main: Main
+  orientation: Orientation
   pending?: Pending1
   preview: Preview
   private_id: PrivateId
@@ -380,6 +384,7 @@ export interface MediaResponse1 {
   description_unsafe: DescriptionUnsafe1
   id: Id6
   main: Main1
+  orientation: Orientation1
   pending?: Pending3
   preview: Preview1
   private_id: PrivateId1
@@ -522,6 +527,7 @@ export interface PrivateMediaProjectResponse {
 export interface PrivateMediaItemResponse {
   created?: Created10
   description_unsafe: DescriptionUnsafe2
+  orientation?: Orientation2
   preview?: Preview2
   private_id: PrivateId2
   resource_date?: ResourceDate4

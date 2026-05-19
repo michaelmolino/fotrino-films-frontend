@@ -8,6 +8,17 @@
         </div>
         <div class="description-actions">
           <q-btn
+            v-if="$q.platform.is.desktop"
+            flat
+            class="q-pa-sm"
+            icon="keyboard"
+            color="primary"
+            aria-label="Show keyboard shortcuts"
+            data-cy="keyboard-shortcuts-button"
+            @click="openShortcutsDialog">
+            <q-tooltip>Keyboard Shortcuts</q-tooltip>
+          </q-btn>
+          <q-btn
             flat
             class="q-pa-sm"
             icon="flag"
@@ -50,6 +61,7 @@
               </q-item>
             </q-list>
           </q-btn-dropdown>
+          <q-tooltip target="[data-cy='share-button']">Share</q-tooltip>
         </div>
       </div>
       <div class="text-subtitle2 q-pl-xl">Captured {{ sinceCaptured }}</div>
@@ -90,13 +102,45 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+
+    <q-dialog v-model="shortcutsDialog" data-cy="keyboard-shortcuts-dialog">
+      <q-card class="shortcuts-card" data-cy="keyboard-shortcuts-card">
+        <q-card-section class="row items-center q-gutter-sm q-pb-sm">
+          <q-icon name="keyboard" color="primary" />
+          <div class="text-h6">Keyboard Shortcuts</div>
+        </q-card-section>
+        <q-card-section class="q-pt-none">
+          <q-markup-table dense flat bordered class="shortcuts-table">
+            <thead>
+              <tr>
+                <th scope="col" class="text-left">Key</th>
+                <th scope="col" class="text-left">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="shortcut in keyboardShortcuts" :key="shortcut.keys">
+                <td class="shortcut-keys">{{ shortcut.keys }}</td>
+                <td>{{ shortcut.action }}</td>
+              </tr>
+            </tbody>
+          </q-markup-table>
+          <div class="text-caption text-grey-7 q-mt-sm">
+            Shortcuts work while the player has focus. When the global player shortcut mode is active,
+            they also work anywhere except inside text inputs.
+          </div>
+        </q-card-section>
+        <q-card-actions align="right" class="q-pt-none">
+          <q-btn flat label="Close" color="primary" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-card>
 </template>
 
 <script setup>
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { Notify, copyToClipboard } from 'quasar'
+import { Notify, copyToClipboard, useQuasar } from 'quasar'
 import { sanitizeHtml } from '@utils/text.js'
 import { daysSince } from '@utils/date.js'
 import { useChannelStore } from 'src/stores/channel-store.js'
@@ -107,6 +151,7 @@ const props = defineProps({
 })
 
 const route = useRoute()
+const $q = useQuasar()
 const isPublic = computed(() => !!route.params.mediaId)
 const sinceCaptured = computed(() =>
   props.media?.resourceDate ? daysSince(props.media.resourceDate, false) : ''
@@ -115,13 +160,33 @@ const sincePublished = computed(() => (props.media?.created ? daysSince(props.me
 const descriptionSafe = computed(() => sanitizeHtml(props.media?.descriptionUnsafe || ''))
 
 const reportDialog = ref(false)
+const shortcutsDialog = ref(false)
 const reason = ref('')
 const submitting = ref(false)
 const channelStore = useChannelStore()
 
+const keyboardShortcuts = [
+  { keys: 'Space', action: 'Toggle playback' },
+  { keys: 'K', action: 'Toggle playback' },
+  { keys: '←', action: 'Seek backward 10 seconds' },
+  { keys: '→', action: 'Seek forward 10 seconds' },
+  { keys: '↑', action: 'Increase volume' },
+  { keys: '↓', action: 'Decrease volume' },
+  { keys: 'M', action: 'Toggle mute' },
+  { keys: 'F', action: 'Toggle fullscreen' },
+  { keys: 'C', action: 'Toggle captions' },
+  { keys: 'L', action: 'Toggle loop' },
+  { keys: '0-9', action: 'Seek to 0-90% of the media' }
+]
+
 function openReportDialog() {
   if (!props.media?.privateId) return
   reportDialog.value = true
+}
+
+function openShortcutsDialog() {
+  if (!$q.screen.gt.sm) return
+  shortcutsDialog.value = true
 }
 
 async function submitReport() {
@@ -224,6 +289,21 @@ function copyLink(val) {
   gap: 4px;
   flex: 0 0 auto;
   margin-left: auto;
+}
+
+.shortcuts-card {
+  min-width: 280px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.shortcuts-table {
+  width: 100%;
+}
+
+.shortcut-keys {
+  white-space: nowrap;
+  font-weight: 600;
 }
 
 @media (max-width: 600px) {

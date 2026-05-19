@@ -11,6 +11,7 @@ const buildMediaEntity = (media, projectId) => ({
     preview: media.preview,
     src: media.src,
     type: media.type,
+    orientation: media.orientation,
     main: media.main,
     resourceDate: media.resourceDate,
     pending: media.pending,

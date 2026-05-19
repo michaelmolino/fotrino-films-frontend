@@ -11,12 +11,19 @@
     <q-badge v-if="media.type?.startsWith('audio/')" class="bg-accent q-pa-md z-top" floating>
       <span class="text-bold text-white">Audio</span>
     </q-badge>
+    <q-badge
+      v-if="media.orientation === 'portrait' && !media.type?.startsWith('audio/')"
+      class="bg-info text-white q-pa-sm z-top"
+      floating>
+      <q-icon name="smartphone" size="16px" />
+    </q-badge>
     <q-img
       v-if="media.preview && ready"
       :src="finalUrl"
       :alt="media.title"
       :ratio="16 / 9"
       fit="cover"
+      position="50% 28%"
       :loading="priority === 'high' ? 'eager' : 'lazy'"
       decoding="async"
       @load="onPreviewLoad"
@@ -146,4 +153,5 @@ function onPreviewError() {
   padding: 8px;
   z-index: 2;
 }
+
 </style>

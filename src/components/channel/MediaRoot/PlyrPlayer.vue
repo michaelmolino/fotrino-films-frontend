@@ -1,15 +1,20 @@
 <template>
-  <div data-cy="media-player">
-    <div v-if="view == 'video'">
-      <video
-        id="video-player"
-        controls
-        x-webkit-airplay="allow"
-        :key="media.id"
-        :aria-label="`Video player for ${media.title}`"
-        preload="metadata"
-        data-cy="video-player"
-        class="videoEl"></video>
+  <div
+    data-cy="media-player"
+    :class="['media-player-shell', { 'portrait-mode': isPortraitVideo }]">
+    <div v-if="view == 'video'" class="video-shell">
+      <div v-if="isPortraitVideo" class="portrait-backdrop" :style="portraitBackdropStyle" aria-hidden="true"></div>
+      <div :class="['video-frame', { 'video-frame-portrait': isPortraitVideo }]">
+        <video
+          id="video-player"
+          controls
+          x-webkit-airplay="allow"
+          :key="media.id"
+          :aria-label="`Video player for ${media.title}`"
+          preload="metadata"
+          data-cy="video-player"
+          class="videoEl"></video>
+      </div>
     </div>
     <div v-else class="audio-container">
       <picture v-if="media.preview" class="audio-preview">
@@ -56,6 +61,11 @@ const audioPreviewUrl = ref(null)
 const playbackUrl = ref(null)
 const view = computed(() => (props.media?.type?.startsWith('audio/') ? 'audio' : 'video'))
 const videoPosterUrl = computed(() => props.media?.preview || null)
+const isPortraitVideo = computed(() => view.value === 'video' && props.media?.orientation === 'portrait')
+const portraitBackdropStyle = computed(() => {
+  if (!videoPosterUrl.value) return {}
+  return { backgroundImage: `url("${videoPosterUrl.value}")` }
+})
 
 function onAudioPreviewError() {
   if (audioPreviewSource.value.fallbackUrl && audioPreviewUrl.value !== audioPreviewSource.value.fallbackUrl) {
@@ -102,21 +112,9 @@ async function setupPlayer() {
   const el = document.getElementById(view.value === 'video' ? 'video-player' : 'audio-player')
   if (!el || !props.media) return
   const sourceUrl = playbackUrl.value || props.media.src
-  if (view.value === 'video') {
-    el.setAttribute('poster', videoPosterUrl.value)
-  }
-  if (!PlyrCtor) {
-    const mod = await import('plyr')
-    PlyrCtor = mod.default
-  }
-  player.value = new PlyrCtor(el, {
-    iconUrl: `${import.meta.env.BASE_URL}icons/plyr.svg`,
-    loadSprite: true,
-    blankVideo: `${import.meta.env.BASE_URL}media/blank.mp4`,
-    settings: [],
-    fullscreen: { iosNative: true },
-    keyboard: { focused: true, global: true },
-    controls: [
+  const controls = isPortraitVideo.value
+    ? ['play-large', 'play', 'progress', 'mute', 'fullscreen', 'airplay']
+    : [
       'play-large',
       'restart',
       'rewind',
@@ -130,7 +128,34 @@ async function setupPlayer() {
       'fullscreen',
       'airplay'
     ]
+
+  if (view.value === 'video' && !isPortraitVideo.value) {
+    el.setAttribute('poster', videoPosterUrl.value)
+  }
+  if (!PlyrCtor) {
+    const mod = await import('plyr')
+    PlyrCtor = mod.default
+  }
+  player.value = new PlyrCtor(el, {
+    iconUrl: `${import.meta.env.BASE_URL}icons/plyr.svg`,
+    loadSprite: true,
+    blankVideo: `${import.meta.env.BASE_URL}media/blank.mp4`,
+    settings: [],
+    fullscreen: { iosNative: true },
+    keyboard: { focused: true, global: true },
+    controls
   })
+
+  // Auto-fullscreen for all videos on play
+  if (view.value === 'video') {
+    let hasAutoFullscreened = false
+    player.value.on('play', () => {
+      if (!hasAutoFullscreened) {
+        hasAutoFullscreened = true
+        player.value.fullscreen.enter()
+      }
+    })
+  }
 
   if (view.value === 'video') {
     const { cleanup } = await setupVideoPlayback({
@@ -204,6 +229,7 @@ watch(
   width: 100%
   height: 100%
   object-fit: cover
+  object-position: 50% 28%
   display: block
 
 .videoEl
@@ -213,4 +239,61 @@ watch(
 
 .audioEl
   width: 100%
+
+.video-shell
+  width: 100%
+
+.video-frame
+  width: 100%
+
+.video-frame-portrait .videoEl
+  width: 100%
+  height: 100%
+  aspect-ratio: 9 / 16
+  object-fit: contain
+
+.media-player-shell.portrait-mode
+  .video-shell
+    width: 100%
+    display: flex
+    align-items: center
+    justify-content: center
+    position: relative
+    min-height: 400px
+    overflow: hidden
+    background: linear-gradient(180deg, rgba(15, 15, 15, 0.96), rgba(0, 0, 0, 0.98))
+
+  .portrait-backdrop
+    position: absolute
+    inset: 0
+    background-size: cover
+    background-position: 50% 28%
+    filter: blur(28px) saturate(2)
+    transform: scale(1.15)
+    opacity: 1
+    pointer-events: none
+
+  .video-shell::after
+    content: ''
+    position: absolute
+    inset: 0
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.65))
+    z-index: 1
+    pointer-events: none
+
+  .video-frame
+    position: relative
+    z-index: 2
+    width: auto
+    max-width: 100%
+    max-height: 60vh
+    aspect-ratio: 9 / 16
+
+  :deep(.plyr)
+    width: 100%
+    height: 100%
+
+  :deep(.plyr--video .plyr__video-wrapper)
+    padding-bottom: 0
+    background: transparent
 </style>
