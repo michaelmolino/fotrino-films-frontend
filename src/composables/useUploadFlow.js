@@ -17,7 +17,6 @@ export function useUploadFlow({
         initializeUppy,
         addFilesToUppy,
         startUpload,
-        getMediaReference,
         cancelUploads,
         cleanup
     } = useUppyPresignedUpload()
@@ -35,20 +34,19 @@ export function useUploadFlow({
         isUploading.value = true
 
         try {
-            const uploadInstructions = await channelStore.postUpload(payload)
+            const uploadDraft = await channelStore.postUploadDraft(payload)
 
             if (abortController.value.signal.aborted) {
                 throw new Error('Upload cancelled')
             }
 
-            initializeUppy(uploadInstructions)
-            addFilesToUppy(uploadItems)
-
-            const mediaRef = getMediaReference()
+            const mediaRef = uploadDraft?.mediaId
             if (mediaRef == null) {
-                throw new Error('No media reference available after adding files')
+                throw new Error('Upload draft did not include a media reference')
             }
 
+            initializeUppy(uploadDraft)
+            addFilesToUppy(uploadItems)
             uploadLock.acquire(mediaRef)
 
             await startUpload()
@@ -57,12 +55,7 @@ export function useUploadFlow({
                 throw new Error('Upload cancelled')
             }
 
-            const confirmMediaRef = getMediaReference()
-            if (confirmMediaRef == null) {
-                throw new Error('Upload completed without a media reference. Confirm step aborted.')
-            }
-
-            await channelStore.confirmUpload(confirmMediaRef)
+            await channelStore.confirmUpload(mediaRef)
 
             statusText.value = 'Upload complete!'
             stepper.value?.next()

@@ -277,17 +277,25 @@ export const useChannelStore = defineStore('channel', () => {
         await loadChannels(true)
     }
 
-    const postUpload = async payload => {
+    const postUploadDraft = async payload => {
         try {
-            const { data } = await api.post('/channels/media', payload, {
+            const { data } = await api.post('/channels/media/draft', payload, {
                 __skipGlobalErrorNotify: true,
                 headers: {
                     'Content-Type': 'application/json',
                     Accept: 'application/json'
                 }
             })
-            setUpload(data)
-            return data
+
+            const normalizedData = {
+                mediaId: data?.mediaId ?? null,
+                requiredResources: data?.requiredResources || [],
+                uploadEndpoint: data?.uploadEndpoint || '/api/upload',
+                instructions: data?.instructions || []
+            }
+
+            setUpload(normalizedData.instructions)
+            return normalizedData
         } catch (error) {
             setUpload(null)
             getGlobalApiErrorPayload(error)
@@ -450,7 +458,7 @@ export const useChannelStore = defineStore('channel', () => {
         loadPrivateMedia,
         createMediaSession,
         deleteResource,
-        postUpload,
+        postUploadDraft,
         confirmUpload,
         abortUpload,
         updateMedia,

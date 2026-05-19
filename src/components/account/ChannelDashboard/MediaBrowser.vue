@@ -135,14 +135,25 @@ async function runEditJourney({
   try {
     if (upload?.shouldUpload) {
       const instruction = await upload.prepare(upload.preparePayload)
-      if (!instruction?.url || !instruction?.objectName) {
+      if (!instruction?.objectName || instruction?.reference == null) {
         throw new Error('Invalid upload instruction returned by backend.')
       }
+      const resourceType = instruction.resourceType || 'upload'
+
       // Use unified composable for upload orchestration
-      initializeUppy([{ resourceType: instruction.resourceType || 'upload', url: instruction.url }])
-      addFilesToUppy([{ file: upload.file, resourceType: instruction.resourceType || 'upload' }])
+      initializeUppy({
+        mediaId: instruction.reference,
+        uploadEndpoint: '/api/upload',
+        instructions: [{
+          resourceType,
+          reference: instruction.reference,
+          url: instruction.url || ''
+        }]
+      })
+      addFilesToUppy([{ file: upload.file, resourceType }])
       await startUpload()
       cleanup()
+
       // Confirm + metadata update atomically in one backend call
       await upload.confirm({
         ...upload.confirmPayload,

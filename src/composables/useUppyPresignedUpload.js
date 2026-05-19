@@ -1,5 +1,6 @@
 import { markRaw, ref, shallowRef } from 'vue'
 import { createPresignedUppyClient } from '@libs/uppy-upload.js'
+import { useAccountStore } from 'src/stores/account-store'
 
 /**
  * Composable for managing presigned URL uploads with Uppy.
@@ -8,6 +9,7 @@ import { createPresignedUppyClient } from '@libs/uppy-upload.js'
  * @returns {Object} uppy instance, methods, progress, statusText, and state
  */
 export function useUppyPresignedUpload() {
+    const accountStore = useAccountStore()
     const progress = ref(0)
     const statusText = ref(null)
     const uppy = shallowRef(null)
@@ -16,20 +18,7 @@ export function useUppyPresignedUpload() {
     const completedCount = ref(0)
     const totalCount = ref(0)
     const hasError = ref(false)
-
-    const instructionByResourceType = () => {
-        const byType = {}
-        for (const instruction of uploadInstructions.value) {
-            if (instruction?.resourceType) {
-                byType[instruction.resourceType] = instruction
-            }
-        }
-        return byType
-    }
-
-    function findInstruction(resourceType) {
-        return instructionByResourceType()[resourceType]
-    }
+    const mediaReference = ref(null)
 
     function resetUploadState() {
         completedCount.value = 0
@@ -38,24 +27,30 @@ export function useUppyPresignedUpload() {
         progress.value = 0
     }
 
-    function getRequiredResourceTypes() {
-        return [...new Set(uploadInstructions.value.map(instruction => instruction.resourceType))]
-    }
-
     /**
      * Initialize Uppy for presigned uploads.
-     * @param {Object[]} instructions - Array of {resourceType, url, reference}
+     * @param {Object} uploadDraft - Draft payload with { mediaId, uploadEndpoint, instructions }
      */
-    function initializeUppy(instructions = []) {
+    function initializeUppy(uploadDraft) {
         if (client.value) {
             client.value.destroy()
         }
 
+        const instructions = uploadDraft?.instructions || []
+        if (!Array.isArray(instructions) || instructions.length === 0) {
+            throw new Error('Upload draft did not include upload instructions.')
+        }
+
         uploadInstructions.value = instructions
+        mediaReference.value = uploadDraft?.mediaId ?? null
 
         const createdClient = createPresignedUppyClient({
             id: 'presigned-uploader',
             instructions,
+            uploadEndpoint: uploadDraft?.uploadEndpoint || '/api/upload',
+            headers: accountStore?.profile?.csrfToken
+                ? { 'X-CSRFToken': accountStore.profile.csrfToken }
+                : {},
             onTotalProgress: percent => {
                 if (!Number.isFinite(percent)) {
                     return
@@ -129,7 +124,14 @@ export function useUppyPresignedUpload() {
         statusText.value = `Uploading ${totalCount.value} files...`
 
         try {
-            const result = await client.value.uploadAndAssert(getRequiredResourceTypes())
+            const result = await client.value.upload()
+            const failed = result?.failed || []
+            if (failed.length > 0) {
+                const failedNames = failed
+                    .map(file => file?.name || 'unknown file')
+                    .join(', ')
+                throw new Error(`Upload failed for: ${failedNames}`)
+            }
 
             progress.value = 100
             statusText.value = `Uploaded ${completedCount.value} of ${totalCount.value} files.`
@@ -140,19 +142,6 @@ export function useUppyPresignedUpload() {
             statusText.value = `Upload error: ${error.message}`
             throw error
         }
-    }
-
-    /**
-     * Get the reference ID for a successfully uploaded media file.
-     * Returns the reference from the 'upload' resource type (main media file).
-     */
-    function getMediaReference() {
-        const uploadInstruction = findInstruction('upload')
-        if (uploadInstruction?.reference != null) {
-            return uploadInstruction.reference
-        }
-
-        return null
     }
 
     /**
@@ -175,6 +164,7 @@ export function useUppyPresignedUpload() {
         }
         resetUploadState()
         uploadInstructions.value = []
+        mediaReference.value = null
     }
 
     return {
@@ -184,7 +174,6 @@ export function useUppyPresignedUpload() {
         initializeUppy,
         addFilesToUppy,
         startUpload,
-        getMediaReference,
         cancelUploads,
         cleanup
     }

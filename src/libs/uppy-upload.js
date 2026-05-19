@@ -1,10 +1,5 @@
 import Uppy from '@uppy/core'
 import AwsS3 from '@uppy/aws-s3'
-import {
-    createMultipartCompanionApi,
-    getMultipartMediaId
-} from './uppy-upload-multipart.js'
-import { uploadAndAssert } from './uppy-upload-policy.js'
 
 /** Minimum file size (bytes) for multipart upload. Only applies to `upload` resource type. */
 const MULTIPART_THRESHOLD = 100 * 1024 * 1024 // 100 MB
@@ -28,28 +23,21 @@ function buildInstructionMap(instructions = []) {
     return map
 }
 
-function getInstructionOrThrow(instructionByType, resourceType) {
-    const instruction = instructionByType.get(resourceType)
-    if (!instruction) {
-        throw new Error(`No upload instruction found for ${resourceType}`)
-    }
-    return instruction
-}
-
 /**
  * Create a configured Uppy client that handles both single-part (images) and
  * multipart (large video files) uploads.
  *
- * - Images (cover, poster, preview): always single-part presigned PUT via XHRUpload.
- * - Videos (`upload` resource type, ≥ MULTIPART_THRESHOLD): multipart via AwsS3 plugin
- *   using the backend companion endpoints.
- * - Videos below the threshold: single-part presigned PUT via AwsS3 getUploadParameters.
+ * - Images (cover, poster, preview): single-part presigned PUT via backend `/upload/s3/params`.
+ * - Videos (`upload` resource type, ≥ MULTIPART_THRESHOLD): multipart via backend
+ *   companion-compatible `/upload/s3/multipart/*` endpoints.
+ * - Videos below the threshold: single-part PUT via the same `/upload/s3/params` endpoint.
  *
  * @param {{
  *   id?: string,
  *   instructions: Array<{ resourceType: string, url: string, reference?: number }>,
  *   maxFileSize?: number,
- *   multipartBaseUrl?: string,
+ *   uploadEndpoint?: string,
+ *   headers?: Record<string, string>,
  *   onTotalProgress?: (percent: number) => void,
  *   onProgress?: (progressData: any) => void,
  *   onUploadSuccess?: (file: any, instruction: any) => void,
@@ -60,14 +48,14 @@ export function createPresignedUppyClient({
     id = 'presigned-uploader',
     instructions = [],
     maxFileSize = null,
-    multipartBaseUrl = '/multipart/media',
+    uploadEndpoint = '/api/upload',
+    headers = {},
     onTotalProgress,
     onProgress,
     onUploadSuccess,
     onUploadError
 }) {
     const instructionByType = buildInstructionMap(instructions)
-    const multipartApi = createMultipartCompanionApi({ multipartBaseUrl })
 
     const restrictions = {}
     if (Number.isFinite(maxFileSize) && maxFileSize > 0) {
@@ -85,50 +73,27 @@ export function createPresignedUppyClient({
     // For files >= MULTIPART_THRESHOLD it uses multipart; below that it uses
     // getUploadParameters for a standard presigned PUT.
     uppy.use(AwsS3, {
+        endpoint: uploadEndpoint,
+        headers,
         shouldUseMultipart: (file) =>
             file.meta?.resourceType === 'upload' && file.size >= MULTIPART_THRESHOLD,
-
-        // Single-part fallback: images AND small videos use the presigned URL from instructions.
         async getUploadParameters(file) {
-            const instruction = getInstructionOrThrow(instructionByType, file.meta?.resourceType)
+            const instruction = instructionByType.get(file.meta?.resourceType)
+            if (!instruction?.url) {
+                const resourceType = typeof file.meta?.resourceType === 'string'
+                    ? file.meta.resourceType
+                    : 'unknown resource'
+                throw new Error(`Missing upload URL for ${resourceType}`)
+            }
+
             return {
                 method: 'PUT',
                 url: instruction.url,
                 fields: {},
-                headers: { 'Content-Type': file.type || 'application/octet-stream' }
+                headers: {
+                    'Content-Type': file.type || 'application/octet-stream'
+                }
             }
-        },
-
-        // Multipart companion methods — only called for the `upload` resource type
-        // when the file is >= MULTIPART_THRESHOLD.
-
-        async createMultipartUpload(file) {
-            const mediaId = getMultipartMediaId(file)
-            return multipartApi.createMultipartUpload(mediaId)
-        },
-
-        async listParts(file, { uploadId }) {
-            const mediaId = getMultipartMediaId(file)
-            return multipartApi.listParts(mediaId, uploadId)
-        },
-
-        async signPart(file, { uploadId, partNumber }) {
-            const mediaId = getMultipartMediaId(file)
-            const response = await multipartApi.signPart(mediaId, uploadId, partNumber)
-            const { url } = response
-            return { url }
-        },
-
-        async completeMultipartUpload(file, { uploadId, parts }) {
-            const mediaId = getMultipartMediaId(file)
-            await multipartApi.completeMultipartUpload(mediaId, uploadId, parts)
-            return {}
-        },
-
-        async abortMultipartUpload(file, { uploadId }) {
-            const mediaId = getMultipartMediaId(file)
-            // Best-effort; ignore errors so Uppy can clean up its own state.
-            await multipartApi.abortMultipartUpload(mediaId, uploadId).catch(() => { })
         }
     })
 
@@ -156,6 +121,10 @@ export function createPresignedUppyClient({
         uppy,
         addFile({ file, resourceType, source = 'presigned-upload' }) {
             const instruction = instructionByType.get(resourceType)
+            if (!instruction?.reference) {
+                throw new Error(`Missing upload instruction for ${resourceType}`)
+            }
+
             return uppy.addFile({
                 source,
                 name: file?.name || `${resourceType}.bin`,
@@ -164,8 +133,8 @@ export function createPresignedUppyClient({
                 meta: { resourceType, reference: instruction?.reference ?? null }
             })
         },
-        async uploadAndAssert(requiredResourceTypes = []) {
-            return uploadAndAssert(uppy, requiredResourceTypes)
+        upload() {
+            return uppy.upload()
         },
         destroy() {
             destroyUppy(uppy)
