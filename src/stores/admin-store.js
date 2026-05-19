@@ -18,6 +18,7 @@ const sortUsers = users => {
 export const useAdminStore = defineStore('admin', () => {
     const users = ref([])
     const outboxDlq = ref([])
+    const pendingJobs = ref([])
     const reportedMedia = ref([])
 
     const setUsers = value => {
@@ -26,6 +27,10 @@ export const useAdminStore = defineStore('admin', () => {
 
     const setOutboxDlq = value => {
         outboxDlq.value = Array.isArray(value) ? value : []
+    }
+
+    const setPendingJobs = value => {
+        pendingJobs.value = Array.isArray(value) ? value : []
     }
 
     const setReportedMedia = value => {
@@ -68,6 +73,28 @@ export const useAdminStore = defineStore('admin', () => {
             __skipGlobalErrorNotify: true
         })
         await loadOutboxDlq()
+    }
+
+    const loadPendingJobs = () => fetchAndApplyGet({
+        api,
+        url: '/admin/jobs/pending',
+        apply: setPendingJobs,
+        requestConfig: {
+            __skipGlobalErrorNotify: true
+        },
+        onError: error => {
+            if (isGlobalApiError(error, 'forbidden')) {
+                return null
+            }
+            getGlobalApiErrorPayload(error)
+        }
+    })
+
+    const startPendingJobNow = async jobId => {
+        await api.post(`/admin/jobs/pending/${jobId}/start-now`, null, {
+            __skipGlobalErrorNotify: true
+        })
+        await loadPendingJobs()
     }
 
     const deleteUser = async userId => {
@@ -137,10 +164,13 @@ export const useAdminStore = defineStore('admin', () => {
     return {
         users,
         outboxDlq,
+        pendingJobs,
         reportedMedia,
         loadUsers,
         loadOutboxDlq,
         requeueDLQItem,
+        loadPendingJobs,
+        startPendingJobNow,
         deleteUser,
         approveUser,
         loadReportedMedia,
