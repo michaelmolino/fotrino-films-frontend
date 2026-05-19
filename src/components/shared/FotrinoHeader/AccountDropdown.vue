@@ -64,10 +64,42 @@
 import { useAccountStore } from 'src/stores/account-store.js'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
+import { ref, watch, onMounted } from 'vue'
 
 const $q = useQuasar()
 const accountStore = useAccountStore()
 const router = useRouter()
+const providers = ref([])
+
+async function fetchProviders() {
+  // Replace with the actual API call to fetch providers
+  providers.value = await fetch('/api/providers').then(res => res.json())
+}
+
+// Define props explicitly
+const props = defineProps({
+  profile: {
+    type: Object,
+    required: true
+  }
+})
+
+// Watch for changes in the profile prop
+watch(
+  () => props.profile,
+  (newProfile) => {
+    if (!newProfile) {
+      fetchProviders()
+    }
+  }
+)
+
+// Fetch providers on mount if not logged in
+onMounted(() => {
+  if (!props.profile) {
+    fetchProviders()
+  }
+})
 
 function goToUpload() {
   router.push({
@@ -76,10 +108,4 @@ function goToUpload() {
   })
 }
 
-defineProps({
-  profile: {
-    type: Object,
-    required: true
-  }
-})
 </script>
