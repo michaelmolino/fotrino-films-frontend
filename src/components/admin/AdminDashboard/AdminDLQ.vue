@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div class="text-h6 text-weight-bold" data-cy="admin-dlq-title">Admin: Dead Letter Queue</div>
+    <div class="text-h6 text-weight-bold" data-cy="admin-dlq-title">Admin: Failed Jobs</div>
     <div class="text-caption text-grey-7 q-mb-md">
-      Events that exhausted retries or were marked dead.
+      Procrastinate jobs currently in failed state.
     </div>
     <div v-if="loading">
       <q-skeleton type="rect" height="40px" class="q-mb-sm" />
@@ -20,12 +20,12 @@
       dense
       :pagination="{ rowsPerPage: 0 }">
       <template #body-cell-created="props">
-        <q-td :props="props">{{ daysSince(props.row.created, true) }}</q-td>
+        <q-td :props="props">{{ daysSince(props.row.failedAt, true) }}</q-td>
       </template>
       <template #body-cell-payload="props">
         <q-td :props="props">
           <q-expansion-item dense expand-separator label="Show Payload">
-            <pre style="white-space: pre-wrap">{{ pretty(props.row.payload) }}</pre>
+            <pre style="white-space: pre-wrap">{{ pretty(props.row.args) }}</pre>
           </q-expansion-item>
         </q-td>
       </template>
@@ -51,8 +51,9 @@ const adminStore = useAdminStore()
 const loading = ref(true)
 const outboxDlq = computed(() => adminStore.outboxDlq || [])
 const outboxColumns = [
-  { name: 'created', label: 'Created', field: 'created', align: 'left' },
-  { name: 'type', label: 'Type', field: 'type', align: 'left' },
+  { name: 'created', label: 'Failed At', field: 'failedAt', align: 'left' },
+  { name: 'type', label: 'Task', field: 'taskName', align: 'left' },
+  { name: 'queue', label: 'Queue', field: 'queueName', align: 'left' },
   { name: 'attempts', label: 'Attempts', field: 'attempts', align: 'right' },
   { name: 'payload', label: 'Payload', field: 'payload', align: 'left' },
   {
@@ -75,7 +76,7 @@ async function requeue(eventId) {
     await adminStore.requeueDLQItem(eventId)
     Notify.create({
       type: 'positive',
-      message: 'Dead-letter event requeued.',
+      message: 'Failed job replay requested.',
       icon: 'check',
       timeout: 2000
     })
@@ -83,7 +84,7 @@ async function requeue(eventId) {
     console.error('Failed to requeue DLQ event:', err)
     Notify.create({
       type: 'negative',
-      message: getComponentApiErrorMessage(err, 'Failed to requeue dead-letter event.'),
+      message: getComponentApiErrorMessage(err, 'Failed to replay failed job.'),
       icon: 'warning',
       timeout: 0
     })
@@ -98,7 +99,7 @@ onMounted(async () => {
     console.error('Failed to load DLQ:', err)
     Notify.create({
       type: 'negative',
-      message: getComponentApiErrorMessage(err, 'Failed to load dead-letter queue.'),
+      message: getComponentApiErrorMessage(err, 'Failed to load failed jobs.'),
       icon: 'warning',
       timeout: 0
     })

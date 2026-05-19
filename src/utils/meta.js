@@ -37,7 +37,7 @@ function getMediaMeta(mediaId, readModel) {
   }
 }
 
-function getPrivateMediaMeta(route, channel, readModel) {
+function getPrivateMediaMeta(route, channel) {
   const media = channel?.project?.media || null
   return {
     title: media?.title || null,
@@ -62,7 +62,7 @@ export function getMetaData(route, channel, readModel = null) {
     meta = getMediaMeta(route.params.mediaId, readModel)
   }
   if (route?.params.privateMediaId) {
-    meta = getPrivateMediaMeta(route, channel, readModel)
+    meta = getPrivateMediaMeta(route, channel)
   }
 
   // Branding

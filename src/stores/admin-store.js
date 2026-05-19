@@ -50,7 +50,7 @@ export const useAdminStore = defineStore('admin', () => {
 
     const loadOutboxDlq = () => fetchAndApplyGet({
         api,
-        url: '/admin/outbox/dlq',
+        url: '/admin/jobs/failed',
         apply: setOutboxDlq,
         requestConfig: {
             __skipGlobalErrorNotify: true
@@ -64,7 +64,7 @@ export const useAdminStore = defineStore('admin', () => {
     })
 
     const requeueDLQItem = async eventId => {
-        await api.post(`/admin/outbox/requeue/${eventId}`, null, {
+        await api.post(`/admin/jobs/failed/${eventId}/replay`, null, {
             __skipGlobalErrorNotify: true
         })
         await loadOutboxDlq()

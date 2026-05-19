@@ -122,32 +122,6 @@ export type Error1 = 'conflict'
 export type Message1 = string | null
 export type Status1 = 409
 export type CoverType = 'profile' | 'new'
-export type Attempts = number
-export type AvailableAt = string
-export type Created9 = string
-export type Id9 = number
-export type LastError = string | null
-export type Payload =
-  | ObjectsDeleteNamePayload
-  | MediaProcessPayload
-  | NotificationSendPayload
-  | EmailSendPayload
-  | DatabaseHardDeletePayload
-export type Name2 = string
-export type Objecttype = string
-export type Media2 = number
-export type Owner2 = number
-export type Source = string
-export type Description = string
-export type Event = string
-export type Htmlbody = string
-export type Subject = string
-export type Toemail = string
-export type Toname = string
-export type Entitytype = 'MEDIA' | 'PROJECT' | 'CHANNEL'
-export type Owner3 = number
-export type Reference = number
-export type Type2 = string
 export type Error2 = string
 export type Error3 = string
 export type Error4 = string
@@ -163,11 +137,11 @@ export type Message4 = string | null
 export type Status5 = 500
 export type Label = string | null
 export type Value = number | string
-export type Description1 = string | null
+export type Description = string | null
 export type Main2 = boolean
 export type Resourcedate = string
 export type Title7 = string
-export type Description2 = string | null
+export type Description1 = string | null
 export type Filename = string
 export type Main3 = boolean
 export type Previewtype = 'frame' | 'new'
@@ -188,7 +162,7 @@ export type PosterType = 'default' | 'new'
 export type PreviewType = 'frame' | 'new'
 export type Cover3 = string
 export type Ownername1 = string
-export type Created10 = string | null
+export type Created9 = string | null
 export type DescriptionUnsafe2 = string | null
 export type Orientation2 = ('landscape' | 'portrait') | null
 export type Preview2 = string | null
@@ -197,7 +171,7 @@ export type ResourceDate4 = string | null
 export type Slug7 = string
 export type Src2 = string | null
 export type Title9 = string
-export type Type3 = string | null
+export type Type2 = string | null
 export type UpdatedAt4 = string | null
 export type Postercolor = string | null
 export type Postertype = 'default' | 'new'
@@ -223,7 +197,7 @@ export type Status7 = 401
 export type Error10 = 'unprocessable_entity'
 export type Message8 = string | null
 export type Status8 = 422
-export type Reference1 = number
+export type Reference = number
 export type Requiredresources = ('cover' | 'poster' | 'preview' | 'upload')[]
 export type Resourcetype = 'cover' | 'poster' | 'preview' | 'upload'
 export type Url = string
@@ -235,10 +209,6 @@ export type Error12 = string
 export type Idle = boolean
 export type Jobsqueued = number
 export type Jobsrunning = number
-export type Outboxdelayed = number
-export type Outboxpending = number
-export type Outboxprocessing = number
-export type Outboxready = number
 
 export interface ApiContracts {
   AccountProfile: AccountProfileResponse
@@ -252,7 +222,6 @@ export interface ApiContracts {
   ChannelSummary: ChannelSummaryResponse
   ConflictErrorResponse: ConflictErrorResponse
   CoverType: CoverType
-  DeadLetterQueueItem: DeadLetterQueueItemResponse
   DeletionBlockedResponse: ErrorResponse
   ErrorDetailResponse: ErrorDetailResponse
   ErrorResponse: ErrorResponse1
@@ -429,39 +398,6 @@ export interface ConflictErrorResponse {
   message?: Message1
   status: Status1
 }
-export interface DeadLetterQueueItemResponse {
-  attempts: Attempts
-  available_at: AvailableAt
-  created: Created9
-  id: Id9
-  last_error: LastError
-  payload: Payload
-  type: Type2
-}
-export interface ObjectsDeleteNamePayload {
-  name: Name2
-  objectType: Objecttype
-}
-export interface MediaProcessPayload {
-  media: Media2
-  owner: Owner2
-  source: Source
-}
-export interface NotificationSendPayload {
-  description: Description
-  event: Event
-}
-export interface EmailSendPayload {
-  htmlBody: Htmlbody
-  subject: Subject
-  toEmail: Toemail
-  toName: Toname
-}
-export interface DatabaseHardDeletePayload {
-  entityType: Entitytype
-  owner: Owner3
-  reference: Reference
-}
 export interface ErrorResponse {
   error: Error2
 }
@@ -498,13 +434,13 @@ export interface LabeledValue {
   value: Value
 }
 export interface MediaUpdateRequest {
-  description?: Description1
+  description?: Description
   main: Main2
   resourceDate: Resourcedate
   title: Title7
 }
 export interface MediaUploadPayload {
-  description?: Description2
+  description?: Description1
   filename: Filename
   main?: Main3
   previewType?: Previewtype
@@ -525,7 +461,7 @@ export interface PrivateMediaProjectResponse {
   media: PrivateMediaItemResponse
 }
 export interface PrivateMediaItemResponse {
-  created?: Created10
+  created?: Created9
   description_unsafe: DescriptionUnsafe2
   orientation?: Orientation2
   preview?: Preview2
@@ -534,7 +470,7 @@ export interface PrivateMediaItemResponse {
   slug: Slug7
   src?: Src2
   title: Title9
-  type?: Type3
+  type?: Type2
   updated_at?: UpdatedAt4
 }
 export interface PrivateMediaProjectResponse1 {
@@ -581,7 +517,7 @@ export interface UnprocessableEntityErrorResponse {
   status: Status8
 }
 export interface UploadInstruction {
-  reference: Reference1
+  reference: Reference
   requiredResources?: Requiredresources
   resourceType: Resourcetype
   url: Url
@@ -610,8 +546,4 @@ export interface WorkerStatusResponse {
   idle: Idle
   jobsQueued: Jobsqueued
   jobsRunning: Jobsrunning
-  outboxDelayed: Outboxdelayed
-  outboxPending: Outboxpending
-  outboxProcessing: Outboxprocessing
-  outboxReady: Outboxready
 }
