@@ -239,7 +239,7 @@ const deleteUser = async user => {
 onMounted(async () => {
   loading.value = true
   try {
-    await adminStore.getAllUsers()
+    await adminStore.loadUsers()
   } catch (err) {
     console.error('Failed to load users:', err)
     notifyError(getComponentApiErrorMessage(err, 'Failed to load users.'), { timeout: 0 })

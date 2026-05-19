@@ -197,7 +197,7 @@ const accountStore = useAccountStore()
 const oAuthProviders = ref([])
 
 onMounted(async () => {
-  const providers = await accountStore.getProviders()
+  const providers = await accountStore.loadProviders()
   oAuthProviders.value = providers
 })
 </script>

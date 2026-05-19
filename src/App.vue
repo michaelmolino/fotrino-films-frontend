@@ -34,7 +34,7 @@ onMounted(async () => {
       'WARNING: This is a development server and should not be exposed to the internet.'
     )
   }
-  await accountStore.getProfile()
+  await accountStore.loadProfile()
   showTerms.value = route.query?.showTerms?.toLowerCase() === 'true'
 })
 

@@ -815,11 +815,11 @@ async function loadProjectsForChannelUuid(publicId, requestToken = projectsLoadT
     }
 
     // Avoid cache key collisions between pending/non-pending variants.
-    let chan = await channelStore.getChannel({ channelId: publicId, pending: true, cache: false })
+    let chan = await channelStore.loadChannel({ channelId: publicId, pending: true, cache: false })
     let projectList = Array.isArray(chan?.projects) ? chan.projects : []
 
     if (projectList.length === 0) {
-      chan = await channelStore.getChannel({ channelId: publicId, pending: false, cache: false })
+      chan = await channelStore.loadChannel({ channelId: publicId, pending: false, cache: false })
       projectList = Array.isArray(chan?.projects) ? chan.projects : []
     }
 
@@ -844,7 +844,7 @@ const beforeUnloadHandler = event => {
 }
 
 onMounted(async () => {
-  await channelStore.getChannels(true)
+  await channelStore.loadChannels(true)
   const list = channelStore.channels || []
   if (list.length === 1) {
     const requestToken = ++projectsLoadToken.value

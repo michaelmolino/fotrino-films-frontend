@@ -73,7 +73,7 @@ function redirect(pathOrObj) {
 
 function findProjectByParams() {
   if (route.params.mediaId) {
-    return channelStore.getProjectByMediaPublicId(route.params.mediaId)
+    return channelStore.findProjectByMediaPublicId(route.params.mediaId)
   }
   if (route.params.privateMediaId && channel.value) {
     return channel.value?.project || null
@@ -88,7 +88,7 @@ function findMediaByParams(project) {
     return project.media || null
   }
   if (route.params.mediaId) {
-    return channelStore.getMediaByPublicId(route.params.mediaId)
+    return channelStore.findMediaByPublicId(route.params.mediaId)
   }
   return null
 }

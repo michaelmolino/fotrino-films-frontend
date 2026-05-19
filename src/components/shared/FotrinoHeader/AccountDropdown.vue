@@ -72,8 +72,7 @@ const router = useRouter()
 const providers = ref([])
 
 async function fetchProviders() {
-  // Replace with the actual API call to fetch providers
-  providers.value = await fetch('/api/providers').then(res => res.json())
+  providers.value = await accountStore.loadProviders()
 }
 
 // Define props explicitly

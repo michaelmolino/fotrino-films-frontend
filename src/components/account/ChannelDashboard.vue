@@ -37,7 +37,7 @@ const mediaCount = computed(() =>
 
 onMounted(async () => {
   try {
-    await channelStore.getChannels(true)
+    await channelStore.loadChannels(true)
   } catch (error) {
     const apiError = getGlobalApiErrorPayload(error)
     console.debug('Dashboard API call failed:', apiError?.error || error?.response?.status)

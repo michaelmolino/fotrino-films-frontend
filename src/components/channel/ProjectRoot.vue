@@ -117,7 +117,7 @@ function redirect(pathOrObj) {
 
 function findProjectByParams() {
   if (route.params.projectId) {
-    return channelStore.getProjectByPublicId(route.params.projectId)
+    return channelStore.findProjectByPublicId(route.params.projectId)
   }
   return null
 }

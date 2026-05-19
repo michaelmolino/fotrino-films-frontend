@@ -12,12 +12,40 @@
  * @param {Object} options.cache.queryCache - QueryCache instance from useQueryCache
  * @returns {Promise<*>} The fetched/cached value
  */
-export const fetchAndApplyGet = async ({ 
-  api, 
-  url, 
-  apply, 
-  extract, 
-  requestConfig, 
+const getStaleTimeMs = queryOptions =>
+  Number.isFinite(queryOptions?.staleTime) ? Number(queryOptions.staleTime) : 0
+
+const getFreshCachedValue = ({ queryOptions, queryCache }) => {
+  const cached = queryCache.getQueryData(queryOptions.key)
+  if (cached?.__fetchAndApplyCached !== true) {
+    return { hit: false, value: null }
+  }
+
+  const staleTime = getStaleTimeMs(queryOptions)
+  const ageMs = Date.now() - cached.cachedAt
+  const isFresh = staleTime > 0 && ageMs >= 0 && ageMs < staleTime
+
+  if (!isFresh) {
+    return { hit: false, value: null }
+  }
+
+  return { hit: true, value: cached.value }
+}
+
+const setCachedValue = ({ queryOptions, queryCache }, value) => {
+  queryCache.setQueryData(queryOptions.key, {
+    __fetchAndApplyCached: true,
+    value,
+    cachedAt: Date.now()
+  })
+}
+
+export const fetchAndApplyGet = async ({
+  api,
+  url,
+  apply,
+  extract,
+  requestConfig,
   onError,
   cache
 }) => {
@@ -25,18 +53,16 @@ export const fetchAndApplyGet = async ({
     let value
 
     if (cache) {
-      const { queryOptions, queryCache } = cache
-      // Try to get from cache first
-      const cached = queryCache.getQueryData(queryOptions.key)
-      if (cached !== undefined && cached !== null) {
-        value = cached
-        apply(value)
-        return value
+      const cached = getFreshCachedValue(cache)
+      if (cached.hit) {
+        apply(cached.value)
+        return cached.value
       }
+
       // Not in cache, fetch from API
       const { data } = await api.get(url, requestConfig)
       value = extract ? extract(data) : data
-      queryCache.setQueryData(queryOptions.key, value)
+      setCachedValue(cache, value)
     } else {
       // Regular fetch without cache
       const { data } = await api.get(url, requestConfig)

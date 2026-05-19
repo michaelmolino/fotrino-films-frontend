@@ -89,7 +89,7 @@ const oauthProviders = computed(() => {
 })
 
 onMounted(async () => {
-  providerKeys.value = await accountStore.getProviders()
+  providerKeys.value = await accountStore.loadProviders()
 })
 </script>
 

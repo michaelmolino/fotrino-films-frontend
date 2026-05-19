@@ -4,10 +4,17 @@ import { useQueryCache } from '@pinia/colada'
 import { api } from 'boot/axios'
 import { getGlobalApiErrorPayload } from 'src/utils/api-errors.js'
 import { fetchAndApplyGet } from 'src/stores/utils/fetch-and-apply.js'
+import { API_CACHE_LONG_MS, API_CACHE_SHORT_MS } from 'src/stores/utils/cache-timeouts.js'
 
-const DEFAULT_CACHE_TIMEOUT = 3600000
+const PROFILE_CACHE_TIMEOUT_MS = API_CACHE_SHORT_MS
+const PROVIDERS_CACHE_TIMEOUT_MS = API_CACHE_LONG_MS
 
-const accountProvidersQuery = (staleTime = DEFAULT_CACHE_TIMEOUT) => ({
+const accountProfileQueryOptions = (staleTime = PROFILE_CACHE_TIMEOUT_MS) => ({
+    key: ['account', 'profile'],
+    staleTime
+})
+
+const accountProvidersQueryOptions = (staleTime = PROVIDERS_CACHE_TIMEOUT_MS) => ({
     key: ['account', 'providers'],
     staleTime
 })
@@ -17,24 +24,32 @@ export const useAccountStore = defineStore('account', () => {
     const providers = ref([])
     const queryCache = useQueryCache()
 
-    const setProfile = nextProfile => {
-        profile.value = nextProfile
+    const setProfile = value => {
+        profile.value = value
     }
 
-    const setProviders = nextProviders => {
-        providers.value = nextProviders
+    const setProviders = value => {
+        providers.value = value
     }
 
-    const getProfile = () => fetchAndApplyGet({
+    const clearProfileCache = () => {
+        queryCache.setQueryData(accountProfileQueryOptions().key, null)
+    }
+
+    const loadProfile = (timeout = PROFILE_CACHE_TIMEOUT_MS) => fetchAndApplyGet({
         api,
         url: '/account/profile',
         apply: setProfile,
+        cache: {
+            queryOptions: accountProfileQueryOptions(timeout),
+            queryCache
+        },
         onError: error => {
             getGlobalApiErrorPayload(error)
         }
     })
 
-    const getProviders = async (timeout = DEFAULT_CACHE_TIMEOUT) => {
+    const loadProviders = async (timeout = PROVIDERS_CACHE_TIMEOUT_MS) => {
         return fetchAndApplyGet({
             api,
             url: '/account/providers',
@@ -44,7 +59,7 @@ export const useAccountStore = defineStore('account', () => {
                 getGlobalApiErrorPayload(error)
             },
             cache: {
-                queryOptions: accountProvidersQuery(timeout),
+                queryOptions: accountProvidersQueryOptions(timeout),
                 queryCache
             }
         })
@@ -52,6 +67,7 @@ export const useAccountStore = defineStore('account', () => {
 
     const logout = async () => {
         await api.post('/account/logout')
+        clearProfileCache()
         setProfile(null)
         return true
     }
@@ -61,8 +77,9 @@ export const useAccountStore = defineStore('account', () => {
         providers,
         setProfile,
         setProviders,
-        getProfile,
-        getProviders,
+        clearProfileCache,
+        loadProfile,
+        loadProviders,
         logout
     }
 })

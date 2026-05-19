@@ -87,10 +87,10 @@ const flattenedReportedMediaRows = computed(() => {
   return rows
 })
 
-async function fetchReportedMedia() {
+async function loadReportedMedia() {
   loading.value = true
   try {
-    await adminStore.getReportedMedia()
+    await adminStore.loadReportedMedia()
   } catch (err) {
     console.error('Failed to fetch reported media:', err)
     Notify.create({
@@ -128,7 +128,7 @@ async function deleteMedia(privateId) {
 watch(
   () => true,
   () => {
-    fetchReportedMedia()
+    loadReportedMedia()
   },
   { immediate: true }
 )

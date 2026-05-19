@@ -13,7 +13,7 @@
       v-else
       flat
       bordered
-      :rows="outboxDLQ"
+      :rows="outboxDlq"
       :columns="outboxColumns"
       row-key="id"
       separator="cell"
@@ -49,7 +49,7 @@ import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
 
 const adminStore = useAdminStore()
 const loading = ref(true)
-const outboxDLQ = computed(() => adminStore.outboxDLQ || [])
+const outboxDlq = computed(() => adminStore.outboxDlq || [])
 const outboxColumns = [
   { name: 'created', label: 'Created', field: 'created', align: 'left' },
   { name: 'type', label: 'Type', field: 'type', align: 'left' },
@@ -93,7 +93,7 @@ async function requeue(eventId) {
 onMounted(async () => {
   loading.value = true
   try {
-    await adminStore.getDLQ()
+    await adminStore.loadOutboxDlq()
   } catch (err) {
     console.error('Failed to load DLQ:', err)
     Notify.create({

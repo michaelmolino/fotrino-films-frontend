@@ -49,16 +49,16 @@ export function useChannelLoader({ manageMeta = false } = {}) {
     }
 
     if (target.type === 'channel') {
-      return channelStore.getChannel({ channelId: target.id })
+      return channelStore.loadChannel({ channelId: target.id })
     }
     if (target.type === 'project') {
-      return channelStore.getChannelByProject(target.id)
+      return channelStore.loadChannelByProject(target.id)
     }
     if (target.type === 'media') {
-      return channelStore.getChannelByMedia(target.id)
+      return channelStore.loadChannelByMedia(target.id)
     }
     if (target.type === 'privateMedia') {
-      return channelStore.getPrivateMedia(target.id)
+      return channelStore.loadPrivateMedia(target.id)
     }
     return Promise.resolve(null)
   }

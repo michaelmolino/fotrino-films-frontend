@@ -27,11 +27,11 @@ export const hasLoadedChannelRouteTarget = (route, channelStore) => {
     }
 
     if (target.type === 'project') {
-        return !!channelStore.getProjectByPublicId(target.id)
+        return !!channelStore.findProjectByPublicId(target.id)
     }
 
     if (target.type === 'media') {
-        return !!channelStore.getMediaByPublicId(target.id)
+        return !!channelStore.findMediaByPublicId(target.id)
     }
 
     if (target.type === 'privateMedia') {
@@ -51,7 +51,7 @@ const getChannelCanonicalPath = (route, channelStore) => {
 }
 
 const getProjectCanonicalPath = (route, channelStore, target) => {
-    const project = channelStore.getProjectByPublicId(target.id)
+    const project = channelStore.findProjectByPublicId(target.id)
     const projectId = project?.publicId
     if (projectId && project.slug && project.slug !== route.params.projectSlug) {
         return `/p/${projectId}/${project.slug}`
@@ -60,7 +60,7 @@ const getProjectCanonicalPath = (route, channelStore, target) => {
 }
 
 const getMediaCanonicalPath = (route, channelStore, target) => {
-    const media = channelStore.getMediaByPublicId(target.id)
+    const media = channelStore.findMediaByPublicId(target.id)
     const mediaId = media?.publicId
     if (mediaId && media.slug && media.slug !== route.params.mediaSlug) {
         return `/m/${mediaId}/${media.slug}`

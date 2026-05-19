@@ -106,7 +106,7 @@ async function abortPendingMedia(mediaId) {
 
   try {
     await channelStore.abortUpload(mediaId)
-    await channelStore.getChannels(true)
+    await channelStore.loadChannels(true)
     notifySuccess('Pending upload aborted.')
   } catch (error) {
     if (error?.__userCancelled || error?.code === 'ERR_CANCELED') {
@@ -153,7 +153,7 @@ async function runEditJourney({
       await update(updatePayload)
     }
 
-    await channelStore.getChannels(true)
+    await channelStore.loadChannels(true)
     notifySuccess(successMessage)
   } catch (error) {
     notifyError(getComponentApiErrorMessage(error, errorMessage), { timeout: 0 })

@@ -17,22 +17,22 @@ const sortUsers = users => {
 
 export const useAdminStore = defineStore('admin', () => {
     const users = ref([])
-    const outboxDLQ = ref([])
+    const outboxDlq = ref([])
     const reportedMedia = ref([])
 
-    const setUsers = payload => {
-        users.value = payload
+    const setUsers = value => {
+        users.value = value
     }
 
-    const setOutboxDLQ = payload => {
-        outboxDLQ.value = Array.isArray(payload) ? payload : []
+    const setOutboxDlq = value => {
+        outboxDlq.value = Array.isArray(value) ? value : []
     }
 
-    const setReportedMedia = payload => {
-        reportedMedia.value = Array.isArray(payload) ? payload : []
+    const setReportedMedia = value => {
+        reportedMedia.value = Array.isArray(value) ? value : []
     }
 
-    const getAllUsers = () => fetchAndApplyGet({
+    const loadUsers = () => fetchAndApplyGet({
         api,
         url: '/admin/users',
         apply: setUsers,
@@ -48,10 +48,10 @@ export const useAdminStore = defineStore('admin', () => {
         }
     })
 
-    const getDLQ = () => fetchAndApplyGet({
+    const loadOutboxDlq = () => fetchAndApplyGet({
         api,
         url: '/admin/outbox/dlq',
-        apply: setOutboxDLQ,
+        apply: setOutboxDlq,
         requestConfig: {
             __skipGlobalErrorNotify: true
         },
@@ -67,7 +67,7 @@ export const useAdminStore = defineStore('admin', () => {
         await api.post(`/admin/outbox/requeue/${eventId}`, null, {
             __skipGlobalErrorNotify: true
         })
-        await getDLQ()
+        await loadOutboxDlq()
     }
 
     const deleteUser = async userId => {
@@ -83,7 +83,7 @@ export const useAdminStore = defineStore('admin', () => {
         }
 
         setUsers([])
-        await getAllUsers()
+        await loadUsers()
     }
 
     const approveUser = async userId => {
@@ -99,10 +99,10 @@ export const useAdminStore = defineStore('admin', () => {
         }
 
         setUsers([])
-        await getAllUsers()
+        await loadUsers()
     }
 
-    const getReportedMedia = () => fetchAndApplyGet({
+    const loadReportedMedia = () => fetchAndApplyGet({
         api,
         url: '/admin/media/reported',
         apply: setReportedMedia,
@@ -130,20 +130,20 @@ export const useAdminStore = defineStore('admin', () => {
         }
 
         setReportedMedia([])
-        await getReportedMedia()
+        await loadReportedMedia()
         return true
     }
 
     return {
         users,
-        outboxDLQ,
+        outboxDlq,
         reportedMedia,
-        getAllUsers,
-        getDLQ,
+        loadUsers,
+        loadOutboxDlq,
         requeueDLQItem,
         deleteUser,
         approveUser,
-        getReportedMedia,
+        loadReportedMedia,
         deleteMedia
     }
 })

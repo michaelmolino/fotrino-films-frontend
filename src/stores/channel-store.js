@@ -7,8 +7,12 @@ import { normalizeChannelPayload, sortChannelDetail } from 'src/utils/read-model
 import { fetchAndApplyGet } from 'src/stores/utils/fetch-and-apply.js'
 import { createRequestCanceler, isRequestCanceled } from 'src/stores/utils/request-canceler.js'
 import { useQueryCache } from '@pinia/colada'
+import { API_CACHE_MEDIUM_MS } from 'src/stores/utils/cache-timeouts.js'
 
-// Sort functions - apply sorting transformations to data structures
+const CHANNEL_LIST_CACHE_TIMEOUT_MS = API_CACHE_MEDIUM_MS
+const CHANNEL_DETAIL_CACHE_TIMEOUT_MS = API_CACHE_MEDIUM_MS
+const PRIVATE_MEDIA_CACHE_TIMEOUT_MS = API_CACHE_MEDIUM_MS
+
 const sortChannels = (channels, field = 'title', direction = 'desc') =>
     sortBy(channels, field, direction)
 
@@ -22,7 +26,6 @@ export const useChannelStore = defineStore('channel', () => {
 
     const queryCache = useQueryCache()
 
-    // Computed property: returns all media across all projects, flattened and sorted
     const sortedAllMedia = computed(() => {
         if (!channel.value?.projects) return []
         return channel.value.projects.flatMap(project =>
@@ -30,22 +33,22 @@ export const useChannelStore = defineStore('channel', () => {
         )
     })
 
-    const setChannelLoadStatus = status => {
-        loadStatus.value = status
+    const setChannelLoadStatus = value => {
+        loadStatus.value = value
     }
 
-    const setChannel = nextChannel => {
-        const normalized = normalizeChannelPayload(nextChannel)
+    const setChannel = value => {
+        const normalized = normalizeChannelPayload(value)
         channel.value = normalized.channel
         readModel.value = normalized.readModel
     }
 
-    const setChannels = nextChannels => {
-        channels.value = nextChannels
+    const setChannels = value => {
+        channels.value = value
     }
 
-    const setUpload = nextUpload => {
-        upload.value = nextUpload
+    const setUpload = value => {
+        upload.value = value
     }
 
     const requestUploadInstruction = async url => {
@@ -55,22 +58,69 @@ export const useChannelStore = defineStore('channel', () => {
         return res.data
     }
 
-    const getChannels = deep => fetchAndApplyGet({
+    const channelsQueryOptions = (deep = false) => ({
+        key: ['channels', deep ? 'deep' : 'flat'],
+        staleTime: CHANNEL_LIST_CACHE_TIMEOUT_MS
+    })
+
+    const channelByProjectQueryOptions = projectId => ({
+        key: ['channel', 'project', projectId],
+        staleTime: CHANNEL_DETAIL_CACHE_TIMEOUT_MS
+    })
+
+    const channelByMediaQueryOptions = mediaId => ({
+        key: ['channel', 'media', mediaId],
+        staleTime: CHANNEL_DETAIL_CACHE_TIMEOUT_MS
+    })
+
+    const privateMediaQueryOptions = privateMediaId => ({
+        key: ['channel', 'private-media', privateMediaId],
+        staleTime: PRIVATE_MEDIA_CACHE_TIMEOUT_MS
+    })
+
+    const invalidateChannelsCache = () => {
+        queryCache.setQueryData(channelsQueryOptions(false).key, null)
+        queryCache.setQueryData(channelsQueryOptions(true).key, null)
+    }
+
+    const invalidateChannelCacheById = channelId => {
+        if (!channelId) return
+        queryCache.setQueryData(channelQueryOptions(channelId).key, null)
+    }
+
+    const invalidateChannelCacheByProject = projectId => {
+        if (!projectId) return
+        queryCache.setQueryData(channelByProjectQueryOptions(projectId).key, null)
+    }
+
+    const invalidateChannelCacheByMedia = mediaId => {
+        if (!mediaId) return
+        queryCache.setQueryData(channelByMediaQueryOptions(mediaId).key, null)
+    }
+
+    const invalidatePrivateMediaCache = privateMediaId => {
+        if (!privateMediaId) return
+        queryCache.setQueryData(privateMediaQueryOptions(privateMediaId).key, null)
+    }
+
+    const loadChannels = deep => fetchAndApplyGet({
         api,
         url: deep ? '/channels/deep' : '/channels',
         apply: setChannels,
         extract: data => {
             const sorted = sortChannels(data)
             return deep ? sorted.map(sortChannelDetail) : sorted
+        },
+        cache: {
+            queryOptions: channelsQueryOptions(deep),
+            queryCache
         }
     })
 
-    // Normalized entities by publicId from read model (O(1) lookups)
     const channelsByPublicId = computed(() => readModel.value?.entities?.channelsByPublicId || {})
     const projectsByPublicId = computed(() => readModel.value?.entities?.projectsByPublicId || {})
     const mediaByPublicId = computed(() => readModel.value?.entities?.mediaByPublicId || {})
 
-    // Map of hydrated projects (with media arrays) from denormalized channel tree
     const hydratedProjectsByPublicId = computed(() => {
         const map = {}
         for (const project of channel.value?.projects || []) {
@@ -85,21 +135,18 @@ export const useChannelStore = defineStore('channel', () => {
         return map
     })
 
-    /** Get hydrated project by publicId. Returns project with media array and metadata. */
-    const getProjectByPublicId = projectPublicId => {
+    const findProjectByPublicId = projectPublicId => {
         if (!projectPublicId) return null
         return hydratedProjectsByPublicId.value?.[projectPublicId] || projectsByPublicId.value?.[projectPublicId] || null
     }
 
-    /** Get media entity by publicId from normalized read model. */
-    const getMediaByPublicId = mediaPublicId => mediaByPublicId.value?.[mediaPublicId] || null
+    const findMediaByPublicId = mediaPublicId => mediaByPublicId.value?.[mediaPublicId] || null
 
-    /** Get project by media publicId by traversing read-model relationships. */
-    const getProjectByMediaPublicId = mediaPublicId => {
-        const media = getMediaByPublicId(mediaPublicId)
+    const findProjectByMediaPublicId = mediaPublicId => {
+        const media = findMediaByPublicId(mediaPublicId)
         const projectPublicId = media?.projectPublicId
         if (!projectPublicId) return null
-        return getProjectByPublicId(projectPublicId)
+        return findProjectByPublicId(projectPublicId)
     }
 
     const resolveHistoryChannels = async items => {
@@ -117,7 +164,7 @@ export const useChannelStore = defineStore('channel', () => {
         }
     }
 
-    const getChannel = ({ channelId, pending = false, cache = true }) => {
+    const loadChannel = ({ channelId, pending = false, cache = true }) => {
         const url = `/channels/${channelId}${pending ? '?pending=true' : ''}`
         return fetchAndApplyGet({
             api,
@@ -141,7 +188,7 @@ export const useChannelStore = defineStore('channel', () => {
         })
     }
 
-    const getChannelByProject = projectId => fetchAndApplyGet({
+    const loadChannelByProject = projectId => fetchAndApplyGet({
         api,
         url: `/channels/project/${projectId}`,
         apply: setChannel,
@@ -153,10 +200,14 @@ export const useChannelStore = defineStore('channel', () => {
         },
         requestConfig: {
             signal: requestCanceler.getSignal('SET_CHANNEL')
+        },
+        cache: {
+            queryOptions: channelByProjectQueryOptions(projectId),
+            queryCache
         }
     })
 
-    const getChannelByMedia = mediaId => fetchAndApplyGet({
+    const loadChannelByMedia = mediaId => fetchAndApplyGet({
         api,
         url: `/channels/media/${mediaId}`,
         apply: setChannel,
@@ -168,10 +219,14 @@ export const useChannelStore = defineStore('channel', () => {
         },
         requestConfig: {
             signal: requestCanceler.getSignal('SET_CHANNEL')
+        },
+        cache: {
+            queryOptions: channelByMediaQueryOptions(mediaId),
+            queryCache
         }
     })
 
-    const getPrivateMedia = privateMediaId => fetchAndApplyGet({
+    const loadPrivateMedia = privateMediaId => fetchAndApplyGet({
         api,
         url: `/channels/media/private/${privateMediaId}`,
         apply: setChannel,
@@ -182,6 +237,10 @@ export const useChannelStore = defineStore('channel', () => {
         },
         requestConfig: {
             signal: requestCanceler.getSignal('SET_CHANNEL')
+        },
+        cache: {
+            queryOptions: privateMediaQueryOptions(privateMediaId),
+            queryCache
         }
     })
 
@@ -206,8 +265,16 @@ export const useChannelStore = defineStore('channel', () => {
             throw error
         }
 
+        invalidateChannelsCache()
+        if (resource.type === 'channel') {
+            invalidateChannelCacheById(resource.id)
+        } else if (resource.type === 'project') {
+            invalidateChannelCacheByProject(resource.id)
+        } else if (resource.type === 'media') {
+            invalidateChannelCacheByMedia(resource.id)
+        }
         setChannels([])
-        await getChannels(true)
+        await loadChannels(true)
     }
 
     const postUpload = async payload => {
@@ -230,10 +297,18 @@ export const useChannelStore = defineStore('channel', () => {
 
     const confirmUpload = media => api.put(`/channels/media/confirm/${media}`, null, {
         __skipGlobalErrorNotify: true
+    }).then(response => {
+        invalidateChannelsCache()
+        invalidateChannelCacheByMedia(media)
+        return response
     })
 
     const abortUpload = mediaId => api.delete(`/channels/media/${mediaId}/abort`, {
         __skipGlobalErrorNotify: true
+    }).then(response => {
+        invalidateChannelsCache()
+        invalidateChannelCacheByMedia(mediaId)
+        return response
     })
 
     const updateMedia = async ({ mediaId, description = null, resourceDate = null, main }) => {
@@ -245,6 +320,8 @@ export const useChannelStore = defineStore('channel', () => {
             }, {
                 __skipGlobalErrorNotify: true
             })
+            invalidateChannelsCache()
+            invalidateChannelCacheByMedia(mediaId)
             return res.data
         } catch (error) {
             getGlobalApiErrorPayload(error)
@@ -261,6 +338,8 @@ export const useChannelStore = defineStore('channel', () => {
             }, {
                 __skipGlobalErrorNotify: true
             })
+            invalidateChannelsCache()
+            invalidateChannelCacheByProject(projectId)
             return res.data
         } catch (error) {
             getGlobalApiErrorPayload(error)
@@ -275,6 +354,8 @@ export const useChannelStore = defineStore('channel', () => {
             }, {
                 __skipGlobalErrorNotify: true
             })
+            invalidateChannelsCache()
+            invalidateChannelCacheById(channelPublicId)
             return res.data
         } catch (error) {
             getGlobalApiErrorPayload(error)
@@ -297,7 +378,11 @@ export const useChannelStore = defineStore('channel', () => {
             main
         },
         { __skipGlobalErrorNotify: true }
-    )
+    ).then(response => {
+        invalidateChannelsCache()
+        invalidateChannelCacheByMedia(mediaId)
+        return response
+    })
 
     const confirmProjectPosterUpload = ({ projectId, objectName, subtitle = null, posterType, posterColor = null }) => api.put(
         `/channels/project/${projectId}/poster/confirm`,
@@ -308,7 +393,11 @@ export const useChannelStore = defineStore('channel', () => {
             posterColor
         },
         { __skipGlobalErrorNotify: true }
-    )
+    ).then(response => {
+        invalidateChannelsCache()
+        invalidateChannelCacheByProject(projectId)
+        return response
+    })
 
     const confirmChannelCoverUpload = ({ channelPublicId, objectName, title }) => api.put(
         `/channels/${channelPublicId}/cover/confirm`,
@@ -317,7 +406,11 @@ export const useChannelStore = defineStore('channel', () => {
             title: title?.trim()
         },
         { __skipGlobalErrorNotify: true }
-    )
+    ).then(response => {
+        invalidateChannelsCache()
+        invalidateChannelCacheById(channelPublicId)
+        return response
+    })
 
     const reportMedia = async ({ privateId, reason }) => {
         const res = await api.post(`/channels/media/private/${privateId}/report`, {
@@ -325,12 +418,13 @@ export const useChannelStore = defineStore('channel', () => {
         }, {
             __skipGlobalErrorNotify: true
         })
+        invalidatePrivateMediaCache(privateId)
         return res.data
     }
 
     const channelQueryOptions = uuid => ({
         key: ['channel', uuid],
-        staleTime: 3600000 // 1 hour, adjust as needed
+        staleTime: CHANNEL_DETAIL_CACHE_TIMEOUT_MS
     })
 
     return {
@@ -345,15 +439,15 @@ export const useChannelStore = defineStore('channel', () => {
         upload,
         setChannelLoadStatus,
         setChannel,
-        getChannels,
-        getProjectByPublicId,
-        getMediaByPublicId,
-        getProjectByMediaPublicId,
+        loadChannels,
+        findProjectByPublicId,
+        findMediaByPublicId,
+        findProjectByMediaPublicId,
         resolveHistoryChannels,
-        getChannel,
-        getChannelByProject,
-        getChannelByMedia,
-        getPrivateMedia,
+        loadChannel,
+        loadChannelByProject,
+        loadChannelByMedia,
+        loadPrivateMedia,
         createMediaSession,
         deleteResource,
         postUpload,
@@ -369,6 +463,15 @@ export const useChannelStore = defineStore('channel', () => {
         confirmProjectPosterUpload,
         confirmChannelCoverUpload,
         reportMedia,
+        channelsQueryOptions,
+        channelByProjectQueryOptions,
+        channelByMediaQueryOptions,
+        privateMediaQueryOptions,
+        invalidateChannelsCache,
+        invalidateChannelCacheById,
+        invalidateChannelCacheByProject,
+        invalidateChannelCacheByMedia,
+        invalidatePrivateMediaCache,
         channelQueryOptions
     }
 })
