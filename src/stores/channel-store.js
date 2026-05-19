@@ -319,9 +319,10 @@ export const useChannelStore = defineStore('channel', () => {
         return response
     })
 
-    const updateMedia = async ({ mediaId, description = null, resourceDate = null, main }) => {
+    const updateMedia = async ({ mediaId, title, description = null, resourceDate = null, main }) => {
         try {
             const res = await api.put(`/channels/media/${mediaId}`, {
+                title: title?.trim(),
                 description: description?.trim() || null,
                 resourceDate: resourceDate?.trim() || null,
                 main
@@ -337,9 +338,10 @@ export const useChannelStore = defineStore('channel', () => {
         }
     }
 
-    const updateProject = async ({ projectId, subtitle = null, posterType, posterColor = null }) => {
+    const updateProject = async ({ projectId, title, subtitle = null, posterType, posterColor = null }) => {
         try {
             const res = await api.put(`/channels/project/${projectId}`, {
+                title: title?.trim(),
                 subtitle: subtitle?.trim() || null,
                 posterType,
                 posterColor
@@ -377,10 +379,11 @@ export const useChannelStore = defineStore('channel', () => {
 
     const requestChannelCoverUpload = ({ channelPublicId }) => requestUploadInstruction(`/channels/${channelPublicId}/cover`)
 
-    const confirmMediaPreviewUpload = ({ mediaId, objectName, description = null, resourceDate = null, main }) => api.put(
+    const confirmMediaPreviewUpload = ({ mediaId, objectName, title, description = null, resourceDate = null, main }) => api.put(
         `/channels/media/${mediaId}/preview/confirm`,
         {
             objectName,
+            title: title?.trim(),
             description: description?.trim() || null,
             resourceDate: resourceDate?.trim() || null,
             main
@@ -392,10 +395,11 @@ export const useChannelStore = defineStore('channel', () => {
         return response
     })
 
-    const confirmProjectPosterUpload = ({ projectId, objectName, subtitle = null, posterType, posterColor = null }) => api.put(
+    const confirmProjectPosterUpload = ({ projectId, objectName, title, subtitle = null, posterType, posterColor = null }) => api.put(
         `/channels/project/${projectId}/poster/confirm`,
         {
             objectName,
+            title: title?.trim(),
             subtitle: subtitle?.trim() || null,
             posterType,
             posterColor

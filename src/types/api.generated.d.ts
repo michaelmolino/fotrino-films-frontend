@@ -164,12 +164,13 @@ export type Value = number | string
 export type Description1 = string | null
 export type Main2 = boolean
 export type Resourcedate = string
+export type Title7 = string
 export type Description2 = string | null
 export type Filename = string
 export type Main3 = boolean
 export type Previewtype = 'frame' | 'new'
 export type Resourcedate1 = string
-export type Title7 = string
+export type Title8 = string
 export type Error8 = 'not_found'
 export type Message5 = string | null
 export type Status6 = 404
@@ -192,13 +193,13 @@ export type PrivateId2 = string
 export type ResourceDate4 = string | null
 export type Slug7 = string
 export type Src2 = string | null
-export type Title8 = string
+export type Title9 = string
 export type Type3 = string | null
 export type UpdatedAt4 = string | null
 export type Postercolor = string | null
 export type Postertype = 'default' | 'new'
 export type Subtitle2 = string | null
-export type Title9 = string | null
+export type Title10 = string | null
 export type Message6 = string | null
 export type Reported = boolean
 export type MediaId = number
@@ -209,7 +210,7 @@ export type Reason = string | null
 export type Reporter = string
 export type Reports = ReportedMediaReportResponse[]
 export type Slug8 = string
-export type Title10 = string
+export type Title11 = string
 export type CreatedAt1 = string
 export type Reason1 = string | null
 export type Reporter1 = string
@@ -224,7 +225,7 @@ export type Requiredresources = ('cover' | 'poster' | 'preview' | 'upload')[]
 export type Resourcetype = 'cover' | 'poster' | 'preview' | 'upload'
 export type Url = string
 export type Covertype = 'profile' | 'new'
-export type Title11 = string | null
+export type Title12 = string | null
 export type UploadResourceType = 'cover' | 'poster' | 'preview' | 'upload'
 export type Error11 = string
 export type Error12 = string
@@ -495,6 +496,7 @@ export interface MediaUpdateRequest {
   description?: Description1
   main: Main2
   resourceDate: Resourcedate
+  title: Title7
 }
 export interface MediaUploadPayload {
   description?: Description2
@@ -502,7 +504,7 @@ export interface MediaUploadPayload {
   main?: Main3
   previewType?: Previewtype
   resourceDate: Resourcedate1
-  title: Title7
+  title: Title8
 }
 export interface NotFoundErrorResponse {
   error: Error8
@@ -525,7 +527,7 @@ export interface PrivateMediaItemResponse {
   resource_date?: ResourceDate4
   slug: Slug7
   src?: Src2
-  title: Title8
+  title: Title9
   type?: Type3
   updated_at?: UpdatedAt4
 }
@@ -538,7 +540,7 @@ export interface ProjectUploadPayload {
   posterColor?: Postercolor
   posterType?: Postertype
   subtitle?: Subtitle2
-  title?: Title9
+  title?: Title10
 }
 export interface ReportMediaResponse {
   message?: Message6
@@ -550,7 +552,7 @@ export interface ReportedMediaItemResponse {
   publicId: Publicid7
   reports: Reports
   slug: Slug8
-  title: Title10
+  title: Title11
 }
 export interface ReportedMediaReportResponse {
   created_at: CreatedAt
@@ -582,7 +584,7 @@ export interface UploadMediaRequest {
   coverType?: Covertype
   project: ProjectUploadPayload
   publicId: LabeledValue
-  title?: Title11
+  title?: Title12
 }
 export interface ErrorDetailResponse1 {
   detail: Detail1

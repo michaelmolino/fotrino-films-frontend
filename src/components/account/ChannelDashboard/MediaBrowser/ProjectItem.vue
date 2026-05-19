@@ -46,6 +46,14 @@
         </q-card-section>
 
         <q-card-section>
+          <q-input
+            outlined
+            clearable
+            class="q-pb-md"
+            :model-value="editForm.title"
+            label="Project Title"
+            data-cy="project-title-input"
+            @update:model-value="onUpdateTitle" />
           <ProjectPosterFields
             :subtitle="editForm.subtitle"
             subtitle-label="Project SubTitle"
@@ -105,6 +113,7 @@ const {
   reset: resetPosterFile
 } = useImageSelectionProcessing()
 const editForm = ref({
+  title: '',
   subtitle: null,
   posterType: 'default',
   posterColor: '#000000',
@@ -122,7 +131,7 @@ const hasPendingChildren = computed(() => {
 
 const editProjectPreview = computed(() => {
   return {
-    title: props.project?.title || '',
+    title: editForm.value.title || props.project?.title || '',
     subtitle: editForm.value.subtitle || '',
     poster: editForm.value.posterType === 'new' ? editForm.value.posterImage : null,
     posterColor: editForm.value.posterColor || '#000000',
@@ -132,6 +141,7 @@ const editProjectPreview = computed(() => {
 
 function openEditDialog() {
   editForm.value = {
+    title: props.project?.title ?? '',
     subtitle: props.project?.subtitle ?? null,
     posterType: props.project?.poster ? 'new' : 'default',
     posterColor: props.project?.posterColor || '#000000',
@@ -139,6 +149,13 @@ function openEditDialog() {
   }
   resetPosterFile()
   editDialog.value = true
+}
+
+function onUpdateTitle(value) {
+  editForm.value = {
+    ...editForm.value,
+    title: value
+  }
 }
 
 function onUpdateSubtitle(value) {
@@ -196,6 +213,7 @@ async function onUpdatePosterFile(fileOrFiles) {
 function saveEdit() {
   emit('editProject', {
     id: props.project?.id,
+    title: editForm.value.title,
     subtitle: editForm.value.subtitle,
     posterType: editForm.value.posterType,
     posterColor: editForm.value.posterColor,

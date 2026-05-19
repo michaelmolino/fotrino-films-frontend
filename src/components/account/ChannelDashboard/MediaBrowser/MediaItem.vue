@@ -22,6 +22,14 @@
           </q-card-section>
 
         <q-card-section>
+          <q-input
+            outlined
+            clearable
+            class="q-pb-md"
+            :model-value="editForm.title"
+            label="Media Title"
+            data-cy="edit-media-title-input"
+            @update:model-value="onUpdateTitle" />
           <MediaMetadataFields
             :description="editForm.description"
             :resource-date="editForm.resourceDate"
@@ -85,6 +93,7 @@ const emit = defineEmits(['deleteMedia', 'editMedia', 'abortMedia'])
 
 const editDialog = ref(false)
 const editForm = ref({
+  title: '',
   description: null,
   resourceDate: null,
   main: false
@@ -111,6 +120,7 @@ function normalizeResourceDate(raw) {
 
 function openEditDialog() {
   editForm.value = {
+    title: props.media?.title ?? '',
     description: props.media?.descriptionUnsafe ?? null,
     resourceDate: normalizeResourceDate(props.media?.resourceDate),
     main: !!props.media?.main
@@ -119,6 +129,13 @@ function openEditDialog() {
   editPreviewFile.value = null
   editPreviewImage.value = props.media?.preview || null
   editDialog.value = true
+}
+
+function onUpdateTitle(value) {
+  editForm.value = {
+    ...editForm.value,
+    title: value
+  }
 }
 
 function onUpdateResourceDate(value) {
@@ -159,6 +176,7 @@ async function onUpdatePreviewFile(fileOrFiles) {
 function saveEdit() {
   emit('editMedia', {
     id: props.media?.id,
+    title: editForm.value.title,
     description: editForm.value.description,
     resourceDate: editForm.value.resourceDate,
     main: !!editForm.value.main,

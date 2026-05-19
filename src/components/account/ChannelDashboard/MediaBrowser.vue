@@ -176,6 +176,7 @@ async function saveMediaEdit(payload) {
     update: channelStore.updateMedia,
     updatePayload: {
       mediaId: payload?.id,
+      title: payload?.title,
       description: payload?.description ?? null,
       resourceDate: payload?.resourceDate ?? null,
       main: !!payload?.main
@@ -202,6 +203,7 @@ async function saveProjectEdit(payload) {
     update: channelStore.updateProject,
     updatePayload: {
       projectId: payload?.id,
+      title: payload?.title,
       subtitle: payload?.subtitle ?? null,
       posterType: payload?.posterType,
       posterColor: payload?.posterColor ?? null
