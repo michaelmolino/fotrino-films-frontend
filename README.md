@@ -12,46 +12,22 @@ This project is actively being developed and is not yet ready for use.
 [![SSL Labs SSL Server Test](https://img.shields.io/badge/SSL%20LABS-A%2B-brightgreen?style=for-the-badge)](https://www.ssllabs.com/ssltest/analyze.html?d=films.fotrino.com)
 [![Mozilla HTTP Observatory Grade](https://img.shields.io/mozilla-observatory/grade/films.fotrino.com?publish&style=for-the-badge)](https://observatory.mozilla.org/analyze/films.fotrino.com)
 
-Note that I regularly delete the DB and content so please don't upload important files.
+The site is not ready for production use - I reserve the right to delete your content.
+
+## Code
 
 ### Frontend
 
 - The frontend is an [SPA](https://en.wikipedia.org/wiki/Single-page_application) built with [Quasar](https://quasar.dev/), a framework based on [Vue](https://vuejs.org/).
 
-### Authentication
-
-- All authentication is handled by external identity providers (currently GitHub, Google, and Microsoft). The session is stateless: when a user logs in, an encrypted cookie is stored on the client, without storing any secrets on the backend that could be hacked or leaked.
-
 ### Backend
 
 - A [Python Flask](https://flask.palletsprojects.com/en/stable/) service exposes the main API which persists data to a [Postgres DB](https://www.postgresql.org/docs/current/index.html). Most `GET` requests are cached in [Redis](https://redis.io/docs/latest/).
+- Media processing is handled asynchronously (currently using [RQ](https://python-rq.org/)) by separately deployed workers. Work is orchestrated by a singleton [outbox](https://microservices.io/patterns/data/transactional-outbox.html) runner.
+- Media processing is handled by [ffmpeg](https://ffmpeg.org/).
 - The backend is stored in a private repo that is not open source.
 
-### Uploads
-
-- To avoid blocking backend threads with long-running uploads, files are uploaded directly to a private S3 bucket
- via [presigned URLs](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html).
-- Large diles are supported by multipart uploads.
-
-### Media Processing
-
-- Media that is uploaded must first be transformed into an [HLS stream](https://en.wikipedia.org/wiki/HTTP_Live_Streaming) before it can be made available.
-- This is an async process. Jobs are published using [RQ](https://python-rq.org/) for workers to consume.
-- Each worker is responsible for:
-  - Downloading the original file
-  - Transforming it to HLS manifests with CMAF/fMP4 segments using [ffmpeg](https://ffmpeg.org/)
-  - Uploading each segment back to the bucket
-  - Publishing the media and sending a notification to the uploader.
-- If an error occurs, work is retried with an exponetial backoff. After exhausting retries, a [DLQ](https://en.wikipedia.org/wiki/Dead_letter_queue) message is created for the Admin to remediate.
-
-### Streaming
-
-- All media is served from a private bucket behind a global [CDN](https://www.cloudflare.com/en-gb/).
-- To request a video segment, a [JWT](https://en.wikipedia.org/wiki/JSON_Web_Token) (provided by the backend API) must be provided.
-- The JWT is validated by an [Edge Function](https://developers.cloudflare.com/workers/reference/how-workers-works/) which will either serve the segment from cache or add authentication headers and fetch the segment from the origin.
-- Airplay from iOS devices is natively supported.
-
-### Testing
+### Tests
 
 - End to end tests written in [Cypress](https://www.cypress.io/) are in a private repo and not open source.
 
@@ -73,11 +49,3 @@ quasar dev
 ```
 
 Note: You'll need to proxy the backend somewhere in `quasar.config.js`.
-
-### API Contract Types
-
-Frontend API contract types are generated from backend contract schemas.
-
-```bash
-yarn generate:api-contracts
-```
