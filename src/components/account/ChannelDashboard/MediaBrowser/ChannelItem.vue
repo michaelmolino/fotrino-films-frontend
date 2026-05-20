@@ -39,12 +39,10 @@
       :getMediaLink="getMediaLink" />
 
     <!-- Edit Channel Dialog -->
-    <q-dialog v-model="editDialog" @before-hide="resetEditForm">
+    <q-dialog v-model="editDialog" no-backdrop-dismiss @before-hide="resetEditForm">
       <q-card style="min-width: 320px; width: 100%; max-width: 560px">
         <q-card-section class="row items-center q-pb-none">
           <div class="text-h6">Edit Channel</div>
-          <q-space />
-          <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
 
         <q-card-section>

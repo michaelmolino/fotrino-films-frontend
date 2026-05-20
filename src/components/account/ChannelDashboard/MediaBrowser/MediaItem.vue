@@ -15,7 +15,7 @@
       @edit="openEditDialog"
       square />
 
-      <q-dialog v-model="editDialog" persistent data-cy="edit-media-dialog">
+      <q-dialog v-model="editDialog" no-backdrop-dismiss data-cy="edit-media-dialog">
         <q-card style="min-width: 320px; width: 100%; max-width: 560px" data-cy="edit-media-dialog-card">
           <q-card-section>
             <div class="text-h6 text-weight-medium" data-cy="edit-media-dialog-title">{{ media.title }}</div>

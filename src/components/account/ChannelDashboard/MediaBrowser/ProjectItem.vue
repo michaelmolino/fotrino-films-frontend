@@ -40,7 +40,7 @@
         @editMedia="$emit('editMedia', $event)" />
     </q-expansion-item>
 
-    <q-dialog v-model="editDialog" persistent data-cy="edit-project-dialog">
+    <q-dialog v-model="editDialog" no-backdrop-dismiss data-cy="edit-project-dialog">
       <q-card style="min-width: 320px; width: 100%; max-width: 560px" data-cy="edit-project-dialog-card">
         <q-card-section>
           <div class="text-h6 text-weight-medium" data-cy="edit-project-dialog-title">{{ project.title }}</div>
