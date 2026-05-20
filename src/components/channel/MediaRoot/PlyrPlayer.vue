@@ -129,8 +129,12 @@ async function setupPlayer() {
       'airplay'
     ]
 
-  if (view.value === 'video' && !isPortraitVideo.value) {
-    el.setAttribute('poster', videoPosterUrl.value)
+  if (view.value === 'video') {
+    if (videoPosterUrl.value) {
+      el.setAttribute('poster', videoPosterUrl.value)
+    } else {
+      el.removeAttribute('poster')
+    }
   }
   if (!PlyrCtor) {
     const mod = await import('plyr')
@@ -183,7 +187,8 @@ async function rebuild() {
   const runId = ++rebuildRunId
   await refreshPlaybackUrl()
   addPreconnectForUrl(playbackUrl.value || props.media?.src)
-  addPreloadImageOnce(audioPreviewUrl.value, 'high')
+  const previewToPreload = view.value === 'video' ? videoPosterUrl.value : audioPreviewUrl.value
+  addPreloadImageOnce(previewToPreload, 'high')
   destroyPlayers()
   await nextTick()
   if (runId !== rebuildRunId) return
