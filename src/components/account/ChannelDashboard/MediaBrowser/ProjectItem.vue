@@ -22,6 +22,7 @@
           :subtitle="project.created ? `Created: ${daysSince(project.created, true)}` : ''"
           editable
           edit-data-cy="edit-project"
+          delete-data-cy="delete-project"
           @edit="openEditDialog"
           @delete="$emit('deleteProject', project.id)" />
       </template>

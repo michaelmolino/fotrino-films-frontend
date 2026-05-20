@@ -20,6 +20,7 @@
         :subtitle="channel.created ? `Created: ${daysSince(channel.created, true)}` : ''"
         :editable="true"
         :editDataCy="'edit-channel'"
+        :deleteDataCy="'delete-channel'"
         @edit="openEditDialog"
         @delete="$emit('deleteChannel', channel.publicId)" />
     </template>

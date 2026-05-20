@@ -12,31 +12,33 @@
         inline />
     </div>
     <div v-if="loading">
-      <q-skeleton type="rect" height="48px" class="q-mb-sm" />
-      <q-skeleton type="rect" height="48px" class="q-mb-sm" />
-      <q-skeleton type="rect" height="48px" class="q-mb-sm" />
+      <q-skeleton type="rect" height="40px" class="q-mb-sm" />
+      <q-skeleton type="rect" height="40px" class="q-mb-sm" />
+      <q-skeleton type="rect" height="40px" class="q-mb-sm" />
     </div>
-    <q-list v-else bordered class="rounded-borders">
-      <q-expansion-item
-        v-for="user in filteredUsers"
-        :key="user.id"
-        group="users"
-        expand-icon-toggle
-        expand-separator
-        switch-toggle-side
-        class="user-item">
-        <template #header>
-          <q-item-section avatar>
-            <div class="relative-position">
-              <q-avatar size="48px" :class="{ 'deleted-user': user.deleted }">
+    <q-table
+      v-else
+      flat
+      bordered
+      :rows="filteredUsers"
+      :columns="userColumns"
+      row-key="id"
+      separator="cell"
+      dense
+      :pagination="{ rowsPerPage: 0 }">
+      <template #body-cell-user="props">
+        <q-td :props="props" class="user-cell-td">
+          <div class="row items-center no-wrap user-cell">
+            <div class="relative-position avatar-wrap q-mr-md">
+              <q-avatar size="44px" :class="{ 'deleted-user': props.row.deleted }">
                 <img
-                  :src="user.avatar"
-                  :alt="`${user.name}'s avatar`"
+                  :src="props.row.avatar"
+                  :alt="`${props.row.name}'s avatar`"
                   loading="lazy"
                   decoding="async" />
               </q-avatar>
               <q-badge
-                v-if="user.isAdmin"
+                v-if="props.row.isAdmin"
                 floating
                 color="accent"
                 text-color="white"
@@ -44,7 +46,7 @@
                 <q-icon name="security" size="12px" />
               </q-badge>
               <q-badge
-                v-if="user.newUser"
+                v-if="props.row.newUser"
                 floating
                 color="warning"
                 text-color="white"
@@ -53,7 +55,7 @@
                 <q-icon name="person_add" size="12px" />
               </q-badge>
               <q-badge
-                v-if="user.deleted"
+                v-if="props.row.deleted"
                 floating
                 color="negative"
                 text-color="white"
@@ -61,116 +63,111 @@
                 <q-icon name="delete" size="12px" />
               </q-badge>
             </div>
-          </q-item-section>
-          <q-item-section>
-            <q-item-label class="text-weight-medium" :class="{ 'deleted-user': user.deleted }">
-              <span>{{ user.name }}</span>
-              <span
-                v-if="user.country"
-                class="flag-emoji q-ml-sm"
-                :title="getCountry(user.country).name">
-                {{ getCountry(user.country).flag }}
-              </span>
-              <q-btn
-                v-if="user.newUser && !user.deleted"
-                icon="check_circle"
-                flat
-                dense
-                round
-                size="sm"
-                color="positive"
-                class="q-ml-sm"
-                @click.stop="approveUser(user)"
-                :title="`Approve ${user.name}`" />
-              <q-btn
-                v-if="!user.deleted"
-                icon="delete"
-                flat
-                dense
-                round
-                size="sm"
-                color="negative"
-                class="q-ml-sm"
-                @click.stop="deleteUser(user)"
-                :title="`Delete ${user.name}`" />
-              <q-btn
-                v-else
-                icon="delete"
-                flat
-                dense
-                round
-                size="sm"
-                color="grey-5"
-                class="q-ml-sm"
-                disable
-                :title="`${user.name} is already deleted`" />
-            </q-item-label>
-            <q-item-label caption :class="{ 'deleted-user': user.deleted }">
-              <span class="q-mr-sm">
-                <q-icon
-                  v-for="provider in user.providers"
-                  :key="provider.provider"
-                  :name="providerIcons[provider.provider]"
-                  size="16px"
-                  :title="provider.provider"
-                  :class="$q.dark.isActive ? 'oauth-icon--white q-ml-xs' : 'q-ml-xs'" />
-              </span>
-              <span>{{ user.email }}</span>
-            </q-item-label>
-            <q-item-label
-              caption
-              class="text-grey-7 q-mt-xs"
-              v-if="user.lastLogin"
-              :class="{ 'deleted-user': user.deleted }">
-              Last login: {{ daysSince(user.lastLogin, true) }}
-            </q-item-label>
-            <q-item-label
-              caption
-              class="text-grey-7 q-mt-xs"
-              v-else
-              :class="{ 'deleted-user': user.deleted }">
-              Never logged in
-            </q-item-label>
-          </q-item-section>
-        </template>
-        <div v-if="user.channels?.length > 0" class="q-pa-sm">
-          <q-list dense>
-            <q-item
-              v-for="channel in user.channels"
-              :key="channel.publicId"
-              class="channel-item q-pl-lg">
-              <q-item-section avatar>
-                <q-avatar size="32px">
-                  <img
-                    :src="channel.cover || '/images/channel.png'"
-                    :alt="`${channel.title} cover`"
-                    loading="lazy"
-                    decoding="async" />
-                </q-avatar>
-              </q-item-section>
-              <q-item-section side>
-                <q-btn
-                  :to="`/c/${channel.publicId}/${channel.slug}`"
-                  icon="link"
-                  flat
-                  dense
-                  size="sm"
-                  color="primary"
-                  :title="`Visit ${channel.title}`"
-                  :aria-label="`Visit ${channel.title}`" />
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>{{ channel.title }}</q-item-label>
-                <q-item-label caption class="text-grey-6">
-                  Created: {{ daysSince(channel.created, true) }}
-                </q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </div>
-        <div v-else class="q-pa-md text-grey-6 text-center">No channels</div>
-      </q-expansion-item>
-    </q-list>
+            <div>
+              <div class="text-weight-medium" :class="{ 'deleted-user': props.row.deleted }">
+                <span>{{ props.row.name }}</span>
+                <span
+                  v-if="props.row.country"
+                  class="flag-emoji q-ml-sm"
+                  :title="getCountry(props.row.country).name">
+                  {{ getCountry(props.row.country).flag }}
+                </span>
+              </div>
+              <div caption :class="{ 'deleted-user': props.row.deleted }">
+                <span class="q-mr-sm">
+                  <q-icon
+                    v-for="provider in props.row.providers"
+                    :key="provider.provider"
+                    :name="providerIcons[provider.provider]"
+                    size="16px"
+                    :title="provider.provider"
+                    :class="$q.dark.isActive ? 'oauth-icon--white q-ml-xs' : 'q-ml-xs'" />
+                </span>
+                <span>{{ props.row.email }}</span>
+              </div>
+            </div>
+          </div>
+        </q-td>
+      </template>
+      <template #body-cell-lastLogin="props">
+        <q-td :props="props" :class="{ 'deleted-user': props.row.deleted }">
+          {{ props.row.lastLogin ? daysSince(props.row.lastLogin, true) : 'Never logged in' }}
+        </q-td>
+      </template>
+      <template #body-cell-channels="props">
+        <q-td :props="props">
+          <q-expansion-item
+            dense
+            expand-separator
+            :label="props.row.channels?.length > 0 ? `Show Channels (${props.row.channels.length})` : 'No Channels'"
+            :disable="(props.row.channels?.length || 0) === 0">
+            <div class="q-py-sm">
+              <div v-for="channel in props.row.channels" :key="channel.publicId" class="channel-row q-px-sm q-py-xs">
+                <div class="row items-center no-wrap">
+                  <q-avatar size="28px" class="q-mr-sm">
+                    <img
+                      :src="channel.cover || '/images/channel.png'"
+                      :alt="`${channel.title} cover`"
+                      loading="lazy"
+                      decoding="async" />
+                  </q-avatar>
+                  <div class="col">
+                    <div>{{ channel.title }}</div>
+                    <div class="text-caption text-grey-6">
+                      Created: {{ daysSince(channel.created, true) }}
+                    </div>
+                  </div>
+                  <q-btn
+                    :to="`/c/${channel.publicId}/${channel.slug}`"
+                    icon="link"
+                    flat
+                    dense
+                    size="sm"
+                    color="primary"
+                    :title="`Visit ${channel.title}`"
+                    :aria-label="`Visit ${channel.title}`" />
+                </div>
+              </div>
+            </div>
+          </q-expansion-item>
+        </q-td>
+      </template>
+      <template #body-cell-actions="props">
+        <q-td :props="props">
+          <q-btn
+            v-if="props.row.newUser && !props.row.deleted"
+            dense
+            size="sm"
+            flat
+            color="positive"
+            icon="check_circle"
+            class="q-mr-xs"
+            @click="approveUser(props.row)">
+            <q-tooltip>Approve</q-tooltip>
+          </q-btn>
+          <q-btn
+            v-if="!props.row.deleted"
+            dense
+            size="sm"
+            flat
+            color="negative"
+            icon="delete"
+            @click="deleteUser(props.row)">
+            <q-tooltip>Delete</q-tooltip>
+          </q-btn>
+          <q-btn
+            v-else
+            dense
+            size="sm"
+            flat
+            color="grey-5"
+            icon="delete"
+            disable>
+            <q-tooltip>Already deleted</q-tooltip>
+          </q-btn>
+        </q-td>
+      </template>
+    </q-table>
     <div v-if="!loading && filteredUsers.length === 0" class="q-pa-md text-grey-6 text-center">
       No users found
     </div>
@@ -178,7 +175,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useAdminStore } from 'src/stores/admin-store.js'
 import { daysSince } from '@utils/date.js'
 import { getCountry } from '@utils/countries.js'
@@ -193,7 +190,18 @@ import yahooIcon from '@assets/icons/yahoo.svg'
 
 const adminStore = useAdminStore()
 const loading = ref(true)
-const filterMode = ref('new')
+const USER_FILTER_KEY = 'admin.users.filterMode'
+const USER_FILTER_VALUES = new Set(['all', 'new'])
+
+function getInitialUserFilterMode() {
+  if (globalThis.window === undefined) {
+    return 'new'
+  }
+  const saved = globalThis.localStorage.getItem(USER_FILTER_KEY)
+  return USER_FILTER_VALUES.has(saved) ? saved : 'new'
+}
+
+const filterMode = ref(getInitialUserFilterMode())
 const users = computed(() => adminStore.users || [])
 const filteredUsers = computed(() => {
   if (filterMode.value === 'new') {
@@ -201,6 +209,12 @@ const filteredUsers = computed(() => {
   }
   return users.value
 })
+const userColumns = [
+  { name: 'user', label: 'User', field: 'name', align: 'left' },
+  { name: 'lastLogin', label: 'Last Login', field: 'lastLogin', align: 'left' },
+  { name: 'channels', label: 'Channels', field: 'channels', align: 'left' },
+  { name: 'actions', label: 'Actions', field: 'actions', align: 'center' }
+]
 const providerIcons = {
   google: `img:${googleIcon}`,
   microsoft: `img:${microsoftIcon}`,
@@ -209,6 +223,15 @@ const providerIcons = {
   apple: `img:${appleIcon}`,
   yahoo: `img:${yahooIcon}`
 }
+
+watch(filterMode, value => {
+  if (globalThis.window === undefined) {
+    return
+  }
+  if (USER_FILTER_VALUES.has(value)) {
+    globalThis.localStorage.setItem(USER_FILTER_KEY, value)
+  }
+})
 
 const approveUser = async user => {
   try {
@@ -250,13 +273,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.user-avatar {
-  min-width: 64px;
-}
-.channel-item {
-  border-left: 2px solid var(--q-primary);
-  margin-left: 1rem;
-}
 .admin-badge {
   z-index: 1;
 }
@@ -273,9 +289,33 @@ onMounted(async () => {
 .deleted-user img {
   filter: grayscale(100%);
 }
+.user-cell {
+  min-width: 280px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+.user-cell-td {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+.avatar-wrap {
+  padding-right: 4px;
+  min-width: 52px;
+}
+.channel-row + .channel-row {
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+ :deep(.q-table tbody td) {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
 @media (max-width: 600px) {
-  .channel-item {
-    margin-left: 0.5rem;
+  .user-cell {
+    min-width: 220px;
+  }
+  .user-cell-td {
+    padding-top: 6px;
+    padding-bottom: 6px;
   }
 }
 :deep(.oauth-icon--white) {

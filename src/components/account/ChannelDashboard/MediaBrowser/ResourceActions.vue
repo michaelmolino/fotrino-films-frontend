@@ -86,7 +86,7 @@
             color="negative"
             :disable="!canDelete"
             class="q-ml-xs"
-            data-cy="delete-media"
+            :data-cy="deleteDataCy"
             @click="$emit('delete')">
             <q-tooltip>Delete</q-tooltip>
           </q-btn>
@@ -129,6 +129,10 @@ const props = defineProps({
   editDataCy: {
     type: String,
     default: 'edit-media'
+  },
+  deleteDataCy: {
+    type: String,
+    default: 'delete-media'
   },
   avatarSize: {
     type: String,

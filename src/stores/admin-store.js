@@ -17,20 +17,15 @@ const sortUsers = users => {
 
 export const useAdminStore = defineStore('admin', () => {
     const users = ref([])
-    const outboxDlq = ref([])
-    const pendingJobs = ref([])
+    const jobs = ref([])
     const reportedMedia = ref([])
 
     const setUsers = value => {
         users.value = value
     }
 
-    const setOutboxDlq = value => {
-        outboxDlq.value = Array.isArray(value) ? value : []
-    }
-
-    const setPendingJobs = value => {
-        pendingJobs.value = Array.isArray(value) ? value : []
+    const setJobs = value => {
+        jobs.value = Array.isArray(value) ? value : []
     }
 
     const setReportedMedia = value => {
@@ -53,11 +48,12 @@ export const useAdminStore = defineStore('admin', () => {
         }
     })
 
-    const loadOutboxDlq = () => fetchAndApplyGet({
+    const loadJobs = (statuses = []) => fetchAndApplyGet({
         api,
-        url: '/admin/jobs/failed',
-        apply: setOutboxDlq,
+        url: '/admin/jobs',
+        apply: setJobs,
         requestConfig: {
+            params: Array.isArray(statuses) && statuses.length > 0 ? { status: statuses } : undefined,
             __skipGlobalErrorNotify: true
         },
         onError: error => {
@@ -68,33 +64,25 @@ export const useAdminStore = defineStore('admin', () => {
         }
     })
 
-    const requeueDLQItem = async eventId => {
-        await api.post(`/admin/jobs/failed/${eventId}/replay`, null, {
-            __skipGlobalErrorNotify: true
-        })
-        await loadOutboxDlq()
-    }
-
-    const loadPendingJobs = () => fetchAndApplyGet({
-        api,
-        url: '/admin/jobs/pending',
-        apply: setPendingJobs,
-        requestConfig: {
-            __skipGlobalErrorNotify: true
-        },
-        onError: error => {
-            if (isGlobalApiError(error, 'forbidden')) {
-                return null
-            }
-            getGlobalApiErrorPayload(error)
+    const runJobAction = async job => {
+        if (!job?.id || !job?.status) {
+            throw new Error('Invalid admin job payload.')
         }
-    })
-
-    const startPendingJobNow = async jobId => {
-        await api.post(`/admin/jobs/pending/${jobId}/start-now`, null, {
-            __skipGlobalErrorNotify: true
-        })
-        await loadPendingJobs()
+        if (job.status === 'todo') {
+            await api.post(`/admin/jobs/pending/${job.id}/start-now`, null, {
+                __skipGlobalErrorNotify: true
+            })
+            await loadJobs()
+            return 'started'
+        }
+        if (job.status === 'failed') {
+            await api.post(`/admin/jobs/failed/${job.id}/replay`, null, {
+                __skipGlobalErrorNotify: true
+            })
+            await loadJobs()
+            return 'replayed'
+        }
+        throw new Error(`No admin action available for status: ${job.status}`)
     }
 
     const deleteUser = async userId => {
@@ -163,14 +151,11 @@ export const useAdminStore = defineStore('admin', () => {
 
     return {
         users,
-        outboxDlq,
-        pendingJobs,
+        jobs,
         reportedMedia,
         loadUsers,
-        loadOutboxDlq,
-        requeueDLQItem,
-        loadPendingJobs,
-        startPendingJobNow,
+        loadJobs,
+        runJobAction,
         deleteUser,
         approveUser,
         loadReportedMedia,
