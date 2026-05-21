@@ -277,6 +277,33 @@ export const useChannelStore = defineStore('channel', () => {
         await loadChannels(true)
     }
 
+    const undeleteResource = async resource => {
+        if (!['media', 'project', 'channel'].includes(resource?.type)) {
+            throw new Error('Unsupported undelete resource type')
+        }
+
+        let url = `/channels/media/${resource.id}/undelete`
+        if (resource.type === 'project') {
+            url = `/channels/project/${resource.id}/undelete`
+        } else if (resource.type === 'channel') {
+            url = `/channels/${resource.id}/undelete`
+        }
+        await api.put(url, null, {
+            __skipGlobalErrorNotify: true
+        })
+
+        invalidateChannelsCache()
+        if (resource.type === 'project') {
+            invalidateChannelCacheByProject(resource.id)
+        } else if (resource.type === 'channel') {
+            invalidateChannelCacheById(resource.id)
+        } else {
+            invalidateChannelCacheByMedia(resource.id)
+        }
+        setChannels([])
+        await loadChannels(true)
+    }
+
     const postUploadDraft = async payload => {
         try {
             const { data } = await api.post('/channels/media/draft', payload, {
@@ -462,6 +489,7 @@ export const useChannelStore = defineStore('channel', () => {
         loadPrivateMedia,
         createMediaSession,
         deleteResource,
+        undeleteResource,
         postUploadDraft,
         confirmUpload,
         abortUpload,

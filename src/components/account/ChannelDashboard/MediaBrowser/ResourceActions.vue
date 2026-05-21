@@ -28,7 +28,20 @@
             <q-tooltip>Visit</q-tooltip>
           </q-btn>
           <q-btn
-            v-if="!pending && deleted"
+            v-if="!pending && deleted && undeletable"
+            flat
+            dense
+            size="sm"
+            icon="restore_from_trash"
+            color="positive"
+            class="q-ml-xs"
+            data-cy="undelete-media"
+            :aria-label="'Undelete ' + title"
+            @click="$emit('undelete')">
+            <q-tooltip>Undelete</q-tooltip>
+          </q-btn>
+          <q-btn
+            v-else-if="!pending && deleted"
             flat
             dense
             size="sm"
@@ -115,6 +128,10 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  undeletable: {
+    type: Boolean,
+    default: false
+  },
   deleted: Boolean,
   hasPendingChildren: Boolean,
   link: String,
@@ -140,7 +157,7 @@ const props = defineProps({
   }
 })
 
-defineEmits(['delete', 'edit', 'abort'])
+defineEmits(['delete', 'edit', 'abort', 'undelete'])
 const canDelete = computed(() => !props.pending && !props.hasPendingChildren)
 </script>
 

@@ -9,8 +9,11 @@
         :getMediaLink="getMediaLink"
         data-cy="channel-item"
         @deleteChannel="deleteResource('channel', $event)"
+        @undeleteChannel="undeleteChannel($event)"
         @deleteProject="deleteResource('project', $event)"
+        @undeleteProject="undeleteProject($event)"
         @deleteMedia="deleteResource('media', $event)"
+        @undeleteMedia="undeleteMedia($event)"
         @abortMedia="abortPendingMedia($event)"
         @editProject="saveProjectEdit"
         @editMedia="saveMediaEdit"
@@ -91,6 +94,39 @@ async function deleteResource(type, id) {
     notifySuccess('Deletion queued.')
   } catch (error) {
     notifyError(getComponentApiErrorMessage(error, 'Unable to delete this resource.'), {
+      timeout: 0
+    })
+  }
+}
+
+async function undeleteMedia(mediaId) {
+  try {
+    await channelStore.undeleteResource({ type: 'media', id: mediaId })
+    notifySuccess('Media restored.')
+  } catch (error) {
+    notifyError(getComponentApiErrorMessage(error, 'Unable to undelete this media.'), {
+      timeout: 0
+    })
+  }
+}
+
+async function undeleteProject(projectId) {
+  try {
+    await channelStore.undeleteResource({ type: 'project', id: projectId })
+    notifySuccess('Project restored.')
+  } catch (error) {
+    notifyError(getComponentApiErrorMessage(error, 'Unable to undelete this project.'), {
+      timeout: 0
+    })
+  }
+}
+
+async function undeleteChannel(channelPublicId) {
+  try {
+    await channelStore.undeleteResource({ type: 'channel', id: channelPublicId })
+    notifySuccess('Channel restored.')
+  } catch (error) {
+    notifyError(getComponentApiErrorMessage(error, 'Unable to undelete this channel.'), {
       timeout: 0
     })
   }

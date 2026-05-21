@@ -16,6 +16,7 @@
           :color="project.posterColor || '#000000'"
           :pending="project.pending"
           :deleted="project.deleted"
+          :undeletable="project.deleted"
           :hasPending-children="hasPendingChildren"
           :link="getMediaLink('project', project.id)"
           :avatarSize="'40px'"
@@ -24,7 +25,8 @@
           edit-data-cy="edit-project"
           delete-data-cy="delete-project"
           @edit="openEditDialog"
-          @delete="$emit('deleteProject', project.id)" />
+          @delete="$emit('deleteProject', project.id)"
+          @undelete="$emit('undeleteProject', project.id)" />
       </template>
 
       <MediaItem
@@ -36,6 +38,7 @@
         data-cy="media-item"
         :getMediaLink="getMediaLink"
         @deleteMedia="$emit('deleteMedia', $event)"
+        @undeleteMedia="$emit('undeleteMedia', $event)"
         @abortMedia="$emit('abortMedia', $event)"
         @editMedia="$emit('editMedia', $event)" />
     </q-expansion-item>
@@ -104,7 +107,7 @@ const props = defineProps({
   getMediaLink: Function
 })
 
-const emit = defineEmits(['deleteProject', 'deleteMedia', 'abortMedia', 'editMedia', 'editProject'])
+const emit = defineEmits(['deleteProject', 'undeleteProject', 'deleteMedia', 'undeleteMedia', 'abortMedia', 'editMedia', 'editProject'])
 
 const editDialog = ref(false)
 const {

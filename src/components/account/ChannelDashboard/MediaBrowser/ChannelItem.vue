@@ -12,6 +12,7 @@
         :image="channel.cover"
         :pending="channel.pending"
         :deleted="channel.deleted"
+        :undeletable="channel.deleted"
         :hasPending-children="hasPendingChildren"
         :link="getMediaLink('channel', channel.id)"
         :avatarSize="'48px'"
@@ -22,7 +23,8 @@
         :editDataCy="'edit-channel'"
         :deleteDataCy="'delete-channel'"
         @edit="openEditDialog"
-        @delete="$emit('deleteChannel', channel.publicId)" />
+        @delete="$emit('deleteChannel', channel.publicId)"
+        @undelete="$emit('undeleteChannel', channel.publicId)" />
     </template>
 
     <ProjectItem
@@ -32,7 +34,9 @@
       :channel="channel"
       data-cy="project-item"
       @deleteProject="$emit('deleteProject', $event)"
+      @undeleteProject="$emit('undeleteProject', $event)"
       @deleteMedia="$emit('deleteMedia', $event)"
+      @undeleteMedia="$emit('undeleteMedia', $event)"
       @abortMedia="$emit('abortMedia', $event)"
       @editProject="$emit('editProject', $event)"
       @editMedia="$emit('editMedia', $event)"
@@ -89,7 +93,7 @@ const props = defineProps({
   getMediaLink: Function
 })
 
-const emit = defineEmits(['deleteChannel', 'deleteProject', 'deleteMedia', 'abortMedia', 'editMedia', 'editProject', 'editChannel'])
+const emit = defineEmits(['deleteChannel', 'undeleteChannel', 'deleteProject', 'undeleteProject', 'deleteMedia', 'undeleteMedia', 'abortMedia', 'editMedia', 'editProject', 'editChannel'])
 
 const hasPendingChildren = computed(() => {
   for (const project of props.channel.projects || []) {

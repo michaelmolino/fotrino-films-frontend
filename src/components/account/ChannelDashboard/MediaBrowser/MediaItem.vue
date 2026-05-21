@@ -6,11 +6,13 @@
       :pending="media.pending"
       :abortable="media.pending"
       :deleted="media.deleted"
+      undeletable
       editable
       :link="getMediaLink('media', media.id)"
       :subtitle="media.created ? `Created: ${daysSince(media.created, true)}` : ''"
       delete-color="warning"
       @delete="$emit('deleteMedia', media.id)"
+      @undelete="$emit('undeleteMedia', media.id)"
       @abort="$emit('abortMedia', media.id)"
       @edit="openEditDialog"
       square />
@@ -89,7 +91,7 @@ const props = defineProps({
   getMediaLink: Function
 })
 
-const emit = defineEmits(['deleteMedia', 'editMedia', 'abortMedia'])
+const emit = defineEmits(['deleteMedia', 'undeleteMedia', 'editMedia', 'abortMedia'])
 
 const editDialog = ref(false)
 const editForm = ref({
