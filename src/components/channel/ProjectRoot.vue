@@ -16,7 +16,7 @@
 
       <!-- Scenario 1: No featured media - show list view -->
       <template v-if="featuredMediaCount === 0">
-        <NothingText v-if="(project.media?.length || 0) === 0" text="No content available." />
+        <NothingText v-if="project.media.length === 0" text="No content available." />
         <template v-else>
           <div class="row q-pt-md">
             <div
@@ -136,7 +136,7 @@ function findProjectByParams() {
 }
 
 function getMediaPath(media) {
-  if (privateMode.value && route.params.privateProjectId && media?.privateId) {
+  if (privateMode.value && route.params.privateProjectId) {
     return `/private/p/${route.params.privateProjectId}/m/${media.privateId}/${media.slug}`
   }
   return `/m/${media.publicId}/${media.slug}`
@@ -147,7 +147,7 @@ const project = computed(() => {
 })
 
 const allMedia = computed(() => {
-  return project.value?.media || []
+  return project.value.media
 })
 
 const featuredMedia = computed(() => {

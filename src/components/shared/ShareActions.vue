@@ -102,27 +102,27 @@ const shareTargetLabel = computed(() => {
 })
 
 const channelPath = computed(() => {
-  if (!props.channel?.publicId || !props.channel?.slug) return null
+  if (!props.channel) return null
   return `/c/${props.channel.publicId}/${props.channel.slug}`
 })
 
 const projectPath = computed(() => {
-  if (!props.project?.publicId || !props.project?.slug) return null
+  if (!props.project) return null
   return `/p/${props.project.publicId}/${props.project.slug}`
 })
 
 const privateProjectPath = computed(() => {
-  if (!props.project?.privateId || !props.project?.slug) return null
+  if (!props.project) return null
   return `/private/p/${props.project.privateId}/${props.project.slug}`
 })
 
 const publicMediaPath = computed(() => {
-  if (!props.media?.publicId || !props.media?.slug) return null
+  if (!props.media) return null
   return `/m/${props.media.publicId}/${props.media.slug}`
 })
 
 const privateMediaPath = computed(() => {
-  if (!props.media?.privateId || !props.media?.slug) return null
+  if (!props.media) return null
   if (route.params?.privateProjectId) {
     return `/private/p/${route.params.privateProjectId}/m/${props.media.privateId}/${props.media.slug}`
   }
@@ -133,7 +133,7 @@ const privateMediaPath = computed(() => {
 })
 
 const standalonePrivateMediaPath = computed(() => {
-  if (!props.media?.privateId || !props.media?.slug) return null
+  if (!props.media) return null
   return `/private/m/${props.media.privateId}/${props.media.slug}`
 })
 
