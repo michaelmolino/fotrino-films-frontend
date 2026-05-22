@@ -98,13 +98,14 @@ function findProjectByParams() {
 
 function findMediaByParams(project) {
   if (!project) return null
+  const mediaItems = project.media || []
 
   if (route.params.privateProjectId && route.params.privateMediaId) {
-    return project.media.find(item => item?.privateId === route.params.privateMediaId) || null
+    return mediaItems.find(item => item?.privateId === route.params.privateMediaId) || null
   }
 
   if (route.params.privateMediaId) {
-    return project.media.find(item => item?.privateId === route.params.privateMediaId) || null
+    return mediaItems.find(item => item?.privateId === route.params.privateMediaId) || null
   }
   if (route.params.mediaId) {
     return channelStore.findMediaByPublicId(route.params.mediaId)
@@ -124,7 +125,7 @@ const projectPoster = computed(() => project.value?.poster || null)
 const projectPosterColor = computed(() => project.value?.posterColor || null)
 
 const relatedMedia = computed(() => {
-  return project.value.media.filter(m => (m.id || m.privateId) !== (media.value?.id || media.value?.privateId))
+  return (project.value?.media || []).filter(m => (m.id || m.privateId) !== (media.value?.id || media.value?.privateId))
 })
 
 const hasRelatedContent = computed(() => {

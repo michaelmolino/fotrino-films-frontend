@@ -77,12 +77,11 @@ export function useChannelLoader({ manageMeta = false } = {}) {
     // If this is a private-project route (with or without focused media),
     // the project is the top-level shared resource we track in history.
     if (!route.params?.privateMediaId || route.params?.privateProjectId || !channel) return
-    const media = channel?.project?.media
-    const fallbackMedia = Array.isArray(channel?.project?.media) ? null : channel?.project?.media
+    const media = (channel?.project?.media || []).find(item => item?.privateId === route.params.privateMediaId) || null
     addPrivateHistory(route.params.privateMediaId, {
-      title: media?.title || fallbackMedia?.title || channel?.title || '',
-      cover: media?.preview || fallbackMedia?.preview || channel?.cover || null,
-      slug: media?.slug || fallbackMedia?.slug || route.params.mediaSlug || null
+      title: media?.title || channel?.title || '',
+      cover: media?.preview || channel?.cover || null,
+      slug: media?.slug || route.params.mediaSlug || null
     })
   }
 

@@ -175,8 +175,10 @@ export type Src2 = string | null
 export type Title9 = string
 export type Type2 = string | null
 export type UpdatedAt4 = string | null
+export type Media2 = PrivateMediaItemResponse[]
 export type Poster2 = string | null
 export type PosterColor2 = string | null
+export type Media3 = PrivateMediaItemResponse[]
 export type Poster3 = string | null
 export type PosterColor3 = string | null
 export type Postercolor = string | null
@@ -466,7 +468,7 @@ export interface PrivateMediaChannelResponse {
   project: PrivateMediaProjectResponse
 }
 export interface PrivateMediaProjectResponse {
-  media: PrivateMediaItemResponse
+  media?: Media2
   poster?: Poster2
   poster_color?: PosterColor2
 }
@@ -484,7 +486,7 @@ export interface PrivateMediaItemResponse {
   updated_at?: UpdatedAt4
 }
 export interface PrivateMediaProjectResponse1 {
-  media: PrivateMediaItemResponse
+  media?: Media3
   poster?: Poster3
   poster_color?: PosterColor3
 }

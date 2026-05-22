@@ -38,7 +38,7 @@ function getMediaMeta(mediaId, readModel) {
 }
 
 function getPrivateMediaMeta(route, channel) {
-  const media = channel?.project?.media || null
+  const media = (channel?.project?.media || []).find(item => item?.privateId === route?.params?.privateMediaId) || null
   return {
     title: media?.title || null,
     description: sanitizeText(media?.descriptionUnsafe),
