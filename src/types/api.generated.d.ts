@@ -68,6 +68,7 @@ export type Media = MediaResponse[]
 export type Pending2 = boolean
 export type Poster = string | null
 export type PosterColor = string | null
+export type PrivateId1 = string
 export type Publicid2 = string
 export type ResourceDate1 = string
 export type Slug2 = string
@@ -86,7 +87,7 @@ export type Main1 = boolean
 export type Orientation1 = 'landscape' | 'portrait'
 export type Pending3 = boolean
 export type Preview1 = string
-export type PrivateId1 = string
+export type PrivateId2 = string
 export type Project1 = number
 export type Publicid4 = string
 export type ResourceDate2 = string
@@ -103,6 +104,7 @@ export type Media1 = MediaResponse[]
 export type Pending4 = boolean
 export type Poster1 = string | null
 export type PosterColor1 = string | null
+export type PrivateId3 = string
 export type Publicid5 = string
 export type ResourceDate3 = string
 export type Slug5 = string
@@ -166,13 +168,17 @@ export type Created9 = string | null
 export type DescriptionUnsafe2 = string | null
 export type Orientation2 = ('landscape' | 'portrait') | null
 export type Preview2 = string | null
-export type PrivateId2 = string
+export type PrivateId4 = string
 export type ResourceDate4 = string | null
 export type Slug7 = string
 export type Src2 = string | null
 export type Title9 = string
 export type Type2 = string | null
 export type UpdatedAt4 = string | null
+export type Poster2 = string | null
+export type PosterColor2 = string | null
+export type Poster3 = string | null
+export type PosterColor3 = string | null
 export type Postercolor = string | null
 export type Postertype = 'default' | 'new'
 export type Subtitle2 = string | null
@@ -180,7 +186,7 @@ export type Title10 = string | null
 export type Message6 = string | null
 export type Reported = boolean
 export type MediaId = number
-export type PrivateId3 = string
+export type PrivateId5 = string
 export type Publicid7 = string
 export type CreatedAt = string
 export type Reason = string | null
@@ -321,6 +327,7 @@ export interface ProjectResponse {
   pending?: Pending2
   poster: Poster
   poster_color: PosterColor
+  private_id: PrivateId1
   publicId: Publicid2
   resource_date: ResourceDate1
   slug: Slug2
@@ -356,7 +363,7 @@ export interface MediaResponse1 {
   orientation: Orientation1
   pending?: Pending3
   preview: Preview1
-  private_id: PrivateId1
+  private_id: PrivateId2
   project: Project1
   publicId: Publicid4
   resource_date: ResourceDate2
@@ -375,6 +382,7 @@ export interface ProjectResponse1 {
   pending?: Pending4
   poster: Poster1
   poster_color: PosterColor1
+  private_id: PrivateId3
   publicId: Publicid5
   resource_date: ResourceDate3
   slug: Slug5
@@ -459,13 +467,15 @@ export interface PrivateMediaChannelResponse {
 }
 export interface PrivateMediaProjectResponse {
   media: PrivateMediaItemResponse
+  poster?: Poster2
+  poster_color?: PosterColor2
 }
 export interface PrivateMediaItemResponse {
   created?: Created9
   description_unsafe: DescriptionUnsafe2
   orientation?: Orientation2
   preview?: Preview2
-  private_id: PrivateId2
+  private_id: PrivateId4
   resource_date?: ResourceDate4
   slug: Slug7
   src?: Src2
@@ -475,6 +485,8 @@ export interface PrivateMediaItemResponse {
 }
 export interface PrivateMediaProjectResponse1 {
   media: PrivateMediaItemResponse
+  poster?: Poster3
+  poster_color?: PosterColor3
 }
 export interface ProjectUploadPayload {
   id: LabeledValue
@@ -490,7 +502,7 @@ export interface ReportMediaResponse {
 }
 export interface ReportedMediaItemResponse {
   media_id: MediaId
-  private_id: PrivateId3
+  private_id: PrivateId5
   publicId: Publicid7
   reports: Reports
   slug: Slug8

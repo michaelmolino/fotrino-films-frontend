@@ -47,6 +47,26 @@ function getPrivateMediaMeta(route, channel) {
   }
 }
 
+function getPrivateProjectMeta(channel) {
+  const project = channel?.project || null
+  return {
+    title: project?.title || null,
+    description: sanitizeText(project?.subtitle || ''),
+    image: project?.poster || null,
+    type: 'website',
+  }
+}
+
+function getPrivateProjectMediaMeta(route, channel) {
+  const media = (channel?.project?.media || []).find(item => item?.privateId === route?.params?.privateMediaId) || null
+  return {
+    title: media?.title || null,
+    description: sanitizeText(media?.descriptionUnsafe),
+    image: media?.preview || null,
+    type: 'video',
+  }
+}
+
 // Main meta generator
 export function getMetaData(route, channel, readModel = null) {
   let meta = { title: null, description: '', image: null, type: 'website' }
@@ -61,7 +81,13 @@ export function getMetaData(route, channel, readModel = null) {
   if (route?.params.mediaId) {
     meta = getMediaMeta(route.params.mediaId, readModel)
   }
-  if (route?.params.privateMediaId) {
+  if (route?.params.privateProjectId && !route?.params.privateMediaId) {
+    meta = getPrivateProjectMeta(channel)
+  }
+  if (route?.params.privateProjectId && route?.params.privateMediaId) {
+    meta = getPrivateProjectMediaMeta(route, channel)
+  }
+  if (route?.params.privateMediaId && !route?.params.privateProjectId) {
     meta = getPrivateMediaMeta(route, channel)
   }
 

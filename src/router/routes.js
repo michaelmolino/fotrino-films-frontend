@@ -32,7 +32,21 @@ const routes = [
     ]
   },
   {
-    path: '/private/m/:privateMediaId([0-9a-fA-F-]{36})/:mediaSlug([0-9a-zA-Z-]+)',
+    path: '/private/p/:privateProjectId([0-9A-Za-z_-]+)/:projectSlug([0-9a-zA-Z-]+)',
+    component: () => import('@layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('@components/channel/ProjectRoot.vue') }
+    ]
+  },
+  {
+    path: '/private/p/:privateProjectId([0-9A-Za-z_-]+)/m/:privateMediaId([0-9A-Za-z_-]+)/:mediaSlug([0-9a-zA-Z-]+)',
+    component: () => import('@layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('@components/channel/MediaRoot.vue') }
+    ]
+  },
+  {
+    path: '/private/m/:privateMediaId([0-9A-Za-z_-]+)/:mediaSlug([0-9a-zA-Z-]+)',
     component: () => import('@layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('@components/channel/MediaRoot.vue') }

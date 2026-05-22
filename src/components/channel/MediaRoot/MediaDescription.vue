@@ -3,8 +3,20 @@
     <q-card-section vertical>
       <div class="description-header">
         <div class="description-title-wrap">
-          <q-icon :name="isPublic ? 'public' : 'public_off'" size="md" class="q-pr-sm description-visibility-icon" />
-          <span class="text-h6 description-title">{{ media?.title || '' }}</span>
+          <div class="description-mini-poster" :style="miniPosterStyle" aria-hidden="true">
+            <q-img
+              v-if="miniPosterSrc"
+              :src="miniPosterSrc"
+              class="description-mini-poster-image"
+              fit="cover"
+              loading="lazy"
+              decoding="async" />
+          </div>
+          <div class="description-text-wrap">
+            <span class="text-h6 description-title">{{ media?.title || '' }}</span>
+            <div class="description-meta text-subtitle2">Captured {{ sinceCaptured }}</div>
+            <div class="description-meta text-subtitle2">Published {{ sincePublished }}</div>
+          </div>
         </div>
         <div class="description-actions">
           <q-btn
@@ -28,44 +40,8 @@
             @click="openReportDialog">
             <q-tooltip>Report</q-tooltip>
           </q-btn>
-          <q-btn-dropdown
-            dropdown-icon="share"
-            class="q-pa-sm"
-            color="info"
-            aria-label="Share this video"
-            data-cy="share-button"
-            flat>
-            <q-list>
-              <q-item v-if="isPublic" clickable v-close-popup data-cy="share-within-channel" @click="copyLink('public')">
-                <q-item-section avatar>
-                  <q-avatar icon="public" color="accent" text-color="white" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Share within this channel</q-item-label>
-                </q-item-section>
-                <q-item-section side>
-                  <q-icon name="content_copy" color="accent" />
-                </q-item-section>
-              </q-item>
-              <q-item clickable v-close-popup data-cy="share-only-video" @click="copyLink('private')">
-                <q-item-section avatar>
-                  <q-avatar icon="public_off" color="accent" text-color="white" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label v-if="isPublic">Share only this video</q-item-label>
-                  <q-item-label v-else>Share this video</q-item-label>
-                </q-item-section>
-                <q-item-section side>
-                  <q-icon name="content_copy" color="accent" />
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </q-btn-dropdown>
-          <q-tooltip target="[data-cy='share-button']">Share</q-tooltip>
         </div>
       </div>
-      <div class="text-subtitle2 q-pl-xl">Captured {{ sinceCaptured }}</div>
-      <div class="text-subtitle2 q-pl-xl">Published {{ sincePublished }}</div>
     </q-card-section>
     <q-separator inset v-if="descriptionSafe" />
     <q-card-section vertical>
@@ -135,25 +111,34 @@
 
 <script setup>
 import { computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
-import { Notify, copyToClipboard, useQuasar } from 'quasar'
+import { Notify, useQuasar } from 'quasar'
 import { sanitizeHtml } from '@utils/text.js'
 import { daysSince } from '@utils/date.js'
 import { useChannelStore } from 'src/stores/channel-store.js'
 import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
 
 const props = defineProps({
-  media: Object
+  media: Object,
+  poster: {
+    type: String,
+    default: null
+  },
+  posterColor: {
+    type: String,
+    default: null
+  }
 })
 
-const route = useRoute()
 const $q = useQuasar()
-const isPublic = computed(() => !!route.params.mediaId)
 const sinceCaptured = computed(() =>
   props.media?.resourceDate ? daysSince(props.media.resourceDate, false) : ''
 )
 const sincePublished = computed(() => (props.media?.created ? daysSince(props.media.created) : ''))
 const descriptionSafe = computed(() => sanitizeHtml(props.media?.descriptionUnsafe || ''))
+const miniPosterSrc = computed(() => props.poster || null)
+const miniPosterStyle = computed(() => ({
+  backgroundColor: props.posterColor || '#1f2933'
+}))
 
 const reportDialog = ref(false)
 const shortcutsDialog = ref(false)
@@ -216,29 +201,6 @@ async function submitReport() {
   }
 }
 
-function copyLink(val) {
-  if (val === 'public') {
-    copyToClipboard(globalThis.location.href).then(() => {
-      Notify.create({
-        message: 'URL copied to clipboard',
-        color: 'accent',
-        icon: 'content_paste',
-        timeout: 1000
-      })
-    })
-  } else if (val === 'private') {
-    const id = props.media?.privateId
-    if (!id) return
-    copyToClipboard(`${globalThis.location.origin}/private/m/${id}/${props.media?.slug || ''}`).then(() => {
-      Notify.create({
-        message: 'URL copied to clipboard',
-        color: 'accent',
-        icon: 'content_paste',
-        timeout: 1000
-      })
-    })
-  }
-}
 </script>
 
 <style scoped>
@@ -258,14 +220,25 @@ function copyLink(val) {
 
 .description-title-wrap {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   min-width: 0;
   flex: 1 1 320px;
+  gap: 10px;
 }
 
-.description-visibility-icon {
+.description-mini-poster {
+  position: relative;
+  overflow: hidden;
   flex: 0 0 auto;
-  margin-top: 2px;
+  width: 56px;
+  min-width: 56px;
+  height: 84px;
+  border-radius: 8px;
+}
+
+.description-mini-poster-image {
+  width: 100%;
+  height: 100%;
 }
 
 .description-title {
@@ -273,6 +246,18 @@ function copyLink(val) {
   line-height: 1.25;
   overflow-wrap: anywhere;
   word-break: break-word;
+}
+
+.description-text-wrap {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 2px;
+}
+
+.description-meta {
+  line-height: 1.2;
 }
 
 .description-actions {
@@ -299,9 +284,32 @@ function copyLink(val) {
 }
 
 @media (max-width: 600px) {
+  .description-header {
+    flex-wrap: nowrap;
+  }
+
+  .description-title-wrap {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
   .description-actions {
-    width: 100%;
-    justify-content: flex-end;
+    margin-left: 0;
+    flex-shrink: 0;
+  }
+
+  .description-title {
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+
+  .description-mini-poster {
+    width: 48px;
+    min-width: 48px;
+    height: 72px;
   }
 }
 </style>

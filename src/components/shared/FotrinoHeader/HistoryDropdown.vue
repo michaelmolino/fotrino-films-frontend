@@ -19,7 +19,7 @@
         :label="channel.title"
         :aria-label="`Visit ${channel.title}`"
         size="md"
-        :to="channel.type === 'private' ? `/private/m/${channel.publicId}/${channel.slug}` : `/c/${channel.publicId}/${channel.slug}`" />
+        :to="historyTarget(channel)" />
       <q-btn
         icon="remove_circle"
         flat
@@ -46,6 +46,16 @@ import {
 
 const channelStore = useChannelStore()
 const stopWatchingHistory = watchChannelHistory(channelStore)
+
+function historyTarget(channel) {
+  if (channel.type === 'privateProject') {
+    return `/private/p/${channel.publicId}/${channel.slug}`
+  }
+  if (channel.type === 'privateMedia') {
+    return `/private/m/${channel.publicId}/${channel.slug}`
+  }
+  return `/c/${channel.publicId}/${channel.slug}`
+}
 
 onBeforeUnmount(() => {
   if (typeof stopWatchingHistory === 'function') {

@@ -31,6 +31,7 @@ const buildProjectEntity = (project, channelId, relationships, mediaByPublicId) 
     return {
         id: project.id,
         publicId: projectPublicId,
+        privateId: project.privateId,
         channel: channelId,
         title: project.title,
         slug: project.slug,

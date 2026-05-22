@@ -16,7 +16,6 @@
           <BreadCrumbs :channel="channel" :project="null" :media="null" />
           <q-space />
           <ViewToggle
-            v-if="showViewToggle"
             v-model="selectedView"
             :projectCount="projectCount"
             :allCount="allCount" />
@@ -24,7 +23,7 @@
 
         <q-separator spaced />
 
-        <template v-if="effectiveSelectedView === 'projects'">
+        <template v-if="selectedView === 'projects'">
           <div class="row q-mt-sm">
             <div
               class="col-xs-6 col-sm-6 col-md-4 col-lg-3 col-xl-2"
@@ -56,6 +55,8 @@
             <NothingText v-if="sortedAllMedia.length === 0" text="No content available." />
           </div>
         </template>
+
+        <ShareActions :channel="channel" floating />
       </div>
     </template>
 
@@ -68,18 +69,27 @@
 <script setup>
 import { ref, computed, defineAsyncComponent, watch } from 'vue'
 import { getViewPreference, setViewPreference } from '@utils/viewPreference.js'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
 
 import BreadCrumbs from '@components/shared/BreadCrumbs.vue'
+import ShareActions from '@components/shared/ShareActions.vue'
 import ProjectPoster from '@components/channel/shared/ProjectPoster.vue'
 import MediaPreview from '@components/channel/shared/MediaPreview.vue'
 import ViewToggle from './ChannelRoot/ViewToggle.vue'
 const NothingText = defineAsyncComponent(() => import('@components/shared/NothingText.vue'))
 
 const route = useRoute()
+const router = useRouter()
+const redirecting = ref(false)
 const selectedView = ref(getViewPreference('all'))
 const { channel, sortedAllMedia, loading } = useChannelLoader()
+
+function redirect(pathOrObj) {
+  if (redirecting.value) return
+  redirecting.value = true
+  router.replace(pathOrObj)
+}
 
 watch(selectedView, val => {
   const normalized = val === 'projects' || val === 'all' ? val : 'all'
@@ -96,13 +106,18 @@ const projects = computed(() => {
 })
 
 const projectCount = computed(() => projects.value.length)
-const showViewToggle = computed(() => projectCount.value !== 1)
-
-// For single-project channels, force the rendered view to media without
-// mutating the persisted user preference.
-const effectiveSelectedView = computed(() => (projectCount.value === 1 ? 'all' : selectedView.value))
-
 const allCount = computed(() => sortedAllMedia.value.length)
+
+watch(
+  [projectCount, channel, loading],
+  ([count, currentChannel, isLoading]) => {
+    if (isLoading || !currentChannel || !route.params.channelId || count !== 1) return
+    const onlyProject = projects.value[0]
+    if (!onlyProject?.publicId || !onlyProject?.slug) return
+    redirect(`/p/${onlyProject.publicId}/${onlyProject.slug}`)
+  },
+  { immediate: true }
+)
 </script>
 
 <style scoped>

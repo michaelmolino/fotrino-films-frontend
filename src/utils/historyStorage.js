@@ -22,7 +22,7 @@ export function parseStoredHistory(value) {
         let entry = null
 
         if (item && typeof item === 'object' && typeof item.publicId === 'string') {
-            if (item.type === 'channel' || item.type === 'private') {
+            if (item.type === 'channel' || item.type === 'privateMedia' || item.type === 'privateProject') {
                 entry = { publicId: item.publicId, type: item.type }
             } else {
                 needsMigration = true

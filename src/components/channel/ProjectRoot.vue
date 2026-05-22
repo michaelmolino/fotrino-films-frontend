@@ -6,12 +6,13 @@
       <q-skeleton type="text" width="40%" />
     </template>
 
-    <template v-else-if="channel && project && route.params.projectId">
+    <template v-else-if="channel && project && (route.params.projectId || route.params.privateProjectId)">
       <BreadCrumbs
         :channel="channel"
         :project="project"
         :media="null"
-        :private="false" />
+        :private="privateMode"
+        private-scope="project" />
 
       <!-- Scenario 1: No featured media - show list view -->
       <template v-if="featuredMediaCount === 0">
@@ -26,7 +27,7 @@
                 :channel="channel"
                 :project="project"
                 :media="item"
-                :to="`/m/${item.publicId}/${item.slug}`"
+                :to="getMediaPath(item)"
                 :detail="true"
                 :showMainAccent="false"
                 :priority="index === 0 ? 'high' : 'auto'" />
@@ -57,7 +58,7 @@
                 :channel="channel"
                 :project="project"
                 :media="item"
-                :to="`/m/${item.publicId}/${item.slug}`"
+                :to="getMediaPath(item)"
                 :detail="true"
                 :showMainAccent="false"
                 :priority="index === 0 ? 'high' : 'auto'" />
@@ -78,12 +79,19 @@
                 :channel="channel"
                 :project="project"
                 :media="related"
-                :to="`/m/${related.publicId}/${related.slug}`"
+                :to="getMediaPath(related)"
                 :priority="index === 0 ? 'high' : 'auto'" />
             </div>
           </div>
         </template>
       </template>
+
+      <ShareActions
+        :channel="channel"
+        :project="project"
+        :private="privateMode"
+        private-scope="project"
+        floating />
     </template>
 
     <template v-else>
@@ -99,6 +107,7 @@ import { useChannelLoader } from '@composables/useChannelLoader.js'
 import { useChannelStore } from 'src/stores/channel-store.js'
 
 import BreadCrumbs from '@components/shared/BreadCrumbs.vue'
+import ShareActions from '@components/shared/ShareActions.vue'
 import MediaPreview from '@components/channel/shared/MediaPreview.vue'
 const NothingText = defineAsyncComponent(() => import('@components/shared/NothingText.vue'))
 
@@ -109,6 +118,8 @@ const channelStore = useChannelStore()
 
 const { channel, loading } = useChannelLoader()
 
+const privateMode = computed(() => !!route.params.privateProjectId)
+
 function redirect(pathOrObj) {
   if (redirecting.value) return
   redirecting.value = true
@@ -116,10 +127,20 @@ function redirect(pathOrObj) {
 }
 
 function findProjectByParams() {
+  if (route.params.privateProjectId) {
+    return channel.value?.project || null
+  }
   if (route.params.projectId) {
     return channelStore.findProjectByPublicId(route.params.projectId)
   }
   return null
+}
+
+function getMediaPath(media) {
+  if (privateMode.value && route.params.privateProjectId && media?.privateId) {
+    return `/private/p/${route.params.privateProjectId}/m/${media.privateId}/${media.slug}`
+  }
+  return `/m/${media.publicId}/${media.slug}`
 }
 
 const project = computed(() => {
@@ -146,10 +167,14 @@ watch(
   project,
   newProject => {
     if (channel.value && newProject && route.params.projectSlug && newProject.slug !== route.params.projectSlug && !loading.value) {
-      redirect(`/p/${newProject.publicId}/${newProject.slug}`)
+      if (privateMode.value && newProject.privateId) {
+        redirect(`/private/p/${newProject.privateId}/${newProject.slug}`)
+      } else {
+        redirect(`/p/${newProject.publicId}/${newProject.slug}`)
+      }
       return
     }
-    if (channel.value && !newProject && route.params.projectId && !loading.value) {
+    if (channel.value && !newProject && (route.params.projectId || route.params.privateProjectId) && !loading.value) {
       redirect('/404')
     }
   },
@@ -161,9 +186,13 @@ watch(
 watch(
   [featuredMediaCount, project, loading],
   ([count, proj, isLoading]) => {
-    if (!isLoading && channel.value && proj && count === 1 && route.params.projectId) {
+    if (!isLoading && channel.value && proj && count === 1 && (route.params.projectId || route.params.privateProjectId)) {
       const featured = featuredMedia.value[0]
-      redirect(`/m/${featured.publicId}/${featured.slug}`)
+      if (privateMode.value && route.params.privateProjectId && featured?.privateId) {
+        redirect(`/private/p/${route.params.privateProjectId}/m/${featured.privateId}/${featured.slug}`)
+      } else {
+        redirect(`/m/${featured.publicId}/${featured.slug}`)
+      }
     }
   },
   { immediate: true }

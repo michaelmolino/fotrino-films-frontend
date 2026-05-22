@@ -1,0 +1,7 @@
+# security.txt
+# Generated using Security.txt Generator
+
+Contact: mailto:michael@fotrino.com
+Expires: 2031-05-22T07:37
+Preferred-Languages: en
+Canonical: https://films.fotrino.com/security.txt

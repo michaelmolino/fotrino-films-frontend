@@ -43,6 +43,7 @@ watch(
     () => route.params.channelId,
     () => route.params.projectId,
     () => route.params.mediaId,
+    () => route.params.privateProjectId,
     () => route.params.privateMediaId
   ],
   async () => {

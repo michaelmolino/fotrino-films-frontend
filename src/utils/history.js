@@ -3,7 +3,7 @@ let hasResolvedHistory = false
 let resolveHistoryPromise = null
 import { parseStoredHistory, writeHistory, HISTORY_KEY } from './historyStorage.js'
 
-/** @typedef {{ publicId: string, type: 'channel' | 'private' }} HistoryEntry */
+/** @typedef {{ publicId: string, type: 'channel' | 'privateMedia' | 'privateProject' }} HistoryEntry */
 
 import { LocalStorage } from 'quasar'
 const parsedHistory = parseStoredHistory(LocalStorage.getItem(HISTORY_KEY))
@@ -31,7 +31,12 @@ export function addHistory(channel) {
 
 export function addPrivateHistory(privateId, details = {}) {
   if (!privateId) return
-  _addEntry({ publicId: privateId, type: 'private' }, { publicId: privateId, ...details })
+  _addEntry({ publicId: privateId, type: 'privateMedia' }, { publicId: privateId, ...details })
+}
+
+export function addPrivateProjectHistory(privateId, details = {}) {
+  if (!privateId) return
+  _addEntry({ publicId: privateId, type: 'privateProject' }, { publicId: privateId, ...details })
 }
 
 function _addEntry(entry, channelData) {

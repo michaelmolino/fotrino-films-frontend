@@ -1,4 +1,16 @@
 export const getChannelRouteTarget = route => {
+    if (route?.params?.privateProjectId && route?.params?.privateMediaId) {
+        return {
+            type: 'privateProjectMedia',
+            projectId: route.params.privateProjectId,
+            mediaId: route.params.privateMediaId,
+        }
+    }
+
+    if (route?.params?.privateProjectId) {
+        return { type: 'privateProject', projectId: route.params.privateProjectId }
+    }
+
     if (route?.params?.channelId) {
         return { type: 'channel', id: route.params.channelId }
     }
@@ -12,7 +24,7 @@ export const getChannelRouteTarget = route => {
     }
 
     if (route?.params?.privateMediaId) {
-        return { type: 'privateMedia', id: route.params.privateMediaId }
+        return { type: 'privateMedia', mediaId: route.params.privateMediaId }
     }
 
     return null
@@ -35,7 +47,26 @@ export const hasLoadedChannelRouteTarget = (route, channelStore) => {
     }
 
     if (target.type === 'privateMedia') {
-        return channelStore.channel?.project?.media?.privateId === target.id
+        const media = channelStore.channel?.project?.media
+        if (Array.isArray(media)) {
+            return media.some(item => item?.privateId === target.mediaId)
+        }
+        return media?.privateId === target.mediaId
+    }
+
+    if (target.type === 'privateProject') {
+        return channelStore.channel?.project?.privateId === target.projectId
+    }
+
+    if (target.type === 'privateProjectMedia') {
+        if (channelStore.channel?.project?.privateId !== target.projectId) {
+            return false
+        }
+        const mediaItems = channelStore.channel?.project?.media
+        if (!Array.isArray(mediaItems)) {
+            return false
+        }
+        return mediaItems.some(item => item?.privateId === target.mediaId)
     }
 
     return false
@@ -70,10 +101,36 @@ const getMediaCanonicalPath = (route, channelStore, target) => {
 
 const getPrivateMediaCanonicalPath = (route, channelStore) => {
     const media = channelStore.channel?.project?.media
-    const privateMediaId = media?.privateId
+    const privateMediaId = Array.isArray(media) ? null : media?.privateId
     if (privateMediaId && media.slug && media.slug !== route.params.mediaSlug) {
         return `/private/m/${privateMediaId}/${media.slug}`
     }
+    return null
+}
+
+const getPrivateProjectCanonicalPath = (route, channelStore) => {
+    const project = channelStore.channel?.project
+    const privateProjectId = project?.privateId
+    if (privateProjectId && project.slug && project.slug !== route.params.projectSlug) {
+        return `/private/p/${privateProjectId}/${project.slug}`
+    }
+    return null
+}
+
+const getPrivateProjectMediaCanonicalPath = (route, channelStore) => {
+    const project = channelStore.channel?.project
+    const privateProjectId = project?.privateId
+    const media = Array.isArray(project?.media)
+        ? project.media.find(item => item?.privateId === route.params.privateMediaId)
+        : null
+    if (!privateProjectId || !media?.privateId || !media?.slug) {
+        return null
+    }
+
+    if (media.slug !== route.params.mediaSlug) {
+        return `/private/p/${privateProjectId}/m/${media.privateId}/${media.slug}`
+    }
+
     return null
 }
 
@@ -82,6 +139,8 @@ const CANONICAL_BUILDERS = {
     project: getProjectCanonicalPath,
     media: getMediaCanonicalPath,
     privateMedia: getPrivateMediaCanonicalPath,
+    privateProject: getPrivateProjectCanonicalPath,
+    privateProjectMedia: getPrivateProjectMediaCanonicalPath,
 }
 
 export const getCanonicalChannelRoutePath = (route, channelStore) => {

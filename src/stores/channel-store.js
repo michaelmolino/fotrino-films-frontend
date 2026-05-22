@@ -12,6 +12,7 @@ import { API_CACHE_MEDIUM_MS } from 'src/stores/utils/cache-timeouts.js'
 const CHANNEL_LIST_CACHE_TIMEOUT_MS = API_CACHE_MEDIUM_MS
 const CHANNEL_DETAIL_CACHE_TIMEOUT_MS = API_CACHE_MEDIUM_MS
 const PRIVATE_MEDIA_CACHE_TIMEOUT_MS = API_CACHE_MEDIUM_MS
+const PRIVATE_PROJECT_CACHE_TIMEOUT_MS = API_CACHE_MEDIUM_MS
 
 const sortChannels = (channels, field = 'title', direction = 'desc') =>
     sortBy(channels, field, direction)
@@ -78,6 +79,11 @@ export const useChannelStore = defineStore('channel', () => {
         staleTime: PRIVATE_MEDIA_CACHE_TIMEOUT_MS
     })
 
+    const privateProjectQueryOptions = (privateProjectId, privateMediaId = null) => ({
+        key: ['channel', 'private-project', privateProjectId, privateMediaId || 'root'],
+        staleTime: PRIVATE_PROJECT_CACHE_TIMEOUT_MS
+    })
+
     const invalidateChannelsCache = () => {
         queryCache.setQueryData(channelsQueryOptions(false).key, null)
         queryCache.setQueryData(channelsQueryOptions(true).key, null)
@@ -101,6 +107,13 @@ export const useChannelStore = defineStore('channel', () => {
     const invalidatePrivateMediaCache = privateMediaId => {
         if (!privateMediaId) return
         queryCache.setQueryData(privateMediaQueryOptions(privateMediaId).key, null)
+    }
+
+    const invalidatePrivateProjectCache = privateProjectId => {
+        if (!privateProjectId) return
+        queryCache.invalidateQueries({
+            predicate: query => query.key?.[0] === 'channel' && query.key?.[1] === 'private-project' && query.key?.[2] === privateProjectId
+        })
     }
 
     const loadChannels = deep => fetchAndApplyGet({
@@ -243,6 +256,27 @@ export const useChannelStore = defineStore('channel', () => {
             queryCache
         }
     })
+
+    const loadPrivateProject = ({ privateProjectId, privateMediaId = null }) => {
+        const mediaQuery = privateMediaId ? `?mediaPrivateId=${encodeURIComponent(privateMediaId)}` : ''
+        return fetchAndApplyGet({
+            api,
+            url: `/channels/project/private/${privateProjectId}${mediaQuery}`,
+            apply: setChannel,
+            onError: error => {
+                if (!isRequestCanceled(error)) {
+                    getGlobalApiErrorPayload(error)
+                }
+            },
+            requestConfig: {
+                signal: requestCanceler.getSignal('SET_CHANNEL')
+            },
+            cache: {
+                queryOptions: privateProjectQueryOptions(privateProjectId, privateMediaId),
+                queryCache
+            }
+        })
+    }
 
     const createMediaSession = async ({ privateId }) => {
         const res = await api.post(`/channels/media/session/${privateId}`)
@@ -487,6 +521,7 @@ export const useChannelStore = defineStore('channel', () => {
         loadChannelByProject,
         loadChannelByMedia,
         loadPrivateMedia,
+        loadPrivateProject,
         createMediaSession,
         deleteResource,
         undeleteResource,
@@ -507,11 +542,13 @@ export const useChannelStore = defineStore('channel', () => {
         channelByProjectQueryOptions,
         channelByMediaQueryOptions,
         privateMediaQueryOptions,
+        privateProjectQueryOptions,
         invalidateChannelsCache,
         invalidateChannelCacheById,
         invalidateChannelCacheByProject,
         invalidateChannelCacheByMedia,
         invalidatePrivateMediaCache,
+        invalidatePrivateProjectCache,
         channelQueryOptions
     }
 })
