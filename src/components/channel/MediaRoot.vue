@@ -48,8 +48,7 @@
         :project="project"
         :media="media"
         :private="!!route.params.privateMediaId"
-        :private-scope="route.params.privateProjectId ? 'project' : 'media'"
-        floating />
+        :private-scope="route.params.privateProjectId ? 'project' : 'media'" />
     </template>
 
     <template v-else>

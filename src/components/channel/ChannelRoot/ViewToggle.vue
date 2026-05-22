@@ -2,7 +2,7 @@
   <q-btn-toggle
     :model-value="model"
     @update:model-value="updateModelValue"
-    class="q-py-md"
+    class="channel-view-toggle-control"
     data-cy="channel-view-toggle"
     no-caps
     rounded
@@ -53,3 +53,35 @@ function updateModelValue(val) {
   model.value = val
 }
 </script>
+
+<style scoped>
+.channel-view-toggle-control {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+@media (max-width: 599px) {
+  .channel-view-toggle-control {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  .channel-view-toggle-control :deep(.q-btn) {
+    min-height: 30px;
+    padding: 4px 8px;
+  }
+
+  .channel-view-toggle-control :deep(.q-btn__content) {
+    font-size: 12px;
+    gap: 4px;
+  }
+
+  .channel-view-toggle-control :deep(.q-avatar) {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    min-height: 18px;
+    font-size: 11px;
+  }
+}
+</style>

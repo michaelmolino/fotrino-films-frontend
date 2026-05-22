@@ -1,15 +1,10 @@
 <template>
-  <div
-    v-if="primaryAction"
-    ref="containerRef"
-    :class="floating ? 'share-actions-floating' : 'share-actions-inline'">
+  <div v-if="primaryAction" ref="containerRef" class="share-actions-floating">
     <q-btn
       icon="share"
-      :flat="!floating"
-      :dense="!floating"
-      :round="floating"
-      :unelevated="floating"
-      :size="buttonSize"
+      :round="true"
+      :unelevated="true"
+      size="md"
       color="info"
       aria-label="Share"
       data-cy="share-button"
@@ -85,29 +80,20 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { Notify, Screen, copyToClipboard } from 'quasar'
+import { Notify, copyToClipboard } from 'quasar'
 
 const props = defineProps({
   channel: { type: Object, required: true },
   project: { type: Object, default: null },
   media: { type: Object, default: null },
   private: { type: Boolean, default: false },
-  privateScope: { type: String, default: 'media' },
-  floating: { type: Boolean, default: false }
+  privateScope: { type: String, default: 'media' }
 })
 
 const route = useRoute()
 const showAdvanced = ref(false)
 const menuOpen = ref(false)
 const containerRef = ref(null)
-
-const buttonSize = computed(() => {
-  if (Screen.lt.sm) {
-    return props.floating ? 'sm' : 'xs'
-  }
-
-  return props.floating ? 'md' : 'sm'
-})
 
 const shareTargetLabel = computed(() => {
   if (props.media) return 'this video'
@@ -316,11 +302,6 @@ function copyLink(path) {
 </script>
 
 <style scoped>
-.share-actions-inline {
-  position: relative;
-  align-self: flex-start;
-}
-
 .share-actions-floating {
   position: fixed;
   right: calc(16px + env(safe-area-inset-right));

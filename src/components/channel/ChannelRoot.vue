@@ -12,13 +12,20 @@
 
     <template v-else-if="channel?.publicId === route.params.channelId">
       <div :key="channel?.publicId || route.fullPath">
-        <div class="row items-center q-mb-sm">
-          <BreadCrumbs :channel="channel" :project="null" :media="null" />
+        <div ref="headerRowRef" class="row items-center q-mb-sm channel-header">
+          <div ref="breadcrumbsRef" class="channel-header-breadcrumbs">
+            <BreadCrumbs :channel="channel" :project="null" :media="null" />
+          </div>
           <q-space />
-          <ViewToggle
-            v-model="selectedView"
-            :projectCount="projectCount"
-            :allCount="allCount" />
+          <div
+            ref="viewToggleRef"
+            class="channel-view-toggle"
+            :class="{ 'channel-view-toggle--wrapped': isViewToggleWrapped }">
+            <ViewToggle
+              v-model="selectedView"
+              :projectCount="projectCount"
+              :allCount="allCount" />
+          </div>
         </div>
 
         <q-separator spaced />
@@ -56,7 +63,7 @@
           </div>
         </template>
 
-        <ShareActions :channel="channel" floating />
+        <ShareActions :channel="channel" />
       </div>
     </template>
 
@@ -67,7 +74,7 @@
 </template>
 
 <script setup>
-import { ref, computed, defineAsyncComponent, watch } from 'vue'
+import { ref, computed, defineAsyncComponent, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { getViewPreference, setViewPreference } from '@utils/viewPreference.js'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
@@ -83,7 +90,23 @@ const route = useRoute()
 const router = useRouter()
 const redirecting = ref(false)
 const selectedView = ref(getViewPreference('all'))
+const headerRowRef = ref(null)
+const breadcrumbsRef = ref(null)
+const viewToggleRef = ref(null)
+const isViewToggleWrapped = ref(false)
+let headerResizeObserver = null
 const { channel, sortedAllMedia, loading } = useChannelLoader()
+
+function updateViewToggleWrapState() {
+  if (!breadcrumbsRef.value || !viewToggleRef.value) {
+    isViewToggleWrapped.value = false
+    return
+  }
+
+  const breadcrumbsTop = breadcrumbsRef.value.offsetTop
+  const toggleTop = viewToggleRef.value.offsetTop
+  isViewToggleWrapped.value = toggleTop > breadcrumbsTop
+}
 
 function redirect(pathOrObj) {
   if (redirecting.value) return
@@ -98,6 +121,30 @@ watch(selectedView, val => {
     return
   }
   setViewPreference(normalized)
+})
+
+onMounted(() => {
+  nextTick(updateViewToggleWrapState)
+
+  if (typeof ResizeObserver !== 'undefined') {
+    headerResizeObserver = new ResizeObserver(() => {
+      updateViewToggleWrapState()
+    })
+
+    if (headerRowRef.value) headerResizeObserver.observe(headerRowRef.value)
+    if (breadcrumbsRef.value) headerResizeObserver.observe(breadcrumbsRef.value)
+    if (viewToggleRef.value) headerResizeObserver.observe(viewToggleRef.value)
+  }
+
+  window.addEventListener('resize', updateViewToggleWrapState)
+})
+
+onBeforeUnmount(() => {
+  if (headerResizeObserver) {
+    headerResizeObserver.disconnect()
+    headerResizeObserver = null
+  }
+  window.removeEventListener('resize', updateViewToggleWrapState)
 })
 
 const projects = computed(() => {
@@ -118,11 +165,28 @@ watch(
   },
   { immediate: true }
 )
+
+watch([loading, channel, selectedView, projectCount, allCount], () => {
+  nextTick(updateViewToggleWrapState)
+})
 </script>
 
 <style scoped>
 .skeleton-medium {
   width: 100%;
   height: 200px;
+}
+
+.channel-header {
+  row-gap: 8px;
+}
+
+.channel-view-toggle {
+  margin-left: auto;
+}
+
+.channel-view-toggle--wrapped {
+  margin-left: auto;
+  margin-right: auto;
 }
 </style>

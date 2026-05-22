@@ -90,8 +90,7 @@
         :channel="channel"
         :project="project"
         :private="privateMode"
-        private-scope="project"
-        floating />
+        private-scope="project" />
     </template>
 
     <template v-else>
