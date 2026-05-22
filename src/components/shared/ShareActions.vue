@@ -9,7 +9,7 @@
       :dense="!floating"
       :round="floating"
       :unelevated="floating"
-      :size="floating ? 'lg' : 'md'"
+      :size="buttonSize"
       color="info"
       aria-label="Share"
       data-cy="share-button"
@@ -85,7 +85,7 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { Notify, copyToClipboard } from 'quasar'
+import { Notify, Screen, copyToClipboard } from 'quasar'
 
 const props = defineProps({
   channel: { type: Object, required: true },
@@ -100,6 +100,14 @@ const route = useRoute()
 const showAdvanced = ref(false)
 const menuOpen = ref(false)
 const containerRef = ref(null)
+
+const buttonSize = computed(() => {
+  if (Screen.lt.sm) {
+    return props.floating ? 'sm' : 'xs'
+  }
+
+  return props.floating ? 'md' : 'sm'
+})
 
 const shareTargetLabel = computed(() => {
   if (props.media) return 'this video'
