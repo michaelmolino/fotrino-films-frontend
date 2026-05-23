@@ -1,18 +1,18 @@
 <template>
-  <q-btn
-    flat
-    dense
-    no-caps
-    padding="8px"
+  <component
+    :is="interactive ? 'q-btn' : 'div'"
+    v-bind="interactive ? { flat: true, dense: true, noCaps: true, padding: '8px', to } : {}"
     data-cy="media-preview"
-    :to="to"
     :aria-label="`View ${media.title}`"
-    :class="['fit', 'width720', { 'bg-accent': media.main && showMainAccent }]">
-    <q-badge v-if="media.type?.startsWith('audio/')" class="bg-accent q-pa-md z-top" floating>
+    :class="containerClasses">
+    <q-badge
+      v-if="showBadges && media.type?.startsWith('audio/')"
+      class="bg-accent q-pa-md z-top"
+      floating>
       <span class="text-bold text-white">Audio</span>
     </q-badge>
     <q-badge
-      v-if="media.orientation === 'portrait' && !media.type?.startsWith('audio/')"
+      v-if="showBadges && media.orientation === 'portrait' && !media.type?.startsWith('audio/')"
       class="bg-info text-white q-pa-sm z-top"
       floating>
       <q-icon name="smartphone" size="16px" />
@@ -23,12 +23,12 @@
       :alt="media.title"
       :ratio="16 / 9"
       fit="cover"
-      position="50% 28%"
+      :position="previewCropPosition"
       :loading="priority === 'high' ? 'eager' : 'lazy'"
       decoding="async"
       @load="onPreviewLoad"
       @error="onPreviewError">
-      <div class="absolute-bottom text-center">
+      <div v-if="showTitleOverlay" class="absolute-bottom text-center">
         <div class="ellipsis">
           <span>{{ media.title }}</span
           ><span v-if="detail && media.title !== album?.title"><br />{{ album?.title }}</span>
@@ -40,7 +40,7 @@
             <q-spinner-gears color="accent" size="xl" />
           </div>
         </div>
-        <div class="absolute-bottom text-center">
+        <div v-if="showTitleOverlay" class="absolute-bottom text-center">
           <div class="ellipsis">
             <span>{{ media.title }}</span
             ><span v-if="detail && media.title !== album?.title"><br />{{ album?.title }}</span>
@@ -56,22 +56,29 @@
       v-if="!media.preview"
       class="cursor-not-allowed preview-skeleton"
       animation="none" />
-  </q-btn>
+  </component>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { addPreconnectForUrl } from '@utils/preconnect'
 import { useWebP } from '@composables/useWebP'
 
-const { media, album, detail, showMainAccent, priority, to } = defineProps({
+const previewCropPosition = '50% 28%'
+
+const { media, album, detail, showMainAccent, showBadges, showTitleOverlay, interactive, priority, to } = defineProps({
   media: { type: Object, required: true },
   album: { type: Object, default: null },
   detail: { type: Boolean, default: false },
   showMainAccent: { type: Boolean, default: true },
+  showBadges: { type: Boolean, default: true },
+  showTitleOverlay: { type: Boolean, default: true },
+  interactive: { type: Boolean, default: true },
   priority: { type: String, default: 'auto' }, // 'high', 'low', or 'auto'
   to: { type: [String, Object], default: null }
 })
+
+const containerClasses = computed(() => [interactive ? 'fit width720' : 'full-fit', { 'bg-accent': media.main && showMainAccent }])
 
 const { resolvePreviewSource } = useWebP()
 const previewSource = ref({ strategy: 'original-only', primaryUrl: null, fallbackUrl: null })

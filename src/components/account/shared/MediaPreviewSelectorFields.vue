@@ -46,13 +46,14 @@
           class="preview-frame"
           :class="{ 'preview-frame-featured': showFeaturedBorder }"
           :style="{ width: previewWidth, aspectRatio: previewAspectRatio }">
-          <q-img
+          <MediaPreview
             v-if="previewImage"
-            :src="previewImage"
-            class="cover full-fit"
-            :ratio="16 / 9"
-            fit="cover"
-            position="50% 28%" />
+            class="full-fit"
+            :media="{ title: 'Video preview', preview: previewImage, main: showFeaturedBorder }"
+            :interactive="false"
+            :show-badges="false"
+            :show-title-overlay="false"
+            :show-main-accent="showFeaturedBorder" />
           <q-skeleton v-else type="rect" class="full-fit" animation="none" />
         </div>
       </div>
@@ -73,6 +74,8 @@
 </template>
 
 <script setup>
+import MediaPreview from '@components/channel/shared/MediaPreview.vue'
+
 defineProps({
   previewType: {
     type: String,
@@ -116,9 +119,6 @@ defineEmits(['update:previewType', 'update:previewFile', 'refresh:frame'])
 </script>
 
 <style scoped>
-.cover {
-  object-fit: cover;
-}
 .full-fit {
   width: 100%;
   height: 100%;
