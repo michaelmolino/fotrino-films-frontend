@@ -35,7 +35,7 @@ export default defineConfig(() => ({
         '@components': path.resolve(__dirname, 'src/components'),
         '@composables': path.resolve(__dirname, 'src/composables'),
         '@utils': path.resolve(__dirname, 'src/utils'),
-        '@libs': path.resolve(__dirname, 'src/libs'),
+        '@clients': path.resolve(__dirname, 'src/clients'),
         '@assets': path.resolve(__dirname, 'src/assets'),
         '@css': path.resolve(__dirname, 'src/css'),
         '@deps': path.resolve(__dirname, 'node_modules')

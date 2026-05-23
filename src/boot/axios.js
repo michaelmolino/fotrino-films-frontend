@@ -1,6 +1,6 @@
 import { boot } from 'quasar/wrappers'
 import { useAccountStore } from 'src/stores/account-store'
-import { api } from 'src/libs/api-client.js'
+import { api } from 'src/clients/axios-client.js'
 import { useRequestLoading } from 'src/composables/useRequestLoading'
 import { confirmDestructiveAction, notifyError } from 'src/utils/notify.js'
 import {

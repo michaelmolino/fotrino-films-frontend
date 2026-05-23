@@ -1,5 +1,5 @@
 import { markRaw, ref, shallowRef } from 'vue'
-import { createPresignedUppyClient } from '@libs/uppy-upload.js'
+import { createPresignedUppyClient } from '@clients/uppy-upload-client.js'
 import { useAccountStore } from 'src/stores/account-store'
 
 /**

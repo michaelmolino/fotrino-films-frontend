@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { api } from 'src/libs/api-client.js'
+import { api } from 'src/clients/axios-client.js'
 import { sortBy } from '@utils/sort.js'
 import { getGlobalApiErrorPayload, isGlobalApiError } from 'src/utils/api-errors.js'
 import { fetchAndApplyGet } from 'src/stores/utils/fetch-and-apply.js'

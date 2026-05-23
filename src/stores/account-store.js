@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { useQueryCache } from '@pinia/colada'
-import { api } from 'src/libs/api-client.js'
+import { api } from 'src/clients/axios-client.js'
 import { getGlobalApiErrorPayload } from 'src/utils/api-errors.js'
 import { fetchAndApplyGet } from 'src/stores/utils/fetch-and-apply.js'
 import { API_CACHE_LONG_MS, API_CACHE_SHORT_MS } from 'src/stores/utils/cache-timeouts.js'
