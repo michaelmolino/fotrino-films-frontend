@@ -1,4 +1,12 @@
-import { sortBy } from '@utils/sort.js'
+const timestampOrZero = value => {
+  const time = new Date(value).getTime()
+  return Number.isNaN(time) ? 0 : time
+}
+
+const sortByResourceDateDesc = items => {
+  const list = Array.isArray(items) ? [...items] : []
+  return list.sort((a, b) => timestampOrZero(b?.resourceDate) - timestampOrZero(a?.resourceDate))
+}
 
 const buildMediaEntity = (media, albumId, albumPublicId) => ({
   id: media.id,
@@ -50,9 +58,9 @@ const buildAlbumEntity = (album, channelId, relationships, mediaByPublicId) => {
 
 export const sortChannelDetail = channel => {
   if (!channel) return channel
-  const albums = sortBy(channel.albums, 'resourceDate', 'desc').map(album => ({
+  const albums = sortByResourceDateDesc(channel.albums).map(album => ({
     ...album,
-    media: sortBy(album.media, 'resourceDate', 'desc')
+    media: sortByResourceDateDesc(album.media)
   }))
   return { ...channel, albums }
 }
@@ -95,29 +103,4 @@ export const buildChannelFromReadModel = readModel => {
     ...baseChannel,
     albums
   })
-}
-
-export const normalizeChannelPayload = payload => {
-  if (!payload) return { channel: payload, readModel: null }
-
-  const hasReadModelEnvelope = !!(payload?.focus && payload?.entities && payload?.relationships)
-  if (!hasReadModelEnvelope) {
-    if (Array.isArray(payload?.albums)) {
-      return {
-        channel: sortChannelDetail(payload),
-        readModel: null
-      }
-    }
-
-    // Private media payloads are intentionally non-envelope responses.
-    return {
-      channel: payload,
-      readModel: null
-    }
-  }
-
-  return {
-    channel: buildChannelFromReadModel(payload),
-    readModel: payload
-  }
 }

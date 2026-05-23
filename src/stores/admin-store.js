@@ -2,14 +2,23 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { useQueryCache } from '@pinia/colada'
 import { api } from 'src/clients/axios-client.js'
-import { sortBy } from '@utils/sort.js'
 import { getGlobalApiErrorPayload, isGlobalApiError } from 'src/utils/api-errors.js'
 
+const timestampOrZero = value => {
+  const time = new Date(value).getTime()
+  return Number.isNaN(time) ? 0 : time
+}
+
+const sortByDateDesc = (items, field) => {
+  const list = Array.isArray(items) ? [...items] : []
+  return list.sort((a, b) => timestampOrZero(b?.[field]) - timestampOrZero(a?.[field]))
+}
+
 const sortUsers = users => {
-  const sortedUsers = sortBy(users, 'lastLogin', 'desc')
+  const sortedUsers = sortByDateDesc(users, 'lastLogin')
   for (const user of sortedUsers) {
     if (Array.isArray(user.channels)) {
-      user.channels = sortBy(user.channels, 'created', 'desc')
+      user.channels = sortByDateDesc(user.channels, 'created')
     }
   }
   return sortedUsers

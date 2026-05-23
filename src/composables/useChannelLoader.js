@@ -4,7 +4,6 @@ import { useChannelStore } from 'src/stores/channel-store.js'
 import { useRoute, useRouter } from 'vue-router'
 import { useMeta } from 'quasar'
 import { getMetaData } from '@utils/meta.js'
-import { normalizeChannelPayload } from 'src/utils/read-model.js'
 import { addHistory, addPrivateHistory, addPrivateAlbumHistory } from '@utils/history.js'
 import { getCanonicalChannelRoutePath, getChannelRouteTarget } from '@utils/channel-route.js'
 
@@ -39,6 +38,8 @@ const sharedHydratedAlbumsByPublicId = computed(() => {
   }
   return map
 })
+
+const EMPTY_CHANNEL_VIEW_RESPONSE = { channel: null, readModel: null }
 
 /**
  * Composable for loading and setting channel data based on route parameters
@@ -95,10 +96,9 @@ export function useChannelLoader({ manageMeta = false } = {}) {
   }
 
   const setChannelPayload = payload => {
-    const normalized = normalizeChannelPayload(payload)
-    channel.value = normalized.channel
-    readModel.value = normalized.readModel
-    return normalized
+    channel.value = payload?.channel ?? null
+    readModel.value = payload?.readModel ?? null
+    return payload
   }
 
   const runRouteQuery = async options => {
@@ -107,7 +107,7 @@ export function useChannelLoader({ manageMeta = false } = {}) {
     if (state?.status === 'error') {
       throw state.error || new Error('Channel route query failed')
     }
-    return normalizeChannelPayload(state?.data ?? null)
+    return state?.data ?? EMPTY_CHANNEL_VIEW_RESPONSE
   }
 
   const hasLoadedChannelRouteTarget = target => {
@@ -156,7 +156,7 @@ export function useChannelLoader({ manageMeta = false } = {}) {
   const fetchChannelByRoute = route => {
     const target = getChannelRouteTarget(route)
     if (!target) {
-      return Promise.resolve(normalizeChannelPayload(null))
+      return Promise.resolve(EMPTY_CHANNEL_VIEW_RESPONSE)
     }
 
     if (hasLoadedChannelRouteTarget(target)) {
@@ -184,7 +184,7 @@ export function useChannelLoader({ manageMeta = false } = {}) {
     if (target.type === 'privateMedia') {
       return runRouteQuery(channelStore.privateMediaQueryOptions(target.mediaId))
     }
-    return Promise.resolve(normalizeChannelPayload(null))
+    return Promise.resolve(EMPTY_CHANNEL_VIEW_RESPONSE)
   }
 
   const syncPrivateHistory = (route, channel) => {

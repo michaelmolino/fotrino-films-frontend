@@ -1,7 +1,6 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { api } from 'src/clients/axios-client.js'
-import { sortBy } from '@utils/sort.js'
 import { getGlobalApiErrorPayload } from 'src/utils/api-errors.js'
 import { sortChannelDetail } from 'src/utils/read-model.js'
 import { useQueryCache } from '@pinia/colada'
@@ -12,8 +11,16 @@ const CHANNEL_DETAIL_CACHE_TIMEOUT_MS = API_CACHE_MEDIUM_MS
 const PRIVATE_MEDIA_CACHE_TIMEOUT_MS = API_CACHE_MEDIUM_MS
 const PRIVATE_ALBUM_CACHE_TIMEOUT_MS = API_CACHE_MEDIUM_MS
 
-const sortChannels = (channels, field = 'title', direction = 'desc') =>
-  sortBy(channels, field, direction)
+const compareStringsDesc = (a, b) => {
+  const aValue = typeof a === 'string' ? a : ''
+  const bValue = typeof b === 'string' ? b : ''
+  return bValue.localeCompare(aValue)
+}
+
+const sortChannels = channels => {
+  const list = Array.isArray(channels) ? [...channels] : []
+  return list.sort((a, b) => compareStringsDesc(a?.title, b?.title))
+}
 
 export const useChannelStore = defineStore('channel', () => {
   const channels = ref([])
@@ -183,7 +190,7 @@ export const useChannelStore = defineStore('channel', () => {
     try {
       if (!cache) {
         const { data } = await api.get(`/channels/${channelId}${pending ? '?pending=true' : ''}`)
-        return data
+        return data?.channel ?? null
       }
 
       const entry = queryCache.ensure(options)
@@ -191,7 +198,7 @@ export const useChannelStore = defineStore('channel', () => {
       if (state?.status === 'error') {
         throw state.error || new Error('Channel query failed')
       }
-      return state?.data ?? null
+      return state?.data?.channel ?? null
     } catch (error) {
       getGlobalApiErrorPayload(error)
       throw error
