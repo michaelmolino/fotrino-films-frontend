@@ -4,10 +4,10 @@ const RANDOM_POSITION_PRECISION = 2
 // For large files, seeking to a random position deep in the file can take
 // a very long time because the browser must decode from the prior keyframe.
 // Limit the seek range to stay near the beginning where keyframes are dense.
-const LARGE_FILE_THRESHOLD_BYTES = 200 * 1024 * 1024 // 200 MB
+const LARGE_FILE_THRESHOLD_BYTES = 512 * 1024 * 1024 // 200 MB
 const LARGE_FILE_MAX_POSITION = 5 // seek within first 5% only
 // Hard timeout so the spinner can never block the UI indefinitely.
-const THUMBNAIL_TIMEOUT_MS = 3000
+const THUMBNAIL_TIMEOUT_MS = 6000
 
 let frameSession = null
 
