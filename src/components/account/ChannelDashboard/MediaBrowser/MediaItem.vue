@@ -29,7 +29,7 @@
             clearable
             class="q-pb-md"
             :model-value="editForm.title"
-            label="Media Title"
+            label="Video Title"
             data-cy="edit-media-title-input"
             @update:model-value="onUpdateTitle" />
           <MediaMetadataFields

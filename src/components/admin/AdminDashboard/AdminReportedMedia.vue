@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="text-h6 text-weight-bold" data-cy="admin-reported-media-title">Admin: Reported Media</div>
-    <div class="text-caption text-grey-7 q-mb-md">All media that has been reported by users.</div>
+    <div class="text-h6 text-weight-bold" data-cy="admin-reported-media-title">Admin: Reported Videos</div>
+    <div class="text-caption text-grey-7 q-mb-md">All videos that have been reported by users.</div>
     <div v-if="loading">
       <q-skeleton type="rect" height="40px" class="q-mb-sm" />
       <q-skeleton type="rect" height="40px" class="q-mb-sm" />
@@ -25,7 +25,7 @@
             flat
             dense
             size="sm"
-            :aria-label="`View reported media: ${props.row.title}`" />
+            :aria-label="`View reported video: ${props.row.title}`" />
         </q-td>
       </template>
       <template #body-cell-createdAt="props">
@@ -40,7 +40,7 @@
             color="negative"
             icon="delete"
             @click="deleteMedia(props.row.privateId)">
-            <q-tooltip>Delete Media</q-tooltip>
+            <q-tooltip>Delete Video</q-tooltip>
           </q-btn>
         </q-td>
       </template>
@@ -59,7 +59,7 @@ const adminStore = useAdminStore()
 const loading = ref(true)
 const reportedMediaColumns = [
   { name: 'createdAt', label: 'Reported', field: 'createdAt', align: 'left' },
-  { name: 'title', label: 'Media', field: 'title', align: 'left' },
+  { name: 'title', label: 'Video', field: 'title', align: 'left' },
   { name: 'reporter', label: 'Reporter', field: 'reporter', align: 'left' },
   { name: 'reason', label: 'Reason', field: 'reason', align: 'left' },
   { name: 'actions', label: 'Actions', field: 'actions', align: 'center' }
@@ -95,7 +95,7 @@ async function loadReportedMedia() {
     console.error('Failed to fetch reported media:', err)
     Notify.create({
       type: 'negative',
-      message: getComponentApiErrorMessage(err, 'Failed to load reported media.'),
+      message: getComponentApiErrorMessage(err, 'Failed to load reported videos.'),
       icon: 'warning',
       timeout: 0
     })
@@ -110,7 +110,7 @@ async function deleteMedia(privateId) {
     if (deleted === false) return
     Notify.create({
       type: 'positive',
-      message: 'Reported media deleted.',
+      message: 'Reported video deleted.',
       icon: 'check',
       timeout: 2000
     })
@@ -118,7 +118,7 @@ async function deleteMedia(privateId) {
     console.error('Failed to delete reported media:', err)
     Notify.create({
       type: 'negative',
-      message: getComponentApiErrorMessage(err, 'Failed to delete reported media.'),
+      message: getComponentApiErrorMessage(err, 'Failed to delete reported videos.'),
       icon: 'warning',
       timeout: 0
     })

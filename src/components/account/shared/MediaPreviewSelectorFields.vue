@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="text-overline">Media Preview</div>
+    <div class="text-overline">Video Preview</div>
     <q-radio
       v-if="allowFrameMode"
       class="q-pl-sm"
@@ -21,7 +21,7 @@
 
     <q-file
       v-if="!allowFrameMode || previewType === 'new'"
-      label="Media Preview (Image)"
+      label="Preview Image"
       outlined
       :model-value="previewFile"
       accept="image/*"

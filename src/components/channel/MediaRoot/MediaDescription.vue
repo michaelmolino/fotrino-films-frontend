@@ -154,7 +154,7 @@ const keyboardShortcuts = [
   { keys: '↓', action: 'Decrease volume' },
   { keys: 'M', action: 'Toggle mute' },
   { keys: 'F', action: 'Toggle fullscreen' },
-  { keys: '0-9', action: 'Seek to 0-90% of the media' }
+  { keys: '0-9', action: 'Seek to 0-90% of the video' }
 ]
 
 function openReportDialog() {

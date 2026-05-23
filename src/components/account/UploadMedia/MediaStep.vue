@@ -1,7 +1,7 @@
 <template>
   <div>
     <q-file
-      label="Media (Video) *"
+      label="Video *"
       outlined
       :model-value="mediaFile"
       accept="video/*"

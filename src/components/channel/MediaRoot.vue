@@ -52,7 +52,7 @@
     </template>
 
     <template v-else>
-      <NothingText text="Media not found or unavailable." />
+      <NothingText text="Video not found or unavailable." />
     </template>
   </div>
 </template>

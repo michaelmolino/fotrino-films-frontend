@@ -24,7 +24,7 @@
     </template>
     <template #all>
       <div class="row items-center no-wrap" data-cy="channel-view-all">
-        <span class="text-center">All Media</span>
+        <span class="text-center">All Videos</span>
         <q-avatar color="accent" text-color="white" size="sm" square class="q-ml-sm">{{
           allCount
         }}</q-avatar>

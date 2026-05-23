@@ -1,6 +1,6 @@
 <template>
   <div class="media-browser admin-tree q-pa-md">
-    <div class="text-h5 text-weight-bold q-mb-md">Your Channels & Media</div>
+    <div class="text-h5 text-weight-bold q-mb-md">Your Channels & Videos</div>
     <q-list bordered class="rounded-borders">
       <ChannelItem
         v-for="channel in channels"
@@ -102,9 +102,9 @@ async function deleteResource(type, id) {
 async function undeleteMedia(mediaId) {
   try {
     await channelStore.undeleteResource({ type: 'media', id: mediaId })
-    notifySuccess('Media restored.')
+    notifySuccess('Video restored.')
   } catch (error) {
-    notifyError(getComponentApiErrorMessage(error, 'Unable to undelete this media.'), {
+    notifyError(getComponentApiErrorMessage(error, 'Unable to undelete this video.'), {
       timeout: 0
     })
   }
@@ -229,8 +229,8 @@ async function saveMediaEdit(payload) {
         mediaId: payload?.id,
       }
     },
-    successMessage: 'Media updated.',
-    errorMessage: 'Unable to update this media.'
+    successMessage: 'Video updated.',
+    errorMessage: 'Unable to update this video.'
   })
 }
 

@@ -3,7 +3,7 @@
     <template v-if="profile?.id">
       <ProfileCard :profile="profile" :mediaCount="mediaCount" data-cy="profile-card" />
       <MediaBrowser v-if="hasChannels" :channels="channels" data-cy="media-browser" />
-      <NothingText v-else text="Your media will appear here (once you have some)." />
+      <NothingText v-else text="Your videos will appear here (once you have some)." />
     </template>
     <AuthRequired v-else type="login" message="Please log in to access your dashboard" />
   </div>

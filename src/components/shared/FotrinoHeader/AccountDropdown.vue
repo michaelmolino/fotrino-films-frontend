@@ -38,7 +38,7 @@
         flat
         no-caps
         icon="cloud_upload"
-        label="Upload Media"
+        label="Upload Video"
         aria-label="Upload a video"
         size="md"
         class="col-xs-12"

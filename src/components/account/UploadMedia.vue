@@ -2,7 +2,7 @@
   <div v-if="profile?.id" class="q-pa-md" data-cy="upload-page">
     <q-item class="q-pb-md">
       <q-item-section>
-        <q-item-label class="text-h5">Upload Media</q-item-label>
+        <q-item-label class="text-h5">Upload Video</q-item-label>
       </q-item-section>
     </q-item>
     <q-banner
@@ -139,7 +139,7 @@
           </div>
           <div class="q-pa-md text-body2">
             <strong>{{ media.title }}</strong> was uploaded successfully.
-            Your media is being processed. We will email you when your video is live.
+            Your video is being processed. We will email you when your video is live.
           </div>
           <div class="q-pt-md text-caption text-grey-6">You can safely close this window.</div>
         </div>
@@ -202,7 +202,7 @@
       </template>
     </q-stepper>
   </div>
-  <AuthRequired v-else type="login" message="Please log in to upload media." />
+  <AuthRequired v-else type="login" message="Please log in to upload videos." />
 </template>
 
 <script setup>
@@ -290,7 +290,7 @@ const uploadFilesByType = computed(() => {
 })
 
 const stepTitles = computed(() => ({
-  media: step.value > 1 ? media.value.title : 'Media',
+  media: step.value > 1 ? media.value.title : 'Video',
   channel: step.value > 2 ? payload.title : 'Channel',
   album: step.value > 3 ? album.value.title : 'Album'
 }))

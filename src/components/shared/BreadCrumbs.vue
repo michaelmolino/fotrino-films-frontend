@@ -8,7 +8,7 @@
         :size="$q.screen.lt.sm ? '32px' : '40px'">
         <img
           :src="channel.cover"
-          :alt="channel.title || media?.title || 'Media cover'"
+          :alt="channel.title || media?.title || 'Video cover'"
           loading="lazy"
           decoding="async" />
       </q-avatar>
@@ -62,7 +62,7 @@ const buildPrivateAlbumBreadcrumbs = () => {
   if (props.media?.privateId && props.album?.privateId) {
     arr.push({
       id: 'private-album-media',
-      label: props.media?.title || 'Private Media',
+      label: props.media?.title || 'Private Video',
       to: null,
     })
   }
@@ -106,7 +106,7 @@ const breadcrumbs = computed(() => {
     return [
       {
         id: 'private-media',
-        label: props.media?.title || 'Private Media',
+        label: props.media?.title || 'Private Video',
         to: null,
       }
     ]
