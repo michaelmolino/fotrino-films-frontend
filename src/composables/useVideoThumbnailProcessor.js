@@ -1,6 +1,13 @@
 import { VideoThumbnailGenerator } from 'browser-video-thumbnail-generator'
 
 const RANDOM_POSITION_PRECISION = 2
+// For large files, seeking to a random position deep in the file can take
+// a very long time because the browser must decode from the prior keyframe.
+// Limit the seek range to stay near the beginning where keyframes are dense.
+const LARGE_FILE_THRESHOLD_BYTES = 200 * 1024 * 1024 // 200 MB
+const LARGE_FILE_MAX_POSITION = 5 // seek within first 5% only
+// Hard timeout so the spinner can never block the UI indefinitely.
+const THUMBNAIL_TIMEOUT_MS = 3000
 
 let frameSession = null
 
@@ -23,13 +30,29 @@ function ensureFrameSession(file) {
     return frameSession
 }
 
-function getRandomFramePosition() {
-    return Number((Math.random() * 100).toFixed(RANDOM_POSITION_PRECISION))
+function getRandomFramePosition(fileSize) {
+    const maxPosition =
+        fileSize > LARGE_FILE_THRESHOLD_BYTES ? LARGE_FILE_MAX_POSITION : 100
+    return Number((Math.random() * maxPosition).toFixed(RANDOM_POSITION_PRECISION))
+}
+
+function withTimeout(promise, ms) {
+    let timer
+    const timeout = new Promise((_, reject) => {
+        timer = setTimeout(
+            () => reject(new Error('Frame extraction timed out')),
+            ms
+        )
+    })
+    return Promise.race([promise, timeout]).finally(() => clearTimeout(timer))
 }
 
 async function generateThumbnailBlob(session) {
-    const framePosition = getRandomFramePosition()
-    const result = await session.generator.getThumbnail(framePosition)
+    const framePosition = getRandomFramePosition(session.file.size)
+    const result = await withTimeout(
+        session.generator.getThumbnail(framePosition),
+        THUMBNAIL_TIMEOUT_MS
+    )
     if (!result?.thumbnail) {
         throw new Error('No thumbnail generated')
     }
