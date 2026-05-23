@@ -210,6 +210,7 @@ export type Requiredresources = ('cover' | 'poster' | 'preview' | 'upload')[]
 export type Resourcetype = 'cover' | 'poster' | 'preview' | 'upload'
 export type Url = string
 export type Covertype = 'profile' | 'new'
+export type Idempotencykey = string | null
 export type Title12 = string | null
 export type UploadResourceType = 'cover' | 'poster' | 'preview' | 'upload'
 export type Error11 = string
@@ -539,6 +540,7 @@ export interface UploadInstruction {
 export interface UploadMediaRequest {
   album: AlbumUploadPayload
   coverType?: Covertype
+  idempotencyKey?: Idempotencykey
   publicId: LabeledValue
   title?: Title12
 }
