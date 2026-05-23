@@ -1,10 +1,9 @@
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { api } from 'src/clients/axios-client.js'
 import { sortBy } from '@utils/sort.js'
 import { getGlobalApiErrorPayload } from 'src/utils/api-errors.js'
-import { normalizeChannelPayload, sortChannelDetail } from 'src/utils/read-model.js'
-import { createRequestCanceler, isRequestCanceled } from 'src/stores/utils/request-canceler.js'
+import { sortChannelDetail } from 'src/utils/read-model.js'
 import { useQueryCache } from '@pinia/colada'
 import { API_CACHE_MEDIUM_MS } from 'src/stores/utils/cache-timeouts.js'
 
@@ -18,30 +17,9 @@ const sortChannels = (channels, field = 'title', direction = 'desc') =>
 
 export const useChannelStore = defineStore('channel', () => {
   const channels = ref([])
-  const channel = ref(null)
-  const readModel = ref(null)
-  const loadStatus = ref('idle')
   const upload = ref(null)
-  const requestCanceler = createRequestCanceler()
 
   const queryCache = useQueryCache()
-
-  const sortedAllMedia = computed(() => {
-    if (!channel.value?.albums) return []
-    return channel.value.albums.flatMap(album =>
-      (album.media || []).map(media => ({ media, album }))
-    )
-  })
-
-  const setChannelLoadStatus = value => {
-    loadStatus.value = value
-  }
-
-  const setChannel = value => {
-    const normalized = normalizeChannelPayload(value)
-    channel.value = normalized.channel
-    readModel.value = normalized.readModel
-  }
 
   const setChannels = value => {
     channels.value = value
@@ -63,9 +41,7 @@ export const useChannelStore = defineStore('channel', () => {
     staleTime: CHANNEL_DETAIL_CACHE_TIMEOUT_MS,
     query: async () => {
       const url = `/channels/${channelId}${pending ? '?pending=true' : ''}`
-      const { data } = await api.get(url, {
-        signal: requestCanceler.getSignal('SET_CHANNEL')
-      })
+      const { data } = await api.get(url)
       return data
     }
   })
@@ -84,9 +60,7 @@ export const useChannelStore = defineStore('channel', () => {
     key: ['channel', 'album', albumId],
     staleTime: CHANNEL_DETAIL_CACHE_TIMEOUT_MS,
     query: async () => {
-      const { data } = await api.get(`/channels/album/${albumId}`, {
-        signal: requestCanceler.getSignal('SET_CHANNEL')
-      })
+      const { data } = await api.get(`/channels/album/${albumId}`)
       return data
     }
   })
@@ -95,9 +69,7 @@ export const useChannelStore = defineStore('channel', () => {
     key: ['channel', 'media', mediaId],
     staleTime: CHANNEL_DETAIL_CACHE_TIMEOUT_MS,
     query: async () => {
-      const { data } = await api.get(`/channels/media/${mediaId}`, {
-        signal: requestCanceler.getSignal('SET_CHANNEL')
-      })
+      const { data } = await api.get(`/channels/media/${mediaId}`)
       return data
     }
   })
@@ -106,9 +78,7 @@ export const useChannelStore = defineStore('channel', () => {
     key: ['channel', 'private-media', privateMediaId],
     staleTime: PRIVATE_MEDIA_CACHE_TIMEOUT_MS,
     query: async () => {
-      const { data } = await api.get(`/channels/media/private/${privateMediaId}`, {
-        signal: requestCanceler.getSignal('SET_CHANNEL')
-      })
+      const { data } = await api.get(`/channels/media/private/${privateMediaId}`)
       return data
     }
   })
@@ -118,35 +88,10 @@ export const useChannelStore = defineStore('channel', () => {
     staleTime: PRIVATE_ALBUM_CACHE_TIMEOUT_MS,
     query: async () => {
       const mediaQuery = privateMediaId ? `?mediaPrivateId=${encodeURIComponent(privateMediaId)}` : ''
-      const { data } = await api.get(`/channels/album/private/${privateAlbumId}${mediaQuery}`, {
-        signal: requestCanceler.getSignal('SET_CHANNEL')
-      })
+      const { data } = await api.get(`/channels/album/private/${privateAlbumId}${mediaQuery}`)
       return data
     }
   })
-
-  const runChannelQuery = async ({ options, apply, onError }) => {
-    const entry = queryCache.ensure(options)
-
-    try {
-      const state = await queryCache.refresh(entry, options)
-      if (state?.status === 'error') {
-        throw state.error || new Error('Channel query failed')
-      }
-      const value = state?.data ?? null
-      apply(value)
-      return value
-    } catch (error) {
-      apply(null)
-      if (typeof onError === 'function') {
-        const maybe = onError(error)
-        if (maybe !== undefined) {
-          return maybe
-        }
-      }
-      throw error
-    }
-  }
 
   const invalidateChannelsCache = () => {
     void queryCache.invalidateQueries({
@@ -201,48 +146,16 @@ export const useChannelStore = defineStore('channel', () => {
     })
   }
 
-  const loadChannels = deep =>
-    runChannelQuery({
-      options: channelsQueryOptions(deep),
-      apply: setChannels
-    })
-
-  const channelsByPublicId = computed(() => readModel.value?.entities?.channelsByPublicId || {})
-  const albumsByPublicId = computed(() => readModel.value?.entities?.albumsByPublicId || {})
-  const mediaByPublicId = computed(() => readModel.value?.entities?.mediaByPublicId || {})
-
-  const hydratedAlbumsByPublicId = computed(() => {
-    const map = {}
-    for (const album of channel.value?.albums || []) {
-      if (album?.publicId) {
-        map[album.publicId] = album
-      }
+  const loadChannels = async deep => {
+    const options = channelsQueryOptions(deep)
+    const entry = queryCache.ensure(options)
+    const state = await queryCache.refresh(entry, options)
+    if (state?.status === 'error') {
+      throw state.error || new Error('Channel query failed')
     }
-    const privateAlbum = channel.value?.album
-    if (privateAlbum?.publicId && !map[privateAlbum.publicId]) {
-      map[privateAlbum.publicId] = privateAlbum
-    }
-    return map
-  })
-
-  const findAlbumByPublicId = albumPublicId => {
-    if (!albumPublicId) return null
-    return (
-      hydratedAlbumsByPublicId.value?.[albumPublicId] ||
-      albumsByPublicId.value?.[albumPublicId] ||
-      null
-    )
-  }
-
-  const findMediaByPublicId = mediaPublicId => {
-    if (!mediaPublicId) return null
-    return mediaByPublicId.value?.[mediaPublicId] || null
-  }
-
-  const findAlbumByMediaPublicId = mediaPublicId => {
-    const media = findMediaByPublicId(mediaPublicId)
-    const albumPublicId = media?.albumPublicId
-    return albumPublicId ? findAlbumByPublicId(albumPublicId) : null
+    const value = Array.isArray(state?.data) ? state.data : []
+    setChannels(value)
+    return value
   }
 
   const resolveHistoryChannels = async items => {
@@ -264,80 +177,26 @@ export const useChannelStore = defineStore('channel', () => {
     }
   }
 
-  const loadChannel = ({ channelId, pending = false, cache = true }) => {
-    if (!cache) {
-      const url = `/channels/${channelId}${pending ? '?pending=true' : ''}`
-      return api
-        .get(url, {
-          signal: requestCanceler.getSignal('SET_CHANNEL')
-        })
-        .then(({ data }) => {
-          setChannel(data)
-          return data
-        })
-        .catch(error => {
-          setChannel(null)
-          if (!isRequestCanceled(error)) {
-            getGlobalApiErrorPayload(error)
-          }
-          throw error
-        })
+  const loadChannel = async ({ channelId, pending = false, cache = true }) => {
+    const options = channelQueryOptions(channelId, pending)
+
+    try {
+      if (!cache) {
+        const { data } = await api.get(`/channels/${channelId}${pending ? '?pending=true' : ''}`)
+        return data
+      }
+
+      const entry = queryCache.ensure(options)
+      const state = await queryCache.refresh(entry, options)
+      if (state?.status === 'error') {
+        throw state.error || new Error('Channel query failed')
+      }
+      return state?.data ?? null
+    } catch (error) {
+      getGlobalApiErrorPayload(error)
+      throw error
     }
-
-    return runChannelQuery({
-      options: channelQueryOptions(channelId, pending),
-      apply: setChannel,
-      onError: error => {
-        if (!isRequestCanceled(error)) {
-          getGlobalApiErrorPayload(error)
-        }
-      }
-    })
   }
-
-  const loadChannelByAlbum = albumId =>
-    runChannelQuery({
-      options: channelByAlbumQueryOptions(albumId),
-      apply: setChannel,
-      onError: error => {
-        if (!isRequestCanceled(error)) {
-          getGlobalApiErrorPayload(error)
-        }
-      }
-    })
-
-  const loadChannelByMedia = mediaId =>
-    runChannelQuery({
-      options: channelByMediaQueryOptions(mediaId),
-      apply: setChannel,
-      onError: error => {
-        if (!isRequestCanceled(error)) {
-          getGlobalApiErrorPayload(error)
-        }
-      }
-    })
-
-  const loadPrivateMedia = privateMediaId =>
-    runChannelQuery({
-      options: privateMediaQueryOptions(privateMediaId),
-      apply: setChannel,
-      onError: error => {
-        if (!isRequestCanceled(error)) {
-          getGlobalApiErrorPayload(error)
-        }
-      }
-    })
-
-  const loadPrivateAlbum = ({ privateAlbumId, privateMediaId = null }) =>
-    runChannelQuery({
-      options: privateAlbumQueryOptions(privateAlbumId, privateMediaId),
-      apply: setChannel,
-      onError: error => {
-        if (!isRequestCanceled(error)) {
-          getGlobalApiErrorPayload(error)
-        }
-      }
-    })
 
   const createMediaSession = async ({ privateId }) => {
     const res = await api.post(`/channels/media/session/${privateId}`)
@@ -613,26 +472,10 @@ export const useChannelStore = defineStore('channel', () => {
 
   return {
     channels,
-    channel,
-    readModel,
-    channelsByPublicId,
-    albumsByPublicId,
-    mediaByPublicId,
-    sortedAllMedia,
-    loadStatus,
     upload,
-    setChannelLoadStatus,
-    setChannel,
     loadChannels,
-    findAlbumByPublicId,
-    findMediaByPublicId,
-    findAlbumByMediaPublicId,
     resolveHistoryChannels,
     loadChannel,
-    loadChannelByAlbum,
-    loadChannelByMedia,
-    loadPrivateMedia,
-    loadPrivateAlbum,
     createMediaSession,
     deleteResource,
     undeleteResource,

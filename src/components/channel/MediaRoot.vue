@@ -58,7 +58,6 @@
 import { computed, watch, defineAsyncComponent, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
-import { useChannelStore } from 'src/stores/channel-store.js'
 
 import BreadCrumbs from '@components/shared/BreadCrumbs.vue'
 import MediaPreview from '@components/channel/shared/MediaPreview.vue'
@@ -75,9 +74,8 @@ const NothingText = defineAsyncComponent(() => import('@components/shared/Nothin
 const route = useRoute()
 const router = useRouter()
 const redirecting = ref(false)
-const channelStore = useChannelStore()
 
-const { channel, loading } = useChannelLoader()
+const { channel, loading, findAlbumByMediaPublicId, findMediaByPublicId } = useChannelLoader()
 
 function redirect(pathOrObj) {
   if (redirecting.value) return
@@ -87,7 +85,7 @@ function redirect(pathOrObj) {
 
 function findAlbumByParams() {
   if (route.params.mediaId) {
-    return channelStore.findAlbumByMediaPublicId(route.params.mediaId)
+    return findAlbumByMediaPublicId(route.params.mediaId)
   }
   if (route.params.privateAlbumId && channel.value) {
     return channel.value?.album || null
@@ -110,7 +108,7 @@ function findMediaByParams(album) {
     return mediaItems.find(item => item?.privateId === route.params.privateMediaId) || null
   }
   if (route.params.mediaId) {
-    return channelStore.findMediaByPublicId(route.params.mediaId)
+    return findMediaByPublicId(route.params.mediaId)
   }
   return null
 }

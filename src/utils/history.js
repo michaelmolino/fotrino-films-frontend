@@ -1,4 +1,4 @@
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 let hasResolvedHistory = false
 let resolveHistoryPromise = null
 import { parseStoredHistory, writeHistory, HISTORY_KEY } from './historyStorage.js'
@@ -156,14 +156,3 @@ export async function resolveHistoryFromBackend(channelStore, { force = false } 
   }
 }
 
-export function watchChannelHistory(channelStore) {
-  return watch(
-    () => channelStore.channel,
-    newChannel => {
-      if (getChannelHistoryId(newChannel) && Array.isArray(newChannel?.albums)) {
-        addHistory(newChannel)
-      }
-    },
-    { immediate: true }
-  )
-}

@@ -37,18 +37,16 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { Notify } from 'quasar'
 import { useChannelStore } from 'src/stores/channel-store.js'
 import {
   historyChannels,
-  watchChannelHistory,
   removeHistory,
   resolveHistoryFromBackend
 } from '@utils/history.js'
 
 const channelStore = useChannelStore()
-const stopWatchingHistory = watchChannelHistory(channelStore)
 
 function historyTarget(channel) {
   if (channel.type === 'privateAlbum') {
@@ -59,12 +57,6 @@ function historyTarget(channel) {
   }
   return `/c/${channel.publicId}/${channel.slug}`
 }
-
-onBeforeUnmount(() => {
-  if (typeof stopWatchingHistory === 'function') {
-    stopWatchingHistory()
-  }
-})
 
 onMounted(async () => {
   const result = await resolveHistoryFromBackend(channelStore)

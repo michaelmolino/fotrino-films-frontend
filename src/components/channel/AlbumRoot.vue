@@ -103,7 +103,6 @@
 import { computed, watch, defineAsyncComponent, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
-import { useChannelStore } from 'src/stores/channel-store.js'
 
 import BreadCrumbs from '@components/shared/BreadCrumbs.vue'
 import ShareActions from '@components/shared/ShareActions.vue'
@@ -113,9 +112,8 @@ const NothingText = defineAsyncComponent(() => import('@components/shared/Nothin
 const route = useRoute()
 const router = useRouter()
 const redirecting = ref(false)
-const channelStore = useChannelStore()
 
-const { channel, loading } = useChannelLoader()
+const { channel, loading, findAlbumByPublicId } = useChannelLoader()
 
 const privateMode = computed(() => !!route.params.privateAlbumId)
 
@@ -130,7 +128,7 @@ function findAlbumByParams() {
     return channel.value?.album || null
   }
   if (route.params.albumId) {
-    return channelStore.findAlbumByPublicId(route.params.albumId)
+    return findAlbumByPublicId(route.params.albumId)
   }
   return null
 }
