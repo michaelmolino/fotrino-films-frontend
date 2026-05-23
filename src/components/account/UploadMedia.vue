@@ -231,9 +231,18 @@ const step = ref(1)
 const stepper = ref(null)
 const albums = ref([])
 /** @type {import('src/types/api-contract').ApiContracts['UploadMediaRequest']} */
+function createUploadIdempotencyKey() {
+  const cryptoObj = globalThis.crypto
+  if (cryptoObj && typeof cryptoObj.randomUUID === 'function') {
+    return cryptoObj.randomUUID()
+  }
+  return `upload-${Date.now()}-${Math.random().toString(16).slice(2)}`
+}
+
 function createInitialPayload() {
   return {
     publicId: null,
+    idempotencyKey: createUploadIdempotencyKey(),
     coverType: 'profile',
     title: 'My Channel',
     album: {
