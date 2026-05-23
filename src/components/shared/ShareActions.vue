@@ -102,27 +102,27 @@ const shareTargetLabel = computed(() => {
 })
 
 const channelPath = computed(() => {
-  if (!props.channel) return null
+  if (!props.channel?.publicId || !props.channel?.slug) return null
   return `/c/${props.channel.publicId}/${props.channel.slug}`
 })
 
 const albumPath = computed(() => {
-  if (!props.album) return null
+  if (!props.album?.publicId || !props.album?.slug) return null
   return `/a/${props.album.publicId}/${props.album.slug}`
 })
 
 const privateAlbumPath = computed(() => {
-  if (!props.album) return null
+  if (!props.album?.privateId || !props.album?.slug) return null
   return `/private/a/${props.album.privateId}/${props.album.slug}`
 })
 
 const publicMediaPath = computed(() => {
-  if (!props.media) return null
+  if (!props.media?.publicId || !props.media?.slug) return null
   return `/m/${props.media.publicId}/${props.media.slug}`
 })
 
 const privateMediaPath = computed(() => {
-  if (!props.media) return null
+  if (!props.media?.privateId || !props.media?.slug) return null
   if (route.params?.privateAlbumId) {
     return `/private/a/${route.params.privateAlbumId}/m/${props.media.privateId}/${props.media.slug}`
   }
@@ -133,8 +133,12 @@ const privateMediaPath = computed(() => {
 })
 
 const standalonePrivateMediaPath = computed(() => {
-  if (!props.media) return null
+  if (!props.media?.privateId || !props.media?.slug) return null
   return `/private/m/${props.media.privateId}/${props.media.slug}`
+})
+
+const isPrivateAlbumContext = computed(() => {
+  return Boolean(props.private || route.params?.privateAlbumId || (!albumPath.value && privateAlbumPath.value))
 })
 
 const shareForChannel = computed(() => {
@@ -174,7 +178,7 @@ const shareForAlbum = computed(() => {
     })
   }
 
-  if (props.private) {
+  if (isPrivateAlbumContext.value) {
     return items
   }
 
@@ -217,7 +221,7 @@ const shareForMedia = computed(() => {
     })
   }
 
-  if (channelPath.value) {
+  if (channelPath.value && !isPrivateAlbumContext.value) {
     items.push({
       key: 'share-media-channel',
       label: 'Entire channel',
