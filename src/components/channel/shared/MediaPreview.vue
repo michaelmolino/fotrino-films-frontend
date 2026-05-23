@@ -1,6 +1,6 @@
 <template>
   <component
-    :is="interactive ? 'q-btn' : 'div'"
+    :is="interactive ? QBtn : 'div'"
     v-bind="interactive ? { flat: true, dense: true, noCaps: true, padding: '8px', to } : {}"
     data-cy="media-preview"
     :aria-label="`View ${media.title}`"
@@ -61,6 +61,7 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue'
+import { QBtn } from 'quasar'
 import { addPreconnectForUrl } from '@utils/preconnect'
 import { useWebP } from '@composables/useWebP'
 
