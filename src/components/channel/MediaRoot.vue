@@ -6,13 +6,13 @@
       <q-skeleton type="text" width="40%" />
     </template>
 
-    <template v-else-if="channel && project && media && (route.params.privateMediaId || route.params.mediaId)">
+    <template v-else-if="channel && album && media && (route.params.privateMediaId || route.params.mediaId)">
       <BreadCrumbs
         :channel="channel"
-        :project="project"
+        :album="album"
         :media="media"
         :private="!!route.params.privateMediaId"
-        :private-scope="route.params.privateProjectId ? 'project' : 'media'" />
+        :private-scope="route.params.privateAlbumId ? 'album' : 'media'" />
 
       <PlyrPlayer
         :media="media"
@@ -21,12 +21,12 @@
       <div class="plyrplayer" data-cy="media-description-container">
         <MediaDescription
           :media="media"
-          :poster="projectPoster"
-          :poster-color="projectPosterColor" />
+          :poster="albumPoster"
+          :poster-color="albumPosterColor" />
       </div>
 
       <template v-if="hasRelatedContent">
-        <div class="q-pt-md text-h6" data-cy="related-media-title">More from {{ project.title }}</div>
+        <div class="q-pt-md text-h6" data-cy="related-media-title">More from {{ album.title }}</div>
         <q-separator spaced />
         <div class="row">
           <div
@@ -35,7 +35,7 @@
             class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm">
             <MediaPreview
               :channel="channel"
-              :project="project"
+              :album="album"
               :media="related"
               :to="getRelatedPath(related)"
               :priority="index === 0 ? 'high' : 'auto'" />
@@ -45,10 +45,10 @@
 
       <ShareActions
         :channel="channel"
-        :project="project"
+        :album="album"
         :media="media"
         :private="!!route.params.privateMediaId"
-        :private-scope="route.params.privateProjectId ? 'project' : 'media'" />
+        :private-scope="route.params.privateAlbumId ? 'album' : 'media'" />
     </template>
 
     <template v-else>
@@ -83,24 +83,24 @@ function redirect(pathOrObj) {
   router.replace(pathOrObj)
 }
 
-function findProjectByParams() {
+function findAlbumByParams() {
   if (route.params.mediaId) {
-    return channelStore.findProjectByMediaPublicId(route.params.mediaId)
+    return channelStore.findAlbumByMediaPublicId(route.params.mediaId)
   }
-  if (route.params.privateProjectId && channel.value) {
-    return channel.value?.project || null
+  if (route.params.privateAlbumId && channel.value) {
+    return channel.value?.album || null
   }
   if (route.params.privateMediaId && channel.value) {
-    return channel.value?.project || null
+    return channel.value?.album || null
   }
   return null
 }
 
-function findMediaByParams(project) {
-  if (!project) return null
-  const mediaItems = project.media || []
+function findMediaByParams(album) {
+  if (!album) return null
+  const mediaItems = album.media || []
 
-  if (route.params.privateProjectId && route.params.privateMediaId) {
+  if (route.params.privateAlbumId && route.params.privateMediaId) {
     return mediaItems.find(item => item?.privateId === route.params.privateMediaId) || null
   }
 
@@ -113,38 +113,38 @@ function findMediaByParams(project) {
   return null
 }
 
-const project = computed(() => {
-  return findProjectByParams()
+const album = computed(() => {
+  return findAlbumByParams()
 })
 
 const media = computed(() => {
-  return findMediaByParams(project.value)
+  return findMediaByParams(album.value)
 })
 
-const projectPoster = computed(() => project.value?.poster || null)
-const projectPosterColor = computed(() => project.value?.posterColor || null)
+const albumPoster = computed(() => album.value?.poster || null)
+const albumPosterColor = computed(() => album.value?.posterColor || null)
 
 const relatedMedia = computed(() => {
-  return (project.value?.media || []).filter(m => (m.id || m.privateId) !== (media.value?.id || media.value?.privateId))
+  return (album.value?.media || []).filter(m => (m.id || m.privateId) !== (media.value?.id || media.value?.privateId))
 })
 
 const hasRelatedContent = computed(() => {
   const isPublicMedia = !!route.params.mediaId
-  const isPrivateProjectMedia = !!route.params.privateProjectId && !!route.params.privateMediaId
-  return (isPublicMedia || isPrivateProjectMedia) && relatedMedia.value.length > 0
+  const isPrivateAlbumMedia = !!route.params.privateAlbumId && !!route.params.privateMediaId
+  return (isPublicMedia || isPrivateAlbumMedia) && relatedMedia.value.length > 0
 })
 
 function getRelatedPath(related) {
-  if (route.params.privateProjectId) {
-    return `/private/p/${route.params.privateProjectId}/m/${related.privateId}/${related.slug}`
+  if (route.params.privateAlbumId) {
+    return `/private/a/${route.params.privateAlbumId}/m/${related.privateId}/${related.slug}`
   }
   return `/m/${related.publicId}/${related.slug}`
 }
 
 watch(
-  project,
-  newProject => {
-    if (channel.value && !newProject && (route.params.mediaId || route.params.privateMediaId) && !loading.value) {
+  album,
+  newAlbum => {
+    if (channel.value && !newAlbum && (route.params.mediaId || route.params.privateMediaId) && !loading.value) {
       redirect('/404')
     }
   },
@@ -156,8 +156,8 @@ watch(
   newMedia => {
     if (
       channel.value &&
-      project.value &&
-      (project.value.media?.length || 0) > 0 &&
+      album.value &&
+      (album.value.media?.length || 0) > 0 &&
       !newMedia &&
       !loading.value
     ) {
@@ -176,8 +176,8 @@ watch(
       return
     }
     if (route.params.privateMediaId && route.params.mediaSlug && newMedia.slug !== route.params.mediaSlug) {
-      if (route.params.privateProjectId && project.value?.privateId && newMedia.privateId) {
-        redirect(`/private/p/${project.value.privateId}/m/${newMedia.privateId}/${newMedia.slug}`)
+      if (route.params.privateAlbumId && album.value?.privateId && newMedia.privateId) {
+        redirect(`/private/a/${album.value.privateId}/m/${newMedia.privateId}/${newMedia.slug}`)
         return
       }
       if (newMedia.privateId) {

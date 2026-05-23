@@ -86,7 +86,7 @@ import { useImageSelectionProcessing } from '@composables/useImageFileProcessor.
 
 const props = defineProps({
   media: Object,
-  project: Object,
+  album: Object,
   channel: Object,
   getMediaLink: Function
 })

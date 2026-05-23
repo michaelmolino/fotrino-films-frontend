@@ -41,9 +41,9 @@ onMounted(async () => {
 watch(
   [
     () => route.params.channelId,
-    () => route.params.projectId,
+    () => route.params.albumId,
     () => route.params.mediaId,
-    () => route.params.privateProjectId,
+    () => route.params.privateAlbumId,
     () => route.params.privateMediaId
   ],
   async () => {

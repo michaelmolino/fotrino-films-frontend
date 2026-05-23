@@ -44,24 +44,24 @@ const $q = useQuasar()
 
 const props = defineProps({
   channel: { type: Object, required: true },
-  project: { type: Object, default: null },
+  album: { type: Object, default: null },
   media: { type: Object, default: null },
   private: { type: Boolean, default: false },
   privateScope: { type: String, default: 'media' }
 })
 
-const buildPrivateProjectBreadcrumbs = () => {
+const buildPrivateAlbumBreadcrumbs = () => {
   const arr = []
-  if (props.project?.privateId) {
+  if (props.album?.privateId) {
     arr.push({
-      id: 'private-project',
-      label: props.project?.title || 'Private Project',
-      to: props.media?.privateId ? `/private/p/${props.project.privateId}/${props.project.slug}` : null,
+      id: 'private-album',
+      label: props.album?.title || 'Private Album',
+      to: props.media?.privateId ? `/private/a/${props.album.privateId}/${props.album.slug}` : null,
     })
   }
-  if (props.media?.privateId && props.project?.privateId) {
+  if (props.media?.privateId && props.album?.privateId) {
     arr.push({
-      id: 'private-project-media',
+      id: 'private-album-media',
       label: props.media?.title || 'Private Media',
       to: null,
     })
@@ -78,16 +78,16 @@ const buildPublicBreadcrumbs = () => {
   arr.push({
     id: 0,
     label: props.channel.title,
-    to: props.project?.id || props.media?.id ? `/c/${props.channel.publicId}/${props.channel.slug}` : null,
+    to: props.album?.id || props.media?.id ? `/c/${props.channel.publicId}/${props.channel.slug}` : null,
   })
-  if (props.project?.id) {
+  if (props.album?.id) {
     arr.push({
       id: 1,
-      label: props.project.title,
-      to: props.media?.id ? `/p/${props.project.publicId}/${props.project.slug}` : null,
+      label: props.album.title,
+      to: props.media?.id ? `/a/${props.album.publicId}/${props.album.slug}` : null,
     })
   }
-  if (props.project?.id && props.media?.id) {
+  if (props.album?.id && props.media?.id) {
     arr.push({
       id: 2,
       label: props.media.title,
@@ -99,8 +99,8 @@ const buildPublicBreadcrumbs = () => {
 
 const breadcrumbs = computed(() => {
   if (props.private) {
-    if (props.privateScope === 'project') {
-      return buildPrivateProjectBreadcrumbs()
+    if (props.privateScope === 'album') {
+      return buildPrivateAlbumBreadcrumbs()
     }
 
     return [

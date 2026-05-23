@@ -23,17 +23,17 @@
         :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
         class="q-pb-md"
         clearable
-        :model-value="payload.project.media.title"
+        :model-value="payload.album.media.title"
         label="Title *"
         data-cy="upload-media-title"
         @update:model-value="onUpdateMediaTitle" />
       <q-card flat bordered class="q-pb-md">
         <q-card-section>
           <MediaPreviewSelectorFields
-            :preview-type="payload.project.media.previewType"
+            :preview-type="payload.album.media.previewType"
             :preview-file="previewFile"
             :preview-image="media?.preview || null"
-            :show-featured-border="!!payload.project.media.main"
+            :show-featured-border="!!payload.album.media.main"
             :preview-processing="previewProcessing"
             :frame-refresh-enabled="!!mediaFile"
             @update:previewType="onUpdatePreviewType"
@@ -43,9 +43,9 @@
         <q-separator inset />
         <q-card-section>
           <MediaMetadataFields
-            :description="payload.project.media.description"
-            :resource-date="payload.project.media.resourceDate"
-            :main="!!payload.project.media.main"
+            :description="payload.album.media.description"
+            :resource-date="payload.album.media.resourceDate"
+            :main="!!payload.album.media.main"
             :input-color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
             @update:description="onUpdateMediaDescription"
             @update:resourceDate="onUpdateResourceDate"
@@ -80,15 +80,15 @@ const $q = useQuasar()
 function onUpdateMediaTitle(val) {
   emit('update:payload', {
     ...props.payload,
-    project: { ...props.payload.project, media: { ...props.payload.project.media, title: val } }
+    album: { ...props.payload.album, media: { ...props.payload.album.media, title: val } }
   })
 }
 function onUpdateMediaDescription(val) {
   emit('update:payload', {
     ...props.payload,
-    project: {
-      ...props.payload.project,
-      media: { ...props.payload.project.media, description: val }
+    album: {
+      ...props.payload.album,
+      media: { ...props.payload.album.media, description: val }
     }
   })
 }
@@ -150,9 +150,9 @@ function onUpdatePreviewFile(fileOrFiles) {
 function onUpdatePreviewType(val) {
   emit('update:payload', {
     ...props.payload,
-    project: {
-      ...props.payload.project,
-      media: { ...props.payload.project.media, previewType: val }
+    album: {
+      ...props.payload.album,
+      media: { ...props.payload.album.media, previewType: val }
     }
   })
   if (val !== 'new') {
@@ -163,18 +163,18 @@ function onUpdateResourceDate(val) {
   const normalized = val ? val.replaceAll('/', '-') : val
   emit('update:payload', {
     ...props.payload,
-    project: {
-      ...props.payload.project,
-      media: { ...props.payload.project.media, resourceDate: normalized }
+    album: {
+      ...props.payload.album,
+      media: { ...props.payload.album.media, resourceDate: normalized }
     }
   })
 }
 function onUpdateMediaMain(val) {
   emit('update:payload', {
     ...props.payload,
-    project: {
-      ...props.payload.project,
-      media: { ...props.payload.project.media, main: !!val }
+    album: {
+      ...props.payload.album,
+      media: { ...props.payload.album.media, main: !!val }
     }
   })
 }

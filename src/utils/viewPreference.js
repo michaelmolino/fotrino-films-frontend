@@ -1,7 +1,7 @@
 import { LocalStorage } from 'quasar'
 
 const VIEW_KEY = 'fotrino-films-view'
-const ALLOWED = new Set(['projects', 'all'])
+const ALLOWED = new Set(['albums', 'all'])
 
 // Get the user's preferred view, or fallback to default
 export function getViewPreference(defaultValue = 'all') {

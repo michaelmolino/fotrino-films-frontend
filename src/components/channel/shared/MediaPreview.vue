@@ -31,7 +31,7 @@
       <div class="absolute-bottom text-center">
         <div class="ellipsis">
           <span>{{ media.title }}</span
-          ><span v-if="detail && media.title !== project?.title"><br />{{ project?.title }}</span>
+          ><span v-if="detail && media.title !== album?.title"><br />{{ album?.title }}</span>
         </div>
       </div>
       <template v-slot:error>
@@ -43,7 +43,7 @@
         <div class="absolute-bottom text-center">
           <div class="ellipsis">
             <span>{{ media.title }}</span
-            ><span v-if="detail && media.title !== project?.title"><br />{{ project?.title }}</span>
+            ><span v-if="detail && media.title !== album?.title"><br />{{ album?.title }}</span>
           </div>
         </div>
       </template>
@@ -64,9 +64,9 @@ import { ref, watch } from 'vue'
 import { addPreconnectForUrl } from '@utils/preconnect'
 import { useWebP } from '@composables/useWebP'
 
-const { media, project, detail, showMainAccent, priority, to } = defineProps({
+const { media, album, detail, showMainAccent, priority, to } = defineProps({
   media: { type: Object, required: true },
-  project: { type: Object, default: null },
+  album: { type: Object, default: null },
   detail: { type: Boolean, default: false },
   showMainAccent: { type: Boolean, default: true },
   priority: { type: String, default: 'auto' }, // 'high', 'low', or 'auto'

@@ -3,7 +3,7 @@ let hasResolvedHistory = false
 let resolveHistoryPromise = null
 import { parseStoredHistory, writeHistory, HISTORY_KEY } from './historyStorage.js'
 
-/** @typedef {{ publicId: string, type: 'channel' | 'privateMedia' | 'privateProject' }} HistoryEntry */
+/** @typedef {{ publicId: string, type: 'channel' | 'privateMedia' | 'privateAlbum' }} HistoryEntry */
 
 import { LocalStorage } from 'quasar'
 const parsedHistory = parseStoredHistory(LocalStorage.getItem(HISTORY_KEY))
@@ -34,9 +34,9 @@ export function addPrivateHistory(privateId, details = {}) {
   _addEntry({ publicId: privateId, type: 'privateMedia' }, { publicId: privateId, ...details })
 }
 
-export function addPrivateProjectHistory(privateId, details = {}) {
+export function addPrivateAlbumHistory(privateId, details = {}) {
   if (!privateId) return
-  _addEntry({ publicId: privateId, type: 'privateProject' }, { publicId: privateId, ...details })
+  _addEntry({ publicId: privateId, type: 'privateAlbum' }, { publicId: privateId, ...details })
 }
 
 function _addEntry(entry, channelData) {
@@ -158,7 +158,7 @@ export function watchChannelHistory(channelStore) {
   return watch(
     () => channelStore.channel,
     newChannel => {
-      if (getChannelHistoryId(newChannel) && Array.isArray(newChannel?.projects)) {
+      if (getChannelHistoryId(newChannel) && Array.isArray(newChannel?.albums)) {
         addHistory(newChannel)
       }
     },

@@ -33,83 +33,95 @@ export type Name1 = string
 export type NewUser1 = boolean
 export type Providers1 = UserProviderResponse[]
 export type AdminUsersResponse = UserResponse[]
+export type Label = string | null
+export type Value = number | string
+export type Description = string | null
+export type Filename = string
+export type Main = boolean
+export type Previewtype = 'frame' | 'new'
+export type Resourcedate = string
+export type Title1 = string
+export type Postercolor = string | null
+export type Postertype = 'default' | 'new'
+export type Subtitle = string | null
+export type Title2 = string | null
 export type Error = 'bad_request'
 export type Message = string | null
 export type Status = 400
-export type Cover1 = string
+export type Channel = number
 export type Created3 = string
 export type Deleted2 = boolean
 export type Id3 = number
-export type Owner = number
-export type Ownername = string
-export type Pending = boolean
-export type Channel = number
+export type Album = number
 export type Created4 = string
 export type Deleted3 = boolean
-export type Id4 = number
-export type Created5 = string
-export type Deleted4 = boolean
 export type DescriptionUnsafe = string | null
-export type Id5 = number
-export type Main = boolean
+export type Id4 = number
+export type Main1 = boolean
 export type Orientation = 'landscape' | 'portrait'
-export type Pending1 = boolean
+export type Pending = boolean
 export type Preview = string
 export type PrivateId = string
-export type Project = number
 export type Publicid1 = string
 export type ResourceDate = string
 export type Slug1 = string
 export type Src = string | null
-export type Title1 = string
+export type Title3 = string
 export type Type = string | null
 export type UpdatedAt = string
 export type Media = MediaResponse[]
-export type Pending2 = boolean
+export type Pending1 = boolean
 export type Poster = string | null
 export type PosterColor = string | null
 export type PrivateId1 = string
 export type Publicid2 = string
 export type ResourceDate1 = string
 export type Slug2 = string
-export type Subtitle = string | null
-export type Title2 = string
-export type UpdatedAt1 = string
-export type Projects = ProjectResponse[]
-export type Publicid3 = string
-export type Slug3 = string
-export type Title3 = string
-export type Created6 = string
-export type Deleted5 = boolean
-export type DescriptionUnsafe1 = string | null
-export type Id6 = number
-export type Main1 = boolean
-export type Orientation1 = 'landscape' | 'portrait'
-export type Pending3 = boolean
-export type Preview1 = string
-export type PrivateId2 = string
-export type Project1 = number
-export type Publicid4 = string
-export type ResourceDate2 = string
-export type Slug4 = string
-export type Src1 = string | null
+export type Subtitle1 = string | null
 export type Title4 = string
-export type Type1 = string | null
-export type UpdatedAt2 = string
+export type UpdatedAt1 = string
 export type Channel1 = number
-export type Created7 = string
-export type Deleted6 = boolean
-export type Id7 = number
+export type Created5 = string
+export type Deleted4 = boolean
+export type Id5 = number
 export type Media1 = MediaResponse[]
-export type Pending4 = boolean
+export type Pending2 = boolean
 export type Poster1 = string | null
 export type PosterColor1 = string | null
+export type PrivateId2 = string
+export type Publicid3 = string
+export type ResourceDate2 = string
+export type Slug3 = string
+export type Subtitle2 = string | null
+export type Title5 = string
+export type UpdatedAt2 = string
+export type Albums = AlbumResponse1[]
+export type Cover1 = string
+export type Created6 = string
+export type Deleted5 = boolean
+export type Id6 = number
+export type Owner = number
+export type Ownername = string
+export type Pending3 = boolean
+export type Publicid4 = string
+export type Slug4 = string
+export type Title6 = string
+export type Album1 = number
+export type Created7 = string
+export type Deleted6 = boolean
+export type DescriptionUnsafe1 = string | null
+export type Id7 = number
+export type Main2 = boolean
+export type Orientation1 = 'landscape' | 'portrait'
+export type Pending4 = boolean
+export type Preview1 = string
 export type PrivateId3 = string
 export type Publicid5 = string
 export type ResourceDate3 = string
 export type Slug5 = string
-export type Subtitle1 = string | null
-export type Title5 = string
+export type Src1 = string | null
+export type Title7 = string
+export type Type1 = string | null
 export type UpdatedAt3 = string
 export type Cover2 = string
 export type Created8 = string
@@ -119,7 +131,7 @@ export type Owner1 = number
 export type Pending5 = boolean
 export type Publicid6 = string
 export type Slug6 = string
-export type Title6 = string
+export type Title8 = string
 export type Error1 = 'conflict'
 export type Message1 = string | null
 export type Status1 = 409
@@ -137,18 +149,10 @@ export type Status4 = string
 export type Error7 = 'internal_server_error'
 export type Message4 = string | null
 export type Status5 = 500
-export type Label = string | null
-export type Value = number | string
-export type Description = string | null
-export type Main2 = boolean
-export type Resourcedate = string
-export type Title7 = string
 export type Description1 = string | null
-export type Filename = string
 export type Main3 = boolean
-export type Previewtype = 'frame' | 'new'
 export type Resourcedate1 = string
-export type Title8 = string
+export type Title9 = string
 export type Error8 = 'not_found'
 export type Message5 = string | null
 export type Status6 = 404
@@ -162,8 +166,6 @@ export type OAuthProvider =
   | 'test'
 export type PosterType = 'default' | 'new'
 export type PreviewType = 'frame' | 'new'
-export type Cover3 = string
-export type Ownername1 = string
 export type Created9 = string | null
 export type DescriptionUnsafe2 = string | null
 export type Orientation2 = ('landscape' | 'portrait') | null
@@ -172,7 +174,7 @@ export type PrivateId4 = string
 export type ResourceDate4 = string | null
 export type Slug7 = string
 export type Src2 = string | null
-export type Title9 = string
+export type Title10 = string
 export type Type2 = string | null
 export type UpdatedAt4 = string | null
 export type Media2 = PrivateMediaItemResponse[]
@@ -181,10 +183,8 @@ export type PosterColor2 = string | null
 export type Media3 = PrivateMediaItemResponse[]
 export type Poster3 = string | null
 export type PosterColor3 = string | null
-export type Postercolor = string | null
-export type Postertype = 'default' | 'new'
-export type Subtitle2 = string | null
-export type Title10 = string | null
+export type Cover3 = string
+export type Ownername1 = string
 export type Message6 = string | null
 export type Reported = boolean
 export type MediaId = number
@@ -223,10 +223,11 @@ export interface ApiContracts {
   AccountProvidersResponse: AccountProvidersResponse
   AdminUser: UserResponse
   AdminUsersResponse: AdminUsersResponse
+  AlbumUploadPayload: AlbumUploadPayload
   BadRequestErrorResponse: BadRequestErrorResponse
+  ChannelAlbum: AlbumResponse
   ChannelDetail: ChannelDetailResponse
   ChannelMedia: MediaResponse1
-  ChannelProject: ProjectResponse1
   ChannelSummary: ChannelSummaryResponse
   ConflictErrorResponse: ConflictErrorResponse
   CoverType: CoverType
@@ -244,9 +245,8 @@ export interface ApiContracts {
   OAuthProvider: OAuthProvider
   PosterType: PosterType
   PreviewType: PreviewType
+  PrivateMediaAlbum: PrivateMediaAlbumResponse
   PrivateMediaChannel: PrivateMediaChannelResponse
-  PrivateMediaProject: PrivateMediaProjectResponse1
-  ProjectUploadPayload: ProjectUploadPayload
   ReportMediaResponse: ReportMediaResponse
   ReportedMediaItem: ReportedMediaItemResponse
   ReportedMediaReport: ReportedMediaReportResponse1
@@ -302,94 +302,114 @@ export interface ChannelCoreResponse {
   slug: Slug
   title: Title
 }
+export interface AlbumUploadPayload {
+  id: LabeledValue
+  media: MediaUploadPayload
+  posterColor?: Postercolor
+  posterType?: Postertype
+  subtitle?: Subtitle
+  title?: Title2
+}
+export interface LabeledValue {
+  label?: Label
+  value: Value
+}
+export interface MediaUploadPayload {
+  description?: Description
+  filename: Filename
+  main?: Main
+  previewType?: Previewtype
+  resourceDate: Resourcedate
+  title: Title1
+}
 export interface BadRequestErrorResponse {
   error: Error
   message?: Message
   status: Status
 }
-export interface ChannelDetailResponse {
-  cover: Cover1
+export interface AlbumResponse {
+  channel: Channel
   created: Created3
   deleted?: Deleted2
   id: Id3
-  owner: Owner
-  ownername: Ownername
-  pending?: Pending
-  projects?: Projects
-  publicId: Publicid3
-  slug: Slug3
-  title: Title3
-}
-export interface ProjectResponse {
-  channel: Channel
-  created: Created4
-  deleted?: Deleted3
-  id: Id4
   media?: Media
-  pending?: Pending2
+  pending?: Pending1
   poster: Poster
   poster_color: PosterColor
   private_id: PrivateId1
   publicId: Publicid2
   resource_date: ResourceDate1
   slug: Slug2
-  subtitle: Subtitle
-  title: Title2
+  subtitle: Subtitle1
+  title: Title4
   updated_at: UpdatedAt1
 }
 export interface MediaResponse {
-  created: Created5
-  deleted?: Deleted4
+  album: Album
+  created: Created4
+  deleted?: Deleted3
   description_unsafe: DescriptionUnsafe
-  id: Id5
-  main: Main
+  id: Id4
+  main: Main1
   orientation: Orientation
-  pending?: Pending1
+  pending?: Pending
   preview: Preview
   private_id: PrivateId
-  project: Project
   publicId: Publicid1
   resource_date: ResourceDate
   slug: Slug1
   src: Src
-  title: Title1
+  title: Title3
   type: Type
   updated_at: UpdatedAt
 }
-export interface MediaResponse1 {
+export interface ChannelDetailResponse {
+  albums?: Albums
+  cover: Cover1
   created: Created6
   deleted?: Deleted5
-  description_unsafe: DescriptionUnsafe1
   id: Id6
-  main: Main1
-  orientation: Orientation1
+  owner: Owner
+  ownername: Ownername
   pending?: Pending3
-  preview: Preview1
-  private_id: PrivateId2
-  project: Project1
   publicId: Publicid4
-  resource_date: ResourceDate2
   slug: Slug4
-  src: Src1
-  title: Title4
-  type: Type1
-  updated_at: UpdatedAt2
+  title: Title6
 }
-export interface ProjectResponse1 {
+export interface AlbumResponse1 {
   channel: Channel1
-  created: Created7
-  deleted?: Deleted6
-  id: Id7
+  created: Created5
+  deleted?: Deleted4
+  id: Id5
   media?: Media1
-  pending?: Pending4
+  pending?: Pending2
   poster: Poster1
   poster_color: PosterColor1
+  private_id: PrivateId2
+  publicId: Publicid3
+  resource_date: ResourceDate2
+  slug: Slug3
+  subtitle: Subtitle2
+  title: Title5
+  updated_at: UpdatedAt2
+}
+export interface MediaResponse1 {
+  album: Album1
+  created: Created7
+  deleted?: Deleted6
+  description_unsafe: DescriptionUnsafe1
+  id: Id7
+  main: Main2
+  orientation: Orientation1
+  pending?: Pending4
+  preview: Preview1
   private_id: PrivateId3
   publicId: Publicid5
   resource_date: ResourceDate3
   slug: Slug5
-  subtitle: Subtitle1
-  title: Title5
+  src: Src1
+  title: Title7
+  type: Type1
   updated_at: UpdatedAt3
 }
 export interface ChannelSummaryResponse {
@@ -401,7 +421,7 @@ export interface ChannelSummaryResponse {
   pending?: Pending5
   publicId: Publicid6
   slug: Slug6
-  title: Title6
+  title: Title8
 }
 export interface ConflictErrorResponse {
   error: Error1
@@ -439,35 +459,18 @@ export interface InternalServerErrorResponse {
   message?: Message4
   status: Status5
 }
-export interface LabeledValue {
-  label?: Label
-  value: Value
-}
 export interface MediaUpdateRequest {
-  description?: Description
-  main: Main2
-  resourceDate: Resourcedate
-  title: Title7
-}
-export interface MediaUploadPayload {
   description?: Description1
-  filename: Filename
-  main?: Main3
-  previewType?: Previewtype
+  main: Main3
   resourceDate: Resourcedate1
-  title: Title8
+  title: Title9
 }
 export interface NotFoundErrorResponse {
   error: Error8
   message?: Message5
   status: Status6
 }
-export interface PrivateMediaChannelResponse {
-  cover: Cover3
-  ownername: Ownername1
-  project: PrivateMediaProjectResponse
-}
-export interface PrivateMediaProjectResponse {
+export interface PrivateMediaAlbumResponse {
   media?: Media2
   poster?: Poster2
   poster_color?: PosterColor2
@@ -481,22 +484,19 @@ export interface PrivateMediaItemResponse {
   resource_date?: ResourceDate4
   slug: Slug7
   src?: Src2
-  title: Title9
+  title: Title10
   type?: Type2
   updated_at?: UpdatedAt4
 }
-export interface PrivateMediaProjectResponse1 {
+export interface PrivateMediaChannelResponse {
+  album: PrivateMediaAlbumResponse1
+  cover: Cover3
+  ownername: Ownername1
+}
+export interface PrivateMediaAlbumResponse1 {
   media?: Media3
   poster?: Poster3
   poster_color?: PosterColor3
-}
-export interface ProjectUploadPayload {
-  id: LabeledValue
-  media: MediaUploadPayload
-  posterColor?: Postercolor
-  posterType?: Postertype
-  subtitle?: Subtitle2
-  title?: Title10
 }
 export interface ReportMediaResponse {
   message?: Message6
@@ -537,8 +537,8 @@ export interface UploadInstruction {
   url: Url
 }
 export interface UploadMediaRequest {
+  album: AlbumUploadPayload
   coverType?: Covertype
-  project: ProjectUploadPayload
   publicId: LabeledValue
   title?: Title12
 }

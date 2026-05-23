@@ -27,18 +27,18 @@
         @undelete="$emit('undeleteChannel', channel.publicId)" />
     </template>
 
-    <ProjectItem
-      v-for="project in channel.projects"
-      :key="project.id"
-      :project="project"
+    <AlbumItem
+      v-for="album in channel.albums"
+      :key="album.id"
+      :album="album"
       :channel="channel"
-      data-cy="project-item"
-      @deleteProject="$emit('deleteProject', $event)"
-      @undeleteProject="$emit('undeleteProject', $event)"
+      data-cy="album-item"
+      @deleteAlbum="$emit('deleteAlbum', $event)"
+      @undeleteAlbum="$emit('undeleteAlbum', $event)"
       @deleteMedia="$emit('deleteMedia', $event)"
       @undeleteMedia="$emit('undeleteMedia', $event)"
       @abortMedia="$emit('abortMedia', $event)"
-      @editProject="$emit('editProject', $event)"
+      @editAlbum="$emit('editAlbum', $event)"
       @editMedia="$emit('editMedia', $event)"
       :getMediaLink="getMediaLink" />
 
@@ -83,7 +83,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import ResourceActions from './ResourceActions.vue'
-import ProjectItem from './ProjectItem.vue'
+import AlbumItem from './AlbumItem.vue'
 import EditableChannelFields from '@components/account/shared/EditableChannelFields.vue'
 import { daysSince } from '@utils/date.js'
 import { useImageSelectionProcessing } from '@composables/useImageFileProcessor.js'
@@ -93,14 +93,14 @@ const props = defineProps({
   getMediaLink: Function
 })
 
-const emit = defineEmits(['deleteChannel', 'undeleteChannel', 'deleteProject', 'undeleteProject', 'deleteMedia', 'undeleteMedia', 'abortMedia', 'editMedia', 'editProject', 'editChannel'])
+const emit = defineEmits(['deleteChannel', 'undeleteChannel', 'deleteAlbum', 'undeleteAlbum', 'deleteMedia', 'undeleteMedia', 'abortMedia', 'editMedia', 'editAlbum', 'editChannel'])
 
 const hasPendingChildren = computed(() => {
-  for (const project of props.channel.projects || []) {
-    if (project?.pending) {
+  for (const album of props.channel.albums || []) {
+    if (album?.pending) {
       return true
     }
-    for (const media of project?.media || []) {
+    for (const media of album?.media || []) {
       if (media?.pending) {
         return true
       }

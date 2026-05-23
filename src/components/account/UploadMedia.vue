@@ -64,18 +64,18 @@
           @update:coverFile="file => handleFile(file, 'cover')" />
       </q-step>
 
-      <!-- Step 3: Project -->
+      <!-- Step 3: Album -->
       <q-step
         :name="3"
-        :title="stepTitles.project"
+        :title="stepTitles.album"
         icon="theaters"
         :done="step > 3"
         :header-nav="canOpenStepFromHeader(3)">
-        <ProjectStep
+        <AlbumStep
           class="step"
           :payload="payload"
-          :projects="projects"
-          :project="project"
+          :albums="albums"
+          :album="album"
           :posterFile="posterFile"
           :handleFile="handleFile"
           @update:payload="p => Object.assign(payload, p)"
@@ -92,7 +92,7 @@
         :header-nav="canOpenStepFromHeader(4)">
         <div class="text-center">
           <div class="upload-preview-shell">
-            <MediaPreview :media="media" :project="project" :detail="false" class="upload-preview" />
+            <MediaPreview :media="media" :album="album" :detail="false" class="upload-preview" />
             <div class="upload-progress-overlay" data-cy="upload-progress-overlay">
               <q-circular-progress
                 :indeterminate="progress === -1"
@@ -127,7 +127,7 @@
           <div class="upload-preview-shell q-mb-md">
             <MediaPreview
               :media="media"
-              :project="project"
+              :album="album"
               :detail="true"
               class="processing-preview" />
             <div class="upload-complete-overlay" data-cy="upload-complete-status">
@@ -211,7 +211,7 @@ import { useAccountStore } from 'src/stores/account-store.js'
 import { useChannelStore } from 'src/stores/channel-store.js'
 import { onBeforeRouteLeave, useRoute } from 'vue-router'
 import ChannelStep from './UploadMedia/ChannelStep.vue'
-import ProjectStep from './UploadMedia/ProjectStep.vue'
+import AlbumStep from './UploadMedia/AlbumStep.vue'
 import MediaStep from './UploadMedia/MediaStep.vue'
 import MediaPreview from '@components/channel/shared/MediaPreview.vue'
 import AuthRequired from '@components/shared/AuthRequired.vue'
@@ -229,14 +229,14 @@ const channelStore = useChannelStore()
 const route = useRoute()
 const step = ref(1)
 const stepper = ref(null)
-const projects = ref([])
+const albums = ref([])
 /** @type {import('src/types/api-contract').ApiContracts['UploadMediaRequest']} */
 function createInitialPayload() {
   return {
     publicId: null,
     coverType: 'profile',
     title: 'My Channel',
-    project: {
+    album: {
       id: null,
       posterType: 'default',
       title: 'My Videos',
@@ -259,7 +259,7 @@ const previewThumb = ref(null)
 const previewThumbRandom = ref(null)
 const mediaFile = ref(null)
 const counter = ref(0)
-const projectsLoadToken = ref(0)
+const albumsLoadToken = ref(0)
 const extractingFrame = ref(false)
 const frameExtractionToken = ref(0)
 const uploadTriggered = ref(false)
@@ -292,7 +292,7 @@ const uploadFilesByType = computed(() => {
 const stepTitles = computed(() => ({
   media: step.value > 1 ? media.value.title : 'Media',
   channel: step.value > 2 ? payload.title : 'Channel',
-  project: step.value > 3 ? project.value.title : 'Project'
+  album: step.value > 3 ? album.value.title : 'Album'
 }))
 
 const canGoBack = computed(() => step.value === 2 || step.value === 3)
@@ -438,7 +438,7 @@ function goBack() {
   if (step.value === 2) {
     resetChannelStep()
   } else if (step.value === 3) {
-    resetProjectStep()
+    resetAlbumStep()
   }
 
   stepper.value.previous()
@@ -453,10 +453,10 @@ function resetChannelStep() {
   clearUploadFile('cover')
 }
 
-function resetProjectStep() {
-  payload.project.id = null
-  payload.project.posterType = 'default'
-  payload.project.title = 'My Videos'
+function resetAlbumStep() {
+  payload.album.id = null
+  payload.album.posterType = 'default'
+  payload.album.title = 'My Videos'
   posterFile.value = null
   posterThumb.value = null
   clearUploadFile('poster')
@@ -471,7 +471,7 @@ function resetUploadFlow() {
   payload.publicId = freshPayload.publicId
   payload.coverType = freshPayload.coverType
   payload.title = freshPayload.title
-  payload.project = freshPayload.project
+  payload.album = freshPayload.album
 
   step.value = 1
   coverFile.value = null
@@ -503,9 +503,9 @@ const isNewUserProfile = computed(() => {
   return profile.value.newUser === true
 })
 const channels = computed(() => channelStore.channels)
-const projectsById = computed(() => {
+const albumsById = computed(() => {
   const map = {}
-  for (const item of projects.value || []) {
+  for (const item of albums.value || []) {
     if (item?.id != null) {
       map[item.id] = item
     }
@@ -513,47 +513,47 @@ const projectsById = computed(() => {
   return map
 })
 
-const project = computed(() => {
-  // If selecting an existing project, return it from the list
-  if (payload.project.id?.value && payload.project.id.value !== 0) {
-    return projectsById.value[payload.project.id.value]
+const album = computed(() => {
+  // If selecting an existing album, return it from the list
+  if (payload.album.id?.value && payload.album.id.value !== 0) {
+    return albumsById.value[payload.album.id.value]
   }
 
-  // Creating a new project - determine poster
+  // Creating a new album - determine poster
   const poster =
-    payload.project.id?.value === 0 && payload.project.posterType === 'new'
+    payload.album.id?.value === 0 && payload.album.posterType === 'new'
       ? posterThumb.value
       : null
 
-  // Return new project structure
+  // Return new album structure
   return {
-    title: payload.project.title,
-    subtitle: payload.project.subtitle,
+    title: payload.album.title,
+    subtitle: payload.album.subtitle,
     poster,
     media: []
   }
 })
 
 const media = computed(() => {
-  if (mediaFile.value && payload.project.media.previewType === 'frame') {
+  if (mediaFile.value && payload.album.media.previewType === 'frame') {
     return {
-      title: payload.project.media.title,
-      description: payload.project.media.description,
-      main: payload.project.media.main,
+      title: payload.album.media.title,
+      description: payload.album.media.description,
+      main: payload.album.media.main,
       preview: previewThumbRandom.value
     }
-  } else if (previewFile.value && payload.project.media.previewType === 'new') {
+  } else if (previewFile.value && payload.album.media.previewType === 'new') {
     return {
-      title: payload.project.media.title,
-      description: payload.project.media.description,
-      main: payload.project.media.main,
+      title: payload.album.media.title,
+      description: payload.album.media.description,
+      main: payload.album.media.main,
       preview: previewThumb.value
     }
   }
   return {
-    title: payload.project.media.title,
-    description: payload.project.media.description,
-    main: payload.project.media.main
+    title: payload.album.media.title,
+    description: payload.album.media.description,
+    main: payload.album.media.main
   }
 })
 
@@ -561,11 +561,11 @@ const next = computed(() => {
   switch (step.value) {
     case 1: // Media
       return (
-        !!payload.project?.media?.title &&
+        !!payload.album?.media?.title &&
         !!mediaFile.value &&
         !isPreviewProcessing.value &&
-        ((payload.project.media.previewType === 'new' && !!previewFile.value) ||
-          (payload.project.media.previewType === 'frame' && !!previewThumbRandom.value))
+        ((payload.album.media.previewType === 'new' && !!previewFile.value) ||
+          (payload.album.media.previewType === 'frame' && !!previewThumbRandom.value))
       )
     case 2: // Channel
       return (
@@ -573,12 +573,12 @@ const next = computed(() => {
         (!!payload.publicId?.value ||
           (!!payload.title && (!!coverFile.value || payload.coverType === 'profile')))
       )
-    case 3: // Project
+    case 3: // Album
       return (
-        payload.project.id !== null &&
-        (!!payload.project.id?.value ||
-          (!!payload.project.title &&
-            (!!posterFile.value || payload.project.posterType === 'default')))
+        payload.album.id !== null &&
+        (!!payload.album.id?.value ||
+          (!!payload.album.title &&
+            (!!posterFile.value || payload.album.posterType === 'default')))
       )
     default:
       return false
@@ -589,7 +589,7 @@ const quickUploadAvailable = computed(() => {
   const ch = channels.value || []
   if (ch.length === 0) return true
   if (ch.length === 1) {
-    const p = projects.value || []
+    const p = albums.value || []
     return p.length <= 1
   }
   return false
@@ -606,17 +606,17 @@ async function quickUpload() {
     } else if (ch.length === 0) {
       payload.publicId = { value: 0, label: 'New...' }
     }
-    // Resolve projects if channel exists
-    projects.value = []
+    // Resolve albums if channel exists
+    albums.value = []
     if (payload.publicId && payload.publicId.value && payload.publicId.value !== 0) {
-      await loadProjectsForChannelUuid(payload.publicId.value)
+      await loadAlbumsForChannelUuid(payload.publicId.value)
     }
-    // Select or create project
-    if (projects.value.length === 1) {
-      const p = projects.value[0]
-      payload.project.id = { value: p.id, label: p.title }
+    // Select or create album
+    if (albums.value.length === 1) {
+      const p = albums.value[0]
+      payload.album.id = { value: p.id, label: p.title }
     } else {
-      payload.project.id = { value: 0, label: 'New...' }
+      payload.album.id = { value: 0, label: 'New...' }
     }
 
     // Quick upload skips the intermediate UI steps; explicitly enter
@@ -633,39 +633,39 @@ async function quickUpload() {
 }
 
 // watchers
-// Keep projects in sync with the selected channel. If 'New...' is selected, there are no projects.
+// Keep albums in sync with the selected channel. If 'New...' is selected, there are no albums.
 watch(
   () => payload.publicId?.value,
   async newPublicId => {
     try {
       if (!newPublicId || newPublicId === 0) {
-        projectsLoadToken.value++
-        projects.value = []
-        // Ensure the Project step defaults to creating a new project
-        if (!payload.project?.id || payload.project.id.value !== 0) {
-          payload.project.id = { value: 0, label: 'New...' }
+        albumsLoadToken.value++
+        albums.value = []
+        // Ensure the Album step defaults to creating a new album
+        if (!payload.album?.id || payload.album.id.value !== 0) {
+          payload.album.id = { value: 0, label: 'New...' }
         }
         return
       }
 
-      const requestToken = ++projectsLoadToken.value
-      await loadProjectsForChannelUuid(newPublicId, requestToken)
-      if (requestToken !== projectsLoadToken.value) return
-      // If the previously selected project isn't part of this channel, reset selection
-      const currentId = payload.project?.id?.value
-      const found = currentId && projectsById.value[currentId] != null
+      const requestToken = ++albumsLoadToken.value
+      await loadAlbumsForChannelUuid(newPublicId, requestToken)
+      if (requestToken !== albumsLoadToken.value) return
+      // If the previously selected album isn't part of this channel, reset selection
+      const currentId = payload.album?.id?.value
+      const found = currentId && albumsById.value[currentId] != null
       if (!found) {
-        if (projects.value.length === 1) {
-          const p = projects.value[0]
-          payload.project.id = { value: p.id, label: p.title }
+        if (albums.value.length === 1) {
+          const p = albums.value[0]
+          payload.album.id = { value: p.id, label: p.title }
         } else {
-          payload.project.id = { value: 0, label: 'New...' }
+          payload.album.id = { value: 0, label: 'New...' }
         }
       }
     } catch (err) {
-      console.error('Failed syncing projects with channel selection:', err)
-      projects.value = []
-      payload.project.id = { value: 0, label: 'New...' }
+      console.error('Failed syncing albums with channel selection:', err)
+      albums.value = []
+      payload.album.id = { value: 0, label: 'New...' }
     }
   }
 )
@@ -675,38 +675,38 @@ watch(channels, ch => {
   if (ch.length === 1 && step.value === 2) {
     payload.publicId = ch.map(({ publicId, title }) => ({ value: publicId, label: title }))[0]
   }
-  // Keep projects in sync for quick upload checks
+  // Keep albums in sync for quick upload checks
   if (ch.length === 1) {
-    const requestToken = ++projectsLoadToken.value
-    loadProjectsForChannelUuid(ch[0].publicId, requestToken)
+    const requestToken = ++albumsLoadToken.value
+    loadAlbumsForChannelUuid(ch[0].publicId, requestToken)
   } else {
-    projectsLoadToken.value++
-    projects.value = []
+    albumsLoadToken.value++
+    albums.value = []
   }
 })
 
-watch(projects, p => {
-  if (p.length === 0 && step.value === 3) payload.project.id = { value: 0, label: 'New...' }
+watch(albums, p => {
+  if (p.length === 0 && step.value === 3) payload.album.id = { value: 0, label: 'New...' }
   if (p.length === 1 && step.value === 3) {
-    payload.project.id = p.map(({ id, title }) => ({ value: id, label: title }))[0]
+    payload.album.id = p.map(({ id, title }) => ({ value: id, label: title }))[0]
   }
 })
 
 watch(step, (s, previousStep) => {
   if (s === 3 && payload.publicId?.value !== 0 && payload.publicId?.value) {
-    const requestToken = ++projectsLoadToken.value
-    loadProjectsForChannelUuid(payload.publicId.value, requestToken).then(() => {
-      if (requestToken !== projectsLoadToken.value) return
-      if (projects.value.length === 0) payload.project.id = { value: 0, label: 'New...' }
-      if (projects.value.length === 1) {
-        payload.project.id = projects.value.map(({ id, title }) => ({
+    const requestToken = ++albumsLoadToken.value
+    loadAlbumsForChannelUuid(payload.publicId.value, requestToken).then(() => {
+      if (requestToken !== albumsLoadToken.value) return
+      if (albums.value.length === 0) payload.album.id = { value: 0, label: 'New...' }
+      if (albums.value.length === 1) {
+        payload.album.id = albums.value.map(({ id, title }) => ({
           value: id,
           label: title
         }))[0]
       }
     })
-  } else if (projects.value.length === 0 && s === 3) {
-    payload.project.id = { value: 0, label: 'New...' }
+  } else if (albums.value.length === 0 && s === 3) {
+    payload.album.id = { value: 0, label: 'New...' }
   }
 
   // Entering step 4 should behave the same whether it came from the button
@@ -735,9 +735,9 @@ watchFileThumb(previewFile, previewThumb)
 
 watch(mediaFile, file => {
   if (file) {
-    payload.project.media.filename = file.name
+    payload.album.media.filename = file.name
   } else {
-    payload.project.media.filename = null
+    payload.album.media.filename = null
     disposeFrameSession()
   }
 })
@@ -746,7 +746,7 @@ watch(mediaFile, file => {
 // Only trigger extraction when mediaFile or the refresh counter changes.
 watch([() => mediaFile.value, () => counter.value], async ([mf]) => {
   const token = ++frameExtractionToken.value
-  if (payload.project.media.previewType !== 'frame' || !mf) {
+  if (payload.album.media.previewType !== 'frame' || !mf) {
     if (!mf) {
       setPreviewThumbRandom(null)
     }
@@ -766,7 +766,7 @@ watch([() => mediaFile.value, () => counter.value], async ([mf]) => {
     }
   } catch (err) {
     console.error(err)
-    payload.project.media.previewType = 'new'
+    payload.album.media.previewType = 'new'
     Notify.create({
       type: 'negative',
       timeout: 0,
@@ -782,7 +782,7 @@ watch([() => mediaFile.value, () => counter.value], async ([mf]) => {
 })
 
 watch(
-  () => payload.project.media.previewType,
+  () => payload.album.media.previewType,
   previewType => {
     if (previewType !== 'frame') {
       frameExtractionToken.value += 1
@@ -805,33 +805,33 @@ watch(
 // Step-specific helpers live in the step components now
 
 // lifecycle
-async function loadProjectsForChannelUuid(publicId, requestToken = projectsLoadToken.value) {
+async function loadAlbumsForChannelUuid(publicId, requestToken = albumsLoadToken.value) {
   try {
     const existing = (channels.value || []).find(ch => ch?.publicId === publicId)
-    if (Array.isArray(existing?.projects)) {
-      if (requestToken !== projectsLoadToken.value) return
-      projects.value = existing.projects
+    if (Array.isArray(existing?.albums)) {
+      if (requestToken !== albumsLoadToken.value) return
+      albums.value = existing.albums
       return
     }
 
     // Avoid cache key collisions between pending/non-pending variants.
     let chan = await channelStore.loadChannel({ channelId: publicId, pending: true, cache: false })
-    let projectList = Array.isArray(chan?.projects) ? chan.projects : []
+    let albumList = Array.isArray(chan?.albums) ? chan.albums : []
 
-    if (projectList.length === 0) {
+    if (albumList.length === 0) {
       chan = await channelStore.loadChannel({ channelId: publicId, pending: false, cache: false })
-      projectList = Array.isArray(chan?.projects) ? chan.projects : []
+      albumList = Array.isArray(chan?.albums) ? chan.albums : []
     }
 
-    if (requestToken !== projectsLoadToken.value) return
-    projects.value = projectList
+    if (requestToken !== albumsLoadToken.value) return
+    albums.value = albumList
   } catch (err) {
-    if (requestToken !== projectsLoadToken.value) return
-    console.error('Failed to load channel projects:', err)
-    projects.value = []
+    if (requestToken !== albumsLoadToken.value) return
+    console.error('Failed to load channel albums:', err)
+    albums.value = []
     Notify.create({
       type: 'negative',
-      message: getComponentApiErrorMessage(err, 'Failed to load channel projects.')
+      message: getComponentApiErrorMessage(err, 'Failed to load channel albums.')
     })
   }
 }
@@ -847,11 +847,11 @@ onMounted(async () => {
   await channelStore.loadChannels(true)
   const list = channelStore.channels || []
   if (list.length === 1) {
-    const requestToken = ++projectsLoadToken.value
-    await loadProjectsForChannelUuid(list[0].publicId, requestToken)
+    const requestToken = ++albumsLoadToken.value
+    await loadAlbumsForChannelUuid(list[0].publicId, requestToken)
   } else {
-    projectsLoadToken.value++
-    projects.value = []
+    albumsLoadToken.value++
+    albums.value = []
   }
   globalThis.addEventListener('beforeunload', beforeUnloadHandler)
 })

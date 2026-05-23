@@ -18,10 +18,10 @@ const routes = [
     ]
   },
   {
-    path: '/p/:projectId([0-9A-Za-z_-]+)/:projectSlug([0-9a-zA-Z-]+)',
+    path: '/a/:albumId([0-9A-Za-z_-]+)/:albumSlug([0-9a-zA-Z-]+)',
     component: () => import('@layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('@components/channel/ProjectRoot.vue') }
+      { path: '', component: () => import('@components/channel/AlbumRoot.vue') }
     ]
   },
   {
@@ -32,14 +32,14 @@ const routes = [
     ]
   },
   {
-    path: '/private/p/:privateProjectId([0-9A-Za-z_-]+)/:projectSlug([0-9a-zA-Z-]+)',
+    path: '/private/a/:privateAlbumId([0-9A-Za-z_-]+)/:albumSlug([0-9a-zA-Z-]+)',
     component: () => import('@layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('@components/channel/ProjectRoot.vue') }
+      { path: '', component: () => import('@components/channel/AlbumRoot.vue') }
     ]
   },
   {
-    path: '/private/p/:privateProjectId([0-9A-Za-z_-]+)/m/:privateMediaId([0-9A-Za-z_-]+)/:mediaSlug([0-9a-zA-Z-]+)',
+    path: '/private/a/:privateAlbumId([0-9A-Za-z_-]+)/m/:privateMediaId([0-9A-Za-z_-]+)/:mediaSlug([0-9a-zA-Z-]+)',
     component: () => import('@layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('@components/channel/MediaRoot.vue') }

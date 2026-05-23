@@ -1,18 +1,18 @@
 <template>
-  <div class="q-pa-md" data-cy="project-root">
+  <div class="q-pa-md" data-cy="album-root">
     <template v-if="loading">
       <q-skeleton type="rect" class="q-mb-md skeleton-large" />
       <q-skeleton type="text" width="60%" />
       <q-skeleton type="text" width="40%" />
     </template>
 
-    <template v-else-if="channel && project && (route.params.projectId || route.params.privateProjectId)">
+    <template v-else-if="channel && album && (route.params.albumId || route.params.privateAlbumId)">
       <BreadCrumbs
         :channel="channel"
-        :project="project"
+        :album="album"
         :media="null"
         :private="privateMode"
-        private-scope="project" />
+        private-scope="album" />
 
       <!-- Scenario 1: No featured media - show list view -->
       <template v-if="featuredMediaCount === 0">
@@ -25,7 +25,7 @@
               class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm text-center">
               <MediaPreview
                 :channel="channel"
-                :project="project"
+                :album="album"
                 :media="item"
                 :to="getMediaPath(item)"
                 :detail="true"
@@ -56,7 +56,7 @@
               class="col-xs-12 col-sm-6 col-md-4 q-pa-sm">
               <MediaPreview
                 :channel="channel"
-                :project="project"
+                :album="album"
                 :media="item"
                 :to="getMediaPath(item)"
                 :detail="true"
@@ -68,7 +68,7 @@
 
         <!-- Other media section -->
         <template v-if="otherMedia.length > 0">
-          <div class="q-pt-md text-h6" data-cy="other-media-title">More from {{ project.title }}</div>
+          <div class="q-pt-md text-h6" data-cy="other-media-title">More from {{ album.title }}</div>
           <q-separator spaced />
           <div class="row">
             <div
@@ -77,7 +77,7 @@
               class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm">
               <MediaPreview
                 :channel="channel"
-                :project="project"
+                :album="album"
                 :media="related"
                 :to="getMediaPath(related)"
                 :priority="index === 0 ? 'high' : 'auto'" />
@@ -88,13 +88,13 @@
 
       <ShareActions
         :channel="channel"
-        :project="project"
+        :album="album"
         :private="privateMode"
-        private-scope="project" />
+        private-scope="album" />
     </template>
 
     <template v-else>
-      <NothingText text="Project not found or unavailable." />
+      <NothingText text="Album not found or unavailable." />
     </template>
   </div>
 </template>
@@ -117,7 +117,7 @@ const channelStore = useChannelStore()
 
 const { channel, loading } = useChannelLoader()
 
-const privateMode = computed(() => !!route.params.privateProjectId)
+const privateMode = computed(() => !!route.params.privateAlbumId)
 
 function redirect(pathOrObj) {
   if (redirecting.value) return
@@ -125,29 +125,29 @@ function redirect(pathOrObj) {
   router.replace(pathOrObj)
 }
 
-function findProjectByParams() {
-  if (route.params.privateProjectId) {
-    return channel.value?.project || null
+function findAlbumByParams() {
+  if (route.params.privateAlbumId) {
+    return channel.value?.album || null
   }
-  if (route.params.projectId) {
-    return channelStore.findProjectByPublicId(route.params.projectId)
+  if (route.params.albumId) {
+    return channelStore.findAlbumByPublicId(route.params.albumId)
   }
   return null
 }
 
 function getMediaPath(media) {
-  if (privateMode.value && route.params.privateProjectId) {
-    return `/private/p/${route.params.privateProjectId}/m/${media.privateId}/${media.slug}`
+  if (privateMode.value && route.params.privateAlbumId) {
+    return `/private/a/${route.params.privateAlbumId}/m/${media.privateId}/${media.slug}`
   }
   return `/m/${media.publicId}/${media.slug}`
 }
 
-const project = computed(() => {
-  return findProjectByParams()
+const album = computed(() => {
+  return findAlbumByParams()
 })
 
 const allMedia = computed(() => {
-  return project.value?.media || []
+  return album.value?.media || []
 })
 
 const featuredMedia = computed(() => {
@@ -163,32 +163,32 @@ const otherMedia = computed(() => {
 })
 
 watch(
-  project,
-  newProject => {
-    if (channel.value && newProject && route.params.projectSlug && newProject.slug !== route.params.projectSlug && !loading.value) {
-      if (privateMode.value && newProject.privateId) {
-        redirect(`/private/p/${newProject.privateId}/${newProject.slug}`)
+  album,
+  newAlbum => {
+    if (channel.value && newAlbum && route.params.albumSlug && newAlbum.slug !== route.params.albumSlug && !loading.value) {
+      if (privateMode.value && newAlbum.privateId) {
+        redirect(`/private/a/${newAlbum.privateId}/${newAlbum.slug}`)
       } else {
-        redirect(`/p/${newProject.publicId}/${newProject.slug}`)
+        redirect(`/a/${newAlbum.publicId}/${newAlbum.slug}`)
       }
       return
     }
-    if (channel.value && !newProject && (route.params.projectId || route.params.privateProjectId) && !loading.value) {
+    if (channel.value && !newAlbum && (route.params.albumId || route.params.privateAlbumId) && !loading.value) {
       redirect('/404')
     }
   },
   { immediate: true }
 )
 
-// If exactly one featured media and we're on the project (not media) route, 
+// If exactly one featured media and we're on the album (not media) route, 
 // redirect to the media route to use MediaRoot instead
 watch(
-  [featuredMediaCount, project, loading],
+  [featuredMediaCount, album, loading],
   ([count, proj, isLoading]) => {
-    if (!isLoading && channel.value && proj && count === 1 && (route.params.projectId || route.params.privateProjectId)) {
+    if (!isLoading && channel.value && proj && count === 1 && (route.params.albumId || route.params.privateAlbumId)) {
       const featured = featuredMedia.value[0]
-      if (privateMode.value && route.params.privateProjectId && featured?.privateId) {
-        redirect(`/private/p/${route.params.privateProjectId}/m/${featured.privateId}/${featured.slug}`)
+      if (privateMode.value && route.params.privateAlbumId && featured?.privateId) {
+        redirect(`/private/a/${route.params.privateAlbumId}/m/${featured.privateId}/${featured.slug}`)
       } else {
         redirect(`/m/${featured.publicId}/${featured.slug}`)
       }

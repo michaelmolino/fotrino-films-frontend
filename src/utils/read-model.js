@@ -1,10 +1,11 @@
 import { sortBy } from '@utils/sort.js'
 
-const buildMediaEntity = (media, projectId) => ({
+const buildMediaEntity = (media, albumId, albumPublicId) => ({
     id: media.id,
     publicId: media.publicId,
     privateId: media.privateId,
-    project: projectId,
+    album: albumId,
+    albumPublicId,
     title: media.title,
     slug: media.slug,
     descriptionUnsafe: media.descriptionUnsafe,
@@ -20,40 +21,40 @@ const buildMediaEntity = (media, projectId) => ({
     updatedAt: media.updatedAt,
 })
 
-const buildProjectEntity = (project, channelId, relationships, mediaByPublicId) => {
-    const projectPublicId = project.publicId
-    const mediaPublicIds = relationships.mediaPublicIdsByProjectPublicId?.[projectPublicId] || []
+const buildAlbumEntity = (album, channelId, relationships, mediaByPublicId) => {
+    const albumPublicId = album.publicId
+    const mediaPublicIds = relationships.mediaPublicIdsByAlbumPublicId?.[albumPublicId] || []
     const media = mediaPublicIds
         .map(mediaId => mediaByPublicId[mediaId])
         .filter(Boolean)
-        .map(item => buildMediaEntity(item, project.id))
+        .map(item => buildMediaEntity(item, album.id, albumPublicId))
 
     return {
-        id: project.id,
-        publicId: projectPublicId,
-        privateId: project.privateId,
+        id: album.id,
+        publicId: albumPublicId,
+        privateId: album.privateId,
         channel: channelId,
-        title: project.title,
-        slug: project.slug,
-        subtitle: project.subtitle,
-        poster: project.poster,
-        posterColor: project.posterColor,
-        resourceDate: project.resourceDate,
-        pending: project.pending,
-        deleted: project.deleted,
-        created: project.created,
-        updatedAt: project.updatedAt,
+        title: album.title,
+        slug: album.slug,
+        subtitle: album.subtitle,
+        poster: album.poster,
+        posterColor: album.posterColor,
+        resourceDate: album.resourceDate,
+        pending: album.pending,
+        deleted: album.deleted,
+        created: album.created,
+        updatedAt: album.updatedAt,
         media,
     }
 }
 
 export const sortChannelDetail = channel => {
     if (!channel) return channel
-    const projects = sortBy(channel.projects, 'resourceDate', 'desc').map(project => ({
-        ...project,
-        media: sortBy(project.media, 'resourceDate', 'desc')
+    const albums = sortBy(channel.albums, 'resourceDate', 'desc').map(album => ({
+        ...album,
+        media: sortBy(album.media, 'resourceDate', 'desc')
     }))
-    return { ...channel, projects }
+    return { ...channel, albums }
 }
 
 export const buildChannelFromReadModel = readModel => {
@@ -63,7 +64,7 @@ export const buildChannelFromReadModel = readModel => {
     const entities = readModel.entities || {}
     const relationships = readModel.relationships || {}
     const channelsByPublicId = entities.channelsByPublicId || {}
-    const projectsByPublicId = entities.projectsByPublicId || {}
+    const albumsByPublicId = entities.albumsByPublicId || {}
     const mediaByPublicId = entities.mediaByPublicId || {}
 
     const channelPublicId = focus.channelPublicId
@@ -84,15 +85,15 @@ export const buildChannelFromReadModel = readModel => {
         created: channelEntity.created,
     }
 
-    const projectPublicIds = relationships.projectPublicIdsByChannelPublicId?.[channelPublicId] || []
-    const projects = projectPublicIds
-        .map(projectId => projectsByPublicId[projectId])
+    const albumPublicIds = relationships.albumPublicIdsByChannelPublicId?.[channelPublicId] || []
+    const albums = albumPublicIds
+        .map(albumId => albumsByPublicId[albumId])
         .filter(Boolean)
-        .map(project => buildProjectEntity(project, channelEntity.id, relationships, mediaByPublicId))
+        .map(album => buildAlbumEntity(album, channelEntity.id, relationships, mediaByPublicId))
 
     return sortChannelDetail({
         ...baseChannel,
-        projects,
+        albums,
     })
 }
 
@@ -101,9 +102,7 @@ export const normalizeChannelPayload = payload => {
 
     const hasReadModelEnvelope = !!(payload?.focus && payload?.entities && payload?.relationships)
     if (!hasReadModelEnvelope) {
-        // Backward compatibility: some endpoints still return a plain channel payload.
-        // Normalize sorting when projects are present and continue without a read model.
-        if (Array.isArray(payload?.projects)) {
+        if (Array.isArray(payload?.albums)) {
             return {
                 channel: sortChannelDetail(payload),
                 readModel: null,

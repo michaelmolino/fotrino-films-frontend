@@ -1,39 +1,39 @@
 <template>
   <div>
     <q-expansion-item
-      :label="project.title"
+      :label="album.title"
       :header-inset-level="0.5"
       :content-inset-level="1"
-      group="projects"
+      group="albums"
       expand-icon-toggle
       expand-separator
       switch-toggle-side
-      :disable="project.pending">
+      :disable="album.pending">
       <template #header>
         <ResourceActions
-          :title="project.title"
-          :image="project.poster"
-          :color="project.posterColor || '#000000'"
-          :pending="project.pending"
-          :deleted="project.deleted"
-          :undeletable="project.deleted"
+          :title="album.title"
+          :image="album.poster"
+          :color="album.posterColor || '#000000'"
+          :pending="album.pending"
+          :deleted="album.deleted"
+          :undeletable="album.deleted"
           :hasPending-children="hasPendingChildren"
-          :link="getMediaLink('project', project.id)"
+          :link="getMediaLink('album', album.id)"
           :avatarSize="'40px'"
-          :subtitle="project.created ? `Created: ${daysSince(project.created, true)}` : ''"
+          :subtitle="album.created ? `Created: ${daysSince(album.created, true)}` : ''"
           editable
-          edit-data-cy="edit-project"
-          delete-data-cy="delete-project"
+          edit-data-cy="edit-album"
+          delete-data-cy="delete-album"
           @edit="openEditDialog"
-          @delete="$emit('deleteProject', project.id)"
-          @undelete="$emit('undeleteProject', project.id)" />
+          @delete="$emit('deleteAlbum', album.id)"
+          @undelete="$emit('undeleteAlbum', album.id)" />
       </template>
 
       <MediaItem
-        v-for="media in project.media"
+        v-for="media in album.media"
         :key="media.id"
         :media="media"
-        :project="project"
+        :album="album"
         :channel="channel"
         data-cy="media-item"
         :getMediaLink="getMediaLink"
@@ -43,10 +43,10 @@
         @editMedia="$emit('editMedia', $event)" />
     </q-expansion-item>
 
-    <q-dialog v-model="editDialog" no-backdrop-dismiss data-cy="edit-project-dialog">
-      <q-card style="min-width: 320px; width: 100%; max-width: 560px" data-cy="edit-project-dialog-card">
+    <q-dialog v-model="editDialog" no-backdrop-dismiss data-cy="edit-album-dialog">
+      <q-card style="min-width: 320px; width: 100%; max-width: 560px" data-cy="edit-album-dialog-card">
         <q-card-section>
-          <div class="text-h6 text-weight-medium" data-cy="edit-project-dialog-title">{{ project.title }}</div>
+          <div class="text-h6 text-weight-medium" data-cy="edit-album-dialog-title">{{ album.title }}</div>
         </q-card-section>
 
         <q-card-section>
@@ -55,22 +55,22 @@
             clearable
             class="q-pb-md"
             :model-value="editForm.title"
-            label="Project Title"
-            data-cy="project-title-input"
+            label="Album Title"
+            data-cy="album-title-input"
             @update:model-value="onUpdateTitle" />
-          <ProjectPosterFields
+          <AlbumPosterFields
             :subtitle="editForm.subtitle"
-            subtitle-label="Project SubTitle"
+            subtitle-label="Album SubTitle"
             :poster-type="editForm.posterType"
             :poster-color="editForm.posterColor"
             :poster-file="editPosterFile"
-            :project-preview="editProjectPreview"
-            subtitle-data-cy="project-subtitle-input"
-            poster-type-default-data-cy="project-poster-type-default"
-            poster-type-new-data-cy="project-poster-type-new"
-            poster-file-data-cy="project-poster-file"
-            poster-color-button-data-cy="project-poster-color"
-            poster-preview-data-cy="project-poster-preview"
+            :album-preview="editAlbumPreview"
+            subtitle-data-cy="album-subtitle-input"
+            poster-type-default-data-cy="album-poster-type-default"
+            poster-type-new-data-cy="album-poster-type-new"
+            poster-file-data-cy="album-poster-file"
+            poster-color-button-data-cy="album-poster-color"
+            poster-preview-data-cy="album-poster-preview"
             @update:subtitle="onUpdateSubtitle"
             @update:posterType="onUpdatePosterType"
             @update:posterColor="onUpdatePosterColor"
@@ -83,7 +83,7 @@
             unelevated
             label="Save"
             color="accent"
-            data-cy="edit-project-save"
+            data-cy="edit-album-save"
             :loading="editPosterProcessing"
             :disable="editPosterProcessing"
             @click="saveEdit" />
@@ -98,16 +98,16 @@ import { computed, ref } from 'vue'
 import ResourceActions from './ResourceActions.vue'
 import MediaItem from './MediaItem.vue'
 import { daysSince } from '@utils/date.js'
-import ProjectPosterFields from '@components/account/shared/ProjectPosterFields.vue'
+import AlbumPosterFields from '@components/account/shared/AlbumPosterFields.vue'
 import { useImageSelectionProcessing } from '@composables/useImageFileProcessor.js'
 
 const props = defineProps({
-  project: Object,
+  album: Object,
   channel: Object,
   getMediaLink: Function
 })
 
-const emit = defineEmits(['deleteProject', 'undeleteProject', 'deleteMedia', 'undeleteMedia', 'abortMedia', 'editMedia', 'editProject'])
+const emit = defineEmits(['deleteAlbum', 'undeleteAlbum', 'deleteMedia', 'undeleteMedia', 'abortMedia', 'editMedia', 'editAlbum'])
 
 const editDialog = ref(false)
 const {
@@ -125,7 +125,7 @@ const editForm = ref({
 })
 
 const hasPendingChildren = computed(() => {
-  for (const media of props.project.media || []) {
+  for (const media of props.album.media || []) {
     if (media?.pending) {
       return true
     }
@@ -133,23 +133,23 @@ const hasPendingChildren = computed(() => {
   return false
 })
 
-const editProjectPreview = computed(() => {
+const editAlbumPreview = computed(() => {
   return {
-    title: editForm.value.title || props.project?.title || '',
+    title: editForm.value.title || props.album?.title || '',
     subtitle: editForm.value.subtitle || '',
     poster: editForm.value.posterType === 'new' ? editForm.value.posterImage : null,
     posterColor: editForm.value.posterColor || '#000000',
-    media: Array.isArray(props.project?.media) ? props.project.media : []
+    media: Array.isArray(props.album?.media) ? props.album.media : []
   }
 })
 
 function openEditDialog() {
   editForm.value = {
-    title: props.project?.title ?? '',
-    subtitle: props.project?.subtitle ?? null,
-    posterType: props.project?.poster ? 'new' : 'default',
-    posterColor: props.project?.posterColor || '#000000',
-    posterImage: props.project?.poster || null
+    title: props.album?.title ?? '',
+    subtitle: props.album?.subtitle ?? null,
+    posterType: props.album?.poster ? 'new' : 'default',
+    posterColor: props.album?.posterColor || '#000000',
+    posterImage: props.album?.poster || null
   }
   resetPosterFile()
   editDialog.value = true
@@ -183,7 +183,7 @@ function onUpdatePosterType(value) {
   editForm.value = {
     ...editForm.value,
     posterType: 'new',
-    posterImage: editForm.value.posterImage || props.project?.poster || null
+    posterImage: editForm.value.posterImage || props.album?.poster || null
   }
 }
 
@@ -200,7 +200,7 @@ async function onUpdatePosterFile(fileOrFiles) {
     resetPosterFile()
     editForm.value = {
       ...editForm.value,
-      posterImage: props.project?.poster || null
+      posterImage: props.album?.poster || null
     }
     return
   }
@@ -215,8 +215,8 @@ async function onUpdatePosterFile(fileOrFiles) {
 }
 
 function saveEdit() {
-  emit('editProject', {
-    id: props.project?.id,
+  emit('editAlbum', {
+    id: props.album?.id,
     title: editForm.value.title,
     subtitle: editForm.value.subtitle,
     posterType: editForm.value.posterType,

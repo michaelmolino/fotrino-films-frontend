@@ -10,12 +10,12 @@
         data-cy="channel-item"
         @deleteChannel="deleteResource('channel', $event)"
         @undeleteChannel="undeleteChannel($event)"
-        @deleteProject="deleteResource('project', $event)"
-        @undeleteProject="undeleteProject($event)"
+        @deleteAlbum="deleteResource('album', $event)"
+        @undeleteAlbum="undeleteAlbum($event)"
         @deleteMedia="deleteResource('media', $event)"
         @undeleteMedia="undeleteMedia($event)"
         @abortMedia="abortPendingMedia($event)"
-        @editProject="saveProjectEdit"
+        @editAlbum="saveAlbumEdit"
         @editMedia="saveMediaEdit"
         @editChannel="saveChannelEdit" />
     </q-list>
@@ -42,7 +42,7 @@ const props = defineProps({
 function buildEmptyLinks() {
   return {
     channel: {},
-    project: {},
+    album: {},
     media: {}
   }
 }
@@ -53,12 +53,12 @@ function addChannelLink(links, channel) {
   }
 }
 
-function addProjectAndMediaLinks(links, project) {
-  if (project?.id && !project?.pending) {
-    links.project[project.id] = `/p/${project.publicId}/${project.slug}`
+function addAlbumAndMediaLinks(links, album) {
+  if (album?.id && !album?.pending) {
+    links.album[album.id] = `/a/${album.publicId}/${album.slug}`
   }
 
-  for (const media of project?.media || []) {
+  for (const media of album?.media || []) {
     if (media?.id && !media?.pending) {
       links.media[media.id] = `/m/${media.publicId}/${media.slug}`
     }
@@ -71,8 +71,8 @@ const resourceLinks = computed(() => {
   for (const channel of props.channels || []) {
     addChannelLink(links, channel)
 
-    for (const project of channel?.projects || []) {
-      addProjectAndMediaLinks(links, project)
+    for (const album of channel?.albums || []) {
+      addAlbumAndMediaLinks(links, album)
     }
   }
 
@@ -82,7 +82,7 @@ const resourceLinks = computed(() => {
 function getMediaLink(type, id) {
   if (!type || id == null) return null
   if (type === 'channel') return resourceLinks.value.channel[id] || null
-  if (type === 'project') return resourceLinks.value.project[id] || null
+  if (type === 'album') return resourceLinks.value.album[id] || null
   if (type === 'media') return resourceLinks.value.media[id] || null
   return null
 }
@@ -110,12 +110,12 @@ async function undeleteMedia(mediaId) {
   }
 }
 
-async function undeleteProject(projectId) {
+async function undeleteAlbum(albumId) {
   try {
-    await channelStore.undeleteResource({ type: 'project', id: projectId })
-    notifySuccess('Project restored.')
+    await channelStore.undeleteResource({ type: 'album', id: albumId })
+    notifySuccess('Album restored.')
   } catch (error) {
-    notifyError(getComponentApiErrorMessage(error, 'Unable to undelete this project.'), {
+    notifyError(getComponentApiErrorMessage(error, 'Unable to undelete this album.'), {
       timeout: 0
     })
   }
@@ -234,11 +234,11 @@ async function saveMediaEdit(payload) {
   })
 }
 
-async function saveProjectEdit(payload) {
+async function saveAlbumEdit(payload) {
   return runEditJourney({
-    update: channelStore.updateProject,
+    update: channelStore.updateAlbum,
     updatePayload: {
-      projectId: payload?.id,
+      albumId: payload?.id,
       title: payload?.title,
       subtitle: payload?.subtitle ?? null,
       posterType: payload?.posterType,
@@ -246,18 +246,18 @@ async function saveProjectEdit(payload) {
     },
     upload: {
       shouldUpload: payload?.posterType === 'new' && !!payload?.posterFile,
-      prepare: channelStore.requestProjectPosterUpload,
+      prepare: channelStore.requestAlbumPosterUpload,
       preparePayload: {
-        projectId: payload?.id
+        albumId: payload?.id
       },
       file: payload?.posterFile,
-      confirm: channelStore.confirmProjectPosterUpload,
+      confirm: channelStore.confirmAlbumPosterUpload,
       confirmPayload: {
-        projectId: payload?.id,
+        albumId: payload?.id,
       }
     },
-    successMessage: 'Project updated.',
-    errorMessage: 'Unable to update this project.'
+    successMessage: 'Album updated.',
+    errorMessage: 'Unable to update this album.'
   })
 }
 

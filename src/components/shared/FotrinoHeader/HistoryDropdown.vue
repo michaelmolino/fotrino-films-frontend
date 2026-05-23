@@ -48,8 +48,8 @@ const channelStore = useChannelStore()
 const stopWatchingHistory = watchChannelHistory(channelStore)
 
 function historyTarget(channel) {
-  if (channel.type === 'privateProject') {
-    return `/private/p/${channel.publicId}/${channel.slug}`
+  if (channel.type === 'privateAlbum') {
+    return `/private/a/${channel.publicId}/${channel.slug}`
   }
   if (channel.type === 'privateMedia') {
     return `/private/m/${channel.publicId}/${channel.slug}`

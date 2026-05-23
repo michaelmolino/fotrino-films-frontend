@@ -11,14 +11,14 @@
     color="white"
     text-color="primary"
     :options="[
-      { value: 'projects', slot: 'project' },
+      { value: 'albums', slot: 'album' },
       { value: 'all', slot: 'all' }
     ]">
-    <template #project>
-      <div class="row items-center no-wrap" data-cy="channel-view-projects">
-        <span class="text-center">Projects</span>
+    <template #album>
+      <div class="row items-center no-wrap" data-cy="channel-view-albums">
+        <span class="text-center">Albums</span>
         <q-avatar color="accent" text-color="white" size="sm" square class="q-ml-sm">{{
-          projectCount
+          albumCount
         }}</q-avatar>
       </div>
     </template>
@@ -38,7 +38,7 @@ import { computed } from 'vue'
 
 const props = defineProps({
   modelValue: { type: String, default: 'all' },
-  projectCount: Number,
+  albumCount: Number,
   allCount: Number
 })
 

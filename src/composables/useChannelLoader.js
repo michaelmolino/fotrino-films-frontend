@@ -3,7 +3,7 @@ import { useChannelStore } from 'src/stores/channel-store.js'
 import { useRoute, useRouter } from 'vue-router'
 import { useMeta } from 'quasar'
 import { getMetaData } from '@utils/meta.js'
-import { addHistory, addPrivateHistory, addPrivateProjectHistory } from '@utils/history.js'
+import { addHistory, addPrivateHistory, addPrivateAlbumHistory } from '@utils/history.js'
 import { getCanonicalChannelRoutePath, hasLoadedChannelRouteTarget, getChannelRouteTarget } from '@utils/channel-route.js'
 
 /**
@@ -25,9 +25,9 @@ export function useChannelLoader({ manageMeta = false } = {}) {
   const loadVersion = ref(0)
   const needsChannelData = computed(() => !!(
     route.params?.channelId ||
-    route.params?.projectId ||
+    route.params?.albumId ||
     route.params?.mediaId ||
-    route.params?.privateProjectId ||
+    route.params?.privateAlbumId ||
     route.params?.privateMediaId
   ))
   const loading = computed(
@@ -45,39 +45,44 @@ export function useChannelLoader({ manageMeta = false } = {}) {
       return Promise.resolve(null)
     }
 
-    if (hasLoadedChannelRouteTarget(route, channelStore)) {
-      return Promise.resolve(channelStore.channel)
-    }
-
     if (target.type === 'channel') {
       return channelStore.loadChannel({ channelId: target.id })
     }
-    if (target.type === 'project') {
-      return channelStore.loadChannelByProject(target.id)
+    if (target.type === 'album') {
+      return channelStore.loadChannelByAlbum(target.id)
     }
     if (target.type === 'media') {
       return channelStore.loadChannelByMedia(target.id)
     }
-    if (target.type === 'privateProject') {
-      return channelStore.loadPrivateProject({ privateProjectId: target.projectId })
+    if (target.type === 'privateAlbum') {
+      if (hasLoadedChannelRouteTarget(route, channelStore)) {
+        return Promise.resolve(channelStore.channel)
+      }
+      return channelStore.loadPrivateAlbum({ privateAlbumId: target.albumId })
     }
-    if (target.type === 'privateProjectMedia') {
-      return channelStore.loadPrivateProject({
-        privateProjectId: target.projectId,
+    if (target.type === 'privateAlbumMedia') {
+      if (hasLoadedChannelRouteTarget(route, channelStore)) {
+        return Promise.resolve(channelStore.channel)
+      }
+      return channelStore.loadPrivateAlbum({
+        privateAlbumId: target.albumId,
         privateMediaId: target.mediaId
       })
     }
     if (target.type === 'privateMedia') {
+      if (hasLoadedChannelRouteTarget(route, channelStore)) {
+        return Promise.resolve(channelStore.channel)
+      }
       return channelStore.loadPrivateMedia(target.mediaId)
     }
     return Promise.resolve(null)
   }
 
   const syncPrivateHistory = (route, channel) => {
-    // If this is a private-project route (with or without focused media),
-    // the project is the top-level shared resource we track in history.
-    if (!route.params?.privateMediaId || route.params?.privateProjectId || !channel) return
-    const media = (channel?.project?.media || []).find(item => item?.privateId === route.params.privateMediaId) || null
+    // If this is a private-album route (with or without focused media),
+    // the album is the top-level shared resource we track in history.
+    if (!route.params?.privateMediaId || route.params?.privateAlbumId || !channel) return
+    const media = (channel?.album?.media || []).find(item => item?.privateId === route.params.privateMediaId) || null
     addPrivateHistory(route.params.privateMediaId, {
       title: media?.title || channel?.title || '',
       cover: media?.preview || channel?.cover || null,
@@ -85,18 +90,18 @@ export function useChannelLoader({ manageMeta = false } = {}) {
     })
   }
 
-  const syncPrivateProjectHistory = (route, channel) => {
-    if (!route.params?.privateProjectId || !channel?.project) return
-    const project = channel.project
-    addPrivateProjectHistory(route.params.privateProjectId, {
-      title: project?.title || channel?.title || '',
-      cover: project?.poster || channel?.cover || null,
-      slug: project?.slug || route.params.projectSlug || null
+  const syncPrivateAlbumHistory = (route, channel) => {
+    if (!route.params?.privateAlbumId || !channel?.album) return
+    const album = channel.album
+    addPrivateAlbumHistory(route.params.privateAlbumId, {
+      title: album?.title || channel?.title || '',
+      cover: album?.poster || channel?.cover || null,
+      slug: album?.slug || route.params.albumSlug || null
     })
   }
 
   const syncChannelHistory = (route, channel) => {
-    if (route.params?.privateMediaId || route.params?.privateProjectId || !channel) return
+    if (route.params?.privateMediaId || route.params?.privateAlbumId || !channel) return
     addHistory(channel)
   }
 
@@ -132,7 +137,7 @@ export function useChannelLoader({ manageMeta = false } = {}) {
 
       syncChannelHistory(route, loadedChannel)
       syncPrivateHistory(route, loadedChannel)
-      syncPrivateProjectHistory(route, loadedChannel)
+      syncPrivateAlbumHistory(route, loadedChannel)
       syncCanonicalSlugs(route)
 
       metaData.value = getMetaData(route, loadedChannel, readModel.value)

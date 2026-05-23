@@ -1,7 +1,7 @@
 import { sanitizeText } from '@utils/text.js'
 
 const getReadModelLookups = readModel => ({
-  projectsByPublicId: readModel?.entities?.projectsByPublicId || {},
+  albumsByPublicId: readModel?.entities?.albumsByPublicId || {},
   mediaByPublicId: readModel?.entities?.mediaByPublicId || {},
 })
 
@@ -15,13 +15,13 @@ function getChannelMeta(route, channel) {
   }
 }
 
-function getProjectMeta(projectId, readModel) {
-  const { projectsByPublicId } = getReadModelLookups(readModel)
-  const project = projectsByPublicId[projectId] || null
+function getAlbumMeta(albumId, readModel) {
+  const { albumsByPublicId } = getReadModelLookups(readModel)
+  const album = albumsByPublicId[albumId] || null
   return {
-    title: project?.title || null,
-    description: sanitizeText(project?.subtitle || ''),
-    image: project?.poster || null,
+    title: album?.title || null,
+    description: sanitizeText(album?.subtitle || ''),
+    image: album?.poster || null,
     type: 'website',
   }
 }
@@ -38,7 +38,7 @@ function getMediaMeta(mediaId, readModel) {
 }
 
 function getPrivateMediaMeta(route, channel) {
-  const media = (channel?.project?.media || []).find(item => item?.privateId === route?.params?.privateMediaId) || null
+  const media = (channel?.album?.media || []).find(item => item?.privateId === route?.params?.privateMediaId) || null
   return {
     title: media?.title || null,
     description: sanitizeText(media?.descriptionUnsafe),
@@ -47,18 +47,18 @@ function getPrivateMediaMeta(route, channel) {
   }
 }
 
-function getPrivateProjectMeta(channel) {
-  const project = channel?.project || null
+function getPrivateAlbumMeta(channel) {
+  const album = channel?.album || null
   return {
-    title: project?.title || null,
-    description: sanitizeText(project?.subtitle || ''),
-    image: project?.poster || null,
+    title: album?.title || null,
+    description: sanitizeText(album?.subtitle || ''),
+    image: album?.poster || null,
     type: 'website',
   }
 }
 
-function getPrivateProjectMediaMeta(route, channel) {
-  const media = (channel?.project?.media || []).find(item => item?.privateId === route?.params?.privateMediaId) || null
+function getPrivateAlbumMediaMeta(route, channel) {
+  const media = (channel?.album?.media || []).find(item => item?.privateId === route?.params?.privateMediaId) || null
   return {
     title: media?.title || null,
     description: sanitizeText(media?.descriptionUnsafe),
@@ -75,19 +75,19 @@ export function getMetaData(route, channel, readModel = null) {
   if (route?.params.channelId) {
     meta = getChannelMeta(route, channel)
   }
-  if (route?.params.projectId) {
-    meta = getProjectMeta(route.params.projectId, readModel)
+  if (route?.params.albumId) {
+    meta = getAlbumMeta(route.params.albumId, readModel)
   }
   if (route?.params.mediaId) {
     meta = getMediaMeta(route.params.mediaId, readModel)
   }
-  if (route?.params.privateProjectId && !route?.params.privateMediaId) {
-    meta = getPrivateProjectMeta(channel)
+  if (route?.params.privateAlbumId && !route?.params.privateMediaId) {
+    meta = getPrivateAlbumMeta(channel)
   }
-  if (route?.params.privateProjectId && route?.params.privateMediaId) {
-    meta = getPrivateProjectMediaMeta(route, channel)
+  if (route?.params.privateAlbumId && route?.params.privateMediaId) {
+    meta = getPrivateAlbumMediaMeta(route, channel)
   }
-  if (route?.params.privateMediaId && !route?.params.privateProjectId) {
+  if (route?.params.privateMediaId && !route?.params.privateAlbumId) {
     meta = getPrivateMediaMeta(route, channel)
   }
 

@@ -84,7 +84,7 @@ import { Notify, copyToClipboard } from 'quasar'
 
 const props = defineProps({
   channel: { type: Object, required: true },
-  project: { type: Object, default: null },
+  album: { type: Object, default: null },
   media: { type: Object, default: null },
   private: { type: Boolean, default: false },
   privateScope: { type: String, default: 'media' }
@@ -97,7 +97,7 @@ const containerRef = ref(null)
 
 const shareTargetLabel = computed(() => {
   if (props.media) return 'this video'
-  if (props.project) return 'this album'
+  if (props.album) return 'this album'
   return 'this channel'
 })
 
@@ -106,14 +106,14 @@ const channelPath = computed(() => {
   return `/c/${props.channel.publicId}/${props.channel.slug}`
 })
 
-const projectPath = computed(() => {
-  if (!props.project) return null
-  return `/p/${props.project.publicId}/${props.project.slug}`
+const albumPath = computed(() => {
+  if (!props.album) return null
+  return `/a/${props.album.publicId}/${props.album.slug}`
 })
 
-const privateProjectPath = computed(() => {
-  if (!props.project) return null
-  return `/private/p/${props.project.privateId}/${props.project.slug}`
+const privateAlbumPath = computed(() => {
+  if (!props.album) return null
+  return `/private/a/${props.album.privateId}/${props.album.slug}`
 })
 
 const publicMediaPath = computed(() => {
@@ -123,11 +123,11 @@ const publicMediaPath = computed(() => {
 
 const privateMediaPath = computed(() => {
   if (!props.media) return null
-  if (route.params?.privateProjectId) {
-    return `/private/p/${route.params.privateProjectId}/m/${props.media.privateId}/${props.media.slug}`
+  if (route.params?.privateAlbumId) {
+    return `/private/a/${route.params.privateAlbumId}/m/${props.media.privateId}/${props.media.slug}`
   }
-  if (props.project?.privateId) {
-    return `/private/p/${props.project.privateId}/m/${props.media.privateId}/${props.media.slug}`
+  if (props.album?.privateId) {
+    return `/private/a/${props.album.privateId}/m/${props.media.privateId}/${props.media.slug}`
   }
   return `/private/m/${props.media.privateId}/${props.media.slug}`
 })
@@ -151,26 +151,26 @@ const shareForChannel = computed(() => {
   ]
 })
 
-const shareForProject = computed(() => {
+const shareForAlbum = computed(() => {
   const items = []
 
-  if (privateProjectPath.value) {
+  if (privateAlbumPath.value) {
     items.push({
-      key: 'share-project-private',
+      key: 'share-album-private',
       label: 'This album',
       description: 'Recipient can browse videos in this album only.',
       icon: 'folder',
-      path: privateProjectPath.value,
-      cy: 'share-only-project'
+      path: privateAlbumPath.value,
+      cy: 'share-only-album'
     })
-  } else if (projectPath.value) {
+  } else if (albumPath.value) {
     items.push({
-      key: 'share-project-public',
+      key: 'share-album-public',
       label: 'This album',
       description: 'Recipient can browse videos in this album.',
       icon: 'folder',
-      path: projectPath.value,
-      cy: 'share-only-project'
+      path: albumPath.value,
+      cy: 'share-only-album'
     })
   }
 
@@ -180,11 +180,11 @@ const shareForProject = computed(() => {
 
   if (channelPath.value) {
     items.push({
-      key: 'share-project-channel',
+      key: 'share-album-channel',
       label: 'Entire channel',
       description: 'Recipient can browse everything in this channel.',
       icon: 'apps',
-      path: projectPath.value || channelPath.value,
+      path: albumPath.value || channelPath.value,
       cy: 'share-within-channel'
     })
   }
@@ -206,14 +206,14 @@ const shareForMedia = computed(() => {
     })
   }
 
-  if (privateProjectPath.value) {
+  if (privateAlbumPath.value) {
     items.push({
       key: 'share-media-album',
       label: 'This album',
       description: 'Recipient can browse related videos in this album.',
       icon: 'folder',
-      path: privateMediaPath.value || privateProjectPath.value,
-      cy: 'share-within-project'
+      path: privateMediaPath.value || privateAlbumPath.value,
+      cy: 'share-within-album'
     })
   }
 
@@ -232,7 +232,7 @@ const shareForMedia = computed(() => {
 
 const actions = computed(() => {
   if (props.media) return shareForMedia.value
-  if (props.project) return shareForProject.value
+  if (props.album) return shareForAlbum.value
   return shareForChannel.value
 })
 

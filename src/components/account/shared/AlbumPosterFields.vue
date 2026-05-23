@@ -11,7 +11,7 @@
       :data-cy="subtitleDataCy"
       @update:model-value="$emit('update:subtitle', $event)" />
 
-    <div class="text-overline q-mb-md">Project Poster</div>
+    <div class="text-overline q-mb-md">Album Poster</div>
     <div class="row items-center q-gutter-sm">
       <q-radio
         v-if="showPosterType"
@@ -44,7 +44,7 @@
 
     <q-file
       v-if="posterType === 'new'"
-      label="Project Poster (Image)"
+      label="Album Poster (Image)"
       outlined
       :model-value="posterFile"
       accept="image/*"
@@ -64,7 +64,7 @@
     </q-file>
 
     <div class="width250" :data-cy="posterPreviewDataCy">
-      <ProjectPoster v-if="projectPreview" :project="projectPreview" />
+      <AlbumPoster v-if="albumPreview" :album="albumPreview" />
       <q-skeleton
         v-else
         class="cursor-not-allowed"
@@ -95,7 +95,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import ProjectPoster from '@components/channel/shared/ProjectPoster.vue'
+import AlbumPoster from '@components/channel/shared/AlbumPoster.vue'
 
 defineProps({
   subtitle: {
@@ -104,7 +104,7 @@ defineProps({
   },
   subtitleLabel: {
     type: String,
-    default: 'Project SubTitle'
+    default: 'Album SubTitle'
   },
   inputColor: {
     type: String,
@@ -130,33 +130,33 @@ defineProps({
     type: [File, Array, null],
     default: null
   },
-  projectPreview: {
+  albumPreview: {
     type: Object,
     default: null
   },
   subtitleDataCy: {
     type: String,
-    default: 'project-subtitle-input'
+    default: 'album-subtitle-input'
   },
   posterTypeDefaultDataCy: {
     type: String,
-    default: 'project-poster-type-default'
+    default: 'album-poster-type-default'
   },
   posterTypeNewDataCy: {
     type: String,
-    default: 'project-poster-type-new'
+    default: 'album-poster-type-new'
   },
   posterFileDataCy: {
     type: String,
-    default: 'project-poster-file'
+    default: 'album-poster-file'
   },
   posterColorButtonDataCy: {
     type: String,
-    default: 'project-poster-color'
+    default: 'album-poster-color'
   },
   posterPreviewDataCy: {
     type: String,
-    default: 'project-poster-preview'
+    default: 'album-poster-preview'
   }
 })
 

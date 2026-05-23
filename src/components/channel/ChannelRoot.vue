@@ -14,7 +14,7 @@
       <div :key="channel?.publicId || route.fullPath">
         <div ref="headerRowRef" class="row items-center q-mb-sm channel-header">
           <div ref="breadcrumbsRef" class="channel-header-breadcrumbs">
-            <BreadCrumbs :channel="channel" :project="null" :media="null" />
+            <BreadCrumbs :channel="channel" :album="null" :media="null" />
           </div>
           <q-space />
           <div
@@ -23,24 +23,24 @@
             :class="{ 'channel-view-toggle--wrapped': isViewToggleWrapped }">
             <ViewToggle
               v-model="selectedView"
-              :projectCount="projectCount"
+              :albumCount="albumCount"
               :allCount="allCount" />
           </div>
         </div>
 
         <q-separator spaced />
 
-        <template v-if="selectedView === 'projects'">
+        <template v-if="selectedView === 'albums'">
           <div class="row q-mt-sm">
             <div
               class="col-xs-6 col-sm-6 col-md-4 col-lg-3 col-xl-2"
-              v-for="project in projects"
-              :key="project.id">
-              <ProjectPoster
-                :project="project"
-                :to="`/p/${project.publicId}/${project.slug}`" />
+              v-for="album in albums"
+              :key="album.id">
+              <AlbumPoster
+                :album="album"
+                :to="`/a/${album.publicId}/${album.slug}`" />
             </div>
-            <NothingText v-if="projects.length === 0" text="No content available." />
+            <NothingText v-if="albums.length === 0" text="No content available." />
           </div>
         </template>
 
@@ -52,7 +52,7 @@
               :key="item.media.id">
               <MediaPreview
                 :channel="channel"
-                :project="item.project"
+                :album="item.album"
                 :media="item.media"
                 :to="`/m/${item.media.publicId}/${item.media.slug}`"
                 :detail="true"
@@ -81,7 +81,7 @@ import { useChannelLoader } from '@composables/useChannelLoader.js'
 
 import BreadCrumbs from '@components/shared/BreadCrumbs.vue'
 import ShareActions from '@components/shared/ShareActions.vue'
-import ProjectPoster from '@components/channel/shared/ProjectPoster.vue'
+import AlbumPoster from '@components/channel/shared/AlbumPoster.vue'
 import MediaPreview from '@components/channel/shared/MediaPreview.vue'
 import ViewToggle from './ChannelRoot/ViewToggle.vue'
 const NothingText = defineAsyncComponent(() => import('@components/shared/NothingText.vue'))
@@ -115,7 +115,7 @@ function redirect(pathOrObj) {
 }
 
 watch(selectedView, val => {
-  const normalized = val === 'projects' || val === 'all' ? val : 'all'
+  const normalized = val === 'albums' || val === 'all' ? val : 'all'
   if (normalized !== val) {
     selectedView.value = normalized
     return
@@ -147,26 +147,26 @@ onBeforeUnmount(() => {
   window.removeEventListener('resize', updateViewToggleWrapState)
 })
 
-const projects = computed(() => {
+const albums = computed(() => {
   if (loading.value || !channel.value) return []
-  return channel.value.projects || []
+  return channel.value.albums || []
 })
 
-const projectCount = computed(() => projects.value.length)
+const albumCount = computed(() => albums.value.length)
 const allCount = computed(() => sortedAllMedia.value.length)
 
 watch(
-  [projectCount, channel, loading],
+  [albumCount, channel, loading],
   ([count, currentChannel, isLoading]) => {
     if (isLoading || !currentChannel || !route.params.channelId || count !== 1) return
-    const onlyProject = projects.value[0]
-    if (!onlyProject?.publicId || !onlyProject?.slug) return
-    redirect(`/p/${onlyProject.publicId}/${onlyProject.slug}`)
+    const onlyAlbum = albums.value[0]
+    if (!onlyAlbum?.publicId || !onlyAlbum?.slug) return
+    redirect(`/a/${onlyAlbum.publicId}/${onlyAlbum.slug}`)
   },
   { immediate: true }
 )
 
-watch([loading, channel, selectedView, projectCount, allCount], () => {
+watch([loading, channel, selectedView, albumCount, allCount], () => {
   nextTick(updateViewToggleWrapState)
 })
 </script>
