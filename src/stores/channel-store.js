@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import { api } from 'boot/axios'
+import { api } from 'src/libs/api-client.js'
 import { sortBy } from '@utils/sort.js'
 import { getGlobalApiErrorPayload } from 'src/utils/api-errors.js'
 import { normalizeChannelPayload, sortChannelDetail } from 'src/utils/read-model.js'

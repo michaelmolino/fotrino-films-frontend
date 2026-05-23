@@ -1,4 +1,13 @@
-import Hls from 'hls.js'
+let HlsCtor = null
+
+async function getHlsCtor() {
+    if (!HlsCtor) {
+        const mod = await import('hls.js/dist/hls.light.mjs')
+        HlsCtor = mod.default
+    }
+
+    return HlsCtor
+}
 
 function supportsNativeHls(videoEl) {
     const support = videoEl.canPlayType('application/vnd.apple.mpegurl')
@@ -12,6 +21,8 @@ function supportsNativeHls(videoEl) {
 }
 
 async function setupHlsJsPlayback({ videoEl, sourceUrl, exposeHlsGlobally }) {
+    const Hls = await getHlsCtor()
+
     if (!Hls.isSupported()) {
         console.error('HLS is not supported in this browser.')
         return { hlsInstance: null, cleanup: () => { } }

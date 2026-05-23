@@ -64,10 +64,11 @@ import { useChannelLoader } from '@composables/useChannelLoader.js'
 import { useChannelStore } from 'src/stores/channel-store.js'
 
 import BreadCrumbs from '@components/shared/BreadCrumbs.vue'
-import ShareActions from '@components/shared/ShareActions.vue'
 import MediaPreview from '@components/channel/shared/MediaPreview.vue'
-import PlyrPlayer from '@components/channel/MediaRoot/PlyrPlayer.vue'
-import MediaDescription from '@components/channel/MediaRoot/MediaDescription.vue'
+
+const ShareActions = defineAsyncComponent(() => import('@components/shared/ShareActions.vue'))
+const PlyrPlayer = defineAsyncComponent(() => import('@components/channel/MediaRoot/PlyrPlayer.vue'))
+const MediaDescription = defineAsyncComponent(() => import('@components/channel/MediaRoot/MediaDescription.vue'))
 const NothingText = defineAsyncComponent(() => import('@components/shared/NothingText.vue'))
 
 const route = useRoute()

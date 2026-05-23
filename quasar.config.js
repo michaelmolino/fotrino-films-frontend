@@ -4,6 +4,7 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from '@quasar/app-vite/wrappers'
+import { visualizer } from 'rollup-plugin-visualizer'
 import viteCompression from 'vite-plugin-compression'
 import istanbul from 'vite-plugin-istanbul'
 
@@ -46,6 +47,17 @@ export default defineConfig(() => ({
         viteCompression({ algorithm: 'brotliCompress', ext: '.br' }),
         viteCompression({ algorithm: 'gzip', ext: '.gz' })
       )
+      if (process.env.ANALYZE === 'true') {
+        viteConf.plugins.push(
+          visualizer({
+            filename: path.resolve(__dirname, 'dist/spa/stats.html'),
+            template: 'treemap',
+            gzipSize: true,
+            brotliSize: true,
+            open: false
+          })
+        )
+      }
       if (process.env.COVERAGE === 'true') {
         viteConf.plugins.push(
           istanbul({

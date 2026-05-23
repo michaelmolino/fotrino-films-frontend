@@ -10,7 +10,8 @@
     "format": "yarn prettier --write . && yarn eslint --fix 'src/**/*.{js,vue}'",
     "lint": "eslint --ext .js,.vue ./",
     "test": "echo \"No test specified\" && exit 0",
-    "coverage": "COVERAGE=true quasar dev"
+    "coverage": "COVERAGE=true quasar dev",
+    "build:analyze": "ANALYZE=true quasar build -m spa"
   },
   "dependencies": {
     "@pinia/colada": "^1.3.1",
