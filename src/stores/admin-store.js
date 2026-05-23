@@ -1,9 +1,9 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
+import { useQueryCache } from '@pinia/colada'
 import { api } from 'src/clients/axios-client.js'
 import { sortBy } from '@utils/sort.js'
 import { getGlobalApiErrorPayload, isGlobalApiError } from 'src/utils/api-errors.js'
-import { fetchAndApplyGet } from 'src/stores/utils/fetch-and-apply.js'
 
 const sortUsers = users => {
   const sortedUsers = sortBy(users, 'lastLogin', 'desc')
@@ -19,6 +19,74 @@ export const useAdminStore = defineStore('admin', () => {
   const users = ref([])
   const jobs = ref([])
   const reportedMedia = ref([])
+  const queryCache = useQueryCache()
+
+  const usersQueryOptions = () => ({
+    key: ['admin', 'users'],
+    staleTime: 0,
+    query: async () => {
+      const { data } = await api.get('/admin/users', {
+        __skipGlobalErrorNotify: true
+      })
+      return sortUsers(data)
+    }
+  })
+
+  const jobsQueryOptions = (statuses = []) => {
+    const normalizedStatuses = Array.isArray(statuses)
+      ? [...statuses]
+        .filter(Boolean)
+        .map(String)
+        .sort((a, b) => a.localeCompare(b))
+      : []
+
+    return {
+      key: ['admin', 'jobs', normalizedStatuses],
+      staleTime: 0,
+      query: async () => {
+        const { data } = await api.get('/admin/jobs', {
+          params:
+            normalizedStatuses.length > 0 ? { status: normalizedStatuses } : undefined,
+          __skipGlobalErrorNotify: true
+        })
+        return data
+      }
+    }
+  }
+
+  const reportedMediaQueryOptions = () => ({
+    key: ['admin', 'media', 'reported'],
+    staleTime: 0,
+    query: async () => {
+      const { data } = await api.get('/admin/media/reported', {
+        __skipGlobalErrorNotify: true
+      })
+      return data
+    }
+  })
+
+  const runAdminQuery = async ({ options, apply, onError }) => {
+    const entry = queryCache.ensure(options)
+
+    try {
+      const state = await queryCache.refresh(entry, options)
+      if (state?.status === 'error') {
+        throw state.error || new Error('Admin query failed')
+      }
+      const value = state?.data ?? null
+      apply(value)
+      return value
+    } catch (error) {
+      apply(null)
+      if (typeof onError === 'function') {
+        const maybe = onError(error)
+        if (maybe !== undefined) {
+          return maybe
+        }
+      }
+      throw error
+    }
+  }
 
   const setUsers = value => {
     users.value = value
@@ -33,14 +101,9 @@ export const useAdminStore = defineStore('admin', () => {
   }
 
   const loadUsers = () =>
-    fetchAndApplyGet({
-      api,
-      url: '/admin/users',
+    runAdminQuery({
+      options: usersQueryOptions(),
       apply: setUsers,
-      requestConfig: {
-        __skipGlobalErrorNotify: true
-      },
-      extract: data => sortUsers(data),
       onError: error => {
         if (isGlobalApiError(error, 'forbidden')) {
           return null
@@ -50,14 +113,9 @@ export const useAdminStore = defineStore('admin', () => {
     })
 
   const loadJobs = (statuses = []) =>
-    fetchAndApplyGet({
-      api,
-      url: '/admin/jobs',
+    runAdminQuery({
+      options: jobsQueryOptions(statuses),
       apply: setJobs,
-      requestConfig: {
-        params: Array.isArray(statuses) && statuses.length > 0 ? { status: statuses } : undefined,
-        __skipGlobalErrorNotify: true
-      },
       onError: error => {
         if (isGlobalApiError(error, 'forbidden')) {
           return null
@@ -74,6 +132,7 @@ export const useAdminStore = defineStore('admin', () => {
       await api.post(`/admin/jobs/pending/${job.id}/start-now`, null, {
         __skipGlobalErrorNotify: true
       })
+      void queryCache.invalidateQueries({ key: ['admin', 'jobs'] })
       await loadJobs()
       return 'started'
     }
@@ -81,6 +140,7 @@ export const useAdminStore = defineStore('admin', () => {
       await api.post(`/admin/jobs/failed/${job.id}/replay`, null, {
         __skipGlobalErrorNotify: true
       })
+      void queryCache.invalidateQueries({ key: ['admin', 'jobs'] })
       await loadJobs()
       return 'replayed'
     }
@@ -99,6 +159,10 @@ export const useAdminStore = defineStore('admin', () => {
       throw error
     }
 
+    void queryCache.invalidateQueries({
+      key: usersQueryOptions().key,
+      exact: true
+    })
     setUsers([])
     await loadUsers()
   }
@@ -115,18 +179,18 @@ export const useAdminStore = defineStore('admin', () => {
       throw error
     }
 
+    void queryCache.invalidateQueries({
+      key: usersQueryOptions().key,
+      exact: true
+    })
     setUsers([])
     await loadUsers()
   }
 
   const loadReportedMedia = () =>
-    fetchAndApplyGet({
-      api,
-      url: '/admin/media/reported',
+    runAdminQuery({
+      options: reportedMediaQueryOptions(),
       apply: setReportedMedia,
-      requestConfig: {
-        __skipGlobalErrorNotify: true
-      },
       onError: error => {
         if (isGlobalApiError(error, 'forbidden')) {
           return null
@@ -147,6 +211,10 @@ export const useAdminStore = defineStore('admin', () => {
       throw error
     }
 
+    void queryCache.invalidateQueries({
+      key: reportedMediaQueryOptions().key,
+      exact: true
+    })
     setReportedMedia([])
     await loadReportedMedia()
     return true
