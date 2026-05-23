@@ -51,7 +51,8 @@
             :src="previewImage"
             class="cover full-fit"
             :ratio="16 / 9"
-            fit="cover" />
+            fit="cover"
+            position="50% 28%" />
           <q-skeleton v-else type="rect" class="full-fit" animation="none" />
         </div>
       </div>
