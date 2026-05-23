@@ -4,6 +4,12 @@ import AwsS3 from '@uppy/aws-s3'
 /** Minimum file size (bytes) for multipart upload. Only applies to `upload` resource type. */
 const MULTIPART_THRESHOLD = 100 * 1024 * 1024 // 100 MB
 
+/**
+ * Extend multipart retries beyond Uppy defaults so brief backend restarts
+ * (signing endpoints) do not fail active uploads.
+ */
+const MULTIPART_RETRY_DELAYS_MS = [0, 1000, 2000, 4000, 8000, 16000, 32000]
+
 export function destroyUppy(uppy) {
     if (!uppy) return
     if (typeof uppy.destroy === 'function') {
@@ -75,6 +81,7 @@ export function createPresignedUppyClient({
     uppy.use(AwsS3, {
         endpoint: uploadEndpoint,
         headers,
+        retryDelays: MULTIPART_RETRY_DELAYS_MS,
         shouldUseMultipart: (file) =>
             file.meta?.resourceType === 'upload' && file.size >= MULTIPART_THRESHOLD,
         async getUploadParameters(file) {
