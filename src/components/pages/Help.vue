@@ -193,32 +193,6 @@
           </q-card>
         </q-expansion-item>
         <q-separator />
-        <q-expansion-item
-          data-cy="help-item-terminology"
-          group="faq"
-          label="What do channels, albums, and videos mean?"
-          header-class="text-bold"
-          :default-opened="selectedItem === 'terminology'"
-          @show="onItemSelect('terminology')">
-          <q-card>
-            <q-card-section>
-              <ul>
-                <li>
-                  A channel is the top-level space where your content lives. Most people only need
-                  one, but you can create more than one if you want to keep things separate.
-                </li>
-                <li>
-                  Albums live inside channels and help you organize your videos. You can think of
-                  them like albums or folders.
-                </li>
-                <li>
-                  Videos are the individual video or audio files inside an album.
-                </li>
-              </ul>
-            </q-card-section>
-          </q-card>
-        </q-expansion-item>
-        <q-separator />
       </q-list>
     </q-card>
   </div>
