@@ -1,21 +1,21 @@
 const GLOBAL_API_ERROR_CODES = new Set([
-    'bad_request',
-    'unauthorized',
-    'forbidden',
-    'not_found',
-    'conflict',
-    'unprocessable_entity',
-    'internal_server_error'
+  'bad_request',
+  'unauthorized',
+  'forbidden',
+  'not_found',
+  'conflict',
+  'unprocessable_entity',
+  'internal_server_error'
 ])
 
 const DEFAULT_GLOBAL_API_ERROR_MESSAGES = {
-    bad_request: 'Bad request.',
-    unauthorized: 'Unauthorised. Please login.',
-    forbidden: 'Forbidden.',
-    not_found: 'Not found.',
-    conflict: 'Conflict.',
-    unprocessable_entity: 'Unprocessable entity.',
-    internal_server_error: 'Internal server error.'
+  bad_request: 'Bad request.',
+  unauthorized: 'Unauthorised. Please login.',
+  forbidden: 'Forbidden.',
+  not_found: 'Not found.',
+  conflict: 'Conflict.',
+  unprocessable_entity: 'Unprocessable entity.',
+  internal_server_error: 'Internal server error.'
 }
 
 /**
@@ -36,7 +36,7 @@ const DEFAULT_GLOBAL_API_ERROR_MESSAGES = {
  */
 
 function isPlainObject(value) {
-    return value !== null && typeof value === 'object' && !Array.isArray(value)
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
 }
 
 /**
@@ -44,24 +44,24 @@ function isPlainObject(value) {
  * @returns {GlobalApiErrorResponse | null}
  */
 export function getGlobalApiErrorPayload(error) {
-    const data = error?.response?.data
-    if (!isPlainObject(data)) {
-        return null
-    }
+  const data = error?.response?.data
+  if (!isPlainObject(data)) {
+    return null
+  }
 
-    if (typeof data.status !== 'number' || typeof data.error !== 'string') {
-        return null
-    }
+  if (typeof data.status !== 'number' || typeof data.error !== 'string') {
+    return null
+  }
 
-    if (!GLOBAL_API_ERROR_CODES.has(data.error)) {
-        return null
-    }
+  if (!GLOBAL_API_ERROR_CODES.has(data.error)) {
+    return null
+  }
 
-    if (data.message != null && typeof data.message !== 'string') {
-        return null
-    }
+  if (data.message != null && typeof data.message !== 'string') {
+    return null
+  }
 
-    return /** @type {GlobalApiErrorResponse} */ (data)
+  return /** @type {GlobalApiErrorResponse} */ (data)
 }
 
 /**
@@ -69,33 +69,39 @@ export function getGlobalApiErrorPayload(error) {
  * @returns {ComponentApiErrorResponse | null}
  */
 export function getComponentApiErrorPayload(error) {
-    const data = error?.response?.data
-    if (!isPlainObject(data) || typeof data.error !== 'string') {
-        return null
-    }
-
-    if (Array.isArray(data.detail) && data.error === 'Invalid upload request') {
-        return /** @type {import('src/types/api-contract').ApiContracts['UploadValidationErrorResponse']} */ (data)
-    }
-
-    if (typeof data.detail === 'string' && data.error === 'Upload not complete') {
-        return /** @type {import('src/types/api-contract').ApiContracts['UploadStorageConflictResponse']} */ (data)
-    }
-
-    if (data.detail == null && !('status' in data)) {
-        return /** @type {import('src/types/api-contract').ApiContracts['DeletionBlockedResponse']} */ (data)
-    }
-
+  const data = error?.response?.data
+  if (!isPlainObject(data) || typeof data.error !== 'string') {
     return null
+  }
+
+  if (Array.isArray(data.detail) && data.error === 'Invalid upload request') {
+    return /** @type {import('src/types/api-contract').ApiContracts['UploadValidationErrorResponse']} */ (
+      data
+    )
+  }
+
+  if (typeof data.detail === 'string' && data.error === 'Upload not complete') {
+    return /** @type {import('src/types/api-contract').ApiContracts['UploadStorageConflictResponse']} */ (
+      data
+    )
+  }
+
+  if (data.detail == null && !('status' in data)) {
+    return /** @type {import('src/types/api-contract').ApiContracts['DeletionBlockedResponse']} */ (
+      data
+    )
+  }
+
+  return null
 }
 
 function getUploadValidationMessage(payload) {
-    const [firstDetail] = payload.detail || []
-    if (typeof firstDetail?.msg === 'string' && firstDetail.msg) {
-        return firstDetail.msg
-    }
+  const [firstDetail] = payload.detail || []
+  if (typeof firstDetail?.msg === 'string' && firstDetail.msg) {
+    return firstDetail.msg
+  }
 
-    return 'Invalid upload request.'
+  return 'Invalid upload request.'
 }
 
 /**
@@ -104,7 +110,7 @@ function getUploadValidationMessage(payload) {
  * @returns {boolean}
  */
 export function isGlobalApiError(error, code) {
-    return getGlobalApiErrorPayload(error)?.error === code
+  return getGlobalApiErrorPayload(error)?.error === code
 }
 
 /**
@@ -113,12 +119,12 @@ export function isGlobalApiError(error, code) {
  * @returns {string}
  */
 export function getGlobalApiErrorMessage(error, fallback = 'Something went wrong!') {
-    const payload = getGlobalApiErrorPayload(error)
-    if (!payload) {
-        return fallback
-    }
+  const payload = getGlobalApiErrorPayload(error)
+  if (!payload) {
+    return fallback
+  }
 
-    return payload.message || DEFAULT_GLOBAL_API_ERROR_MESSAGES[payload.error] || fallback
+  return payload.message || DEFAULT_GLOBAL_API_ERROR_MESSAGES[payload.error] || fallback
 }
 
 /**
@@ -127,23 +133,23 @@ export function getGlobalApiErrorMessage(error, fallback = 'Something went wrong
  * @returns {string}
  */
 export function getComponentApiErrorMessage(error, fallback = 'Something went wrong!') {
-    const globalPayload = getGlobalApiErrorPayload(error)
-    if (globalPayload) {
-        return getGlobalApiErrorMessage(error, fallback)
-    }
+  const globalPayload = getGlobalApiErrorPayload(error)
+  if (globalPayload) {
+    return getGlobalApiErrorMessage(error, fallback)
+  }
 
-    const payload = getComponentApiErrorPayload(error)
-    if (!payload) {
-        return fallback
-    }
+  const payload = getComponentApiErrorPayload(error)
+  if (!payload) {
+    return fallback
+  }
 
-    if (Array.isArray(payload.detail)) {
-        return getUploadValidationMessage(payload)
-    }
+  if (Array.isArray(payload.detail)) {
+    return getUploadValidationMessage(payload)
+  }
 
-    if (typeof payload.detail === 'string' && payload.detail) {
-        return payload.detail
-    }
+  if (typeof payload.detail === 'string' && payload.detail) {
+    return payload.detail
+  }
 
-    return payload.error || fallback
+  return payload.error || fallback
 }

@@ -1,9 +1,11 @@
 <template>
-  <div
-    data-cy="media-player"
-    :class="['media-player-shell', { 'portrait-mode': isPortraitVideo }]">
+  <div data-cy="media-player" :class="['media-player-shell', { 'portrait-mode': isPortraitVideo }]">
     <div v-if="view == 'video'" class="video-shell">
-      <div v-if="isPortraitVideo" class="portrait-backdrop" :style="portraitBackdropStyle" aria-hidden="true"></div>
+      <div
+        v-if="isPortraitVideo"
+        class="portrait-backdrop"
+        :style="portraitBackdropStyle"
+        aria-hidden="true"></div>
       <div :class="['video-frame', { 'video-frame-portrait': isPortraitVideo }]">
         <video
           id="video-player"
@@ -61,14 +63,19 @@ const audioPreviewUrl = ref(null)
 const playbackUrl = ref(null)
 const view = computed(() => (props.media?.type?.startsWith('audio/') ? 'audio' : 'video'))
 const videoPosterUrl = computed(() => props.media?.preview || null)
-const isPortraitVideo = computed(() => view.value === 'video' && props.media?.orientation === 'portrait')
+const isPortraitVideo = computed(
+  () => view.value === 'video' && props.media?.orientation === 'portrait'
+)
 const portraitBackdropStyle = computed(() => {
   if (!videoPosterUrl.value) return {}
   return { backgroundImage: `url("${videoPosterUrl.value}")` }
 })
 
 function onAudioPreviewError() {
-  if (audioPreviewSource.value.fallbackUrl && audioPreviewUrl.value !== audioPreviewSource.value.fallbackUrl) {
+  if (
+    audioPreviewSource.value.fallbackUrl &&
+    audioPreviewUrl.value !== audioPreviewSource.value.fallbackUrl
+  ) {
     audioPreviewUrl.value = audioPreviewSource.value.fallbackUrl
   }
 }
@@ -84,11 +91,19 @@ async function refreshAudioPreviewSource() {
 
 function destroyPlayers() {
   if (teardownPlayback.value) {
-    try { teardownPlayback.value() } catch (e) { console.debug(e) }
+    try {
+      teardownPlayback.value()
+    } catch (e) {
+      console.debug(e)
+    }
     teardownPlayback.value = null
   }
   if (player.value) {
-    try { player.value.destroy() } catch (e) { console.debug(e) }
+    try {
+      player.value.destroy()
+    } catch (e) {
+      console.debug(e)
+    }
     player.value = null
   }
 }
@@ -115,19 +130,19 @@ async function setupPlayer() {
   const controls = isPortraitVideo.value
     ? ['play-large', 'play', 'progress', 'mute', 'fullscreen', 'airplay']
     : [
-      'play-large',
-      'restart',
-      'rewind',
-      'play',
-      'fast-forward',
-      'progress',
-      'current-time',
-      'duration',
-      'mute',
-      'volume',
-      'fullscreen',
-      'airplay'
-    ]
+        'play-large',
+        'restart',
+        'rewind',
+        'play',
+        'fast-forward',
+        'progress',
+        'current-time',
+        'duration',
+        'mute',
+        'volume',
+        'fullscreen',
+        'airplay'
+      ]
 
   if (view.value === 'video') {
     if (videoPosterUrl.value) {

@@ -154,12 +154,7 @@ async function abortPendingMedia(mediaId) {
   }
 }
 
-const {
-  initializeUppy,
-  addFilesToUppy,
-  startUpload,
-  cleanup
-} = useUppyPresignedUpload()
+const { initializeUppy, addFilesToUppy, startUpload, cleanup } = useUppyPresignedUpload()
 
 async function runEditJourney({
   update,
@@ -180,11 +175,13 @@ async function runEditJourney({
       initializeUppy({
         mediaId: instruction.reference,
         uploadEndpoint: '/api/upload',
-        instructions: [{
-          resourceType,
-          reference: instruction.reference,
-          url: instruction.url || ''
-        }]
+        instructions: [
+          {
+            resourceType,
+            reference: instruction.reference,
+            url: instruction.url || ''
+          }
+        ]
       })
       addFilesToUppy([{ file: upload.file, resourceType }])
       await startUpload()
@@ -226,7 +223,7 @@ async function saveMediaEdit(payload) {
       file: payload?.previewFile,
       confirm: channelStore.confirmMediaPreviewUpload,
       confirmPayload: {
-        mediaId: payload?.id,
+        mediaId: payload?.id
       }
     },
     successMessage: 'Video updated.',
@@ -253,7 +250,7 @@ async function saveAlbumEdit(payload) {
       file: payload?.posterFile,
       confirm: channelStore.confirmAlbumPosterUpload,
       confirmPayload: {
-        albumId: payload?.id,
+        albumId: payload?.id
       }
     },
     successMessage: 'Album updated.',
@@ -277,7 +274,7 @@ async function saveChannelEdit(payload) {
       file: payload?.coverFile,
       confirm: channelStore.confirmChannelCoverUpload,
       confirmPayload: {
-        channelPublicId: payload?.channelPublicId,
+        channelPublicId: payload?.channelPublicId
       }
     },
     successMessage: 'Channel updated.',

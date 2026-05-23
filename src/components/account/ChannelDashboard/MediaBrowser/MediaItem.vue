@@ -17,11 +17,15 @@
       @edit="openEditDialog"
       square />
 
-      <q-dialog v-model="editDialog" no-backdrop-dismiss data-cy="edit-media-dialog">
-        <q-card style="min-width: 320px; width: 100%; max-width: 560px" data-cy="edit-media-dialog-card">
-          <q-card-section>
-            <div class="text-h6 text-weight-medium" data-cy="edit-media-dialog-title">{{ media.title }}</div>
-          </q-card-section>
+    <q-dialog v-model="editDialog" no-backdrop-dismiss data-cy="edit-media-dialog">
+      <q-card
+        style="min-width: 320px; width: 100%; max-width: 560px"
+        data-cy="edit-media-dialog-card">
+        <q-card-section>
+          <div class="text-h6 text-weight-medium" data-cy="edit-media-dialog-title">
+            {{ media.title }}
+          </div>
+        </q-card-section>
 
         <q-card-section>
           <q-input
@@ -48,8 +52,7 @@
             :show-featured-border="!!editForm.main"
             :preview-processing="false"
             :frame-refresh-enabled="false"
-            @update:previewFile="onUpdatePreviewFile"
-            />
+            @update:previewFile="onUpdatePreviewFile" />
 
           <MediaMetadataFields
             :description="editForm.description"

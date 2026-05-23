@@ -86,7 +86,7 @@ const props = defineProps({
 // Watch for changes in the profile prop
 watch(
   () => props.profile,
-  (newProfile) => {
+  newProfile => {
     if (!newProfile) {
       fetchProviders()
     }
@@ -106,5 +106,4 @@ function goToUpload() {
     query: { u: String(Date.now()) }
   })
 }
-
 </script>

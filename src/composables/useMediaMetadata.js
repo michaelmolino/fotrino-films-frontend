@@ -9,18 +9,18 @@ import * as exifr from 'exifr'
  * @returns {Promise<Date|null>}
  */
 export async function extractExifDate(file) {
-    if (!file) return null
-    try {
-        const date = await getExifDate(file)
-        if (date) return date
-        return getFallbackDate(file)
-    } catch (e) {
-        // Only log unexpected errors
-        if (!String(e).includes('Unknown file format')) {
-            console.debug('exifr error', e)
-        }
-        return getFallbackDate(file)
+  if (!file) return null
+  try {
+    const date = await getExifDate(file)
+    if (date) return date
+    return getFallbackDate(file)
+  } catch (e) {
+    // Only log unexpected errors
+    if (!String(e).includes('Unknown file format')) {
+      console.debug('exifr error', e)
     }
+    return getFallbackDate(file)
+  }
 }
 
 /**
@@ -29,20 +29,28 @@ export async function extractExifDate(file) {
  * @returns {Promise<Date|null>}
  */
 async function getExifDate(file) {
-    const meta = await exifr.parse(file, [
-        'DateTimeOriginal',
-        'CreateDate',
-        'MediaCreateDate',
-        'TrackCreateDate',
-        'ModifyDate',
-        'CreationTime',
-        'date',
-        'creation_time',
-    ])
-    if (!meta) return null
+  const meta = await exifr.parse(file, [
+    'DateTimeOriginal',
+    'CreateDate',
+    'MediaCreateDate',
+    'TrackCreateDate',
+    'ModifyDate',
+    'CreationTime',
+    'date',
+    'creation_time'
+  ])
+  if (!meta) return null
 
-    const date = meta.DateTimeOriginal || meta.CreateDate || meta.MediaCreateDate || meta.TrackCreateDate || meta.ModifyDate || meta.CreationTime || meta.date || meta.creation_time
-    return validateDate(date)
+  const date =
+    meta.DateTimeOriginal ||
+    meta.CreateDate ||
+    meta.MediaCreateDate ||
+    meta.TrackCreateDate ||
+    meta.ModifyDate ||
+    meta.CreationTime ||
+    meta.date ||
+    meta.creation_time
+  return validateDate(date)
 }
 
 /**
@@ -51,15 +59,15 @@ async function getExifDate(file) {
  * @returns {Date|null}
  */
 function validateDate(date) {
-    if (!date) return null
-    if (typeof date === 'string') {
-        const parsed = new Date(date)
-        return Number.isNaN(parsed.getTime()) ? null : parsed
-    }
-    if (date instanceof Date && !Number.isNaN(date.getTime())) {
-        return date
-    }
-    return null
+  if (!date) return null
+  if (typeof date === 'string') {
+    const parsed = new Date(date)
+    return Number.isNaN(parsed.getTime()) ? null : parsed
+  }
+  if (date instanceof Date && !Number.isNaN(date.getTime())) {
+    return date
+  }
+  return null
 }
 
 /**
@@ -68,9 +76,9 @@ function validateDate(date) {
  * @returns {Date|null}
  */
 function getFallbackDate(file) {
-    if (!file.lastModified) return null
-    const fallback = new Date(file.lastModified)
-    return Number.isNaN(fallback.getTime()) ? null : fallback
+  if (!file.lastModified) return null
+  const fallback = new Date(file.lastModified)
+  return Number.isNaN(fallback.getTime()) ? null : fallback
 }
 
 // Future: add more metadata extraction helpers as needed

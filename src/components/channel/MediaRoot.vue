@@ -6,7 +6,10 @@
       <q-skeleton type="text" width="40%" />
     </template>
 
-    <template v-else-if="channel && album && media && (route.params.privateMediaId || route.params.mediaId)">
+    <template
+      v-else-if="
+        channel && album && media && (route.params.privateMediaId || route.params.mediaId)
+      ">
       <BreadCrumbs
         :channel="channel"
         :album="album"
@@ -14,15 +17,9 @@
         :private="!!route.params.privateMediaId"
         :private-scope="route.params.privateAlbumId ? 'album' : 'media'" />
 
-      <PlyrPlayer
-        :media="media"
-        :artist="channel?.ownerName"
-        class="q-py-md plyrplayer" />
+      <PlyrPlayer :media="media" :artist="channel?.ownerName" class="q-py-md plyrplayer" />
       <div class="plyrplayer" data-cy="media-description-container">
-        <MediaDescription
-          :media="media"
-          :poster="albumPoster"
-          :poster-color="albumPosterColor" />
+        <MediaDescription :media="media" :poster="albumPoster" :poster-color="albumPosterColor" />
       </div>
 
       <template v-if="hasRelatedContent">
@@ -67,8 +64,12 @@ import BreadCrumbs from '@components/shared/BreadCrumbs.vue'
 import MediaPreview from '@components/channel/shared/MediaPreview.vue'
 
 const ShareActions = defineAsyncComponent(() => import('@components/shared/ShareActions.vue'))
-const PlyrPlayer = defineAsyncComponent(() => import('@components/channel/MediaRoot/PlyrPlayer.vue'))
-const MediaDescription = defineAsyncComponent(() => import('@components/channel/MediaRoot/MediaDescription.vue'))
+const PlyrPlayer = defineAsyncComponent(
+  () => import('@components/channel/MediaRoot/PlyrPlayer.vue')
+)
+const MediaDescription = defineAsyncComponent(
+  () => import('@components/channel/MediaRoot/MediaDescription.vue')
+)
 const NothingText = defineAsyncComponent(() => import('@components/shared/NothingText.vue'))
 
 const route = useRoute()
@@ -126,7 +127,9 @@ const albumPoster = computed(() => album.value?.poster || null)
 const albumPosterColor = computed(() => album.value?.posterColor || null)
 
 const relatedMedia = computed(() => {
-  return (album.value?.media || []).filter(m => (m.id || m.privateId) !== (media.value?.id || media.value?.privateId))
+  return (album.value?.media || []).filter(
+    m => (m.id || m.privateId) !== (media.value?.id || media.value?.privateId)
+  )
 })
 
 const hasRelatedContent = computed(() => {
@@ -145,7 +148,12 @@ function getRelatedPath(related) {
 watch(
   album,
   newAlbum => {
-    if (channel.value && !newAlbum && (route.params.mediaId || route.params.privateMediaId) && !loading.value) {
+    if (
+      channel.value &&
+      !newAlbum &&
+      (route.params.mediaId || route.params.privateMediaId) &&
+      !loading.value
+    ) {
       redirect('/404')
     }
   },
@@ -172,11 +180,19 @@ watch(
   media,
   newMedia => {
     if (!newMedia || loading.value) return
-    if (route.params.mediaId && route.params.mediaSlug && newMedia.slug !== route.params.mediaSlug) {
+    if (
+      route.params.mediaId &&
+      route.params.mediaSlug &&
+      newMedia.slug !== route.params.mediaSlug
+    ) {
       redirect(`/m/${newMedia.publicId}/${newMedia.slug}`)
       return
     }
-    if (route.params.privateMediaId && route.params.mediaSlug && newMedia.slug !== route.params.mediaSlug) {
+    if (
+      route.params.privateMediaId &&
+      route.params.mediaSlug &&
+      newMedia.slug !== route.params.mediaSlug
+    ) {
       if (route.params.privateAlbumId && album.value?.privateId && newMedia.privateId) {
         redirect(`/private/a/${album.value.privateId}/m/${newMedia.privateId}/${newMedia.slug}`)
         return

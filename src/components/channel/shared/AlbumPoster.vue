@@ -39,9 +39,7 @@
       class="poster-fallback"
       :style="{ backgroundColor: album.posterColor || '#000000' }">
       <!-- Centered overlay in the main body for color fallback -->
-      <div
-        class="absolute-center text-center q-pa-sm poster-center-overlay contrast-text"
-        >
+      <div class="absolute-center text-center q-pa-sm poster-center-overlay contrast-text">
         <div class="ellipsis text-weight-bold">{{ album.title }}</div>
         <div class="ellipsis">{{ album.subtitle }}</div>
       </div>
@@ -87,7 +85,7 @@ onMounted(() => {
   const el = document.querySelector('.contrast-text')
   if (el) el.style.setProperty('--contrast-text', contrastTextColor.value)
 })
-watch(contrastTextColor, (val) => {
+watch(contrastTextColor, val => {
   const el = document.querySelector('.contrast-text')
   if (el) el.style.setProperty('--contrast-text', val)
 })

@@ -138,7 +138,9 @@ const standalonePrivateMediaPath = computed(() => {
 })
 
 const isPrivateAlbumContext = computed(() => {
-  return Boolean(props.private || route.params?.privateAlbumId || (!albumPath.value && privateAlbumPath.value))
+  return Boolean(
+    props.private || route.params?.privateAlbumId || (!albumPath.value && privateAlbumPath.value)
+  )
 })
 
 const shareForChannel = computed(() => {

@@ -160,7 +160,12 @@ defineProps({
   }
 })
 
-const emit = defineEmits(['update:subtitle', 'update:posterType', 'update:posterColor', 'update:posterFile'])
+const emit = defineEmits([
+  'update:subtitle',
+  'update:posterType',
+  'update:posterColor',
+  'update:posterFile'
+])
 
 const defaultColor = '#000000'
 const colorDialog = ref(false)

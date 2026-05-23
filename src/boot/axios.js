@@ -66,9 +66,7 @@ export default boot(({ app, router }) => {
       const apiError = getGlobalApiErrorPayload(error)
       const status = apiError?.status ?? error?.response?.status
       const requestCanceled = error?.code === 'ERR_CANCELED' || error?.name === 'CanceledError'
-      const skipNotify =
-        error?.config?.__skipGlobalErrorNotify === true ||
-        requestCanceled
+      const skipNotify = error?.config?.__skipGlobalErrorNotify === true || requestCanceled
 
       if (isGlobalApiError(error, 'not_found')) {
         router.replace('/404')

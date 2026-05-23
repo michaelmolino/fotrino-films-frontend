@@ -14,11 +14,7 @@
 
     <div v-if="showExtendedAttributes">
       <div class="text-overline">Extended Attributes</div>
-      <q-btn
-        icon="event"
-        flat
-        class="q-mt-xs"
-        :label="resourceDateLabel">
+      <q-btn icon="event" flat class="q-mt-xs" :label="resourceDateLabel">
         <q-popup-proxy cover transition-show="scale" transition-hide="scale">
           <q-date
             :model-value="resourceDate"
@@ -97,7 +93,10 @@ function parseResourceDate(value) {
     return new Date('invalid')
   }
 
-  const [year, month, day] = value.replaceAll('/', '-').split('-').map((part) => Number.parseInt(part, 10))
+  const [year, month, day] = value
+    .replaceAll('/', '-')
+    .split('-')
+    .map(part => Number.parseInt(part, 10))
   if (!year || !month || !day) {
     return new Date('invalid')
   }

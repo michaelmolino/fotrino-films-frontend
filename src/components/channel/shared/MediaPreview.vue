@@ -67,7 +67,17 @@ import { useWebP } from '@composables/useWebP'
 
 const previewCropPosition = '50% 28%'
 
-const { media, album, detail, showMainAccent, showBadges, showTitleOverlay, interactive, priority, to } = defineProps({
+const {
+  media,
+  album,
+  detail,
+  showMainAccent,
+  showBadges,
+  showTitleOverlay,
+  interactive,
+  priority,
+  to
+} = defineProps({
   media: { type: Object, required: true },
   album: { type: Object, default: null },
   detail: { type: Boolean, default: false },
@@ -79,7 +89,10 @@ const { media, album, detail, showMainAccent, showBadges, showTitleOverlay, inte
   to: { type: [String, Object], default: null }
 })
 
-const containerClasses = computed(() => [interactive ? 'fit width720' : 'full-fit', { 'bg-accent': media.main && showMainAccent }])
+const containerClasses = computed(() => [
+  interactive ? 'fit width720' : 'full-fit',
+  { 'bg-accent': media.main && showMainAccent }
+])
 
 const { resolvePreviewSource } = useWebP()
 const previewSource = ref({ strategy: 'original-only', primaryUrl: null, fallbackUrl: null })
@@ -161,5 +174,4 @@ function onPreviewError() {
   padding: 8px;
   z-index: 2;
 }
-
 </style>

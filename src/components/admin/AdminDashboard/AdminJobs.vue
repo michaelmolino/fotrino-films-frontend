@@ -28,7 +28,11 @@
       :pagination="{ rowsPerPage: 0 }">
       <template #body-cell-status="props">
         <q-td :props="props">
-          <q-chip dense :color="statusColor(props.row.status)" text-color="white" class="text-capitalize">
+          <q-chip
+            dense
+            :color="statusColor(props.row.status)"
+            text-color="white"
+            class="text-capitalize">
             {{ props.row.status }}
           </q-chip>
         </q-td>
@@ -190,7 +194,8 @@ async function runAction(job) {
     const action = await adminStore.runJobAction(job)
     Notify.create({
       type: 'positive',
-      message: action === 'started' ? 'Pending job set to run now.' : 'Failed job replay requested.',
+      message:
+        action === 'started' ? 'Pending job set to run now.' : 'Failed job replay requested.',
       icon: 'check',
       timeout: 2000
     })

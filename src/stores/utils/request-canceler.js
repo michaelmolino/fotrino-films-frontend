@@ -5,7 +5,7 @@
 export const createRequestCanceler = () => {
   const controllerByKey = new Map()
 
-  const getSignal = (requestKey) => {
+  const getSignal = requestKey => {
     const previous = controllerByKey.get(requestKey)
     if (previous) {
       previous.abort()
@@ -19,6 +19,5 @@ export const createRequestCanceler = () => {
   return { getSignal }
 }
 
-export const isRequestCanceled = (error) =>
-  error?.code === 'ERR_CANCELED' ||
-  error?.name === 'CanceledError'
+export const isRequestCanceled = error =>
+  error?.code === 'ERR_CANCELED' || error?.name === 'CanceledError'

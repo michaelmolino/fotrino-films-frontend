@@ -4,7 +4,11 @@ import { useRoute, useRouter } from 'vue-router'
 import { useMeta } from 'quasar'
 import { getMetaData } from '@utils/meta.js'
 import { addHistory, addPrivateHistory, addPrivateAlbumHistory } from '@utils/history.js'
-import { getCanonicalChannelRoutePath, hasLoadedChannelRouteTarget, getChannelRouteTarget } from '@utils/channel-route.js'
+import {
+  getCanonicalChannelRoutePath,
+  hasLoadedChannelRouteTarget,
+  getChannelRouteTarget
+} from '@utils/channel-route.js'
 
 /**
  * Composable for loading and setting channel data based on route parameters
@@ -23,13 +27,16 @@ export function useChannelLoader({ manageMeta = false } = {}) {
   const loadStatus = toRef(channelStore, 'loadStatus')
   const metaData = ref(getMetaData(null, null))
   const loadVersion = ref(0)
-  const needsChannelData = computed(() => !!(
-    route.params?.channelId ||
-    route.params?.albumId ||
-    route.params?.mediaId ||
-    route.params?.privateAlbumId ||
-    route.params?.privateMediaId
-  ))
+  const needsChannelData = computed(
+    () =>
+      !!(
+        route.params?.channelId ||
+        route.params?.albumId ||
+        route.params?.mediaId ||
+        route.params?.privateAlbumId ||
+        route.params?.privateMediaId
+      )
+  )
   const loading = computed(
     () => loadStatus.value === 'loading' || (loadStatus.value === 'idle' && needsChannelData.value)
   )
@@ -82,7 +89,9 @@ export function useChannelLoader({ manageMeta = false } = {}) {
     // If this is a private-album route (with or without focused media),
     // the album is the top-level shared resource we track in history.
     if (!route.params?.privateMediaId || route.params?.privateAlbumId || !channel) return
-    const media = (channel?.album?.media || []).find(item => item?.privateId === route.params.privateMediaId) || null
+    const media =
+      (channel?.album?.media || []).find(item => item?.privateId === route.params.privateMediaId) ||
+      null
     addPrivateHistory(route.params.privateMediaId, {
       title: media?.title || channel?.title || '',
       cover: media?.preview || channel?.cover || null,

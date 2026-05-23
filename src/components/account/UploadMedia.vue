@@ -10,7 +10,8 @@
       rounded
       class="bg-orange-1 text-orange-10 q-pa-md"
       data-cy="upload-verification-pending-message">
-      Uploads are currently disabled pending account verification, which usually happens within 24 hours.
+      Uploads are currently disabled pending account verification, which usually happens within 24
+      hours.
     </q-banner>
     <q-stepper
       v-else
@@ -25,12 +26,7 @@
       :vertical="$q.screen.lt.md"
       header-nav>
       <!-- Step 1: Media first -->
-      <q-step
-        :name="1"
-        :title="stepTitles.media"
-        icon="movie"
-        :done="step > 1"
-        :header-nav="false">
+      <q-step :name="1" :title="stepTitles.media" icon="movie" :done="step > 1" :header-nav="false">
         <MediaStep
           class="step"
           :payload="payload"
@@ -125,11 +121,7 @@
         :header-nav="false">
         <div class="text-center">
           <div class="upload-preview-shell q-mb-md">
-            <MediaPreview
-              :media="media"
-              :album="album"
-              :detail="true"
-              class="processing-preview" />
+            <MediaPreview :media="media" :album="album" :detail="true" class="processing-preview" />
             <div class="upload-complete-overlay" data-cy="upload-complete-status">
               <q-icon name="check_circle" size="64px" color="info" />
             </div>
@@ -138,8 +130,8 @@
             <span class="text-h6" data-cy="upload-processing-text">Upload complete</span>
           </div>
           <div class="q-pa-md text-body2">
-            <strong>{{ media.title }}</strong> was uploaded successfully.
-            Your video is being processed. We will email you when your video is live.
+            <strong>{{ media.title }}</strong> was uploaded successfully. Your video is being
+            processed. We will email you when your video is live.
           </div>
           <div class="q-pt-md text-caption text-grey-6">You can safely close this window.</div>
         </div>
@@ -148,12 +140,7 @@
       <template v-slot:navigation>
         <q-stepper-navigation>
           <!-- Back button for steps 2 and 3 -->
-          <q-btn
-            v-if="canGoBack"
-            icon="arrow_back"
-            flat
-            label="Back"
-            @click="goBack" />
+          <q-btn v-if="canGoBack" icon="arrow_back" flat label="Back" @click="goBack" />
 
           <q-btn
             v-if="showQuickUploadButton"
@@ -277,7 +264,13 @@ let dismissUploadErrorNotify = null
 const uploadFiles = ref([])
 const { compressImageFile } = useImageFileProcessor()
 const { getRandomFrameFromFile, disposeFrameSession } = useVideoThumbnailProcessor()
-const { factoryUpload, cancel: cancelUpload, progress, statusText, isUploading } = useUploadFlow({
+const {
+  factoryUpload,
+  cancel: cancelUpload,
+  progress,
+  statusText,
+  isUploading
+} = useUploadFlow({
   channelStore,
   payload,
   stepper
@@ -342,7 +335,8 @@ function clearUploadFile(resourceType) {
 
 function upsertUploadFile(resourceType, file, processing) {
   const uploadFileIndex = uploadFiles.value.findIndex(entry => entry.resourceType === resourceType)
-  const entry = processing === undefined ? { resourceType, file } : { resourceType, file, processing }
+  const entry =
+    processing === undefined ? { resourceType, file } : { resourceType, file, processing }
   if (uploadFileIndex === -1) {
     uploadFiles.value.push(entry)
     return
@@ -530,9 +524,7 @@ const album = computed(() => {
 
   // Creating a new album - determine poster
   const poster =
-    payload.album.id?.value === 0 && payload.album.posterType === 'new'
-      ? posterThumb.value
-      : null
+    payload.album.id?.value === 0 && payload.album.posterType === 'new' ? posterThumb.value : null
 
   // Return new album structure
   return {
@@ -586,8 +578,7 @@ const next = computed(() => {
       return (
         payload.album.id !== null &&
         (!!payload.album.id?.value ||
-          (!!payload.album.title &&
-            (!!posterFile.value || payload.album.posterType === 'default')))
+          (!!payload.album.title && (!!posterFile.value || payload.album.posterType === 'default')))
       )
     default:
       return false

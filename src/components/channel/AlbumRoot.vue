@@ -165,7 +165,13 @@ const otherMedia = computed(() => {
 watch(
   album,
   newAlbum => {
-    if (channel.value && newAlbum && route.params.albumSlug && newAlbum.slug !== route.params.albumSlug && !loading.value) {
+    if (
+      channel.value &&
+      newAlbum &&
+      route.params.albumSlug &&
+      newAlbum.slug !== route.params.albumSlug &&
+      !loading.value
+    ) {
       if (privateMode.value && newAlbum.privateId) {
         redirect(`/private/a/${newAlbum.privateId}/${newAlbum.slug}`)
       } else {
@@ -173,22 +179,35 @@ watch(
       }
       return
     }
-    if (channel.value && !newAlbum && (route.params.albumId || route.params.privateAlbumId) && !loading.value) {
+    if (
+      channel.value &&
+      !newAlbum &&
+      (route.params.albumId || route.params.privateAlbumId) &&
+      !loading.value
+    ) {
       redirect('/404')
     }
   },
   { immediate: true }
 )
 
-// If exactly one featured media and we're on the album (not media) route, 
+// If exactly one featured media and we're on the album (not media) route,
 // redirect to the media route to use MediaRoot instead
 watch(
   [featuredMediaCount, album, loading],
   ([count, proj, isLoading]) => {
-    if (!isLoading && channel.value && proj && count === 1 && (route.params.albumId || route.params.privateAlbumId)) {
+    if (
+      !isLoading &&
+      channel.value &&
+      proj &&
+      count === 1 &&
+      (route.params.albumId || route.params.privateAlbumId)
+    ) {
       const featured = featuredMedia.value[0]
       if (privateMode.value && route.params.privateAlbumId && featured?.privateId) {
-        redirect(`/private/a/${route.params.privateAlbumId}/m/${featured.privateId}/${featured.slug}`)
+        redirect(
+          `/private/a/${route.params.privateAlbumId}/m/${featured.privateId}/${featured.slug}`
+        )
       } else {
         redirect(`/m/${featured.publicId}/${featured.slug}`)
       }

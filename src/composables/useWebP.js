@@ -60,7 +60,6 @@ async function resolvePreviewSource(url) {
   }
 }
 
-
 export function useWebP() {
   return {
     resolvePreviewSource,

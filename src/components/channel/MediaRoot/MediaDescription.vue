@@ -200,7 +200,6 @@ async function submitReport() {
     submitting.value = false
   }
 }
-
 </script>
 
 <style scoped>

@@ -2,7 +2,9 @@
   <div class="q-pa-md flex flex-center" data-cy="help-page">
     <q-card flat bordered class="q-pa-xl card-terms" data-cy="help-card">
       <div class="text-h4 text-center q-mb-md" data-cy="help-title">Frequently Asked Questions</div>
-      <div class="text-caption text-center q-mb-lg">Helpful answers to common questions about Fotrino Films</div>
+      <div class="text-caption text-center q-mb-lg">
+        Helpful answers to common questions about Fotrino Films
+      </div>
       <q-list bordered data-cy="help-faq-list">
         <q-expansion-item
           data-cy="help-item-about"
@@ -13,7 +15,8 @@
           @show="onItemSelect('about')">
           <q-card>
             <q-card-section>
-              Fotrino Films is a video hosting platform built for sharing personal content with family and friends.
+              Fotrino Films is a video hosting platform built for sharing personal content with
+              family and friends.
             </q-card-section>
           </q-card>
         </q-expansion-item>
@@ -30,8 +33,9 @@
               <div>
                 Fotrino Films is meant to be simple, private, and ad-free. It is not built around
                 discovery, monetization, or engagement metrics, so there are no ads, recommendation
-                algorithms, or tracking designed to keep people watching. The focus is on giving you a
-                secure place to host your videos and share them directly with the people you choose.
+                algorithms, or tracking designed to keep people watching. The focus is on giving you
+                a secure place to host your videos and share them directly with the people you
+                choose.
               </div>
             </q-card-section>
           </q-card>
@@ -61,10 +65,10 @@
           <q-card>
             <q-card-section>
               <div>
-                By default, your content is only available to people who have the direct link to your
-                channel. It is not indexed by search engines, and the URLs are not easy to guess.
-                That said, anyone you share a link with can pass it along, so it is best to share
-                only with people you trust.
+                By default, your content is only available to people who have the direct link to
+                your channel. It is not indexed by search engines, and the URLs are not easy to
+                guess. That said, anyone you share a link with can pass it along, so it is best to
+                share only with people you trust.
               </div>
             </q-card-section>
           </q-card>
@@ -79,7 +83,8 @@
           @show="onItemSelect('production')">
           <q-card>
             <q-card-section>
-              It is usable today, but it is still primarily a personal project built for me and my family.
+              It is usable today, but it is still primarily a personal project built for me and my
+              family.
             </q-card-section>
           </q-card>
         </q-expansion-item>
@@ -95,8 +100,8 @@
             <q-card-section>
               Fotrino Films works on modern browsers across desktop, tablet, and mobile devices.
               Watching videos on mobile is fully supported. Uploading is more reliable on desktop;
-              if you upload from a phone or tablet, you will need to keep the device awake until
-              the upload finishes.
+              if you upload from a phone or tablet, you will need to keep the device awake until the
+              upload finishes.
             </q-card-section>
           </q-card>
         </q-expansion-item>
@@ -169,9 +174,9 @@
           <q-card>
             <q-card-section>
               At the moment, sign-in relies on third-party identity providers such as Google. That
-              approach helps offload account security to providers that are better equipped to handle
-              authentication safely. No content or viewing data is shared beyond what is needed to
-              support login, and additional sign-in options may be added over time.
+              approach helps offload account security to providers that are better equipped to
+              handle authentication safely. No content or viewing data is shared beyond what is
+              needed to support login, and additional sign-in options may be added over time.
             </q-card-section>
           </q-card>
         </q-expansion-item>

@@ -10,18 +10,18 @@ updates:
     schedule:
       interval: 'daily'
 
-    rebase-strategy: "auto"
+    rebase-strategy: 'auto'
 
     groups:
       minor-and-patch:
         update-types:
-          - "minor"
-          - "patch"
+          - 'minor'
+          - 'patch'
 
     labels:
-      - "dependencies"
-      - "auto-merge"
+      - 'dependencies'
+      - 'auto-merge'
 
     ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']

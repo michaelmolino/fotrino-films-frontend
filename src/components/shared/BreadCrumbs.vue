@@ -1,11 +1,7 @@
 <template>
   <nav class="breadcrumb-nav" data-cy="breadcrumbs">
-    <div
-      class="row items-start q-pa-md"
-      :class="$q.screen.lt.sm ? 'q-gutter-sm' : 'q-gutter-md'">
-      <q-avatar
-        class="self-start"
-        :size="$q.screen.lt.sm ? '32px' : '40px'">
+    <div class="row items-start q-pa-md" :class="$q.screen.lt.sm ? 'q-gutter-sm' : 'q-gutter-md'">
+      <q-avatar class="self-start" :size="$q.screen.lt.sm ? '32px' : '40px'">
         <img
           :src="channel.cover"
           :alt="channel.title || media?.title || 'Video cover'"
@@ -13,15 +9,9 @@
           decoding="async" />
       </q-avatar>
       <div class="col">
-        <q-breadcrumbs
-          class="breadcrumbs-list"
-          active-color="primary"
-          data-cy="breadcrumbs-list">
+        <q-breadcrumbs class="breadcrumbs-list" active-color="primary" data-cy="breadcrumbs-list">
           <template #separator>
-            <q-icon
-              size="1.5em"
-              name="chevron_right"
-              color="primary" />
+            <q-icon size="1.5em" name="chevron_right" color="primary" />
           </template>
           <q-breadcrumbs-el
             v-for="location in breadcrumbs"
@@ -56,14 +46,14 @@ const buildPrivateAlbumBreadcrumbs = () => {
     arr.push({
       id: 'private-album',
       label: props.album?.title || 'Private Album',
-      to: props.media?.privateId ? `/private/a/${props.album.privateId}/${props.album.slug}` : null,
+      to: props.media?.privateId ? `/private/a/${props.album.privateId}/${props.album.slug}` : null
     })
   }
   if (props.media?.privateId && props.album?.privateId) {
     arr.push({
       id: 'private-album-media',
       label: props.media?.title || 'Private Video',
-      to: null,
+      to: null
     })
   }
   if (arr.length) {
@@ -78,20 +68,23 @@ const buildPublicBreadcrumbs = () => {
   arr.push({
     id: 0,
     label: props.channel.title,
-    to: props.album?.id || props.media?.id ? `/c/${props.channel.publicId}/${props.channel.slug}` : null,
+    to:
+      props.album?.id || props.media?.id
+        ? `/c/${props.channel.publicId}/${props.channel.slug}`
+        : null
   })
   if (props.album?.id) {
     arr.push({
       id: 1,
       label: props.album.title,
-      to: props.media?.id ? `/a/${props.album.publicId}/${props.album.slug}` : null,
+      to: props.media?.id ? `/a/${props.album.publicId}/${props.album.slug}` : null
     })
   }
   if (props.album?.id && props.media?.id) {
     arr.push({
       id: 2,
       label: props.media.title,
-      to: null,
+      to: null
     })
   }
   return arr
@@ -107,7 +100,7 @@ const breadcrumbs = computed(() => {
       {
         id: 'private-media',
         label: props.media?.title || 'Private Video',
-        to: null,
+        to: null
       }
     ]
   }

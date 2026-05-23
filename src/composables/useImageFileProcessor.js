@@ -5,82 +5,82 @@ import imageCompressionLibUrl from 'browser-image-compression/dist/browser-image
 import { notifyError } from 'src/utils/notify.js'
 
 async function compressImageFile(file) {
-    if (!file) return file
+  if (!file) return file
 
-    const options = {
-        fileType: 'image/jpeg',
-        maxWidthOrHeight: 720,
-        useWebWorker: true,
-        libURL: imageCompressionLibUrl
+  const options = {
+    fileType: 'image/jpeg',
+    maxWidthOrHeight: 720,
+    useWebWorker: true,
+    libURL: imageCompressionLibUrl
+  }
+
+  try {
+    const compressed = await imageCompression(file, options)
+
+    if (compressed instanceof File) {
+      return compressed
     }
 
-    try {
-        const compressed = await imageCompression(file, options)
-
-        if (compressed instanceof File) {
-            return compressed
-        }
-
-        return new File([compressed], file.name, {
-            type: compressed.type || 'image/jpeg',
-            lastModified: file.lastModified ?? Date.now()
-        })
-    } catch (error) {
-        console.error('Error processing file:', error)
-        notifyError('Error processing image. Using original file.', { timeout: 5000 })
-        return file
-    }
+    return new File([compressed], file.name, {
+      type: compressed.type || 'image/jpeg',
+      lastModified: file.lastModified ?? Date.now()
+    })
+  } catch (error) {
+    console.error('Error processing file:', error)
+    notifyError('Error processing image. Using original file.', { timeout: 5000 })
+    return file
+  }
 }
 
 export function useImageFileProcessor() {
-    return {
-        compressImageFile
-    }
+  return {
+    compressImageFile
+  }
 }
 
 export function useImageSelectionProcessing() {
-    const selectedFile = ref(null)
-    const processing = ref(false)
-    const previewFile = ref(null)
-    const previewUrl = useObjectUrl(previewFile)
-    const { compressImageFile } = useImageFileProcessor()
+  const selectedFile = ref(null)
+  const processing = ref(false)
+  const previewFile = ref(null)
+  const previewUrl = useObjectUrl(previewFile)
+  const { compressImageFile } = useImageFileProcessor()
 
-    function clearPreview() {
-        previewFile.value = null
+  function clearPreview() {
+    previewFile.value = null
+  }
+
+  function reset() {
+    selectedFile.value = null
+    processing.value = false
+    clearPreview()
+  }
+
+  async function setAndCompressImage(file) {
+    if (!file) {
+      reset()
+      return { file: null, previewUrl: null }
     }
 
-    function reset() {
-        selectedFile.value = null
-        processing.value = false
-        clearPreview()
+    selectedFile.value = file
+    previewFile.value = file
+    processing.value = true
+
+    try {
+      const processed = await compressImageFile(file)
+      selectedFile.value = processed || file
+    } finally {
+      processing.value = false
     }
 
-    async function setAndCompressImage(file) {
-        if (!file) {
-            reset()
-            return { file: null, previewUrl: null }
-        }
+    return { file: selectedFile.value, previewUrl: previewUrl.value || null }
+  }
 
-        selectedFile.value = file
-        previewFile.value = file
-        processing.value = true
-
-        try {
-            const processed = await compressImageFile(file)
-            selectedFile.value = processed || file
-        } finally {
-            processing.value = false
-        }
-
-        return { file: selectedFile.value, previewUrl: previewUrl.value || null }
-    }
-
-    return {
-        selectedFile,
-        processing,
-        previewUrl,
-        setAndCompressImage,
-        reset,
-        clearPreview
-    }
+  return {
+    selectedFile,
+    processing,
+    previewUrl,
+    setAndCompressImage,
+    reset,
+    clearPreview
+  }
 }

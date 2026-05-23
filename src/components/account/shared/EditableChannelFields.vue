@@ -42,22 +42,14 @@
         style="max-width: 100%; max-height: 200px; object-fit: cover"
         :data-cy="coverPreviewDataCy" />
     </div>
-    <q-skeleton
-      v-else
-      type="rect"
-      width="100%"
-      height="200px"
-      class="rounded-borders" />
+    <q-skeleton v-else type="rect" width="100%" height="200px" class="rounded-borders" />
 
     <!-- Processing Status -->
-    <div v-if="coverProcessing" class="q-mt-md text-caption text-grey">
-      Processing cover...
-    </div>
+    <div v-if="coverProcessing" class="q-mt-md text-caption text-grey">Processing cover...</div>
   </div>
 </template>
 
 <script setup>
-
 defineProps({
   title: {
     type: String,

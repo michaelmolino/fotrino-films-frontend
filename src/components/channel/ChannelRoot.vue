@@ -21,10 +21,7 @@
             ref="viewToggleRef"
             class="channel-view-toggle"
             :class="{ 'channel-view-toggle--wrapped': isViewToggleWrapped }">
-            <ViewToggle
-              v-model="selectedView"
-              :albumCount="albumCount"
-              :allCount="allCount" />
+            <ViewToggle v-model="selectedView" :albumCount="albumCount" :allCount="allCount" />
           </div>
         </div>
 
@@ -36,9 +33,7 @@
               class="col-xs-6 col-sm-6 col-md-4 col-lg-3 col-xl-2"
               v-for="album in albums"
               :key="album.id">
-              <AlbumPoster
-                :album="album"
-                :to="`/a/${album.publicId}/${album.slug}`" />
+              <AlbumPoster :album="album" :to="`/a/${album.publicId}/${album.slug}`" />
             </div>
             <NothingText v-if="albums.length === 0" text="No content available." />
           </div>
@@ -74,7 +69,15 @@
 </template>
 
 <script setup>
-import { ref, computed, defineAsyncComponent, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import {
+  ref,
+  computed,
+  defineAsyncComponent,
+  watch,
+  onMounted,
+  onBeforeUnmount,
+  nextTick
+} from 'vue'
 import { getViewPreference, setViewPreference } from '@utils/viewPreference.js'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'

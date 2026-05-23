@@ -1,14 +1,17 @@
 <template>
   <div class="q-pa-md flex flex-center" data-cy="terms-page">
     <q-card flat bordered class="q-pa-xl card-terms" data-cy="terms-card">
-      <div class="text-h4 text-center q-mb-md" data-cy="terms-title">Privacy Policy & Terms of Use</div>
+      <div class="text-h4 text-center q-mb-md" data-cy="terms-title">
+        Privacy Policy & Terms of Use
+      </div>
       <div class="text-caption text-center q-mb-lg">Last updated: <i>2025-12-14</i></div>
       <ol class="q-pl-md">
         <li class="q-mb-lg">
           <div class="text-h6 text-primary q-mb-xs">Introduction</div>
           <div class="q-mb-md">
-            Fotrino Films is currently under active development and is not ready for public use. Your 
-            account and any associated content (including images and videos) may be deleted at any time.
+            Fotrino Films is currently under active development and is not ready for public use.
+            Your account and any associated content (including images and videos) may be deleted at
+            any time.
           </div>
           <div class="q-mb-md">
             We respect your privacy and are committed to protecting any personal information we
@@ -116,9 +119,7 @@
           <ul class="q-pl-md q-mb-sm">
             <li>When required by law enforcement or legal obligations</li>
             <li>To prevent fraud, abuse, or security threats</li>
-            <li>
-              When enabling third-party services you opt into
-            </li>
+            <li>When enabling third-party services you opt into</li>
             <li>
               In the event of a merger, acquisition, or business transfer, in which case users will
               be notified

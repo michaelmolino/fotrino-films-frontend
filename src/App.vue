@@ -30,9 +30,7 @@ const showTerms = ref(false)
 
 onMounted(async () => {
   if (process.env.NODE_ENV === 'development') {
-    console.warn(
-      'WARNING: This is a development server and should not be exposed to the internet.'
-    )
+    console.warn('WARNING: This is a development server and should not be exposed to the internet.')
   }
   await accountStore.loadProfile()
   showTerms.value = route.query?.showTerms?.toLowerCase() === 'true'

@@ -1,8 +1,5 @@
 <template>
-  <q-layout
-    view="hHh lpR fFf"
-    :class="{ 'bg-hero-dark': isDark, 'bg-hero-light': !isDark }"
-  >
+  <q-layout view="hHh lpR fFf" :class="{ 'bg-hero-dark': isDark, 'bg-hero-light': !isDark }">
     <a href="#main-content" class="skip-to-content">Skip to main content</a>
     <FotrinoHeader />
     <main id="main-content">
@@ -33,7 +30,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-
 .skip-to-content {
   position: absolute;
   left: -9999px;
@@ -62,11 +58,11 @@ export default {
     pointer-events: none;
     background:
       radial-gradient(1000px 480px at 85% 20%, rgba($primary, 0.45), rgba($primary, 0) 68%),
-      radial-gradient(780px 360px at 10% 88%, rgba($secondary, 0.30), rgba($secondary, 0) 62%);
+      radial-gradient(780px 360px at 10% 88%, rgba($secondary, 0.3), rgba($secondary, 0) 62%);
   }
 }
 
 .bg-hero-light {
-// TODO: Add light mode background gradients
+  // TODO: Add light mode background gradients
 }
 </style>

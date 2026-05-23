@@ -8,7 +8,10 @@
     no-caps
     size="md"
     content-class="my-history-dropdown-menu">
-    <div v-for="channel in historyChannels" :key="`${channel.type}:${channel.publicId}`" class="row">
+    <div
+      v-for="channel in historyChannels"
+      :key="`${channel.type}:${channel.publicId}`"
+      class="row">
       <q-btn
         :icon="channel.cover ? 'img:' + channel.cover : 'movie'"
         align="left"

@@ -27,10 +27,7 @@ const channels = computed(() => channelStore.channels || [])
 const hasChannels = computed(() => channels.value.length > 0)
 const mediaCount = computed(() =>
   channels.value.reduce((total, ch) => {
-    const albumMediaCount = (ch.albums || []).reduce(
-      (sum, p) => sum + (p.media || []).length,
-      0
-    )
+    const albumMediaCount = (ch.albums || []).reduce((sum, p) => sum + (p.media || []).length, 0)
     return total + albumMediaCount
   }, 0)
 )

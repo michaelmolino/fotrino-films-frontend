@@ -13,44 +13,32 @@ const routes = [
   {
     path: '/c/:channelId([0-9A-Za-z_-]+)/:channelSlug([0-9a-zA-Z-]+)',
     component: () => import('@layouts/MainLayout.vue'),
-    children: [
-      { path: '', component: () => import('@components/channel/ChannelRoot.vue') },
-    ]
+    children: [{ path: '', component: () => import('@components/channel/ChannelRoot.vue') }]
   },
   {
     path: '/a/:albumId([0-9A-Za-z_-]+)/:albumSlug([0-9a-zA-Z-]+)',
     component: () => import('@layouts/MainLayout.vue'),
-    children: [
-      { path: '', component: () => import('@components/channel/AlbumRoot.vue') }
-    ]
+    children: [{ path: '', component: () => import('@components/channel/AlbumRoot.vue') }]
   },
   {
     path: '/m/:mediaId([0-9A-Za-z_-]+)/:mediaSlug([0-9a-zA-Z-]+)',
     component: () => import('@layouts/MainLayout.vue'),
-    children: [
-      { path: '', component: () => import('@components/channel/MediaRoot.vue') }
-    ]
+    children: [{ path: '', component: () => import('@components/channel/MediaRoot.vue') }]
   },
   {
     path: '/private/a/:privateAlbumId([0-9A-Za-z_-]+)/:albumSlug([0-9a-zA-Z-]+)',
     component: () => import('@layouts/MainLayout.vue'),
-    children: [
-      { path: '', component: () => import('@components/channel/AlbumRoot.vue') }
-    ]
+    children: [{ path: '', component: () => import('@components/channel/AlbumRoot.vue') }]
   },
   {
     path: '/private/a/:privateAlbumId([0-9A-Za-z_-]+)/m/:privateMediaId([0-9A-Za-z_-]+)/:mediaSlug([0-9a-zA-Z-]+)',
     component: () => import('@layouts/MainLayout.vue'),
-    children: [
-      { path: '', component: () => import('@components/channel/MediaRoot.vue') }
-    ]
+    children: [{ path: '', component: () => import('@components/channel/MediaRoot.vue') }]
   },
   {
     path: '/private/m/:privateMediaId([0-9A-Za-z_-]+)/:mediaSlug([0-9a-zA-Z-]+)',
     component: () => import('@layouts/MainLayout.vue'),
-    children: [
-      { path: '', component: () => import('@components/channel/MediaRoot.vue') }
-    ]
+    children: [{ path: '', component: () => import('@components/channel/MediaRoot.vue') }]
   },
   {
     path: '/account',

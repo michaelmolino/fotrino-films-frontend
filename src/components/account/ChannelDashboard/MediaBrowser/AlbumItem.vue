@@ -44,9 +44,13 @@
     </q-expansion-item>
 
     <q-dialog v-model="editDialog" no-backdrop-dismiss data-cy="edit-album-dialog">
-      <q-card style="min-width: 320px; width: 100%; max-width: 560px" data-cy="edit-album-dialog-card">
+      <q-card
+        style="min-width: 320px; width: 100%; max-width: 560px"
+        data-cy="edit-album-dialog-card">
         <q-card-section>
-          <div class="text-h6 text-weight-medium" data-cy="edit-album-dialog-title">{{ album.title }}</div>
+          <div class="text-h6 text-weight-medium" data-cy="edit-album-dialog-title">
+            {{ album.title }}
+          </div>
         </q-card-section>
 
         <q-card-section>
@@ -107,7 +111,15 @@ const props = defineProps({
   getMediaLink: Function
 })
 
-const emit = defineEmits(['deleteAlbum', 'undeleteAlbum', 'deleteMedia', 'undeleteMedia', 'abortMedia', 'editMedia', 'editAlbum'])
+const emit = defineEmits([
+  'deleteAlbum',
+  'undeleteAlbum',
+  'deleteMedia',
+  'undeleteMedia',
+  'abortMedia',
+  'editMedia',
+  'editAlbum'
+])
 
 const editDialog = ref(false)
 const {

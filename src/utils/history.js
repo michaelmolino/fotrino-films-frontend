@@ -100,7 +100,9 @@ export async function resolveHistoryFromBackend(channelStore, { force = false } 
     try {
       const response = await channelStore.resolveHistoryChannels(entries)
       const items = Array.isArray(response?.items) ? response.items : []
-      const deletedPublicIds = Array.isArray(response?.deletedPublicIds) ? response.deletedPublicIds : []
+      const deletedPublicIds = Array.isArray(response?.deletedPublicIds)
+        ? response.deletedPublicIds
+        : []
 
       if (deletedPublicIds.length > 0) {
         const deletedSet = new Set(deletedPublicIds)

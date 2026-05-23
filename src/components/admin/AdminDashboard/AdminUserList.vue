@@ -51,7 +51,7 @@
                 color="warning"
                 text-color="white"
                 class="new-user-badge"
-                style="top: 2px; right: 30px;">
+                style="top: 2px; right: 30px">
                 <q-icon name="person_add" size="12px" />
               </q-badge>
               <q-badge
@@ -99,10 +99,17 @@
           <q-expansion-item
             dense
             expand-separator
-            :label="props.row.channels?.length > 0 ? `Show Channels (${props.row.channels.length})` : 'No Channels'"
+            :label="
+              props.row.channels?.length > 0
+                ? `Show Channels (${props.row.channels.length})`
+                : 'No Channels'
+            "
             :disable="(props.row.channels?.length || 0) === 0">
             <div class="q-py-sm">
-              <div v-for="channel in props.row.channels" :key="channel.publicId" class="channel-row q-px-sm q-py-xs">
+              <div
+                v-for="channel in props.row.channels"
+                :key="channel.publicId"
+                class="channel-row q-px-sm q-py-xs">
                 <div class="row items-center no-wrap">
                   <q-avatar size="28px" class="q-mr-sm">
                     <img
@@ -155,14 +162,7 @@
             @click="deleteUser(props.row)">
             <q-tooltip>Delete</q-tooltip>
           </q-btn>
-          <q-btn
-            v-else
-            dense
-            size="sm"
-            flat
-            color="grey-5"
-            icon="delete"
-            disable>
+          <q-btn v-else dense size="sm" flat color="grey-5" icon="delete" disable>
             <q-tooltip>Already deleted</q-tooltip>
           </q-btn>
         </q-td>
@@ -305,7 +305,7 @@ onMounted(async () => {
 .channel-row + .channel-row {
   border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
- :deep(.q-table tbody td) {
+:deep(.q-table tbody td) {
   padding-top: 10px;
   padding-bottom: 10px;
 }

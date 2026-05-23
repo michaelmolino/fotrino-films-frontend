@@ -3,9 +3,7 @@
     <q-card flat bordered class="q-pa-xl text-center card-center">
       <q-icon name="person_off" color="warning" size="64px" class="q-mb-md" />
       <div class="text-h4 q-mb-sm">Account Deleted</div>
-      <div class="text-body1 q-mb-md">
-        This account has been deleted.
-      </div>
+      <div class="text-body1 q-mb-md">This account has been deleted.</div>
       <div class="text-body2 q-mb-lg">
         Please contact
         <a class="text-primary" href="mailto:michael@fotrino.com">michael@fotrino.com</a>

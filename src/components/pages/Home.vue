@@ -16,7 +16,10 @@
           </h2>
         </transition>
       </div>
-      <div class="text-subtitle1 text-center q-mt-sm q-mb-md" :class="darkClass" data-cy="home-subtitle">
+      <div
+        class="text-subtitle1 text-center q-mt-sm q-mb-md"
+        :class="darkClass"
+        data-cy="home-subtitle">
         Private, ad‑free video hosting for friends and family.
       </div>
       <div class="row justify-center q-gutter-sm q-mt-md">
@@ -45,5 +48,3 @@ const $q = useQuasar()
 const sampleChannelPath = `/c/${process.env.SAMPLE_CHANNEL_ID}/${process.env.SAMPLE_CHANNEL_SLUG}`
 const darkClass = computed(() => ($q.dark.isActive ? 'text-white' : 'text-primary'))
 </script>
-
-

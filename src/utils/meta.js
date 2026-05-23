@@ -2,7 +2,7 @@ import { sanitizeText } from '@utils/text.js'
 
 const getReadModelLookups = readModel => ({
   albumsByPublicId: readModel?.entities?.albumsByPublicId || {},
-  mediaByPublicId: readModel?.entities?.mediaByPublicId || {},
+  mediaByPublicId: readModel?.entities?.mediaByPublicId || {}
 })
 
 // Helpers for each route type
@@ -11,7 +11,7 @@ function getChannelMeta(route, channel) {
     title: channel?.title || null,
     description: channel?.title || '',
     image: channel?.cover || null,
-    type: 'website',
+    type: 'website'
   }
 }
 
@@ -22,7 +22,7 @@ function getAlbumMeta(albumId, readModel) {
     title: album?.title || null,
     description: sanitizeText(album?.subtitle || ''),
     image: album?.poster || null,
-    type: 'website',
+    type: 'website'
   }
 }
 
@@ -33,17 +33,19 @@ function getMediaMeta(mediaId, readModel) {
     title: media?.title || null,
     description: sanitizeText(media?.descriptionUnsafe),
     image: media?.preview || null,
-    type: 'video',
+    type: 'video'
   }
 }
 
 function getPrivateMediaMeta(route, channel) {
-  const media = (channel?.album?.media || []).find(item => item?.privateId === route?.params?.privateMediaId) || null
+  const media =
+    (channel?.album?.media || []).find(item => item?.privateId === route?.params?.privateMediaId) ||
+    null
   return {
     title: media?.title || null,
     description: sanitizeText(media?.descriptionUnsafe),
     image: media?.preview || null,
-    type: 'video',
+    type: 'video'
   }
 }
 
@@ -53,17 +55,19 @@ function getPrivateAlbumMeta(channel) {
     title: album?.title || null,
     description: sanitizeText(album?.subtitle || ''),
     image: album?.poster || null,
-    type: 'website',
+    type: 'website'
   }
 }
 
 function getPrivateAlbumMediaMeta(route, channel) {
-  const media = (channel?.album?.media || []).find(item => item?.privateId === route?.params?.privateMediaId) || null
+  const media =
+    (channel?.album?.media || []).find(item => item?.privateId === route?.params?.privateMediaId) ||
+    null
   return {
     title: media?.title || null,
     description: sanitizeText(media?.descriptionUnsafe),
     image: media?.preview || null,
-    type: 'video',
+    type: 'video'
   }
 }
 

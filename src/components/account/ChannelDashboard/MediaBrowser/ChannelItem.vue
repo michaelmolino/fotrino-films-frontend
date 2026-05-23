@@ -60,12 +60,7 @@
         </q-card-section>
 
         <q-card-actions align="right" class="q-pa-md">
-          <q-btn
-            flat
-            label="Cancel"
-            color="accent"
-            v-close-popup
-            data-cy="cancel-edit-channel" />
+          <q-btn flat label="Cancel" color="accent" v-close-popup data-cy="cancel-edit-channel" />
           <q-btn
             unelevated
             label="Save"
@@ -93,7 +88,18 @@ const props = defineProps({
   getMediaLink: Function
 })
 
-const emit = defineEmits(['deleteChannel', 'undeleteChannel', 'deleteAlbum', 'undeleteAlbum', 'deleteMedia', 'undeleteMedia', 'abortMedia', 'editMedia', 'editAlbum', 'editChannel'])
+const emit = defineEmits([
+  'deleteChannel',
+  'undeleteChannel',
+  'deleteAlbum',
+  'undeleteAlbum',
+  'deleteMedia',
+  'undeleteMedia',
+  'abortMedia',
+  'editMedia',
+  'editAlbum',
+  'editChannel'
+])
 
 const hasPendingChildren = computed(() => {
   for (const album of props.channel.albums || []) {

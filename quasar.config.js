@@ -8,7 +8,6 @@ import { visualizer } from 'rollup-plugin-visualizer'
 import viteCompression from 'vite-plugin-compression'
 import istanbul from 'vite-plugin-istanbul'
 
-
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
@@ -81,11 +80,17 @@ export default defineConfig(() => ({
         target: 'https://fotrino.example.com:65443/',
         changeOrigin: true,
         secure: false,
-        configure: (proxy) => {
+        configure: proxy => {
           proxy.on('proxyReq', (proxyReq, req) => {
-            proxyReq.setHeader('X-Forwarded-Host', req.headers.host || req.headers['x-forwarded-host'] || req.headers[':authority'] || '');
-            proxyReq.setHeader('X-Forwarded-Proto', req.headers['x-forwarded-proto'] || (req.socket.encrypted ? 'https' : 'http'));
-          });
+            proxyReq.setHeader(
+              'X-Forwarded-Host',
+              req.headers.host || req.headers['x-forwarded-host'] || req.headers[':authority'] || ''
+            )
+            proxyReq.setHeader(
+              'X-Forwarded-Proto',
+              req.headers['x-forwarded-proto'] || (req.socket.encrypted ? 'https' : 'http')
+            )
+          })
         }
       }
     }
