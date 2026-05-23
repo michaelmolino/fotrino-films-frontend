@@ -4,26 +4,6 @@ import { useQueryCache } from '@pinia/colada'
 import { api } from 'src/clients/axios-client.js'
 import { getGlobalApiErrorPayload, isGlobalApiError } from 'src/utils/api-errors.js'
 
-const timestampOrZero = value => {
-  const time = new Date(value).getTime()
-  return Number.isNaN(time) ? 0 : time
-}
-
-const sortByDateDesc = (items, field) => {
-  const list = Array.isArray(items) ? [...items] : []
-  return list.sort((a, b) => timestampOrZero(b?.[field]) - timestampOrZero(a?.[field]))
-}
-
-const sortUsers = users => {
-  const sortedUsers = sortByDateDesc(users, 'lastLogin')
-  for (const user of sortedUsers) {
-    if (Array.isArray(user.channels)) {
-      user.channels = sortByDateDesc(user.channels, 'created')
-    }
-  }
-  return sortedUsers
-}
-
 export const useAdminStore = defineStore('admin', () => {
   const users = ref([])
   const jobs = ref([])
@@ -37,7 +17,7 @@ export const useAdminStore = defineStore('admin', () => {
       const { data } = await api.get('/admin/users', {
         __skipGlobalErrorNotify: true
       })
-      return sortUsers(data)
+      return Array.isArray(data) ? data : []
     }
   })
 
@@ -58,7 +38,7 @@ export const useAdminStore = defineStore('admin', () => {
             normalizedStatuses.length > 0 ? { status: normalizedStatuses } : undefined,
           __skipGlobalErrorNotify: true
         })
-        return data
+        return Array.isArray(data) ? data : []
       }
     }
   }
@@ -70,7 +50,7 @@ export const useAdminStore = defineStore('admin', () => {
       const { data } = await api.get('/admin/media/reported', {
         __skipGlobalErrorNotify: true
       })
-      return data
+      return Array.isArray(data) ? data : []
     }
   })
 

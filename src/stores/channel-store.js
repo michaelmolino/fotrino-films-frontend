@@ -2,7 +2,6 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { api } from 'src/clients/axios-client.js'
 import { getGlobalApiErrorPayload } from 'src/utils/api-errors.js'
-import { sortChannelDetail } from 'src/utils/read-model.js'
 import { useQueryCache } from '@pinia/colada'
 import { API_CACHE_MEDIUM_MS } from 'src/stores/utils/cache-timeouts.js'
 
@@ -10,17 +9,6 @@ const CHANNEL_LIST_CACHE_TIMEOUT_MS = API_CACHE_MEDIUM_MS
 const CHANNEL_DETAIL_CACHE_TIMEOUT_MS = API_CACHE_MEDIUM_MS
 const PRIVATE_MEDIA_CACHE_TIMEOUT_MS = API_CACHE_MEDIUM_MS
 const PRIVATE_ALBUM_CACHE_TIMEOUT_MS = API_CACHE_MEDIUM_MS
-
-const compareStringsDesc = (a, b) => {
-  const aValue = typeof a === 'string' ? a : ''
-  const bValue = typeof b === 'string' ? b : ''
-  return bValue.localeCompare(aValue)
-}
-
-const sortChannels = channels => {
-  const list = Array.isArray(channels) ? [...channels] : []
-  return list.sort((a, b) => compareStringsDesc(a?.title, b?.title))
-}
 
 export const useChannelStore = defineStore('channel', () => {
   const channels = ref([])
@@ -58,8 +46,7 @@ export const useChannelStore = defineStore('channel', () => {
     staleTime: CHANNEL_LIST_CACHE_TIMEOUT_MS,
     query: async () => {
       const { data } = await api.get(deep ? '/channels/deep' : '/channels')
-      const sorted = sortChannels(data)
-      return deep ? sorted.map(sortChannelDetail) : sorted
+      return Array.isArray(data) ? data : []
     }
   })
 

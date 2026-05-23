@@ -1,13 +1,3 @@
-const timestampOrZero = value => {
-  const time = new Date(value).getTime()
-  return Number.isNaN(time) ? 0 : time
-}
-
-const sortByResourceDateDesc = items => {
-  const list = Array.isArray(items) ? [...items] : []
-  return list.sort((a, b) => timestampOrZero(b?.resourceDate) - timestampOrZero(a?.resourceDate))
-}
-
 const buildMediaEntity = (media, albumId, albumPublicId) => ({
   id: media.id,
   publicId: media.publicId,
@@ -56,15 +46,6 @@ const buildAlbumEntity = (album, channelId, relationships, mediaByPublicId) => {
   }
 }
 
-export const sortChannelDetail = channel => {
-  if (!channel) return channel
-  const albums = sortByResourceDateDesc(channel.albums).map(album => ({
-    ...album,
-    media: sortByResourceDateDesc(album.media)
-  }))
-  return { ...channel, albums }
-}
-
 export const buildChannelFromReadModel = readModel => {
   if (!readModel) return null
 
@@ -99,8 +80,8 @@ export const buildChannelFromReadModel = readModel => {
     .filter(Boolean)
     .map(album => buildAlbumEntity(album, channelEntity.id, relationships, mediaByPublicId))
 
-  return sortChannelDetail({
+  return {
     ...baseChannel,
     albums
-  })
+  }
 }
