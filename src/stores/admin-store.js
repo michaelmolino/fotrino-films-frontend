@@ -10,6 +10,52 @@ export const useAdminStore = defineStore('admin', () => {
   const reportedMedia = ref([])
   const queryCache = useQueryCache()
 
+  const runStoreQuery = async ({ options, apply, onError }) => {
+    const entry = queryCache.ensure(options)
+
+    try {
+      const state = await queryCache.refresh(entry, options)
+      if (state?.status === 'error') {
+        throw state.error || new Error('Admin query failed')
+      }
+      const value = state?.data ?? null
+      if (typeof apply === 'function') {
+        apply(value)
+      }
+      return value
+    } catch (error) {
+      if (typeof apply === 'function') {
+        apply(null)
+      }
+      if (typeof onError === 'function') {
+        const maybe = onError(error)
+        if (maybe !== undefined) {
+          return maybe
+        }
+      }
+      throw error
+    }
+  }
+
+  const runStoreMutation = async ({ request, onSuccess, onError }) => {
+    try {
+      const result = await request()
+      if (typeof onSuccess === 'function') {
+        await onSuccess(result)
+      }
+      return result
+    } catch (error) {
+      if (typeof onError === 'function') {
+        const maybe = onError(error)
+        if (maybe !== undefined) {
+          return maybe
+        }
+      }
+      getGlobalApiErrorPayload(error)
+      throw error
+    }
+  }
+
   const usersQueryOptions = () => ({
     key: ['admin', 'users'],
     staleTime: 0,
@@ -54,29 +100,6 @@ export const useAdminStore = defineStore('admin', () => {
     }
   })
 
-  const runAdminQuery = async ({ options, apply, onError }) => {
-    const entry = queryCache.ensure(options)
-
-    try {
-      const state = await queryCache.refresh(entry, options)
-      if (state?.status === 'error') {
-        throw state.error || new Error('Admin query failed')
-      }
-      const value = state?.data ?? null
-      apply(value)
-      return value
-    } catch (error) {
-      apply(null)
-      if (typeof onError === 'function') {
-        const maybe = onError(error)
-        if (maybe !== undefined) {
-          return maybe
-        }
-      }
-      throw error
-    }
-  }
-
   const setUsers = value => {
     users.value = value
   }
@@ -90,7 +113,7 @@ export const useAdminStore = defineStore('admin', () => {
   }
 
   const loadUsers = () =>
-    runAdminQuery({
+    runStoreQuery({
       options: usersQueryOptions(),
       apply: setUsers,
       onError: error => {
@@ -102,7 +125,7 @@ export const useAdminStore = defineStore('admin', () => {
     })
 
   const loadJobs = (statuses = []) =>
-    runAdminQuery({
+    runStoreQuery({
       options: jobsQueryOptions(statuses),
       apply: setJobs,
       onError: error => {
@@ -118,16 +141,22 @@ export const useAdminStore = defineStore('admin', () => {
       throw new Error('Invalid admin job payload.')
     }
     if (job.status === 'todo') {
-      await api.post(`/admin/jobs/pending/${job.id}/start-now`, null, {
-        __skipGlobalErrorNotify: true
+      await runStoreMutation({
+        request: () =>
+          api.post(`/admin/jobs/pending/${job.id}/start-now`, null, {
+            __skipGlobalErrorNotify: true
+          })
       })
       void queryCache.invalidateQueries({ key: ['admin', 'jobs'] })
       await loadJobs()
       return 'started'
     }
     if (job.status === 'failed') {
-      await api.post(`/admin/jobs/failed/${job.id}/replay`, null, {
-        __skipGlobalErrorNotify: true
+      await runStoreMutation({
+        request: () =>
+          api.post(`/admin/jobs/failed/${job.id}/replay`, null, {
+            __skipGlobalErrorNotify: true
+          })
       })
       void queryCache.invalidateQueries({ key: ['admin', 'jobs'] })
       await loadJobs()
@@ -137,15 +166,19 @@ export const useAdminStore = defineStore('admin', () => {
   }
 
   const deleteUser = async userId => {
-    try {
-      await api.delete(`/admin/users/${userId}`, {
-        __skipGlobalErrorNotify: true
-      })
-    } catch (error) {
-      if (error?.__userCancelled) {
-        return false
+    const response = await runStoreMutation({
+      request: () =>
+        api.delete(`/admin/users/${userId}`, {
+          __skipGlobalErrorNotify: true
+        }),
+      onError: error => {
+        if (error?.__userCancelled) {
+          return false
+        }
       }
-      throw error
+    })
+    if (response === false) {
+      return false
     }
 
     void queryCache.invalidateQueries({
@@ -157,15 +190,19 @@ export const useAdminStore = defineStore('admin', () => {
   }
 
   const approveUser = async userId => {
-    try {
-      await api.post(`/admin/users/${userId}/approve`, null, {
-        __skipGlobalErrorNotify: true
-      })
-    } catch (error) {
-      if (error?.__userCancelled) {
-        return false
+    const response = await runStoreMutation({
+      request: () =>
+        api.post(`/admin/users/${userId}/approve`, null, {
+          __skipGlobalErrorNotify: true
+        }),
+      onError: error => {
+        if (error?.__userCancelled) {
+          return false
+        }
       }
-      throw error
+    })
+    if (response === false) {
+      return false
     }
 
     void queryCache.invalidateQueries({
@@ -177,7 +214,7 @@ export const useAdminStore = defineStore('admin', () => {
   }
 
   const loadReportedMedia = () =>
-    runAdminQuery({
+    runStoreQuery({
       options: reportedMediaQueryOptions(),
       apply: setReportedMedia,
       onError: error => {
@@ -189,15 +226,19 @@ export const useAdminStore = defineStore('admin', () => {
     })
 
   const deleteMedia = async privateId => {
-    try {
-      await api.delete(`/admin/media/${privateId}`, {
-        __skipGlobalErrorNotify: true
-      })
-    } catch (error) {
-      if (error?.__userCancelled) {
-        return false
+    const response = await runStoreMutation({
+      request: () =>
+        api.delete(`/admin/media/${privateId}`, {
+          __skipGlobalErrorNotify: true
+        }),
+      onError: error => {
+        if (error?.__userCancelled) {
+          return false
+        }
       }
-      throw error
+    })
+    if (response === false) {
+      return false
     }
 
     void queryCache.invalidateQueries({

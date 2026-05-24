@@ -6,6 +6,9 @@
     flat
     no-caps
     size="md">
+    <div v-if="accountStore.providersLoadFailed" class="text-caption text-warning q-px-md q-py-sm">
+      Login providers are temporarily unavailable. Please refresh and try again in a moment.
+    </div>
     <template v-for="provider in oauthProviders" :key="provider.name">
       <div style="max-width: 220px; margin: 0 auto; width: 100%" class="row">
         <q-btn

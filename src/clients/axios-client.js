@@ -1,7 +1,16 @@
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
+import { getGlobalApiErrorPayload } from 'src/utils/api-errors.js'
 
 const shouldRetryApi = error => {
+  const method = (error?.config?.method || '').toLowerCase()
+  const isSafeMethod = ['get', 'head', 'options'].includes(method)
+  const allowNonIdempotentRetry = error?.config?.__retryNonIdempotent === true
+
+  if (!isSafeMethod && !allowNonIdempotentRetry) {
+    return false
+  }
+
   const status = error?.response?.status
   if (status == null) {
     return axiosRetry.isNetworkOrIdempotentRequestError(error)
@@ -31,4 +40,74 @@ axiosRetry(api, {
   retryCondition: shouldRetryApi
 })
 
-export { api }
+let interceptorsInstalled = false
+
+const installApiClientInterceptors = ({
+  getCsrfToken,
+  onBeforeDelete,
+  onRequestStart,
+  onRequestEnd,
+  onApiError
+} = {}) => {
+  if (interceptorsInstalled) return
+  interceptorsInstalled = true
+
+  api.interceptors.request.use(async req => {
+    const method = (req.method || '').toLowerCase()
+
+    if (['post', 'put', 'delete'].includes(method) && typeof getCsrfToken === 'function') {
+      const token = getCsrfToken()
+      if (token) {
+        req.headers = req.headers || {}
+        req.headers['X-CSRFToken'] = token
+      }
+    }
+
+    if (method === 'delete' && typeof onBeforeDelete === 'function') {
+      const confirmed = await onBeforeDelete(req)
+      if (!confirmed) {
+        const err = new Error('User cancelled delete')
+        err.__userCancelled = true
+        err.code = 'ERR_CANCELED'
+        throw err
+      }
+    }
+
+    if (typeof onRequestStart === 'function') {
+      onRequestStart(req)
+    }
+
+    return req
+  })
+
+  api.interceptors.response.use(
+    response => {
+      if (typeof onRequestEnd === 'function') {
+        onRequestEnd(response?.config)
+      }
+      return response
+    },
+    error => {
+      if (typeof onRequestEnd === 'function') {
+        onRequestEnd(error?.config)
+      }
+
+      const apiError = getGlobalApiErrorPayload(error)
+      const status = apiError?.status ?? error?.response?.status
+      const requestCanceled = error?.code === 'ERR_CANCELED' || error?.name === 'CanceledError'
+
+      if (typeof onApiError === 'function') {
+        onApiError({
+          error,
+          apiError,
+          status,
+          requestCanceled
+        })
+      }
+
+      return Promise.reject(error)
+    }
+  )
+}
+
+export { api, installApiClientInterceptors }
