@@ -29,7 +29,7 @@ export function useUppyPresignedUpload() {
 
   /**
    * Initialize Uppy for presigned uploads.
-   * @param {Object} uploadDraft - Draft payload with { mediaId, uploadEndpoint, instructions }
+    * @param {Object} uploadDraft - Draft payload with { mediaId, instructions }
    */
   function initializeUppy(uploadDraft) {
     if (client.value) {
@@ -47,7 +47,7 @@ export function useUppyPresignedUpload() {
     const createdClient = createPresignedUppyClient({
       id: 'presigned-uploader',
       instructions,
-      uploadEndpoint: uploadDraft?.uploadEndpoint || '/api/upload',
+      uploadEndpoint: '/api/upload',
       headers: accountStore?.profile?.csrfToken
         ? { 'X-CSRFToken': accountStore.profile.csrfToken }
         : {},

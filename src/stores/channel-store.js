@@ -329,8 +329,6 @@ export const useChannelStore = defineStore('channel', () => {
         const data = response?.data || {}
         const normalizedData = {
             mediaId: data?.mediaId ?? null,
-            requiredResources: data.requiredResources,
-            uploadEndpoint: data.uploadEndpoint,
             instructions: data.instructions
         }
 
