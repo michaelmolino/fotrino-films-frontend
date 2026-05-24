@@ -1,6 +1,5 @@
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
-import { getGlobalApiErrorPayload } from 'src/utils/api-errors.js'
 
 const shouldRetryApi = error => {
   const method = (error?.config?.method || '').toLowerCase()
@@ -92,14 +91,12 @@ const installApiClientInterceptors = ({
         onRequestEnd(error?.config)
       }
 
-      const apiError = getGlobalApiErrorPayload(error)
-      const status = apiError?.status ?? error?.response?.status
+      const status = error?.response?.status
       const requestCanceled = error?.code === 'ERR_CANCELED' || error?.name === 'CanceledError'
 
       if (typeof onApiError === 'function') {
         onApiError({
           error,
-          apiError,
           status,
           requestCanceled
         })

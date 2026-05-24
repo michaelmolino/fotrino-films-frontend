@@ -59,6 +59,10 @@ export function notifyWarning(message, options = {}) {
 
 // Notify error with persistent dismiss
 export function notifyError(message, options = {}) {
+  if (typeof message !== 'string' || !message.trim()) {
+    return null
+  }
+
   const payload = withPersistentDismiss({
     type: 'negative',
     icon: 'warning',

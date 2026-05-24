@@ -41,6 +41,71 @@ function isPlainObject(value) {
 
 /**
  * @param {unknown} error
+ * @returns {Record<string, any> | null}
+ */
+export function getCloudflareGatewayErrorPayload(error) {
+  const data = error?.response?.data
+  if (!isPlainObject(data)) {
+    return null
+  }
+
+  if (data.cloudflare_error !== true) {
+    return null
+  }
+
+  if (typeof data.status !== 'number' || data.status < 500) {
+    return null
+  }
+
+  if (typeof data.error_name !== 'string' || !data.error_name.trim()) {
+    return null
+  }
+
+  return /** @type {Record<string, any>} */ (data)
+}
+
+/**
+ * @param {unknown} error
+ * @returns {boolean}
+ */
+export function isGloballyHandledApiError(error) {
+  if (error?.__cloudflareDialogShown === true) {
+    return true
+  }
+  return getCloudflareGatewayErrorPayload(error) != null
+}
+
+/**
+ * @param {Record<string, any>} payload
+ * @returns {{ message: string, caption: string }}
+ */
+export function formatCloudflareGatewayError(payload) {
+  let message = 'Temporary upstream error. Please retry in a moment.'
+  if (typeof payload.what_you_should_do === 'string' && payload.what_you_should_do.trim()) {
+    message = payload.what_you_should_do.trim().replaceAll('**', '')
+  } else if (typeof payload.detail === 'string' && payload.detail.trim()) {
+    message = payload.detail.trim()
+  }
+
+  const detailParts = []
+  if (payload.error_name) {
+    detailParts.push(`Type: ${payload.error_name}`)
+  }
+  if (payload.ray_id) {
+    detailParts.push(`Ray ID: ${payload.ray_id}`)
+  }
+  if (Number.isFinite(Number(payload.retry_after))) {
+    detailParts.push(`Retry after: ${Number(payload.retry_after)}s`)
+  }
+
+  return {
+    message,
+    caption: detailParts.join(' | ')
+  }
+}
+
+/**
+ * @param {unknown} error
  * @returns {GlobalApiErrorResponse | null}
  */
 export function getGlobalApiErrorPayload(error) {
@@ -133,6 +198,10 @@ export function getGlobalApiErrorMessage(error, fallback = 'Something went wrong
  * @returns {string}
  */
 export function getComponentApiErrorMessage(error, fallback = 'Something went wrong!') {
+  if (isGloballyHandledApiError(error)) {
+    return ''
+  }
+
   const globalPayload = getGlobalApiErrorPayload(error)
   if (globalPayload) {
     return getGlobalApiErrorMessage(error, fallback)

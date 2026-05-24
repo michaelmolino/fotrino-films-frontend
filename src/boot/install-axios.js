@@ -1,9 +1,16 @@
 import { boot } from 'quasar/wrappers'
+import { Dialog } from 'quasar'
 import { useAccountStore } from 'src/stores/account-store'
 import { api, installApiClientInterceptors } from 'src/clients/axios-client.js'
 import { useRequestLoading } from 'src/composables/useRequestLoading'
 import { confirmDestructiveAction, notifyError } from 'src/utils/notify.js'
-import { getGlobalApiErrorMessage, isGlobalApiError } from 'src/utils/api-errors.js'
+import {
+    getCloudflareGatewayErrorPayload,
+    getGlobalApiErrorPayload,
+    getGlobalApiErrorMessage,
+    isGlobalApiError
+} from 'src/utils/api-errors.js'
+import CloudflareGatewayErrorDialog from '@components/errors/CloudflareGatewayErrorDialog.vue'
 
 export default boot(({ app, router }) => {
     const { increment: showLoader, decrement: hideLoader } = useRequestLoading()
@@ -30,8 +37,24 @@ export default boot(({ app, router }) => {
                 hideLoader()
             }
         },
-        onApiError: ({ error, apiError, status, requestCanceled }) => {
+        onApiError: ({ error, status, requestCanceled }) => {
             const skipNotify = error?.config?.__skipGlobalErrorNotify === true || requestCanceled
+            const cloudflarePayload = getCloudflareGatewayErrorPayload(error)
+            const apiError = getGlobalApiErrorPayload(error)
+            const resolvedStatus = apiError?.status ?? status
+
+            if (cloudflarePayload && !requestCanceled) {
+                Dialog.create({
+                    component: CloudflareGatewayErrorDialog,
+                    componentProps: {
+                        payload: cloudflarePayload,
+                        requestMethod: error?.config?.method,
+                        requestUrl: error?.config?.url,
+                        requestStatus: resolvedStatus ?? error?.response?.status
+                    }
+                })
+                error.__cloudflareDialogShown = true
+            }
 
             if (isGlobalApiError(error, 'not_found') && error?.config?.__redirectNotFoundTo404 === true) {
                 router.replace('/404')
@@ -39,18 +62,25 @@ export default boot(({ app, router }) => {
             }
 
             let msg = getGlobalApiErrorMessage(error)
-            if (!apiError && status === 402) msg = 'You have exceeded a limit for your account type.'
-            else if (!apiError && status === 501) msg = 'Not yet implemented.'
+            const timeout = 0
+
+            if (!apiError && resolvedStatus === 402) msg = 'You have exceeded a limit for your account type.'
+            else if (!apiError && resolvedStatus === 501) msg = 'Not yet implemented.'
 
             if (!skipNotify) {
-                notifyError(msg, { timeout: 0 })
+                if (!cloudflarePayload) {
+                    notifyError(msg, {
+                        timeout,
+                        multiLine: true
+                    })
+                }
             }
 
             if (
                 isGlobalApiError(error, 'unauthorized') ||
                 isGlobalApiError(error, 'forbidden') ||
-                status === 401 ||
-                status === 403
+                resolvedStatus === 401 ||
+                resolvedStatus === 403
             ) {
                 router.replace('/')
             }
