@@ -21,7 +21,7 @@
       bordered
       data-cy="upload-stepper"
       active-color="info"
-      :inactive-color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
+      :inactive-color="inactiveStepperColor"
       done-color="positive"
       :vertical="$q.screen.lt.md"
       header-nav>
@@ -35,9 +35,9 @@
           :previewFile="previewFile"
           :handleFile="handleFile"
           :previewProcessing="isPreviewProcessing"
-          @update:payload="p => Object.assign(payload, p)"
-          @update:mediaFile="file => handleFile(file, 'upload')"
-          @update:previewFile="file => handleFile(file, 'preview')"
+          @update:payload="onMediaStepPayloadUpdate"
+          @update:mediaFile="onMediaStepFileUpdate"
+          @update:previewFile="onMediaStepPreviewUpdate"
           @increment:counter="incrementCounter" />
       </q-step>
 
@@ -56,8 +56,8 @@
           :coverFile="coverFile"
           :coverThumb="coverThumb"
           :handleFile="handleFile"
-          @update:payload="p => Object.assign(payload, p)"
-          @update:coverFile="file => handleFile(file, 'cover')" />
+          @update:payload="onChannelStepPayloadUpdate"
+          @update:coverFile="onChannelStepCoverUpdate" />
       </q-step>
 
       <!-- Step 3: Album -->
@@ -74,8 +74,8 @@
           :album="album"
           :posterFile="posterFile"
           :handleFile="handleFile"
-          @update:payload="p => Object.assign(payload, p)"
-          @update:posterFile="file => handleFile(file, 'poster')" />
+          @update:payload="onAlbumStepPayloadUpdate"
+          @update:posterFile="onAlbumStepPosterUpdate" />
       </q-step>
 
       <q-step
@@ -203,7 +203,7 @@ import AlbumStep from './UploadMedia/AlbumStep.vue'
 import MediaStep from './UploadMedia/MediaStep.vue'
 import MediaPreview from '@components/channel/shared/MediaPreview.vue'
 import AuthRequired from '@components/shared/AuthRequired.vue'
-import { Notify } from 'quasar'
+import { Notify, useQuasar } from 'quasar'
 import { getComponentApiErrorMessage } from 'src/utils/apiErrors.js'
 import { useImageFileProcessor } from '@composables/useImageFileProcessor.js'
 import { useVideoThumbnailProcessor } from '@composables/useVideoThumbnailProcessor.js'
@@ -215,6 +215,7 @@ const IMAGE_RESOURCE_TYPES = new Set(['cover', 'poster', 'preview'])
 const accountStore = useAccountStore()
 const channelStore = useChannelStore()
 const uploadStore = useUploadStore()
+const $q = useQuasar()
 const route = useRoute()
 const channelsQuery = channelStore.useChannelsQuery(true)
 const step = ref(1)
@@ -299,6 +300,7 @@ const stepTitles = computed(() => ({
   channel: step.value > 2 ? payload.title : 'Channel',
   album: step.value > 3 ? album.value.title : 'Album'
 }))
+const inactiveStepperColor = computed(() => ($q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'))
 
 const canGoBack = computed(() => step.value === 2 || step.value === 3)
 const showQuickUploadButton = computed(() => step.value === 1 && quickUploadAvailable.value)
@@ -310,6 +312,38 @@ const showRetryUploadButton = computed(() => step.value === 4 && !isUploading.va
 const nextButtonLabel = computed(() =>
   step.value === 1 && quickUploadAvailable.value ? 'More Options' : 'Next'
 )
+
+function patchPayload(partial) {
+  Object.assign(payload, partial)
+}
+
+function onMediaStepPayloadUpdate(partial) {
+  patchPayload(partial)
+}
+
+function onMediaStepFileUpdate(file) {
+  handleFile(file, 'upload')
+}
+
+function onMediaStepPreviewUpdate(file) {
+  handleFile(file, 'preview')
+}
+
+function onChannelStepPayloadUpdate(partial) {
+  patchPayload(partial)
+}
+
+function onChannelStepCoverUpdate(file) {
+  handleFile(file, 'cover')
+}
+
+function onAlbumStepPayloadUpdate(partial) {
+  patchPayload(partial)
+}
+
+function onAlbumStepPosterUpdate(file) {
+  handleFile(file, 'poster')
+}
 
 function canOpenStepFromHeader(targetStep) {
   return step.value === targetStep - 1 && !!next.value

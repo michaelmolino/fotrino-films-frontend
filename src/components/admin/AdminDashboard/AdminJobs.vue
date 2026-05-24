@@ -11,9 +11,7 @@
     </div>
 
     <div v-if="loading">
-      <q-skeleton type="rect" height="40px" class="q-mb-sm" />
-      <q-skeleton type="rect" height="40px" class="q-mb-sm" />
-      <q-skeleton type="rect" height="40px" class="q-mb-sm" />
+      <q-skeleton v-for="row in loadingRows" :key="row" type="rect" height="40px" class="q-mb-sm" />
     </div>
 
     <q-table
@@ -25,7 +23,7 @@
       row-key="id"
       separator="cell"
       dense
-      :pagination="{ rowsPerPage: 0 }">
+      :pagination="tablePagination">
       <template #body-cell-status="props">
         <q-td :props="props">
           <q-chip
@@ -101,6 +99,8 @@ const filterMode = ref(getInitialJobFilterMode())
 const jobsQuery = adminStore.useJobsQuery()
 const jobs = computed(() => adminStore.jobs || [])
 const loading = computed(() => jobsQuery.isLoading.value && jobs.value.length === 0)
+const loadingRows = [1, 2, 3]
+const tablePagination = { rowsPerPage: 0 }
 
 const FILTER_STATUSES = [
   { value: 'todo', label: 'Pending' },

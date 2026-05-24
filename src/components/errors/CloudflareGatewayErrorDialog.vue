@@ -38,7 +38,12 @@
       </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn flat color="orange-9" label="Dismiss" @click="onDialogOK" data-cy="cloudflare-error-dismiss" />
+        <q-btn
+          flat
+          color="orange-9"
+          :label="dismissLabel"
+          @click="onDialogOK"
+          data-cy="cloudflare-error-dismiss" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -70,6 +75,13 @@ const props = defineProps({
 defineEmits([...useDialogPluginComponent.emits])
 
 const { dialogRef, onDialogHide, onDialogOK } = useDialogPluginComponent()
+const dismissLabel = 'Dismiss'
+
+const requestSummary = computed(() => {
+  const method = props.requestMethod?.toUpperCase()
+  const url = props.requestUrl
+  return [method, url].filter(Boolean).join(' ')
+})
 
 const titleText = computed(() => {
   if (typeof props.payload?.title === 'string' && props.payload.title.trim()) {
@@ -109,7 +121,7 @@ const detailRows = computed(() => {
     rows.push({ label, value: String(value) })
   }
 
-  pushIfPresent('Request', [props.requestMethod?.toUpperCase(), props.requestUrl].filter(Boolean).join(' '))
+  pushIfPresent('Request', requestSummary.value)
   pushIfPresent('Status', props.requestStatus ?? props.payload?.status)
   pushIfPresent('Error Name', props.payload?.error_name)
   pushIfPresent('Error Code', props.payload?.error_code)

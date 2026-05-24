@@ -1,44 +1,44 @@
 <template>
   <q-btn-dropdown
-    v-if="historyChannels && historyChannels.length > 0"
+    v-if="hasHistory"
     icon="history"
-    :label="$q.screen.gt.sm ? 'History' : ''"
+    :label="dropdownLabel"
     aria-label="View recently visited channels"
     flat
     no-caps
     size="md"
     content-class="my-history-dropdown-menu">
     <div
-      v-for="channel in historyChannels"
-      :key="`${channel.type}:${channel.publicId}`"
+      v-for="entry in historyEntries"
+      :key="entry.key"
       class="row">
       <q-btn
-        :icon="channel.cover ? 'img:' + channel.cover : 'movie'"
+        :icon="entry.icon"
         align="left"
         flat
         no-caps
         no-wrap
         class="col-xs-10"
-        :label="channel.title"
-        :aria-label="`Visit ${channel.title}`"
+        :label="entry.title"
+        :aria-label="entry.visitLabel"
         size="md"
-        :to="historyTarget(channel)" />
+        :to="entry.target" />
       <q-btn
         icon="remove_circle"
         flat
         no-caps
         no-wrap
         class="col-xs-2"
-        :aria-label="`Remove ${channel.title} from history`"
+        :aria-label="entry.removeLabel"
         size="md"
-        @click="removeHistory(channel.publicId, channel.type)" />
+        @click="removeHistory(entry.publicId, entry.type)" />
     </div>
   </q-btn-dropdown>
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
-import { Notify } from 'quasar'
+import { computed, onMounted } from 'vue'
+import { Notify, useQuasar } from 'quasar'
 import { useChannelStore } from 'src/stores/channel-store.js'
 import {
   historyChannels,
@@ -47,6 +47,23 @@ import {
 } from '@utils/history.js'
 
 const channelStore = useChannelStore()
+const $q = useQuasar()
+
+const hasHistory = computed(() => (historyChannels?.value || []).length > 0)
+const dropdownLabel = computed(() => ($q.screen.gt.sm ? 'History' : ''))
+
+const historyEntries = computed(() => {
+  return (historyChannels?.value || []).map(channel => ({
+    key: `${channel.type}:${channel.publicId}`,
+    publicId: channel.publicId,
+    type: channel.type,
+    title: channel.title,
+    icon: channel.cover ? `img:${channel.cover}` : 'movie',
+    target: historyTarget(channel),
+    visitLabel: `Visit ${channel.title}`,
+    removeLabel: `Remove ${channel.title} from history`
+  }))
+})
 
 function historyTarget(channel) {
   if (channel.type === 'privateAlbum') {
@@ -58,6 +75,13 @@ function historyTarget(channel) {
   return `/c/${channel.publicId}/${channel.slug}`
 }
 
+function getRemovedHistoryMessage(removedCount) {
+  if (removedCount === 1) {
+    return '1 deleted item was removed from your history.'
+  }
+  return `${removedCount} deleted items were removed from your history.`
+}
+
 onMounted(async () => {
   const result = await resolveHistoryFromBackend(channelStore)
   const removedCount = result?.deletedPublicIds?.length || 0
@@ -67,10 +91,7 @@ onMounted(async () => {
       type: 'warning',
       timeout: 2200,
       icon: 'info',
-      message:
-        removedCount === 1
-          ? '1 deleted item was removed from your history.'
-          : `${removedCount} deleted items were removed from your history.`
+      message: getRemovedHistoryMessage(removedCount)
     })
   }
 })

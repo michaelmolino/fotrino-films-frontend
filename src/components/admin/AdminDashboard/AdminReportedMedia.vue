@@ -5,9 +5,7 @@
     </div>
     <div class="text-caption text-grey-7 q-mb-md">All videos that have been reported by users.</div>
     <div v-if="loading">
-      <q-skeleton type="rect" height="40px" class="q-mb-sm" />
-      <q-skeleton type="rect" height="40px" class="q-mb-sm" />
-      <q-skeleton type="rect" height="40px" class="q-mb-sm" />
+      <q-skeleton v-for="row in loadingRows" :key="row" type="rect" height="40px" class="q-mb-sm" />
     </div>
     <q-table
       v-else
@@ -22,7 +20,7 @@
         <q-td :props="props">
           <q-btn
             :label="props.row.title"
-            :to="`/private/m/${props.row.privateId}/${props.row.slug}`"
+            :to="getReportedMediaPath(props.row)"
             icon="link"
             flat
             dense
@@ -59,6 +57,7 @@ import { getComponentApiErrorMessage } from 'src/utils/apiErrors.js'
 
 const adminStore = useAdminStore()
 const reportedMediaQuery = adminStore.useReportedMediaQuery()
+const loadingRows = [1, 2, 3]
 const loading = computed(() =>
   reportedMediaQuery.isLoading.value && (adminStore.reportedMedia || []).length === 0
 )
@@ -91,6 +90,10 @@ const flattenedReportedMediaRows = computed(() => {
   }
   return rows
 })
+
+function getReportedMediaPath(row) {
+  return `/private/m/${row.privateId}/${row.slug}`
+}
 
 async function deleteMedia(privateId) {
   try {

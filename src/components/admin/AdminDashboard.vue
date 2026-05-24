@@ -1,13 +1,13 @@
 <template>
   <div class="admin-dashboard-page q-pa-md" data-cy="admin-dashboard">
-    <template v-if="isAdmin">
+    <template v-if="contentState === 'admin'">
       <div class="text-h6 text-weight-bold" data-cy="admin-all-users-title">Admin: All Users</div>
       <div class="text-caption text-grey-7 q-mb-md">All registered users.</div>
       <AdminUserList class="q-mb-xl" />
       <AdminJobs class="q-mb-xl" />
       <AdminReportedMedia />
     </template>
-    <AuthRequired v-else :type="isAuthenticated ? 'admin' : 'login'" />
+    <AuthRequired v-else :type="authRequiredType" />
   </div>
 </template>
 
@@ -23,4 +23,6 @@ const accountStore = useAccountStore()
 const profile = computed(() => accountStore.profile)
 const isAuthenticated = computed(() => !!profile.value?.id)
 const isAdmin = computed(() => profile.value?.isAdmin === true)
+const contentState = computed(() => (isAdmin.value ? 'admin' : 'auth-required'))
+const authRequiredType = computed(() => (isAuthenticated.value ? 'admin' : 'login'))
 </script>

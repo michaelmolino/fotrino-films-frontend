@@ -95,10 +95,19 @@ const showAdvanced = ref(false)
 const menuOpen = ref(false)
 const containerRef = ref(null)
 
+const shareContext = computed(() => {
+  if (props.media) return 'media'
+  if (props.album) return 'album'
+  return 'channel'
+})
+
 const shareTargetLabel = computed(() => {
-  if (props.media) return 'this video'
-  if (props.album) return 'this album'
-  return 'this channel'
+  const labels = {
+    media: 'this video',
+    album: 'this album',
+    channel: 'this channel'
+  }
+  return labels[shareContext.value]
 })
 
 const channelPath = computed(() => {
@@ -143,7 +152,7 @@ const isPrivateAlbumContext = computed(() => {
   )
 })
 
-const shareForChannel = computed(() => {
+function buildChannelActions() {
   if (!channelPath.value) return []
   return [
     {
@@ -155,9 +164,9 @@ const shareForChannel = computed(() => {
       cy: 'share-channel'
     }
   ]
-})
+}
 
-const shareForAlbum = computed(() => {
+function buildAlbumActions() {
   const items = []
 
   if (privateAlbumPath.value) {
@@ -196,9 +205,9 @@ const shareForAlbum = computed(() => {
   }
 
   return items
-})
+}
 
-const shareForMedia = computed(() => {
+function buildMediaActions() {
   const items = []
 
   if (standalonePrivateMediaPath.value || privateMediaPath.value || publicMediaPath.value) {
@@ -234,22 +243,22 @@ const shareForMedia = computed(() => {
     })
   }
   return items
-})
+}
 
-const actions = computed(() => {
-  if (props.media) return shareForMedia.value
-  if (props.album) return shareForAlbum.value
-  return shareForChannel.value
+const menuActions = computed(() => {
+  if (shareContext.value === 'media') return buildMediaActions()
+  if (shareContext.value === 'album') return buildAlbumActions()
+  return buildChannelActions()
 })
 
 const primaryAction = computed(() => {
-  if (!actions.value.length) return null
-  return actions.value[0]
+  if (!menuActions.value.length) return null
+  return menuActions.value[0]
 })
 
 const advancedActions = computed(() => {
-  if (actions.value.length <= 1) return []
-  return actions.value.slice(1)
+  if (menuActions.value.length <= 1) return []
+  return menuActions.value.slice(1)
 })
 
 function closeMenu() {

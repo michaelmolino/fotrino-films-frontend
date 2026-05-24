@@ -2,22 +2,18 @@
   <div>
     <q-select
       outlined
-      :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
+      :color="inputColor"
       label="Channel *"
       :model-value="payload.publicId"
       @update:model-value="onUpdatePublicId"
       data-cy="upload-channel-select"
-      :options="
-        channels
-          .map(({ publicId, title }) => ({ value: publicId, label: title }))
-          .concat({ value: 0, label: 'New...' })
-      "
+      :options="channelOptions"
       class="q-pb-lg" />
     <div>
       <q-input
         v-if="payload.publicId?.value === 0"
         outlined
-        :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
+        :color="inputColor"
         class="q-pb-md"
         :model-value="payload.title"
         label="Channel Title *"
@@ -99,6 +95,9 @@
 
 <script setup>
 import { computed, onMounted, watch } from 'vue'
+import { useQuasar } from 'quasar'
+
+const $q = useQuasar()
 const props = defineProps({
   payload: { type: Object, required: true },
   channels: { type: Array, default: () => [] },
@@ -108,6 +107,13 @@ const props = defineProps({
   handleFile: { type: Function, default: null }
 })
 const emit = defineEmits(['update:payload', 'update:coverFile'])
+
+const inputColor = computed(() => ($q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'))
+const channelOptions = computed(() => {
+  return (props.channels || [])
+    .map(({ publicId, title }) => ({ value: publicId, label: title }))
+    .concat({ value: 0, label: 'New...' })
+})
 
 const channelCoverByPublicId = computed(() => {
   const map = {}

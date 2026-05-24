@@ -2,17 +2,17 @@
   <div class="fullscreen bg-warning text-black flex flex-center">
     <q-card flat bordered class="q-pa-xl text-center card-center">
       <q-icon name="person_off" color="warning" size="64px" class="q-mb-md" />
-      <div class="text-h4 q-mb-sm">Account Deleted</div>
-      <div class="text-body1 q-mb-md">This account has been deleted.</div>
+      <div class="text-h4 q-mb-sm">{{ content.title }}</div>
+      <div class="text-body1 q-mb-md">{{ content.subtitle }}</div>
       <div class="text-body2 q-mb-lg">
-        Please contact
+        {{ content.contactPrefix }}
         <a class="text-primary" href="mailto:michael@fotrino.com">michael@fotrino.com</a>
-        if you would like to re-enable it.
+        {{ content.contactSuffix }}
       </div>
       <q-btn
         class="q-py-md q-mt-sm"
         icon="home"
-        label="Home"
+        :label="content.ctaLabel"
         color="primary"
         unelevated
         no-caps
@@ -24,6 +24,14 @@
 
 <script setup>
 defineOptions({ name: 'Error-Account-Deleted' })
+
+const content = {
+  title: 'Account Deleted',
+  subtitle: 'This account has been deleted.',
+  contactPrefix: 'Please contact',
+  contactSuffix: 'if you would like to re-enable it.',
+  ctaLabel: 'Home'
+}
 </script>
 
 <style scoped>

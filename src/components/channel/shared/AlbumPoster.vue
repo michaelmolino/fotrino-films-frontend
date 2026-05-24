@@ -39,7 +39,9 @@
       class="poster-fallback"
       :style="{ backgroundColor: album.posterColor || '#000000' }">
       <!-- Centered overlay in the main body for color fallback -->
-      <div class="absolute-center text-center q-pa-sm poster-center-overlay contrast-text">
+      <div
+        class="absolute-center text-center q-pa-sm poster-center-overlay"
+        :style="contrastTextStyle">
         <div class="ellipsis text-weight-bold">{{ album.title }}</div>
         <div class="ellipsis">{{ album.subtitle }}</div>
       </div>
@@ -48,7 +50,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, watch } from 'vue'
+import { computed } from 'vue'
 
 const props = defineProps({
   album: Object,
@@ -79,16 +81,7 @@ function getContrastColor(hex) {
 }
 
 const contrastTextColor = computed(() => getContrastColor(props.album?.posterColor || '#000000'))
-
-// Add dynamic color via CSS variable for .contrast-text
-onMounted(() => {
-  const el = document.querySelector('.contrast-text')
-  if (el) el.style.setProperty('--contrast-text', contrastTextColor.value)
-})
-watch(contrastTextColor, val => {
-  const el = document.querySelector('.contrast-text')
-  if (el) el.style.setProperty('--contrast-text', val)
-})
+const contrastTextStyle = computed(() => ({ color: contrastTextColor.value }))
 </script>
 
 <style scoped>
@@ -99,8 +92,5 @@ watch(contrastTextColor, val => {
 }
 .poster-center-overlay {
   pointer-events: none; /* allow click-through to the button */
-}
-.contrast-text {
-  color: var(--contrast-text, #fff);
 }
 </style>

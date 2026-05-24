@@ -15,7 +15,7 @@
         </q-badge>
         <span class="action-btns-inline">
           <q-btn
-            v-if="!pending && !deleted && link"
+            v-if="showVisitAction"
             flat
             dense
             size="sm"
@@ -28,7 +28,7 @@
             <q-tooltip>Visit</q-tooltip>
           </q-btn>
           <q-btn
-            v-if="!pending && deleted && undeletable"
+            v-if="showUndeleteAction"
             flat
             dense
             size="sm"
@@ -41,7 +41,7 @@
             <q-tooltip>Undelete</q-tooltip>
           </q-btn>
           <q-btn
-            v-else-if="!pending && deleted"
+            v-else-if="showDeletedDisabledAction"
             flat
             dense
             size="sm"
@@ -53,7 +53,7 @@
             <q-tooltip>Resource pending deletion.</q-tooltip>
           </q-btn>
           <q-btn
-            v-if="pending"
+            v-if="showPendingAction"
             flat
             dense
             size="sm"
@@ -65,7 +65,7 @@
             <q-tooltip>Pending</q-tooltip>
           </q-btn>
           <q-btn
-            v-if="pending && abortable"
+            v-if="showAbortAction"
             flat
             dense
             size="sm"
@@ -78,7 +78,7 @@
             <q-tooltip>Abort Pending Upload</q-tooltip>
           </q-btn>
           <q-btn
-            v-if="editable && !pending && !deleted"
+            v-if="showEditAction"
             flat
             dense
             size="sm"
@@ -90,7 +90,7 @@
             <q-tooltip>Edit</q-tooltip>
           </q-btn>
           <q-btn
-            v-if="!pending && !deleted"
+            v-if="showDeleteAction"
             flat
             dense
             size="sm"
@@ -159,6 +159,13 @@ const props = defineProps({
 
 defineEmits(['delete', 'edit', 'abort', 'undelete'])
 const canDelete = computed(() => !props.pending && !props.hasPendingChildren)
+const showVisitAction = computed(() => !props.pending && !props.deleted && !!props.link)
+const showUndeleteAction = computed(() => !props.pending && props.deleted && props.undeletable)
+const showDeletedDisabledAction = computed(() => !props.pending && props.deleted && !props.undeletable)
+const showPendingAction = computed(() => !!props.pending)
+const showAbortAction = computed(() => !!props.pending && !!props.abortable)
+const showEditAction = computed(() => !!props.editable && !props.pending && !props.deleted)
+const showDeleteAction = computed(() => !props.pending && !props.deleted)
 </script>
 
 <style scoped>

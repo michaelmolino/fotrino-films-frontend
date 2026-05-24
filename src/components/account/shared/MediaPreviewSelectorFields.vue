@@ -8,7 +8,7 @@
       val="frame"
       label="Video Frame"
       color="accent"
-      @update:model-value="$emit('update:previewType', $event)" />
+      @update:model-value="onUpdatePreviewType" />
     <q-radio
       v-if="allowFrameMode"
       class="q-pl-sm"
@@ -17,7 +17,7 @@
       label="Upload Photo"
       data-cy="preview-type-upload"
       color="accent"
-      @update:model-value="$emit('update:previewType', $event)" />
+      @update:model-value="onUpdatePreviewType" />
 
     <q-file
       v-if="!allowFrameMode || previewType === 'new'"
@@ -28,14 +28,14 @@
       class="q-pb-md"
       color="accent"
       data-cy="preview-image-file"
-      @update:model-value="$emit('update:previewFile', $event)">
+      @update:model-value="onUpdatePreviewFile">
       <template v-slot:prepend>
         <q-icon name="image" @click.stop.prevent />
       </template>
       <template v-slot:append>
         <q-icon
           name="close"
-          @click.stop.prevent="$emit('update:previewFile', null)"
+          @click.stop.prevent="clearPreviewFile"
           class="cursor-pointer" />
       </template>
     </q-file>
@@ -59,13 +59,13 @@
       </div>
       <div class="col-auto">
         <q-btn
-          v-if="allowFrameMode && previewType === 'frame'"
+          v-if="showRefreshButton"
           :disable="!frameRefreshEnabled || previewProcessing"
           :loading="previewProcessing"
           icon="autorenew"
           flat
           size="xl"
-          @click="$emit('refresh:frame')">
+          @click="emitRefreshFrame">
           <q-tooltip>Refresh Thumbnail</q-tooltip>
         </q-btn>
       </div>
@@ -74,9 +74,10 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import MediaPreview from '@components/channel/shared/MediaPreview.vue'
 
-defineProps({
+const props = defineProps({
   previewType: {
     type: String,
     default: 'frame'
@@ -115,7 +116,25 @@ defineProps({
   }
 })
 
-defineEmits(['update:previewType', 'update:previewFile', 'refresh:frame'])
+const emit = defineEmits(['update:previewType', 'update:previewFile', 'refresh:frame'])
+
+const showRefreshButton = computed(() => props.allowFrameMode && props.previewType === 'frame')
+
+function onUpdatePreviewType(value) {
+  emit('update:previewType', value)
+}
+
+function onUpdatePreviewFile(value) {
+  emit('update:previewFile', value)
+}
+
+function clearPreviewFile() {
+  emit('update:previewFile', null)
+}
+
+function emitRefreshFrame() {
+  emit('refresh:frame')
+}
 </script>
 
 <style scoped>

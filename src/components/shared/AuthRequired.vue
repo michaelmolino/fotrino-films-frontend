@@ -1,8 +1,8 @@
 <template>
   <div class="auth-required-container" :data-cy="`auth-required-${props.type}`">
-    <q-icon :name="computedIcon" :size="iconSize" color="grey-5" />
-    <div class="text-h6 q-mt-md text-grey-6" data-cy="auth-required-title">{{ computedTitle }}</div>
-    <div class="text-body2 text-grey-7" data-cy="auth-required-message">{{ computedMessage }}</div>
+    <q-icon :name="resolved.icon" :size="iconSize" color="grey-5" />
+    <div class="text-h6 q-mt-md text-grey-6" data-cy="auth-required-title">{{ resolved.title }}</div>
+    <div class="text-body2 text-grey-7" data-cy="auth-required-message">{{ resolved.message }}</div>
   </div>
 </template>
 
@@ -33,36 +33,30 @@ const props = defineProps({
   }
 })
 
-const computedTitle = computed(() => {
-  if (props.title) return props.title
-  switch (props.type) {
-    case 'admin':
-      return 'Access Denied'
-    case 'login':
-    default:
-      return 'Authentication Required'
+const AUTH_REQUIRED_PRESETS = {
+  login: {
+    title: 'Authentication Required',
+    message: 'Please log in to access this page.',
+    icon: 'lock'
+  },
+  admin: {
+    title: 'Access Denied',
+    message: "You don't have administrator privileges.",
+    icon: 'security'
+  },
+  custom: {
+    title: 'Authentication Required',
+    message: 'Please log in to access this page.',
+    icon: 'lock'
   }
-})
+}
 
-const computedMessage = computed(() => {
-  if (props.message) return props.message
-  switch (props.type) {
-    case 'admin':
-      return "You don't have administrator privileges."
-    case 'login':
-    default:
-      return 'Please log in to access this page.'
-  }
-})
-
-const computedIcon = computed(() => {
-  if (props.icon) return props.icon
-  switch (props.type) {
-    case 'admin':
-      return 'security'
-    case 'login':
-    default:
-      return 'lock'
+const resolved = computed(() => {
+  const preset = AUTH_REQUIRED_PRESETS[props.type] || AUTH_REQUIRED_PRESETS.login
+  return {
+    title: props.title || preset.title,
+    message: props.message || preset.message,
+    icon: props.icon || preset.icon
   }
 })
 </script>

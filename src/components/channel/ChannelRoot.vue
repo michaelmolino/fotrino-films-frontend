@@ -1,6 +1,6 @@
 <template>
   <div class="q-pa-md">
-    <template v-if="loading">
+    <div v-if="contentState === 'loading'">
       <div class="row items-start q-col-gutter-md">
         <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-for="n in 6" :key="n">
           <q-skeleton type="rect" class="q-mb-sm skeleton-medium" />
@@ -8,9 +8,9 @@
           <q-skeleton type="text" width="60%" />
         </div>
       </div>
-    </template>
+    </div>
 
-    <template v-else-if="channel?.publicId === route.params.channelId">
+    <div v-else-if="contentState === 'ready'">
       <div :key="channel?.publicId || route.fullPath">
         <div ref="headerRowRef" class="row items-center q-mb-sm channel-header">
           <div ref="breadcrumbsRef" class="channel-header-breadcrumbs">
@@ -27,15 +27,15 @@
 
         <q-separator spaced />
 
-        <template v-if="selectedView === 'albums'">
+        <template v-if="showAlbumsView">
           <div class="row q-mt-sm">
             <div
               class="col-xs-6 col-sm-6 col-md-4 col-lg-3 col-xl-2"
-              v-for="album in albums"
-              :key="album.id">
-              <AlbumPoster :album="album" :to="`/a/${album.publicId}/${album.slug}`" />
+              v-for="card in albumCards"
+              :key="card.id">
+              <AlbumPoster :album="card.album" :to="card.to" />
             </div>
-            <NothingText v-if="albums.length === 0" text="No content available." />
+            <NothingText v-if="showEmptyContent" text="No content available." />
           </div>
         </template>
 
@@ -43,24 +43,24 @@
           <div class="row q-pt-md">
             <div
               class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm text-center"
-              v-for="(item, index) in sortedAllMedia"
-              :key="item.media.id">
+              v-for="card in mediaCards"
+              :key="card.id">
               <MediaPreview
                 :channel="channel"
-                :album="item.album"
-                :media="item.media"
-                :to="`/m/${item.media.publicId}/${item.media.slug}`"
+                :album="card.album"
+                :media="card.media"
+                :to="card.to"
                 :detail="true"
                 :showMainAccent="true"
-                :priority="index === 0 ? 'high' : 'auto'" />
+                :priority="card.priority" />
             </div>
-            <NothingText v-if="sortedAllMedia.length === 0" text="No content available." />
+            <NothingText v-if="showEmptyContent" text="No content available." />
           </div>
         </template>
 
         <ShareActions :channel="channel" />
       </div>
-    </template>
+    </div>
 
     <template v-else>
       <NothingText text="Channel not found or unavailable." />
@@ -71,7 +71,6 @@
 <script setup>
 import {
   ref,
-  computed,
   defineAsyncComponent,
   watch,
   onMounted,
@@ -81,6 +80,7 @@ import {
 import { getViewPreference, setViewPreference } from '@utils/viewPreference.js'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
+import { useChannelRootViewModel } from '@composables/useChannelRootViewModel.js'
 
 import BreadCrumbs from '@components/channel/shared/BreadCrumbs.vue'
 import ShareActions from '@components/channel/shared/ShareActions.vue'
@@ -99,6 +99,22 @@ const viewToggleRef = ref(null)
 const isViewToggleWrapped = ref(false)
 let headerResizeObserver = null
 const { channel, sortedAllMedia, loading } = useChannelLoader()
+const {
+  albums,
+  contentState,
+  showAlbumsView,
+  albumCards,
+  mediaCards,
+  showEmptyContent,
+  albumCount,
+  allCount
+} = useChannelRootViewModel({
+  loading,
+  channel,
+  route,
+  selectedView,
+  sortedAllMedia
+})
 
 function updateViewToggleWrapState() {
   if (!breadcrumbsRef.value || !viewToggleRef.value) {
@@ -149,14 +165,6 @@ onBeforeUnmount(() => {
   }
   window.removeEventListener('resize', updateViewToggleWrapState)
 })
-
-const albums = computed(() => {
-  if (loading.value || !channel.value) return []
-  return channel.value.albums || []
-})
-
-const albumCount = computed(() => albums.value.length)
-const allCount = computed(() => sortedAllMedia.value.length)
 
 watch(
   [albumCount, channel, loading],

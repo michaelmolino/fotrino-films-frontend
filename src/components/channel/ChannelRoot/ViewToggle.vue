@@ -1,7 +1,7 @@
 <template>
   <q-btn-toggle
     :model-value="model"
-    @update:model-value="updateModelValue"
+    @update:model-value="onUpdateModelValue"
     class="channel-view-toggle-control"
     data-cy="channel-view-toggle"
     no-caps
@@ -10,10 +10,7 @@
     toggle-color="primary"
     color="white"
     text-color="primary"
-    :options="[
-      { value: 'albums', slot: 'album' },
-      { value: 'all', slot: 'all' }
-    ]">
+    :options="viewOptions">
     <template #album>
       <div class="row items-center no-wrap" data-cy="channel-view-albums">
         <span class="text-center">Albums</span>
@@ -49,7 +46,12 @@ const model = computed({
   set: val => emit('update:modelValue', val)
 })
 
-function updateModelValue(val) {
+const viewOptions = computed(() => [
+  { value: 'albums', slot: 'album' },
+  { value: 'all', slot: 'all' }
+])
+
+function onUpdateModelValue(val) {
   model.value = val
 }
 </script>

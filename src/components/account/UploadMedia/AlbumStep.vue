@@ -2,7 +2,7 @@
   <div>
     <q-select
       outlined
-      :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
+      :color="inputColor"
       label="Album *"
       :model-value="payload.album.id"
       @update:model-value="onUpdateAlbumId"
@@ -12,7 +12,7 @@
     <q-input
       v-if="payload.album.id?.value === 0"
       outlined
-      :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
+      :color="inputColor"
       class="q-pb-md"
       clearable
       :model-value="payload.album.title"
@@ -38,7 +38,7 @@
       <q-card-section>
         <AlbumPosterFields
           :subtitle="payload.album.subtitle"
-          :input-color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
+          :input-color="inputColor"
           :show-subtitle="true"
           :show-poster-type="true"
           :poster-type="localPosterType"
@@ -62,8 +62,11 @@
 
 <script setup>
 import { computed, onMounted, watch } from 'vue'
+import { useQuasar } from 'quasar'
 import AlbumPoster from '@components/channel/shared/AlbumPoster.vue'
 import AlbumPosterFields from '@components/account/shared/AlbumPosterFields.vue'
+
+const $q = useQuasar()
 const props = defineProps({
   payload: { type: Object, required: true },
   albums: { type: Array, default: () => [] },
@@ -73,6 +76,7 @@ const props = defineProps({
 })
 const emit = defineEmits(['update:payload', 'update:posterFile'])
 const defaultColor = '#000000'
+const inputColor = computed(() => ($q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'))
 
 // Filter albums that are eligible for the currently selected channel.
 // Parent now syncs albums per-channel, but keep this defensive.

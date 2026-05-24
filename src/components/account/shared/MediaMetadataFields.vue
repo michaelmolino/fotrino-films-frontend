@@ -10,7 +10,7 @@
       class="q-pb-md"
       label="Description - p, br, strong, and i tags allowed"
       data-cy="media-description-input"
-      @update:model-value="$emit('update:description', $event)" />
+      @update:model-value="onUpdateDescription" />
 
     <div v-if="showExtendedAttributes">
       <div class="text-overline">Extended Attributes</div>
@@ -21,7 +21,7 @@
             mask="YYYY-MM-DD"
             subtitle="Capture Date"
             :options="dateOptionsFn"
-            @update:model-value="$emit('update:resourceDate', $event)">
+            @update:model-value="onUpdateResourceDate">
             <div class="row items-center justify-end q-gutter-sm">
               <q-btn label="Cancel" flat v-close-popup />
               <q-btn label="OK" flat v-close-popup />
@@ -38,7 +38,7 @@
           label="Featured"
           class="q-pr-lg q-pl-sm"
           data-cy="media-featured-checkbox"
-          @update:model-value="$emit('update:main', $event)" />
+          @update:model-value="onUpdateMain" />
       </div>
     </div>
   </div>
@@ -74,7 +74,7 @@ const props = defineProps({
   }
 })
 
-defineEmits(['update:description', 'update:resourceDate', 'update:main'])
+const emit = defineEmits(['update:description', 'update:resourceDate', 'update:main'])
 
 const resourceDateLabel = computed(() => {
   if (!props.resourceDate) {
@@ -86,6 +86,18 @@ const resourceDateLabel = computed(() => {
 
 function dateOptionsFn(date) {
   return parseResourceDate(date) <= new Date()
+}
+
+function onUpdateDescription(value) {
+  emit('update:description', value)
+}
+
+function onUpdateResourceDate(value) {
+  emit('update:resourceDate', value)
+}
+
+function onUpdateMain(value) {
+  emit('update:main', value)
 }
 
 function parseResourceDate(value) {

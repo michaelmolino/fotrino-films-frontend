@@ -1,12 +1,12 @@
 <template>
   <div class="q-pa-md" data-cy="album-root">
-    <template v-if="loading">
+    <div v-if="contentState === 'loading'">
       <q-skeleton type="rect" class="q-mb-md skeleton-large" />
       <q-skeleton type="text" width="60%" />
       <q-skeleton type="text" width="40%" />
-    </template>
+    </div>
 
-    <template v-else-if="channel && album && (route.params.albumId || route.params.privateAlbumId)">
+    <div v-else-if="contentState === 'ready'">
       <BreadCrumbs
         :channel="channel"
         :album="album"
@@ -14,73 +14,69 @@
         :private="privateMode"
         private-scope="album" />
 
-      <!-- Scenario 1: No featured media - show list view -->
-      <template v-if="featuredMediaCount === 0">
-        <NothingText v-if="allMedia.length === 0" text="No content available." />
-        <template v-else>
-          <div class="row q-pt-md">
-            <div
-              v-for="(item, index) in allMedia"
-              :key="item.id"
-              class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm text-center">
-              <MediaPreview
-                :channel="channel"
-                :album="album"
-                :media="item"
-                :to="getMediaPath(item)"
-                :detail="true"
-                :showMainAccent="false"
-                :priority="index === 0 ? 'high' : 'auto'" />
-            </div>
-          </div>
-        </template>
+      <template v-if="displayState === 'empty'">
+        <NothingText text="No content available." />
       </template>
 
-      <!-- Scenario 2: Exactly one featured media - redirect to MediaRoot -->
-      <template v-else-if="featuredMediaCount === 1">
+      <template v-else-if="displayState === 'all-list'">
+        <div class="row q-pt-md">
+          <div
+            v-for="card in allMediaCards"
+            :key="card.id"
+            class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm text-center">
+            <MediaPreview
+              :channel="channel"
+              :album="album"
+              :media="card.media"
+              :to="card.to"
+              :detail="true"
+              :showMainAccent="false"
+              :priority="card.priority" />
+          </div>
+        </div>
+      </template>
+
+      <template v-else-if="displayState === 'redirecting'">
         <q-skeleton type="rect" class="q-mb-md skeleton-large" />
         <q-skeleton type="text" width="60%" />
         <q-skeleton type="text" width="40%" />
       </template>
 
-      <!-- Scenario 3: Multiple featured media -->
       <template v-else>
-        <!-- Featured media section (2+) -->
-        <template v-if="featuredMediaCount > 1">
+        <template v-if="showFeaturedSection">
           <div class="q-pt-md text-h6" data-cy="featured-media-title">Featured</div>
           <q-separator spaced />
           <div class="row">
             <div
-              v-for="(item, index) in featuredMedia"
-              :key="item.id"
+              v-for="card in featuredMediaCards"
+              :key="card.id"
               class="col-xs-12 col-sm-6 col-md-4 q-pa-sm">
               <MediaPreview
                 :channel="channel"
                 :album="album"
-                :media="item"
-                :to="getMediaPath(item)"
+                :media="card.media"
+                :to="card.to"
                 :detail="true"
                 :showMainAccent="false"
-                :priority="index === 0 ? 'high' : 'auto'" />
+                :priority="card.priority" />
             </div>
           </div>
         </template>
 
-        <!-- Other media section -->
-        <template v-if="otherMedia.length > 0">
+        <template v-if="showOtherSection">
           <div class="q-pt-md text-h6" data-cy="other-media-title">More from {{ album.title }}</div>
           <q-separator spaced />
           <div class="row">
             <div
-              v-for="(related, index) in otherMedia"
-              :key="related.id"
+              v-for="card in otherMediaCards"
+              :key="card.id"
               class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm">
               <MediaPreview
                 :channel="channel"
                 :album="album"
-                :media="related"
-                :to="getMediaPath(related)"
-                :priority="index === 0 ? 'high' : 'auto'" />
+                :media="card.media"
+                :to="card.to"
+                :priority="card.priority" />
             </div>
           </div>
         </template>
@@ -91,7 +87,7 @@
         :album="album"
         :private="privateMode"
         private-scope="album" />
-    </template>
+      </div>
 
     <template v-else>
       <NothingText text="Album not found or unavailable." />
@@ -103,6 +99,7 @@
 import { computed, watch, defineAsyncComponent, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
+import { useAlbumRootViewModel } from '@composables/useAlbumRootViewModel.js'
 
 import BreadCrumbs from '@components/channel/shared/BreadCrumbs.vue'
 import ShareActions from '@components/channel/shared/ShareActions.vue'
@@ -133,31 +130,25 @@ function findAlbumByParams() {
   return null
 }
 
-function getMediaPath(media) {
-  if (privateMode.value && route.params.privateAlbumId) {
-    return `/private/a/${route.params.privateAlbumId}/m/${media.privateId}/${media.slug}`
-  }
-  return `/m/${media.publicId}/${media.slug}`
-}
-
 const album = computed(() => {
   return findAlbumByParams()
 })
-
-const allMedia = computed(() => {
-  return album.value?.media || []
-})
-
-const featuredMedia = computed(() => {
-  return allMedia.value.filter(m => m.main === true)
-})
-
-const featuredMediaCount = computed(() => {
-  return featuredMedia.value.length
-})
-
-const otherMedia = computed(() => {
-  return allMedia.value.filter(m => m.main !== true)
+const {
+  contentState,
+  featuredMedia,
+  featuredMediaCount,
+  displayState,
+  allMediaCards,
+  featuredMediaCards,
+  otherMediaCards,
+  showFeaturedSection,
+  showOtherSection
+} = useAlbumRootViewModel({
+  loading,
+  channel,
+  album,
+  route,
+  privateMode
 })
 
 watch(

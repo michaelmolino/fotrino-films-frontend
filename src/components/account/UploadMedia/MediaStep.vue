@@ -20,7 +20,7 @@
     <div v-if="mediaFile">
       <q-input
         outlined
-        :color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
+        :color="inputColor"
         class="q-pb-md"
         clearable
         :model-value="payload.album.media.title"
@@ -46,7 +46,7 @@
             :description="payload.album.media.description"
             :resource-date="payload.album.media.resourceDate"
             :main="!!payload.album.media.main"
-            :input-color="$q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'"
+            :input-color="inputColor"
             @update:description="onUpdateMediaDescription"
             @update:resourceDate="onUpdateResourceDate"
             @update:main="onUpdateMediaMain" />
@@ -57,6 +57,7 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useQuasar } from 'quasar'
 import MediaMetadataFields from '@components/account/shared/MediaMetadataFields.vue'
 import MediaPreviewSelectorFields from '@components/account/shared/MediaPreviewSelectorFields.vue'
@@ -76,6 +77,7 @@ const emit = defineEmits([
 ])
 
 const $q = useQuasar()
+const inputColor = computed(() => ($q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'))
 
 function onUpdateMediaTitle(val) {
   emit('update:payload', {

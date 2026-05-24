@@ -20,13 +20,13 @@
           :hasPending-children="hasPendingChildren"
           :link="getMediaLink('album', album.id)"
           :avatarSize="'40px'"
-          :subtitle="album.created ? `Created: ${daysSince(album.created, true)}` : ''"
+          :subtitle="albumSubtitle"
           editable
           edit-data-cy="edit-album"
           delete-data-cy="delete-album"
           @edit="openEditDialog"
-          @delete="$emit('deleteAlbum', album.id)"
-          @undelete="$emit('undeleteAlbum', album.id)" />
+          @delete="emitDeleteAlbum"
+          @undelete="emitUndeleteAlbum" />
       </template>
 
       <MediaItem
@@ -37,10 +37,7 @@
         :channel="channel"
         data-cy="media-item"
         :getMediaLink="getMediaLink"
-        @deleteMedia="$emit('deleteMedia', $event)"
-        @undeleteMedia="$emit('undeleteMedia', $event)"
-        @abortMedia="$emit('abortMedia', $event)"
-        @editMedia="$emit('editMedia', $event)" />
+        v-on="mediaItemListeners" />
     </q-expansion-item>
 
     <q-dialog v-model="editDialog" no-backdrop-dismiss data-cy="edit-album-dialog">
@@ -144,6 +141,24 @@ const hasPendingChildren = computed(() => {
   }
   return false
 })
+const albumSubtitle = computed(() =>
+  props.album.created ? `Created: ${daysSince(props.album.created, true)}` : ''
+)
+
+const mediaItemListeners = {
+  deleteMedia: value => emit('deleteMedia', value),
+  undeleteMedia: value => emit('undeleteMedia', value),
+  abortMedia: value => emit('abortMedia', value),
+  editMedia: value => emit('editMedia', value)
+}
+
+function emitDeleteAlbum() {
+  emit('deleteAlbum', props.album.id)
+}
+
+function emitUndeleteAlbum() {
+  emit('undeleteAlbum', props.album.id)
+}
 
 const editAlbumPreview = computed(() => {
   return {

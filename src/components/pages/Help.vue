@@ -211,22 +211,22 @@ import { useRoute, useRouter } from 'vue-router'
 defineOptions({ name: 'Help-Page' })
 const route = useRoute()
 const router = useRouter()
+const DEFAULT_HELP_ITEM = 'about'
 const selectedItem = computed(() => route.query.item)
 
 onMounted(() => {
   if (!selectedItem.value) {
-    router.replace({
-      query: {
-        ...route.query,
-        item: 'about'
-      }
-    })
+    replaceSelectedItem(DEFAULT_HELP_ITEM)
   }
 })
 
 function onItemSelect(item) {
   if (selectedItem.value === item) return
 
+  replaceSelectedItem(item)
+}
+
+function replaceSelectedItem(item) {
   router.replace({
     query: {
       ...route.query,

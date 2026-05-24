@@ -6,7 +6,7 @@
       </q-toolbar-title>
       <HistoryDropdown />
       <DarkModeDropdown />
-      <LoginDropdown v-if="!profile?.id" />
+      <LoginDropdown v-if="showLoginMenu" />
       <AccountDropdown v-else :profile="profile" />
     </q-toolbar>
   </q-header>
@@ -24,4 +24,6 @@ import AccountDropdown from './FotrinoHeader/AccountDropdown.vue'
 
 const accountStore = useAccountStore()
 const profile = computed(() => accountStore.profile || null)
+const isAuthenticated = computed(() => !!profile.value?.id)
+const showLoginMenu = computed(() => !isAuthenticated.value)
 </script>

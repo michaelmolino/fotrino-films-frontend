@@ -8,18 +8,9 @@
         :channel="channel"
         :getMediaLink="getMediaLink"
         data-cy="channel-item"
-        @deleteChannel="deleteResource('channel', $event)"
-        @undeleteChannel="undeleteChannel($event)"
-        @deleteAlbum="deleteResource('album', $event)"
-        @undeleteAlbum="undeleteAlbum($event)"
-        @deleteMedia="deleteResource('media', $event)"
-        @undeleteMedia="undeleteMedia($event)"
-        @abortMedia="abortPendingMedia($event)"
-        @editAlbum="saveAlbumEdit"
-        @editMedia="saveMediaEdit"
-        @editChannel="saveChannelEdit" />
+        v-on="channelItemListeners" />
     </q-list>
-    <div v-if="channels.length === 0" class="q-pa-md text-grey-6 text-center">
+    <div v-if="showEmptyState" class="q-pa-md text-grey-6 text-center">
       No channels found
     </div>
   </div>
@@ -40,6 +31,21 @@ const uploadStore = useUploadStore()
 const props = defineProps({
   channels: { type: Array, default: () => [] }
 })
+
+const showEmptyState = computed(() => (props.channels || []).length === 0)
+
+const channelItemListeners = {
+  deleteChannel: value => deleteResource('channel', value),
+  undeleteChannel,
+  deleteAlbum: value => deleteResource('album', value),
+  undeleteAlbum,
+  deleteMedia: value => deleteResource('media', value),
+  undeleteMedia,
+  abortMedia: abortPendingMedia,
+  editAlbum: saveAlbumEdit,
+  editMedia: saveMediaEdit,
+  editChannel: saveChannelEdit
+}
 
 function buildEmptyLinks() {
   return {

@@ -43,7 +43,7 @@
         </div>
       </div>
     </q-card-section>
-    <q-separator inset v-if="descriptionSafe" />
+    <q-separator inset v-if="showDescription" />
     <q-card-section vertical>
       <div class="text-body1" data-cy="media-description-text" v-html="descriptionSafe"></div>
     </q-card-section>
@@ -135,6 +135,7 @@ const sinceCaptured = computed(() =>
 )
 const sincePublished = computed(() => (props.media?.created ? daysSince(props.media.created) : ''))
 const descriptionSafe = computed(() => sanitizeHtml(props.media?.descriptionUnsafe || ''))
+const showDescription = computed(() => !!descriptionSafe.value)
 const miniPosterSrc = computed(() => props.poster || null)
 const miniPosterStyle = computed(() => ({
   backgroundColor: props.posterColor || '#1f2933'
@@ -157,6 +158,11 @@ const keyboardShortcuts = [
   { keys: '0-9', action: 'Seek to 0-90% of the video' }
 ]
 
+const reportPayload = computed(() => ({
+  privateId: props.media?.privateId,
+  reason: reason.value
+}))
+
 function openReportDialog() {
   if (!props.media?.privateId) return
   reportDialog.value = true
@@ -167,13 +173,10 @@ function openShortcutsDialog() {
 }
 
 async function submitReport() {
-  if (!props.media?.privateId) return
+  if (!reportPayload.value.privateId) return
   submitting.value = true
   try {
-    const result = await channelStore.reportMedia({
-      privateId: props.media.privateId,
-      reason: reason.value
-    })
+    const result = await channelStore.reportMedia(reportPayload.value)
     const res = result?.data || {}
     const reported = !!res?.reported
     if (reported) {

@@ -13,10 +13,10 @@
           <div class="profile-title-row">
             <span class="text-weight-medium text-h6 ellipsis">{{ safeName }}</span>
             <span
-              v-if="profile.country"
+              v-if="country"
               class="flag-emoji q-ml-sm"
-              :title="getCountry(profile.country).name">
-              {{ getCountry(profile.country).flag }}
+              :title="country.name">
+              {{ country.flag }}
             </span>
           </div>
           <div class="text-grey-6 text-caption ellipsis">{{ safeEmail }}</div>
@@ -42,6 +42,15 @@ import githubIcon from '@assets/icons/github.svg'
 import appleIcon from '@assets/icons/apple.svg'
 import yahooIcon from '@assets/icons/yahoo.svg'
 
+const PROVIDER_ICON_MAP = {
+  google: `img:${googleIcon}`,
+  microsoft: `img:${microsoftIcon}`,
+  facebook: `img:${facebookIcon}`,
+  github: `img:${githubIcon}`,
+  apple: `img:${appleIcon}`,
+  yahoo: `img:${yahooIcon}`
+}
+
 const props = defineProps({
   profile: { type: Object, default: null },
   mediaCount: { type: Number, default: 0 }
@@ -50,15 +59,7 @@ const props = defineProps({
 const profilePic = computed(() => props.profile?.avatar || undefined)
 const providerIcon = computed(() => {
   const p = (props.profile?.identityProvider?.provider || '').toLowerCase()
-  const map = {
-    google: `img:${googleIcon}`,
-    microsoft: `img:${microsoftIcon}`,
-    facebook: `img:${facebookIcon}`,
-    github: `img:${githubIcon}`,
-    apple: `img:${appleIcon}`,
-    yahoo: `img:${yahooIcon}`
-  }
-  return map[p] || 'account_circle'
+  return PROVIDER_ICON_MAP[p] || 'account_circle'
 })
 const joinedText = computed(() => {
   const created = props.profile?.created
@@ -66,6 +67,7 @@ const joinedText = computed(() => {
 })
 const safeName = computed(() => props.profile?.name || '')
 const safeEmail = computed(() => props.profile?.email || '')
+const country = computed(() => getCountry(props.profile?.country))
 </script>
 
 <style scoped>

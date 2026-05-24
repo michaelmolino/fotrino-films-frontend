@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-page q-pa-md" data-cy="dashboard">
-    <template v-if="profile?.id">
+    <template v-if="contentState === 'ready'">
       <ProfileCard :profile="profile" :mediaCount="mediaCount" data-cy="profile-card" />
       <MediaBrowser v-if="hasChannels" :channels="channels" data-cy="media-browser" />
       <NothingText v-else text="Your videos will appear here (once you have some)." />
@@ -23,6 +23,7 @@ const channelStore = useChannelStore()
 const channelsQuery = channelStore.useChannelsQuery(true)
 
 const profile = computed(() => accountStore.profile)
+const contentState = computed(() => (profile.value?.id ? 'ready' : 'auth-required'))
 const channels = computed(() => channelsQuery.data.value || [])
 const hasChannels = computed(() => channels.value.length > 0)
 const mediaCount = computed(() =>

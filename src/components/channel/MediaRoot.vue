@@ -1,41 +1,38 @@
 <template>
   <div class="q-pa-md" data-cy="media-root">
-    <template v-if="loading">
+    <div v-if="contentState === 'loading'">
       <q-skeleton type="rect" class="q-mb-md skeleton-large" />
       <q-skeleton type="text" width="60%" />
       <q-skeleton type="text" width="40%" />
-    </template>
+    </div>
 
-    <template
-      v-else-if="
-        channel && album && media && (route.params.privateMediaId || route.params.mediaId)
-      ">
+    <div v-else-if="contentState === 'ready'">
       <BreadCrumbs
         :channel="channel"
         :album="album"
         :media="media"
-        :private="!!route.params.privateMediaId"
-        :private-scope="route.params.privateAlbumId ? 'album' : 'media'" />
+        :private="privateMode"
+        :private-scope="privateScope" />
 
       <PlyrPlayer :media="media" :artist="channel?.ownerName" class="q-py-md plyrplayer" />
       <div class="plyrplayer" data-cy="media-description-container">
         <MediaDescription :media="media" :poster="albumPoster" :poster-color="albumPosterColor" />
       </div>
 
-      <template v-if="hasRelatedContent">
+      <template v-if="showRelatedContent">
         <div class="q-pt-md text-h6" data-cy="related-media-title">More from {{ album.title }}</div>
         <q-separator spaced />
         <div class="row">
           <div
-            v-for="(related, index) in relatedMedia"
-            :key="related.id"
+            v-for="card in relatedCards"
+            :key="card.id"
             class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm">
             <MediaPreview
               :channel="channel"
               :album="album"
-              :media="related"
-              :to="getRelatedPath(related)"
-              :priority="index === 0 ? 'high' : 'auto'" />
+              :media="card.media"
+              :to="card.to"
+              :priority="card.priority" />
           </div>
         </div>
       </template>
@@ -44,9 +41,9 @@
         :channel="channel"
         :album="album"
         :media="media"
-        :private="!!route.params.privateMediaId"
-        :private-scope="route.params.privateAlbumId ? 'album' : 'media'" />
-    </template>
+        :private="privateMode"
+        :private-scope="privateScope" />
+    </div>
 
     <template v-else>
       <NothingText text="Video not found or unavailable." />
@@ -58,6 +55,7 @@
 import { computed, watch, defineAsyncComponent, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
+import { useMediaRootViewModel } from '@composables/useMediaRootViewModel.js'
 
 import BreadCrumbs from '@components/channel/shared/BreadCrumbs.vue'
 import MediaPreview from '@components/channel/shared/MediaPreview.vue'
@@ -122,28 +120,21 @@ const album = computed(() => {
 const media = computed(() => {
   return findMediaByParams(album.value)
 })
-
-const albumPoster = computed(() => album.value?.poster || null)
-const albumPosterColor = computed(() => album.value?.posterColor || null)
-
-const relatedMedia = computed(() => {
-  return (album.value?.media || []).filter(
-    m => (m.id || m.privateId) !== (media.value?.id || media.value?.privateId)
-  )
+const {
+  privateMode,
+  privateScope,
+  contentState,
+  albumPoster,
+  albumPosterColor,
+  showRelatedContent,
+  relatedCards
+} = useMediaRootViewModel({
+  loading,
+  channel,
+  album,
+  media,
+  route
 })
-
-const hasRelatedContent = computed(() => {
-  const isPublicMedia = !!route.params.mediaId
-  const isPrivateAlbumMedia = !!route.params.privateAlbumId && !!route.params.privateMediaId
-  return (isPublicMedia || isPrivateAlbumMedia) && relatedMedia.value.length > 0
-})
-
-function getRelatedPath(related) {
-  if (route.params.privateAlbumId) {
-    return `/private/a/${route.params.privateAlbumId}/m/${related.privateId}/${related.slug}`
-  }
-  return `/m/${related.publicId}/${related.slug}`
-}
 
 watch(
   album,

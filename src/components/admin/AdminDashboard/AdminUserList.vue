@@ -4,10 +4,7 @@
       <span class="text-body2 text-weight-medium">Filter:</span>
       <q-option-group
         v-model="filterMode"
-        :options="[
-          { label: 'All Users', value: 'all' },
-          { label: 'New Users', value: 'new' }
-        ]"
+        :options="filterOptions"
         color="primary"
         inline />
     </div>
@@ -81,7 +78,7 @@
                     :name="providerIcons[provider.provider]"
                     size="16px"
                     :title="provider.provider"
-                    :class="$q.dark.isActive ? 'oauth-icon--white q-ml-xs' : 'q-ml-xs'" />
+                    :class="providerIconClass" />
                 </span>
                 <span>{{ props.row.email }}</span>
               </div>
@@ -99,11 +96,7 @@
           <q-expansion-item
             dense
             expand-separator
-            :label="
-              props.row.channels?.length > 0
-                ? `Show Channels (${props.row.channels.length})`
-                : 'No Channels'
-            "
+            :label="getChannelsLabel(props.row)"
             :disable="(props.row.channels?.length || 0) === 0">
             <div class="q-py-sm">
               <div
@@ -176,6 +169,7 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue'
+import { useQuasar } from 'quasar'
 import { useAdminStore } from 'src/stores/admin-store.js'
 import { daysSince } from '@utils/date.js'
 import { getCountry } from '@utils/countries.js'
@@ -188,6 +182,7 @@ import githubIcon from '@assets/icons/github.svg'
 import appleIcon from '@assets/icons/apple.svg'
 import yahooIcon from '@assets/icons/yahoo.svg'
 
+const $q = useQuasar()
 const adminStore = useAdminStore()
 const usersQuery = adminStore.useUsersQuery()
 const loading = computed(() => usersQuery.isLoading.value && (adminStore.users || []).length === 0)
@@ -203,6 +198,10 @@ function getInitialUserFilterMode() {
 }
 
 const filterMode = ref(getInitialUserFilterMode())
+const filterOptions = [
+  { label: 'All Users', value: 'all' },
+  { label: 'New Users', value: 'new' }
+]
 const users = computed(() => adminStore.users || [])
 const filteredUsers = computed(() => {
   if (filterMode.value === 'new') {
@@ -223,6 +222,14 @@ const providerIcons = {
   github: `img:${githubIcon}`,
   apple: `img:${appleIcon}`,
   yahoo: `img:${yahooIcon}`
+}
+const providerIconClass = computed(() =>
+  $q.dark.isActive ? 'oauth-icon--white q-ml-xs' : 'q-ml-xs'
+)
+
+function getChannelsLabel(user) {
+  const count = user.channels?.length || 0
+  return count > 0 ? `Show Channels (${count})` : 'No Channels'
 }
 
 watch(filterMode, value => {

@@ -9,11 +9,11 @@
       undeletable
       editable
       :link="getMediaLink('media', media.id)"
-      :subtitle="media.created ? `Created: ${daysSince(media.created, true)}` : ''"
+      :subtitle="mediaSubtitle"
       delete-color="warning"
-      @delete="$emit('deleteMedia', media.id)"
-      @undelete="$emit('undeleteMedia', media.id)"
-      @abort="$emit('abortMedia', media.id)"
+      @delete="emitDeleteMedia"
+      @undelete="emitUndeleteMedia"
+      @abort="emitAbortMedia"
       @edit="openEditDialog"
       square />
 
@@ -80,7 +80,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import ResourceActions from './ResourceActions.vue'
 import { daysSince } from '@utils/date.js'
 import MediaMetadataFields from '@components/account/shared/MediaMetadataFields.vue'
@@ -110,6 +110,21 @@ const {
   setAndCompressImage: processPreviewFile,
   reset: resetPreviewFile
 } = useImageSelectionProcessing()
+const mediaSubtitle = computed(() =>
+  props.media.created ? `Created: ${daysSince(props.media.created, true)}` : ''
+)
+
+function emitDeleteMedia() {
+  emit('deleteMedia', props.media.id)
+}
+
+function emitUndeleteMedia() {
+  emit('undeleteMedia', props.media.id)
+}
+
+function emitAbortMedia() {
+  emit('abortMedia', props.media.id)
+}
 
 function setLocalPreviewImage(url) {
   editPreviewImage.value = url || props.media?.preview || null

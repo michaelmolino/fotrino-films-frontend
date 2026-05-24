@@ -4,23 +4,23 @@
       <div>
         <transition appear enter-active-class="animated zoomInDown slower">
           <h1 class="text-h4 q-my-none" data-cy="home-title-primary">
-            <span :class="darkClass">Fotrino </span>
-            <span class="text-accent">Films </span>
+            <span :class="textToneClass">{{ content.titlePrimaryLeft }}</span>
+            <span class="text-accent">{{ content.titlePrimaryRight }}</span>
           </h1>
         </transition>
         <transition appear enter-active-class="animated zoomInDown slower delay-1s">
           <h2 class="text-h4 q-my-none" data-cy="home-title-secondary">
-            <span :class="darkClass">The </span>
+            <span :class="textToneClass">{{ content.titleSecondaryLeft }} </span>
             <span class="text-accent">Transparent </span>
-            <span :class="darkClass">Video Host</span>
+            <span :class="textToneClass">{{ content.titleSecondaryRight }}</span>
           </h2>
         </transition>
       </div>
       <div
         class="text-subtitle1 text-center q-mt-sm q-mb-md"
-        :class="darkClass"
+        :class="textToneClass"
         data-cy="home-subtitle">
-        Private, ad‑free video hosting for friends and family.
+        {{ content.subtitle }}
       </div>
       <div class="row justify-center q-gutter-sm q-mt-md">
         <div class="col-auto">
@@ -30,7 +30,7 @@
             rounded
             size="md"
             icon="play_circle"
-            label="Explore Sample Channel"
+            :label="content.ctaLabel"
             data-cy="home-explore-sample-channel"
             :to="sampleChannelPath" />
         </div>
@@ -46,5 +46,13 @@ import { useQuasar } from 'quasar'
 defineOptions({ name: 'Home-Page' })
 const $q = useQuasar()
 const sampleChannelPath = `/c/${process.env.SAMPLE_CHANNEL_ID}/${process.env.SAMPLE_CHANNEL_SLUG}`
-const darkClass = computed(() => ($q.dark.isActive ? 'text-white' : 'text-primary'))
+const textToneClass = computed(() => ($q.dark.isActive ? 'text-white' : 'text-primary'))
+const content = {
+  titlePrimaryLeft: 'Fotrino ',
+  titlePrimaryRight: 'Films',
+  titleSecondaryLeft: 'The',
+  titleSecondaryRight: 'Video Host',
+  subtitle: 'Private, ad-free video hosting for friends and family.',
+  ctaLabel: 'Explore Sample Channel'
+}
 </script>

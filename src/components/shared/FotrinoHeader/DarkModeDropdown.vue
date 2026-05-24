@@ -1,46 +1,22 @@
 <template>
   <q-btn-dropdown
     :icon="darkModeIcon"
-    :label="$q.screen.gt.sm ? 'Theme' : ''"
+    :label="buttonLabel"
     aria-label="Select theme preference"
     size="md"
     flat
     no-caps>
-    <div class="theme-row row">
+    <div v-for="option in themeOptions" :key="option.mode" class="theme-row row">
       <q-btn
         flat
         no-caps
         align="left"
-        :icon="darkModeIcons.light"
-        label="Light"
-        aria-label="Switch to light theme"
+        :icon="option.icon"
+        :label="option.label"
+        :aria-label="option.ariaLabel"
         size="md"
         class="col-xs-12"
-        @click="setDarkMode('light')" />
-    </div>
-    <div class="theme-row row">
-      <q-btn
-        flat
-        no-caps
-        align="left"
-        :icon="darkModeIcons.auto"
-        label="System"
-        aria-label="Use system theme preference"
-        size="md"
-        class="col-xs-12"
-        @click="setDarkMode('auto')" />
-    </div>
-    <div class="theme-row row">
-      <q-btn
-        flat
-        no-caps
-        align="left"
-        :icon="darkModeIcons.dark"
-        label="Dark"
-        aria-label="Switch to dark theme"
-        size="md"
-        class="col-xs-12"
-        @click="setDarkMode('dark')" />
+        @click="setDarkMode(option.mode)" />
     </div>
   </q-btn-dropdown>
 </template>
@@ -53,6 +29,27 @@ import { useDarkMode, darkModeIcons, setDarkMode } from '@utils/dark.js'
 const $q = useQuasar()
 const { darkModePref } = useDarkMode($q)
 const darkModeIcon = computed(() => darkModeIcons[darkModePref.value])
+const buttonLabel = computed(() => ($q.screen.gt.sm ? 'Theme' : ''))
+const themeOptions = computed(() => [
+  {
+    mode: 'light',
+    icon: darkModeIcons.light,
+    label: 'Light',
+    ariaLabel: 'Switch to light theme'
+  },
+  {
+    mode: 'auto',
+    icon: darkModeIcons.auto,
+    label: 'System',
+    ariaLabel: 'Use system theme preference'
+  },
+  {
+    mode: 'dark',
+    icon: darkModeIcons.dark,
+    label: 'Dark',
+    ariaLabel: 'Switch to dark theme'
+  }
+])
 </script>
 
 <style scoped>

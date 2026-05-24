@@ -18,13 +18,13 @@
         :avatarSize="'48px'"
         :badge="channel.isAdmin"
         badgeIcon="security"
-        :subtitle="channel.created ? `Created: ${daysSince(channel.created, true)}` : ''"
+        :subtitle="channelSubtitle"
         :editable="true"
         :editDataCy="'edit-channel'"
         :deleteDataCy="'delete-channel'"
         @edit="openEditDialog"
-        @delete="$emit('deleteChannel', channel.publicId)"
-        @undelete="$emit('undeleteChannel', channel.publicId)" />
+        @delete="emitDeleteChannel"
+        @undelete="emitUndeleteChannel" />
     </template>
 
     <AlbumItem
@@ -33,13 +33,7 @@
       :album="album"
       :channel="channel"
       data-cy="album-item"
-      @deleteAlbum="$emit('deleteAlbum', $event)"
-      @undeleteAlbum="$emit('undeleteAlbum', $event)"
-      @deleteMedia="$emit('deleteMedia', $event)"
-      @undeleteMedia="$emit('undeleteMedia', $event)"
-      @abortMedia="$emit('abortMedia', $event)"
-      @editAlbum="$emit('editAlbum', $event)"
-      @editMedia="$emit('editMedia', $event)"
+      v-on="albumItemListeners"
       :getMediaLink="getMediaLink" />
 
     <!-- Edit Channel Dialog -->
@@ -114,6 +108,27 @@ const hasPendingChildren = computed(() => {
   }
   return false
 })
+const channelSubtitle = computed(() =>
+  props.channel.created ? `Created: ${daysSince(props.channel.created, true)}` : ''
+)
+
+const albumItemListeners = {
+  deleteAlbum: value => emit('deleteAlbum', value),
+  undeleteAlbum: value => emit('undeleteAlbum', value),
+  deleteMedia: value => emit('deleteMedia', value),
+  undeleteMedia: value => emit('undeleteMedia', value),
+  abortMedia: value => emit('abortMedia', value),
+  editAlbum: value => emit('editAlbum', value),
+  editMedia: value => emit('editMedia', value)
+}
+
+function emitDeleteChannel() {
+  emit('deleteChannel', props.channel.publicId)
+}
+
+function emitUndeleteChannel() {
+  emit('undeleteChannel', props.channel.publicId)
+}
 
 // Edit state
 const editDialog = ref(false)

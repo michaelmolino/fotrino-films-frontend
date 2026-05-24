@@ -1,66 +1,31 @@
 <template>
   <q-btn-dropdown
     :icon="'img:' + profile.avatar"
-    :label="$q.screen.gt.sm ? 'Account' : ''"
+    :label="buttonLabel"
     :aria-label="'Account menu for ' + (profile.name || 'user')"
     data-cy="account-menu"
     flat
     no-caps
     size="md">
-    <div style="max-width: 220px; margin: 0 auto; width: 100%" class="row">
-      <q-btn
-        v-if="profile?.isAdmin"
-        to="/admin"
-        align="left"
-        flat
-        no-caps
-        icon="verified_user"
-        label="Admin"
-        aria-label="Go to admin dashboard"
-        size="md"
-        class="col-xs-12" />
-    </div>
-    <div style="max-width: 220px; margin: 0 auto; width: 100%" class="row">
-      <q-btn
-        to="/account/dashboard"
-        align="left"
-        flat
-        no-caps
-        icon="dashboard"
-        label="Dashboard"
-        aria-label="Go to account dashboard"
-        size="md"
-        class="col-xs-12" />
-    </div>
-    <div style="max-width: 220px; margin: 0 auto; width: 100%" class="row">
+    <div v-for="item in menuItems" :key="item.key" class="menu-row row">
       <q-btn
         align="left"
         flat
         no-caps
-        icon="cloud_upload"
-        label="Upload Video"
-        aria-label="Upload a video"
+        :icon="item.icon"
+        :label="item.label"
+        :aria-label="item.ariaLabel"
+        :data-cy="item.dataCy"
         size="md"
         class="col-xs-12"
-        @click="goToUpload" />
-    </div>
-    <div style="max-width: 220px; margin: 0 auto; width: 100%" class="row">
-      <q-btn
-        @click="accountStore.logout()"
-        align="left"
-        flat
-        no-caps
-        icon="logout"
-        label="Logout"
-        aria-label="Logout from your account"
-        data-cy="account-logout"
-        size="md"
-        class="col-xs-12" />
+        :to="item.to"
+        @click="item.onClick ? item.onClick() : null" />
     </div>
   </q-btn-dropdown>
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useAccountStore } from 'src/stores/account-store.js'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
@@ -69,12 +34,54 @@ const $q = useQuasar()
 const accountStore = useAccountStore()
 const router = useRouter()
 
-// Define props explicitly
-defineProps({
+const props = defineProps({
   profile: {
     type: Object,
     required: true
   }
+})
+
+const buttonLabel = computed(() => ($q.screen.gt.sm ? 'Account' : ''))
+
+const menuItems = computed(() => {
+  const items = []
+
+  if (props.profile?.isAdmin) {
+    items.push({
+      key: 'admin',
+      to: '/admin',
+      icon: 'verified_user',
+      label: 'Admin',
+      ariaLabel: 'Go to admin dashboard'
+    })
+  }
+
+  items.push(
+    {
+      key: 'dashboard',
+      to: '/account/dashboard',
+      icon: 'dashboard',
+      label: 'Dashboard',
+      ariaLabel: 'Go to account dashboard'
+    },
+    {
+      key: 'upload',
+      icon: 'cloud_upload',
+      label: 'Upload Video',
+      ariaLabel: 'Upload a video',
+      onClick: goToUpload
+    },
+    {
+      key: 'logout',
+      icon: 'logout',
+      label: 'Logout',
+      ariaLabel: 'Logout from your account',
+      dataCy: 'account-logout',
+      onClick: () => accountStore.logout()
+    }
+  )
+
+  return items
 })
 
 function goToUpload() {
@@ -84,3 +91,11 @@ function goToUpload() {
   })
 }
 </script>
+
+<style scoped>
+.menu-row {
+  max-width: 220px;
+  margin: 0 auto;
+  width: 100%;
+}
+</style>

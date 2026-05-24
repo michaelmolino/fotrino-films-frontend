@@ -1,7 +1,7 @@
 <template>
   <nav class="breadcrumb-nav" data-cy="breadcrumbs">
-    <div class="row items-start q-pa-md" :class="$q.screen.lt.sm ? 'q-gutter-sm' : 'q-gutter-md'">
-      <q-avatar class="self-start" :size="$q.screen.lt.sm ? '32px' : '40px'">
+    <div class="row items-start q-pa-md" :class="rowGutterClass">
+      <q-avatar class="self-start" :size="avatarSize">
         <img
           :src="channel.cover"
           :alt="channel.title || media?.title || 'Video cover'"
@@ -15,7 +15,7 @@
           </template>
           <q-breadcrumbs-el
             v-for="location in breadcrumbs"
-            :class="$q.screen.gt.xs ? 'text-h5' : 'text-subtitle1'"
+            :class="crumbTextClass"
             :key="location.id"
             :label="location.label"
             :to="location.to" />
@@ -40,6 +40,17 @@ const props = defineProps({
   privateScope: { type: String, default: 'media' }
 })
 
+const rowGutterClass = computed(() => ($q.screen.lt.sm ? 'q-gutter-sm' : 'q-gutter-md'))
+const avatarSize = computed(() => ($q.screen.lt.sm ? '32px' : '40px'))
+const crumbTextClass = computed(() => ($q.screen.gt.xs ? 'text-h5' : 'text-subtitle1'))
+
+function withLastCrumbCurrent(items) {
+  if (items.length > 0) {
+    items[items.length - 1].to = null
+  }
+  return items
+}
+
 const buildPrivateAlbumBreadcrumbs = () => {
   const arr = []
   if (props.album?.privateId) {
@@ -56,10 +67,7 @@ const buildPrivateAlbumBreadcrumbs = () => {
       to: null
     })
   }
-  if (arr.length) {
-    arr[arr.length - 1].to = null
-  }
-  return arr
+  return withLastCrumbCurrent(arr)
 }
 
 const buildPublicBreadcrumbs = () => {

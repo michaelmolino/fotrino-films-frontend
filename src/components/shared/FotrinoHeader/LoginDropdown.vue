@@ -1,7 +1,7 @@
 <template>
   <q-btn-dropdown
     icon="account_circle"
-    :label="$q.screen.gt.sm ? 'Sign Up/Login' : ''"
+    :label="buttonLabel"
     aria-label="Sign up or login to your account"
     flat
     no-caps
@@ -10,7 +10,7 @@
       Login providers are temporarily unavailable. Please refresh and try again in a moment.
     </div>
     <template v-for="provider in oauthProviders" :key="provider.name">
-      <div style="max-width: 220px; margin: 0 auto; width: 100%" class="row">
+      <div class="provider-row row">
         <q-btn
           :href="provider.login"
           align="left"
@@ -21,7 +21,7 @@
           class="col-xs-12">
           <q-icon
             :name="provider.icon"
-            :class="$q.dark.isActive ? 'oauth-icon--white q-mr-md' : 'q-mr-md'" />
+              :class="provider.iconClass" />
           {{ provider.name }}
         </q-btn>
       </div>
@@ -45,6 +45,11 @@ const $q = useQuasar()
 const accountStore = useAccountStore()
 const route = useRoute()
 accountStore.useProvidersQuery()
+
+const buttonLabel = computed(() => ($q.screen.gt.sm ? 'Sign Up/Login' : ''))
+const oauthIconClass = computed(() =>
+  $q.dark.isActive ? 'oauth-icon--white q-mr-md' : 'q-mr-md'
+)
 
 const providerMap = {
   google: {
@@ -85,7 +90,8 @@ const oauthProviders = computed(() => {
       if (!base) return null
       return {
         ...base,
-        login: getProviderLoginHref(providerKey)
+        login: getProviderLoginHref(providerKey),
+        iconClass: oauthIconClass.value
       }
     })
     .filter(Boolean)
@@ -93,6 +99,12 @@ const oauthProviders = computed(() => {
 </script>
 
 <style scoped>
+.provider-row {
+  max-width: 220px;
+  margin: 0 auto;
+  width: 100%;
+}
+
 :deep(.oauth-icon--white) {
   filter: invert(1) brightness(1.2);
 }

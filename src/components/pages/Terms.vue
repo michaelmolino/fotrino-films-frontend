@@ -39,7 +39,7 @@
           </div>
         </li>
         <q-separator />
-        <li v-for="provider in oAuthProviders" :key="provider" class="q-mb-lg">
+        <li v-for="provider in normalizedProviders" :key="provider" class="q-mb-lg">
           <div class="text-h6 text-primary q-mb-xs">
             Information Received from {{ provider.toUpperCase() }} Login
           </div>
@@ -144,7 +144,7 @@
             If you need to export your data, contact us at the same email address, and we will
             provide a downloadable file containing the information we hold about you.
           </div>
-          <div v-for="provider in oAuthProviders" :key="provider">
+          <div v-for="provider in normalizedProviders" :key="provider">
             <div class="text-primary q-my-md">
               Information Received from {{ provider.toUpperCase() }} Login
             </div>
@@ -196,7 +196,7 @@ import { useAccountStore } from 'src/stores/account-store.js'
 const accountStore = useAccountStore()
 accountStore.useProvidersQuery()
 
-const oAuthProviders = computed(() => accountStore.providers || [])
+const normalizedProviders = computed(() => accountStore.providers || [])
 </script>
 
 <style scoped>

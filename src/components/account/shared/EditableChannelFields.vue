@@ -8,7 +8,7 @@
       label="Channel Title"
       class="q-pb-md"
       :data-cy="titleDataCy"
-      @update:model-value="$emit('update:title', $event)" />
+      @update:model-value="onUpdateTitle" />
 
     <!-- Cover Section -->
     <div class="text-overline q-mb-md">Channel Cover</div>
@@ -21,14 +21,14 @@
       accept="image/*"
       class="q-pb-md"
       :data-cy="coverFileDataCy"
-      @update:model-value="$emit('update:coverFile', $event)">
+      @update:model-value="onUpdateCoverFile">
       <template v-slot:prepend>
         <q-icon name="image" @click.stop.prevent />
       </template>
       <template v-slot:append>
         <q-icon
           name="close"
-          @click.stop.prevent="$emit('update:coverFile', null)"
+          @click.stop.prevent="clearCoverFile"
           class="cursor-pointer" />
       </template>
     </q-file>
@@ -85,5 +85,17 @@ defineProps({
   }
 })
 
-defineEmits(['update:title', 'update:coverFile'])
+const emit = defineEmits(['update:title', 'update:coverFile'])
+
+function onUpdateTitle(value) {
+  emit('update:title', value)
+}
+
+function onUpdateCoverFile(value) {
+  emit('update:coverFile', value)
+}
+
+function clearCoverFile() {
+  emit('update:coverFile', null)
+}
 </script>

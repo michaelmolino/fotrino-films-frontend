@@ -1,6 +1,6 @@
 <template>
   <div data-cy="media-player" :class="['media-player-shell', { 'portrait-mode': isPortraitVideo }]">
-    <div v-if="view == 'video'" class="video-shell">
+    <div v-if="isVideoView" class="video-shell">
       <div
         v-if="isPortraitVideo"
         class="portrait-backdrop"
@@ -61,6 +61,8 @@ const audioPreviewSource = ref({ strategy: 'original-only', primaryUrl: null, fa
 const audioPreviewUrl = ref(null)
 const playbackUrl = ref(null)
 const view = computed(() => (props.media?.type?.startsWith('audio/') ? 'audio' : 'video'))
+const isVideoView = computed(() => view.value === 'video')
+const mediaElementId = computed(() => (isVideoView.value ? 'video-player' : 'audio-player'))
 const videoPosterUrl = computed(() => props.media?.preview || null)
 const isPortraitVideo = computed(
   () => view.value === 'video' && props.media?.orientation === 'portrait'
@@ -124,7 +126,7 @@ async function refreshPlaybackUrl() {
 }
 
 async function setupPlayer() {
-  const el = document.getElementById(view.value === 'video' ? 'video-player' : 'audio-player')
+  const el = document.getElementById(mediaElementId.value)
   if (!el || !props.media) return
   const sourceUrl = playbackUrl.value || props.media.src
   const controls = isPortraitVideo.value
@@ -144,7 +146,7 @@ async function setupPlayer() {
         'airplay'
       ]
 
-  if (view.value === 'video') {
+  if (isVideoView.value) {
     if (videoPosterUrl.value) {
       el.setAttribute('poster', videoPosterUrl.value)
     } else {
@@ -176,7 +178,7 @@ async function setupPlayer() {
     })
   }
 
-  if (view.value === 'video') {
+  if (isVideoView.value) {
     const { cleanup } = await setupVideoPlayback({
       videoEl: el,
       sourceUrl,
@@ -189,7 +191,7 @@ async function setupPlayer() {
 }
 
 function attachMediaSessionHandler() {
-  const el = document.getElementById(view.value === 'video' ? 'video-player' : 'audio-player')
+  const el = document.getElementById(mediaElementId.value)
   if (!('mediaSession' in navigator) || !el || !props.media) return
   navigator.mediaSession.metadata = new MediaMetadata({
     title: props.media.title,

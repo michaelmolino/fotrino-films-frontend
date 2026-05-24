@@ -1,18 +1,18 @@
 <template>
   <component
-    :is="interactive ? QBtn : 'div'"
-    v-bind="interactive ? { flat: true, dense: true, noCaps: true, padding: '8px', to } : {}"
+    :is="rootTag"
+    v-bind="rootBindings"
     data-cy="media-preview"
-    :aria-label="`View ${media.title}`"
+    :aria-label="mediaAriaLabel"
     :class="containerClasses">
     <q-badge
-      v-if="showBadges && media.type?.startsWith('audio/')"
+      v-if="showAudioBadge"
       class="bg-accent q-pa-md z-top"
       floating>
       <span class="text-bold text-white">Audio</span>
     </q-badge>
     <q-badge
-      v-if="showBadges && media.orientation === 'portrait' && !media.type?.startsWith('audio/')"
+      v-if="showPortraitBadge"
       class="bg-info text-white q-pa-sm z-top"
       floating>
       <q-icon name="smartphone" size="16px" />
@@ -24,13 +24,12 @@
       :ratio="16 / 9"
       fit="cover"
       :position="previewCropPosition"
-      :loading="priority === 'high' ? 'eager' : 'lazy'"
+      :loading="imageLoadingMode"
       decoding="async"
       @error="onPreviewError">
       <div v-if="showTitleOverlay" class="absolute-bottom text-center">
         <div class="ellipsis">
-          <span>{{ media.title }}</span
-          ><span v-if="detail && media.title !== album?.title"><br />{{ album?.title }}</span>
+          <span>{{ titlePrimary }}</span><span v-if="titleSecondary"><br />{{ titleSecondary }}</span>
         </div>
       </div>
       <template v-slot:error>
@@ -41,8 +40,7 @@
         </div>
         <div v-if="showTitleOverlay" class="absolute-bottom text-center">
           <div class="ellipsis">
-            <span>{{ media.title }}</span
-            ><span v-if="detail && media.title !== album?.title"><br />{{ album?.title }}</span>
+            <span>{{ titlePrimary }}</span><span v-if="titleSecondary"><br />{{ titleSecondary }}</span>
           </div>
         </div>
       </template>
@@ -91,6 +89,22 @@ const containerClasses = computed(() => [
   interactive ? 'fit width720' : 'full-fit',
   { 'bg-accent': media.main && showMainAccent }
 ])
+
+const rootTag = computed(() => (interactive ? QBtn : 'div'))
+const rootBindings = computed(() =>
+  interactive ? { flat: true, dense: true, noCaps: true, padding: '8px', to } : {}
+)
+
+const mediaAriaLabel = computed(() => `View ${media.title}`)
+const isAudio = computed(() => media.type?.startsWith('audio/'))
+const showAudioBadge = computed(() => showBadges && isAudio.value)
+const showPortraitBadge = computed(() => showBadges && media.orientation === 'portrait' && !isAudio.value)
+const imageLoadingMode = computed(() => (priority === 'high' ? 'eager' : 'lazy'))
+const titlePrimary = computed(() => media.title)
+const titleSecondary = computed(() => {
+  if (!detail || media.title === album?.title) return null
+  return album?.title || null
+})
 
 const { resolvePreviewSource } = useWebP()
 const previewSource = ref({ strategy: 'original-only', primaryUrl: null, fallbackUrl: null })

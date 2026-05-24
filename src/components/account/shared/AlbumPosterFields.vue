@@ -9,7 +9,7 @@
       :model-value="subtitle"
       :label="subtitleLabel"
       :data-cy="subtitleDataCy"
-      @update:model-value="$emit('update:subtitle', $event)" />
+      @update:model-value="onUpdateSubtitle" />
 
     <div class="text-overline q-mb-md">Album Poster</div>
     <div class="row items-center q-gutter-sm">
@@ -20,7 +20,7 @@
         label="Solid Colour"
         :data-cy="posterTypeDefaultDataCy"
         color="accent"
-        @update:model-value="$emit('update:posterType', $event)" />
+        @update:model-value="onUpdatePosterType" />
       <q-btn
         v-if="showPosterType && posterType === 'default'"
         flat
@@ -40,7 +40,7 @@
       label="Upload Photo"
       :data-cy="posterTypeNewDataCy"
       color="accent"
-      @update:model-value="$emit('update:posterType', $event)" />
+      @update:model-value="onUpdatePosterType" />
 
     <q-file
       v-if="posterType === 'new'"
@@ -51,14 +51,14 @@
       class="q-py-md"
       color="accent"
       :data-cy="posterFileDataCy"
-      @update:model-value="$emit('update:posterFile', $event)">
+      @update:model-value="onUpdatePosterFile">
       <template v-slot:prepend>
         <q-icon name="image" @click.stop.prevent />
       </template>
       <template v-slot:append>
         <q-icon
           name="close"
-          @click.stop.prevent="$emit('update:posterFile', null)"
+          @click.stop.prevent="clearPosterFile"
           class="cursor-pointer" />
       </template>
     </q-file>
@@ -183,5 +183,21 @@ function onUpdatePosterColor(val) {
     }
   }
   emit('update:posterColor', color)
+}
+
+function onUpdateSubtitle(value) {
+  emit('update:subtitle', value)
+}
+
+function onUpdatePosterType(value) {
+  emit('update:posterType', value)
+}
+
+function onUpdatePosterFile(value) {
+  emit('update:posterFile', value)
+}
+
+function clearPosterFile() {
+  emit('update:posterFile', null)
 }
 </script>
