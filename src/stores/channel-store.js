@@ -6,7 +6,6 @@ import { API_CACHE_MEDIUM_MS } from 'src/stores/utils/cache-timeouts.js'
 
 export const useChannelStore = defineStore('channel', () => {
     const channels = ref([])
-    const upload = ref(null)
 
     const queryCache = useQueryCache()
 
@@ -37,17 +36,6 @@ export const useChannelStore = defineStore('channel', () => {
 
     const setChannels = value => {
         channels.value = value
-    }
-
-    const setUpload = value => {
-        upload.value = value
-    }
-
-    const requestUploadInstruction = async url => {
-        const res = await api.post(url, null, {
-            __skipGlobalErrorNotify: true
-        })
-        return mutationResult({ ok: true, data: res.data })
     }
 
     const channelQueryOptions = (channelId, pending = false) => ({
@@ -295,55 +283,6 @@ export const useChannelStore = defineStore('channel', () => {
         return mutationResult({ ok: true })
     }
 
-    const postUploadDraft = async payload => {
-        const response = await runStoreMutation({
-            request: () =>
-                api.post('/channels/media/draft', payload, {
-                    __skipGlobalErrorNotify: true,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Accept: 'application/json'
-                    }
-                }),
-            onError: () => {
-                setUpload(null)
-            }
-        })
-
-        const data = response?.data || {}
-        const normalizedData = {
-            mediaId: data?.mediaId ?? null,
-            instructions: data.instructions
-        }
-
-        setUpload(normalizedData.instructions)
-        return mutationResult({ ok: true, data: normalizedData })
-    }
-
-    const confirmUpload = async media => {
-        await runStoreMutation({
-            request: () =>
-                api.put(`/channels/media/confirm/${media}`, null, {
-                    __skipGlobalErrorNotify: true
-                })
-        })
-        invalidateChannelsCache()
-        invalidateChannelCacheByMedia(media)
-        return mutationResult({ ok: true })
-    }
-
-    const abortUpload = async mediaId => {
-        await runStoreMutation({
-            request: () =>
-                api.delete(`/channels/media/${mediaId}/abort`, {
-                    __skipGlobalErrorNotify: true
-                })
-        })
-        invalidateChannelsCache()
-        invalidateChannelCacheByMedia(mediaId)
-        return mutationResult({ ok: true })
-    }
-
     const updateMedia = async ({ mediaId, title, description = null, resourceDate = null, main }) => {
         const res = await runStoreMutation({
             request: () =>
@@ -410,86 +349,6 @@ export const useChannelStore = defineStore('channel', () => {
         return mutationResult({ ok: true, data: res.data })
     }
 
-    const requestMediaPreviewUpload = ({ mediaId }) =>
-        requestUploadInstruction(`/channels/media/${mediaId}/preview`)
-
-    const requestAlbumPosterUpload = ({ albumId }) =>
-        requestUploadInstruction(`/channels/album/${albumId}/poster`)
-
-    const requestChannelCoverUpload = ({ channelPublicId }) =>
-        requestUploadInstruction(`/channels/${channelPublicId}/cover`)
-
-    const confirmMediaPreviewUpload = async ({
-        mediaId,
-        objectName,
-        title,
-        description = null,
-        resourceDate = null,
-        main
-    }) => {
-        const response = await runStoreMutation({
-            request: () =>
-                api.put(
-                    `/channels/media/${mediaId}/preview/confirm`,
-                    {
-                        objectName,
-                        title: title?.trim(),
-                        description: description?.trim() || null,
-                        resourceDate: resourceDate?.trim() || null,
-                        main
-                    },
-                    { __skipGlobalErrorNotify: true }
-                )
-        })
-        invalidateChannelsCache()
-        invalidateChannelCacheByMedia(mediaId)
-        return mutationResult({ ok: true, data: response?.data ?? null })
-    }
-
-    const confirmAlbumPosterUpload = async ({
-        albumId,
-        objectName,
-        title,
-        subtitle = null,
-        posterType,
-        posterColor = null
-    }) => {
-        const response = await runStoreMutation({
-            request: () =>
-                api.put(
-                    `/channels/album/${albumId}/poster/confirm`,
-                    {
-                        objectName,
-                        title: title?.trim(),
-                        subtitle: subtitle?.trim() || null,
-                        posterType,
-                        posterColor
-                    },
-                    { __skipGlobalErrorNotify: true }
-                )
-        })
-        invalidateChannelsCache()
-        invalidateChannelCacheByAlbum(albumId)
-        return mutationResult({ ok: true, data: response?.data ?? null })
-    }
-
-    const confirmChannelCoverUpload = async ({ channelPublicId, objectName, title }) => {
-        const response = await runStoreMutation({
-            request: () =>
-                api.put(
-                    `/channels/${channelPublicId}/cover/confirm`,
-                    {
-                        objectName,
-                        title: title?.trim()
-                    },
-                    { __skipGlobalErrorNotify: true }
-                )
-        })
-        invalidateChannelsCache()
-        invalidateChannelCacheById(channelPublicId)
-        return mutationResult({ ok: true, data: response?.data ?? null })
-    }
-
     const reportMedia = async ({ privateId, reason }) => {
         const res = await runStoreMutation({
             request: () =>
@@ -509,25 +368,15 @@ export const useChannelStore = defineStore('channel', () => {
 
     return {
         channels,
-        upload,
         useChannelsQuery,
         resolveHistoryChannels,
         fetchChannel,
         createMediaSession,
         deleteResource,
         undeleteResource,
-        postUploadDraft,
-        confirmUpload,
-        abortUpload,
         updateMedia,
         updateAlbum,
         updateChannel,
-        requestMediaPreviewUpload,
-        requestAlbumPosterUpload,
-        requestChannelCoverUpload,
-        confirmMediaPreviewUpload,
-        confirmAlbumPosterUpload,
-        confirmChannelCoverUpload,
         reportMedia,
         channelsQueryOptions,
         channelByAlbumQueryOptions,

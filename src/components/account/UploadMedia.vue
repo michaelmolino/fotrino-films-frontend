@@ -196,6 +196,7 @@
 import { ref, reactive, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useAccountStore } from 'src/stores/account-store.js'
 import { useChannelStore } from 'src/stores/channel-store.js'
+import { useUploadStore } from 'src/stores/upload-store.js'
 import { onBeforeRouteLeave, useRoute } from 'vue-router'
 import ChannelStep from './UploadMedia/ChannelStep.vue'
 import AlbumStep from './UploadMedia/AlbumStep.vue'
@@ -213,6 +214,7 @@ const IMAGE_RESOURCE_TYPES = new Set(['cover', 'poster', 'preview'])
 // refs & reactive state
 const accountStore = useAccountStore()
 const channelStore = useChannelStore()
+const uploadStore = useUploadStore()
 const route = useRoute()
 const channelsQuery = channelStore.useChannelsQuery(true)
 const step = ref(1)
@@ -272,7 +274,7 @@ const {
   statusText,
   isUploading
 } = useUploadFlow({
-  channelStore,
+  uploadStore,
   payload,
   stepper
 })

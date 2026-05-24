@@ -28,6 +28,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useChannelStore } from 'src/stores/channel-store.js'
+import { useUploadStore } from 'src/stores/upload-store.js'
 import ChannelItem from './MediaBrowser/ChannelItem.vue'
 import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
 import { useUppyPresignedUpload } from 'src/composables/useUppyPresignedUpload.js'
@@ -35,6 +36,7 @@ import { isPendingUploadLockedByAnotherTab } from '@utils/pendingUploadLocks.js'
 import { notifyError, notifySuccess, notifyWarning } from 'src/utils/notify.js'
 
 const channelStore = useChannelStore()
+const uploadStore = useUploadStore()
 const props = defineProps({
   channels: { type: Array, default: () => [] }
 })
@@ -141,7 +143,7 @@ async function abortPendingMedia(mediaId) {
   }
 
   try {
-    await channelStore.abortUpload(mediaId)
+    await uploadStore.abortUpload(mediaId)
     notifySuccess('Pending upload aborted.')
   } catch (error) {
     if (error?.__userCancelled || error?.code === 'ERR_CANCELED') {
@@ -215,12 +217,12 @@ async function saveMediaEdit(payload) {
     },
     upload: {
       shouldUpload: !!payload?.previewFile,
-      prepare: channelStore.requestMediaPreviewUpload,
+      prepare: uploadStore.requestMediaPreviewUpload,
       preparePayload: {
         mediaId: payload?.id
       },
       file: payload?.previewFile,
-      confirm: channelStore.confirmMediaPreviewUpload,
+      confirm: uploadStore.confirmMediaPreviewUpload,
       confirmPayload: {
         mediaId: payload?.id
       }
@@ -242,12 +244,12 @@ async function saveAlbumEdit(payload) {
     },
     upload: {
       shouldUpload: payload?.posterType === 'new' && !!payload?.posterFile,
-      prepare: channelStore.requestAlbumPosterUpload,
+      prepare: uploadStore.requestAlbumPosterUpload,
       preparePayload: {
         albumId: payload?.id
       },
       file: payload?.posterFile,
-      confirm: channelStore.confirmAlbumPosterUpload,
+      confirm: uploadStore.confirmAlbumPosterUpload,
       confirmPayload: {
         albumId: payload?.id
       }
@@ -266,12 +268,12 @@ async function saveChannelEdit(payload) {
     },
     upload: {
       shouldUpload: !!payload?.coverFile,
-      prepare: channelStore.requestChannelCoverUpload,
+      prepare: uploadStore.requestChannelCoverUpload,
       preparePayload: {
         channelPublicId: payload?.channelPublicId
       },
       file: payload?.coverFile,
-      confirm: channelStore.confirmChannelCoverUpload,
+      confirm: uploadStore.confirmChannelCoverUpload,
       confirmPayload: {
         channelPublicId: payload?.channelPublicId
       }

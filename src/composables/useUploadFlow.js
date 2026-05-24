@@ -2,7 +2,7 @@ import { ref } from 'vue'
 import { useUppyPresignedUpload } from './useUppyPresignedUpload.js'
 import { usePendingUploadLock } from './usePendingUploadLock.js'
 
-export function useUploadFlow({ channelStore, payload, stepper }) {
+export function useUploadFlow({ uploadStore, payload, stepper }) {
   const isUploading = ref(false)
   const abortController = ref(null)
   const uploadLock = usePendingUploadLock()
@@ -30,7 +30,7 @@ export function useUploadFlow({ channelStore, payload, stepper }) {
     isUploading.value = true
 
     try {
-      const draftResult = await channelStore.postUploadDraft(payload)
+      const draftResult = await uploadStore.postUploadDraft(payload)
       const uploadDraft = draftResult?.data
 
       if (abortController.value.signal.aborted) {
@@ -52,7 +52,7 @@ export function useUploadFlow({ channelStore, payload, stepper }) {
         throw new Error('Upload cancelled')
       }
 
-      await channelStore.confirmUpload(mediaRef)
+      await uploadStore.confirmUpload(mediaRef)
 
       statusText.value = 'Upload complete!'
       stepper.value?.next()
@@ -84,7 +84,7 @@ export function useUploadFlow({ channelStore, payload, stepper }) {
     statusText.value = 'Upload cancelled.'
 
     if (mediaRef != null) {
-      channelStore.abortUpload(mediaRef).catch(err => {
+      uploadStore.abortUpload(mediaRef).catch(err => {
         console.warn('Failed to abort pending upload on cancel:', err)
       })
     }
