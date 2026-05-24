@@ -474,6 +474,7 @@ function resetUploadFlow() {
   }
 
   const freshPayload = createInitialPayload()
+  payload.idempotencyKey = freshPayload.idempotencyKey
   payload.publicId = freshPayload.publicId
   payload.coverType = freshPayload.coverType
   payload.title = freshPayload.title
