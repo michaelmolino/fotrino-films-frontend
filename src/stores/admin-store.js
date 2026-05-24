@@ -2,7 +2,7 @@ import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { useQuery, useQueryCache } from '@pinia/colada'
 import { api } from 'src/clients/axios-client.js'
-import { isGlobalApiError } from 'src/utils/api-errors.js'
+import { isGlobalApiError } from 'src/utils/apiErrors.js'
 
 export const useAdminStore = defineStore('admin', () => {
   const users = ref([])
@@ -169,20 +169,14 @@ export const useAdminStore = defineStore('admin', () => {
     }
     if (job.status === 'todo') {
       await runStoreMutation({
-        request: () =>
-          api.post(`/admin/jobs/pending/${job.id}/start-now`, null, {
-            __skipGlobalErrorNotify: true
-          })
+        request: () => api.post(`/admin/jobs/pending/${job.id}/start-now`)
       })
       void queryCache.invalidateQueries({ key: ['admin', 'jobs'] })
       return mutationResult({ ok: true, data: 'started' })
     }
     if (job.status === 'failed') {
       await runStoreMutation({
-        request: () =>
-          api.post(`/admin/jobs/failed/${job.id}/replay`, null, {
-            __skipGlobalErrorNotify: true
-          })
+        request: () => api.post(`/admin/jobs/failed/${job.id}/replay`)
       })
       void queryCache.invalidateQueries({ key: ['admin', 'jobs'] })
       return mutationResult({ ok: true, data: 'replayed' })
@@ -192,10 +186,7 @@ export const useAdminStore = defineStore('admin', () => {
 
   const deleteUser = async userId => {
     const response = await runStoreMutation({
-      request: () =>
-        api.delete(`/admin/users/${userId}`, {
-          __skipGlobalErrorNotify: true
-        }),
+      request: () => api.delete(`/admin/users/${userId}`),
       onError: error => {
         if (error?.__userCancelled) {
           return CANCELLED
@@ -215,10 +206,7 @@ export const useAdminStore = defineStore('admin', () => {
 
   const approveUser = async userId => {
     const response = await runStoreMutation({
-      request: () =>
-        api.post(`/admin/users/${userId}/approve`, null, {
-          __skipGlobalErrorNotify: true
-        }),
+      request: () => api.post(`/admin/users/${userId}/approve`),
       onError: error => {
         if (error?.__userCancelled) {
           return CANCELLED
@@ -238,10 +226,7 @@ export const useAdminStore = defineStore('admin', () => {
 
   const deleteMedia = async privateId => {
     const response = await runStoreMutation({
-      request: () =>
-        api.delete(`/admin/media/${privateId}`, {
-          __skipGlobalErrorNotify: true
-        }),
+      request: () => api.delete(`/admin/media/${privateId}`),
       onError: error => {
         if (error?.__userCancelled) {
           return CANCELLED

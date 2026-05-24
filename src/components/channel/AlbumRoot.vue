@@ -104,8 +104,8 @@ import { computed, watch, defineAsyncComponent, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
 
-import BreadCrumbs from '@components/shared/BreadCrumbs.vue'
-import ShareActions from '@components/shared/ShareActions.vue'
+import BreadCrumbs from '@components/channel/shared/BreadCrumbs.vue'
+import ShareActions from '@components/channel/shared/ShareActions.vue'
 import MediaPreview from '@components/channel/shared/MediaPreview.vue'
 const NothingText = defineAsyncComponent(() => import('@components/shared/NothingText.vue'))
 

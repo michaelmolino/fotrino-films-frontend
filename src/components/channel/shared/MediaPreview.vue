@@ -26,7 +26,6 @@
       :position="previewCropPosition"
       :loading="priority === 'high' ? 'eager' : 'lazy'"
       decoding="async"
-      @load="onPreviewLoad"
       @error="onPreviewError">
       <div v-if="showTitleOverlay" class="absolute-bottom text-center">
         <div class="ellipsis">
@@ -62,7 +61,6 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { QBtn } from 'quasar'
-import { addPreconnectForUrl } from '@utils/preconnect'
 import { useWebP } from '@composables/useWebP'
 
 const previewCropPosition = '50% 28%'
@@ -127,10 +125,6 @@ watch(
   },
   { immediate: true }
 )
-
-function onPreviewLoad() {
-  if (finalUrl.value) addPreconnectForUrl(finalUrl.value)
-}
 
 function onPreviewError() {
   if (previewSource.value.fallbackUrl && finalUrl.value !== previewSource.value.fallbackUrl) {

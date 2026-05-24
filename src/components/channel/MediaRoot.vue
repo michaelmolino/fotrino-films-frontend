@@ -59,10 +59,12 @@ import { computed, watch, defineAsyncComponent, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
 
-import BreadCrumbs from '@components/shared/BreadCrumbs.vue'
+import BreadCrumbs from '@components/channel/shared/BreadCrumbs.vue'
 import MediaPreview from '@components/channel/shared/MediaPreview.vue'
 
-const ShareActions = defineAsyncComponent(() => import('@components/shared/ShareActions.vue'))
+const ShareActions = defineAsyncComponent(
+  () => import('@components/channel/shared/ShareActions.vue')
+)
 const PlyrPlayer = defineAsyncComponent(
   () => import('@components/channel/MediaRoot/PlyrPlayer.vue')
 )

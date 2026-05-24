@@ -5,7 +5,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useMeta } from 'quasar'
 import { getMetaData } from '@utils/meta.js'
 import { addHistory, addPrivateHistory, addPrivateAlbumHistory } from '@utils/history.js'
-import { getCanonicalChannelRoutePath, getChannelRouteTarget } from '@utils/channel-route.js'
+import { getCanonicalChannelRoutePath, getChannelRouteTarget } from '@utils/channelRoute.js'
 
 // Shared loader state so the App-level loader and page-level loaders stay in sync.
 const sharedChannel = ref(null)
@@ -40,7 +40,6 @@ const sharedHydratedAlbumsByPublicId = computed(() => {
 })
 
 const EMPTY_CHANNEL_VIEW_RESPONSE = { channel: null, readModel: null }
-
 /**
  * Composable for loading and setting channel data based on route parameters
  * State is shared across composable callers so App-level route loading and

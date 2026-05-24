@@ -59,18 +59,6 @@ function getPrivateAlbumMeta(channel) {
   }
 }
 
-function getPrivateAlbumMediaMeta(route, channel) {
-  const media =
-    (channel?.album?.media || []).find(item => item?.privateId === route?.params?.privateMediaId) ||
-    null
-  return {
-    title: media?.title || null,
-    description: sanitizeText(media?.descriptionUnsafe),
-    image: media?.preview || null,
-    type: 'video'
-  }
-}
-
 // Main meta generator
 export function getMetaData(route, channel, readModel = null) {
   let meta = { title: null, description: '', image: null, type: 'website' }
@@ -89,7 +77,7 @@ export function getMetaData(route, channel, readModel = null) {
     meta = getPrivateAlbumMeta(channel)
   }
   if (route?.params.privateAlbumId && route?.params.privateMediaId) {
-    meta = getPrivateAlbumMediaMeta(route, channel)
+    meta = getPrivateMediaMeta(route, channel)
   }
   if (route?.params.privateMediaId && !route?.params.privateAlbumId) {
     meta = getPrivateMediaMeta(route, channel)

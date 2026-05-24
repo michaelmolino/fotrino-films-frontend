@@ -6,8 +6,9 @@ import { parseStoredHistory, writeHistory, HISTORY_KEY } from './historyStorage.
 /** @typedef {{ publicId: string, type: 'channel' | 'privateMedia' | 'privateAlbum' }} HistoryEntry */
 
 import { LocalStorage } from 'quasar'
-const parsedHistory = parseStoredHistory(LocalStorage.getItem(HISTORY_KEY))
-export const history = ref(parsedHistory.entries)
+const storedHistory = LocalStorage.getItem(HISTORY_KEY)
+const parsedHistory = parseStoredHistory(storedHistory)
+export const history = ref(parsedHistory)
 export const historyChannels = ref([])
 
 function getChannelHistoryId(channel) {
@@ -19,8 +20,8 @@ function persistHistory(entries) {
   writeHistory(entries)
 }
 
-if (parsedHistory.needsMigration) {
-  persistHistory(parsedHistory.entries)
+if (JSON.stringify(storedHistory) !== JSON.stringify(parsedHistory)) {
+  writeHistory(parsedHistory)
 }
 
 export function addHistory(channel) {

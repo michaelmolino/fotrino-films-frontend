@@ -8,8 +8,9 @@ import {
     getCloudflareGatewayErrorPayload,
     getGlobalApiErrorPayload,
     getGlobalApiErrorMessage,
+    isCloudflareGatewayError,
     isGlobalApiError
-} from 'src/utils/api-errors.js'
+} from 'src/utils/apiErrors.js'
 import CloudflareGatewayErrorDialog from '@components/errors/CloudflareGatewayErrorDialog.vue'
 
 export default boot(({ app, router }) => {
@@ -17,33 +18,26 @@ export default boot(({ app, router }) => {
 
     installApiClientInterceptors({
         getCsrfToken: () => useAccountStore()?.profile?.csrfToken,
-        onBeforeDelete: req => {
-            if (req?.__skipDeleteConfirm === true) {
-                return true
-            }
-
+        onBeforeDelete: () => {
             return confirmDestructiveAction({
                 confirmAction: { 'data-cy': 'confirm-delete' },
                 cancelAction: { 'data-cy': 'cancel-delete' }
             })
         },
-        onRequestStart: req => {
-            if (req?.__skipRequestLoading !== true) {
-                showLoader()
-            }
+        onRequestStart: () => {
+            showLoader()
         },
-        onRequestEnd: config => {
-            if (config?.__skipRequestLoading !== true) {
-                hideLoader()
-            }
+        onRequestEnd: () => {
+            hideLoader()
         },
         onApiError: ({ error, status, requestCanceled }) => {
             const skipNotify = error?.config?.__skipGlobalErrorNotify === true || requestCanceled
-            const cloudflarePayload = getCloudflareGatewayErrorPayload(error)
+            const cloudflareError = isCloudflareGatewayError(error)
+            const cloudflarePayload = cloudflareError ? getCloudflareGatewayErrorPayload(error) : null
             const apiError = getGlobalApiErrorPayload(error)
             const resolvedStatus = apiError?.status ?? status
 
-            if (cloudflarePayload && !requestCanceled) {
+            if (cloudflareError && !requestCanceled) {
                 Dialog.create({
                     component: CloudflareGatewayErrorDialog,
                     componentProps: {
@@ -68,7 +62,7 @@ export default boot(({ app, router }) => {
             else if (!apiError && resolvedStatus === 501) msg = 'Not yet implemented.'
 
             if (!skipNotify) {
-                if (!cloudflarePayload) {
+                if (!cloudflareError) {
                     notifyError(msg, {
                         timeout,
                         multiLine: true

@@ -186,13 +186,7 @@ export const useChannelStore = defineStore('channel', () => {
             return { items: [], deletedPublicIds: [] }
         }
 
-        const { data } = await api.post(
-            '/channels/history',
-            { items },
-            {
-                __skipGlobalErrorNotify: true
-            }
-        )
+        const { data } = await api.post('/channels/history', { items })
 
         return {
             items: Array.isArray(data?.items) ? data.items : [],
@@ -227,10 +221,7 @@ export const useChannelStore = defineStore('channel', () => {
                 : `/channels/${resource.type}/${resource.id}`
 
         const response = await runStoreMutation({
-            request: () =>
-                api.delete(url, {
-                    __skipGlobalErrorNotify: true
-                }),
+            request: () => api.delete(url),
             onError: error => {
                 if (error?.__userCancelled) {
                     return CANCELLED
@@ -266,10 +257,7 @@ export const useChannelStore = defineStore('channel', () => {
         }
 
         await runStoreMutation({
-            request: () =>
-                api.put(url, null, {
-                    __skipGlobalErrorNotify: true
-                })
+            request: () => api.put(url, null)
         })
 
         invalidateChannelsCache()
@@ -293,9 +281,6 @@ export const useChannelStore = defineStore('channel', () => {
                         description: description?.trim() || null,
                         resourceDate: resourceDate?.trim() || null,
                         main
-                    },
-                    {
-                        __skipGlobalErrorNotify: true
                     }
                 )
         })
@@ -320,9 +305,6 @@ export const useChannelStore = defineStore('channel', () => {
                         subtitle: subtitle?.trim() || null,
                         posterType,
                         posterColor
-                    },
-                    {
-                        __skipGlobalErrorNotify: true
                     }
                 )
         })
@@ -338,9 +320,6 @@ export const useChannelStore = defineStore('channel', () => {
                     `/channels/${channelPublicId}`,
                     {
                         title: title?.trim()
-                    },
-                    {
-                        __skipGlobalErrorNotify: true
                     }
                 )
         })
@@ -356,9 +335,6 @@ export const useChannelStore = defineStore('channel', () => {
                     `/channels/media/private/${privateId}/report`,
                     {
                         reason: reason?.trim() || null
-                    },
-                    {
-                        __skipGlobalErrorNotify: true
                     }
                 )
         })

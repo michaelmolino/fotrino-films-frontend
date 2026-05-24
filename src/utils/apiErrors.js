@@ -68,11 +68,19 @@ export function getCloudflareGatewayErrorPayload(error) {
  * @param {unknown} error
  * @returns {boolean}
  */
+export function isCloudflareGatewayError(error) {
+  return getCloudflareGatewayErrorPayload(error) != null
+}
+
+/**
+ * @param {unknown} error
+ * @returns {boolean}
+ */
 export function isGloballyHandledApiError(error) {
   if (error?.__cloudflareDialogShown === true) {
     return true
   }
-  return getCloudflareGatewayErrorPayload(error) != null
+  return isCloudflareGatewayError(error)
 }
 
 /**

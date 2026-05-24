@@ -115,7 +115,7 @@ import { Notify, useQuasar } from 'quasar'
 import { sanitizeHtml } from '@utils/text.js'
 import { daysSince } from '@utils/date.js'
 import { useChannelStore } from 'src/stores/channel-store.js'
-import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
+import { getComponentApiErrorMessage } from 'src/utils/apiErrors.js'
 
 const props = defineProps({
   media: Object,

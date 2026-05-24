@@ -83,7 +83,7 @@ import { computed, ref, watch } from 'vue'
 import { Notify } from 'quasar'
 import { useAdminStore } from 'src/stores/admin-store.js'
 import { daysSince } from '@utils/date.js'
-import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
+import { getComponentApiErrorMessage } from 'src/utils/apiErrors.js'
 
 const adminStore = useAdminStore()
 const JOB_FILTER_KEY = 'admin.jobs.filterMode'

@@ -43,7 +43,6 @@ import { computed, onMounted, onBeforeUnmount, watch, ref, nextTick } from 'vue'
 import { useChannelStore } from 'src/stores/channel-store.js'
 import 'plyr/dist/plyr.css'
 import '@css/plyr.sass'
-import { addPreconnectForUrl, addPreloadImageOnce } from '@utils/preconnect'
 import { setupVideoPlayback } from '@utils/videoPlayback'
 import { useWebP } from '@composables/useWebP'
 
@@ -202,9 +201,6 @@ function attachMediaSessionHandler() {
 async function rebuild() {
   const runId = ++rebuildRunId
   await refreshPlaybackUrl()
-  addPreconnectForUrl(playbackUrl.value || props.media?.src)
-  const previewToPreload = view.value === 'video' ? videoPosterUrl.value : audioPreviewUrl.value
-  addPreloadImageOnce(previewToPreload, 'high')
   destroyPlayers()
   await nextTick()
   if (runId !== rebuildRunId) return

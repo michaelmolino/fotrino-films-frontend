@@ -60,9 +60,7 @@ export const useUploadStore = defineStore('upload', () => {
     }
 
     const requestUploadInstruction = async url => {
-        const res = await api.post(url, null, {
-            __skipGlobalErrorNotify: true
-        })
+        const res = await api.post(url)
         return mutationResult({ ok: true, data: res.data })
     }
 
@@ -70,7 +68,6 @@ export const useUploadStore = defineStore('upload', () => {
         const response = await runStoreMutation({
             request: () =>
                 api.post('/uploads/media/draft', payload, {
-                    __skipGlobalErrorNotify: true,
                     headers: {
                         'Content-Type': 'application/json',
                         Accept: 'application/json'
@@ -93,10 +90,7 @@ export const useUploadStore = defineStore('upload', () => {
 
     const confirmUpload = async media => {
         await runStoreMutation({
-            request: () =>
-                api.put(`/uploads/media/confirm/${media}`, null, {
-                    __skipGlobalErrorNotify: true
-                })
+            request: () => api.put(`/uploads/media/confirm/${media}`)
         })
         invalidateChannelsCache()
         invalidateChannelCacheByMedia(media)
@@ -105,10 +99,7 @@ export const useUploadStore = defineStore('upload', () => {
 
     const abortUpload = async mediaId => {
         const response = await runStoreMutation({
-            request: () =>
-                api.delete(`/uploads/media/${mediaId}/abort`, {
-                    __skipGlobalErrorNotify: true
-                }),
+            request: () => api.delete(`/uploads/media/${mediaId}/abort`),
             onError: error => {
                 if (error?.__userCancelled) {
                     return CANCELLED
@@ -152,8 +143,7 @@ export const useUploadStore = defineStore('upload', () => {
                         description: description?.trim() || null,
                         resourceDate: resourceDate?.trim() || null,
                         main
-                    },
-                    { __skipGlobalErrorNotify: true }
+                    }
                 )
         })
         invalidateChannelsCache()
@@ -179,8 +169,7 @@ export const useUploadStore = defineStore('upload', () => {
                         subtitle: subtitle?.trim() || null,
                         posterType,
                         posterColor
-                    },
-                    { __skipGlobalErrorNotify: true }
+                    }
                 )
         })
         invalidateChannelsCache()
@@ -196,8 +185,7 @@ export const useUploadStore = defineStore('upload', () => {
                     {
                         objectName,
                         title: title?.trim()
-                    },
-                    { __skipGlobalErrorNotify: true }
+                    }
                 )
         })
         invalidateChannelsCache()
