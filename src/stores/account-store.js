@@ -1,8 +1,7 @@
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
-import { useQueryCache } from '@pinia/colada'
+import { useQuery, useQueryCache } from '@pinia/colada'
 import { api } from 'src/clients/axios-client.js'
-import { getGlobalApiErrorPayload } from 'src/utils/api-errors.js'
 import { API_CACHE_LONG_MS, API_CACHE_SHORT_MS } from 'src/stores/utils/cache-timeouts.js'
 
 export const useAccountStore = defineStore('account', () => {
@@ -10,33 +9,6 @@ export const useAccountStore = defineStore('account', () => {
   const providers = ref([])
   const providersLoadFailed = ref(false)
   const queryCache = useQueryCache()
-
-  const runStoreQuery = async ({ options, apply, onError }) => {
-    const entry = queryCache.ensure(options)
-
-    try {
-      const state = await queryCache.refresh(entry, options)
-      if (state?.status === 'error') {
-        throw state.error || new Error('Account query failed')
-      }
-      const value = state?.data ?? null
-      if (typeof apply === 'function') {
-        apply(value)
-      }
-      return value
-    } catch (error) {
-      if (typeof apply === 'function') {
-        apply(null)
-      }
-      if (typeof onError === 'function') {
-        const maybe = onError(error)
-        if (maybe !== undefined) {
-          return maybe
-        }
-      }
-      throw error
-    }
-  }
 
   const runStoreMutation = async ({ request, onSuccess, onError }) => {
     try {
@@ -52,10 +24,15 @@ export const useAccountStore = defineStore('account', () => {
           return maybe
         }
       }
-      getGlobalApiErrorPayload(error)
       throw error
     }
   }
+
+  const mutationResult = ({ ok, data = null, cancelled = false }) => ({
+    ok,
+    data,
+    cancelled
+  })
 
   const accountProfileQueryOptions = (staleTime = API_CACHE_SHORT_MS) => ({
     key: ['account', 'profile'],
@@ -94,29 +71,55 @@ export const useAccountStore = defineStore('account', () => {
     })
   }
 
-  const loadProfile = (timeout = API_CACHE_SHORT_MS) =>
-    runStoreQuery({
-      options: accountProfileQueryOptions(timeout),
-      apply: setProfile,
-      onError: error => {
-        getGlobalApiErrorPayload(error)
-        return null
-      }
-    })
+  const useProfileQuery = (staleTime = API_CACHE_SHORT_MS) => {
+    const query = useQuery(() => accountProfileQueryOptions(staleTime))
 
-  const loadProviders = (timeout = API_CACHE_LONG_MS) =>
-    runStoreQuery({
-      options: accountProvidersQueryOptions(timeout),
-      apply: value => {
+    watch(
+      () => query.data.value,
+      value => {
+        setProfile(value ?? null)
+      },
+      { immediate: true }
+    )
+
+    watch(
+      () => query.error.value,
+      error => {
+        if (error) {
+          setProfile(null)
+        }
+      },
+      { immediate: true }
+    )
+
+    return query
+  }
+
+  const useProvidersQuery = (staleTime = API_CACHE_LONG_MS) => {
+    const query = useQuery(() => accountProvidersQueryOptions(staleTime))
+
+    watch(
+      () => query.data.value,
+      value => {
         providersLoadFailed.value = false
         setProviders(value)
       },
-      onError: error => {
-        getGlobalApiErrorPayload(error)
-        providersLoadFailed.value = true
-        return []
-      }
-    })
+      { immediate: true }
+    )
+
+    watch(
+      () => query.error.value,
+      error => {
+        if (error) {
+          providersLoadFailed.value = true
+          setProviders([])
+        }
+      },
+      { immediate: true }
+    )
+
+    return query
+  }
 
   const logout = async () => {
     await runStoreMutation({
@@ -126,7 +129,7 @@ export const useAccountStore = defineStore('account', () => {
         setProfile(null)
       }
     })
-    return true
+    return mutationResult({ ok: true })
   }
 
   return {
@@ -136,8 +139,10 @@ export const useAccountStore = defineStore('account', () => {
     setProfile,
     setProviders,
     clearProfileCache,
-    loadProfile,
-    loadProviders,
+    useProfileQuery,
+    useProvidersQuery,
+    accountProfileQueryOptions,
+    accountProvidersQueryOptions,
     logout
   }
 })

@@ -51,14 +51,17 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { computed, watch } from 'vue'
 import { Notify } from 'quasar'
 import { useAdminStore } from 'src/stores/admin-store.js'
 import { daysSince } from '@utils/date.js'
 import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
 
 const adminStore = useAdminStore()
-const loading = ref(true)
+const reportedMediaQuery = adminStore.useReportedMediaQuery()
+const loading = computed(() =>
+  reportedMediaQuery.isLoading.value && (adminStore.reportedMedia || []).length === 0
+)
 const reportedMediaColumns = [
   { name: 'createdAt', label: 'Reported', field: 'createdAt', align: 'left' },
   { name: 'title', label: 'Video', field: 'title', align: 'left' },
@@ -89,27 +92,10 @@ const flattenedReportedMediaRows = computed(() => {
   return rows
 })
 
-async function loadReportedMedia() {
-  loading.value = true
-  try {
-    await adminStore.loadReportedMedia()
-  } catch (err) {
-    console.error('Failed to fetch reported media:', err)
-    Notify.create({
-      type: 'negative',
-      message: getComponentApiErrorMessage(err, 'Failed to load reported videos.'),
-      icon: 'warning',
-      timeout: 0
-    })
-  } finally {
-    loading.value = false
-  }
-}
-
 async function deleteMedia(privateId) {
   try {
-    const deleted = await adminStore.deleteMedia(privateId)
-    if (deleted === false) return
+    const result = await adminStore.deleteMedia(privateId)
+    if (result?.cancelled || result?.ok === false) return
     Notify.create({
       type: 'positive',
       message: 'Reported video deleted.',
@@ -128,10 +114,18 @@ async function deleteMedia(privateId) {
 }
 
 watch(
-  () => true,
-  () => {
-    loadReportedMedia()
-  },
-  { immediate: true }
+  () => reportedMediaQuery.error.value,
+  err => {
+    if (!err) {
+      return
+    }
+    console.error('Failed to fetch reported media:', err)
+    Notify.create({
+      type: 'negative',
+      message: getComponentApiErrorMessage(err, 'Failed to load reported videos.'),
+      icon: 'warning',
+      timeout: 0
+    })
+  }
 )
 </script>

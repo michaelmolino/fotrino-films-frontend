@@ -30,7 +30,8 @@ export function useUploadFlow({ channelStore, payload, stepper }) {
     isUploading.value = true
 
     try {
-      const uploadDraft = await channelStore.postUploadDraft(payload)
+      const draftResult = await channelStore.postUploadDraft(payload)
+      const uploadDraft = draftResult?.data
 
       if (abortController.value.signal.aborted) {
         throw new Error('Upload cancelled')

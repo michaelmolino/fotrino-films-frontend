@@ -1,8 +1,7 @@
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { api } from 'src/clients/axios-client.js'
-import { getGlobalApiErrorPayload } from 'src/utils/api-errors.js'
-import { useQueryCache } from '@pinia/colada'
+import { useQuery, useQueryCache } from '@pinia/colada'
 import { API_CACHE_MEDIUM_MS } from 'src/stores/utils/cache-timeouts.js'
 
 export const useChannelStore = defineStore('channel', () => {
@@ -10,33 +9,6 @@ export const useChannelStore = defineStore('channel', () => {
     const upload = ref(null)
 
     const queryCache = useQueryCache()
-
-    const runStoreQuery = async ({ options, apply, onError }) => {
-        const entry = queryCache.ensure(options)
-
-        try {
-            const state = await queryCache.refresh(entry, options)
-            if (state?.status === 'error') {
-                throw state.error || new Error('Channel query failed')
-            }
-            const value = state?.data ?? null
-            if (typeof apply === 'function') {
-                apply(value)
-            }
-            return value
-        } catch (error) {
-            if (typeof apply === 'function') {
-                apply(null)
-            }
-            if (typeof onError === 'function') {
-                const maybe = onError(error)
-                if (maybe !== undefined) {
-                    return maybe
-                }
-            }
-            throw error
-        }
-    }
 
     const runStoreMutation = async ({ request, onSuccess, onError }) => {
         try {
@@ -52,10 +24,16 @@ export const useChannelStore = defineStore('channel', () => {
                     return maybe
                 }
             }
-            getGlobalApiErrorPayload(error)
             throw error
         }
     }
+
+    const mutationResult = ({ ok, data = null, cancelled = false }) => ({
+        ok,
+        data,
+        cancelled
+    })
+    const CANCELLED = Symbol('cancelled')
 
     const setChannels = value => {
         channels.value = value
@@ -69,7 +47,7 @@ export const useChannelStore = defineStore('channel', () => {
         const res = await api.post(url, null, {
             __skipGlobalErrorNotify: true
         })
-        return res.data
+        return mutationResult({ ok: true, data: res.data })
     }
 
     const channelQueryOptions = (channelId, pending = false) => ({
@@ -191,16 +169,29 @@ export const useChannelStore = defineStore('channel', () => {
         })
     }
 
-    const loadChannels = deep =>
-        runStoreQuery({
-            options: channelsQueryOptions(deep),
-            apply: value => {
+    const useChannelsQuery = (deep = false) => {
+        const query = useQuery(() => channelsQueryOptions(deep))
+
+        watch(
+            () => query.data.value,
+            value => {
                 setChannels(Array.isArray(value) ? value : [])
             },
-            onError: error => {
-                getGlobalApiErrorPayload(error)
-            }
-        })
+            { immediate: true }
+        )
+
+        watch(
+            () => query.error.value,
+            error => {
+                if (error) {
+                    setChannels([])
+                }
+            },
+            { immediate: true }
+        )
+
+        return query
+    }
 
     const resolveHistoryChannels = async items => {
         if (!Array.isArray(items) || items.length === 0) {
@@ -221,29 +212,24 @@ export const useChannelStore = defineStore('channel', () => {
         }
     }
 
-    const loadChannel = async ({ channelId, pending = false, cache = true }) => {
-        try {
-            if (!cache) {
-                const { data } = await api.get(`/channels/${channelId}${pending ? '?pending=true' : ''}`)
-                return data?.channel ?? null
-            }
-
-            const value = await runStoreQuery({
-                options: channelQueryOptions(channelId, pending),
-                onError: error => {
-                    getGlobalApiErrorPayload(error)
-                }
-            })
-            return value?.channel ?? null
-        } catch (error) {
-            getGlobalApiErrorPayload(error)
-            throw error
+    const fetchChannel = async ({ channelId, pending = false, cache = true }) => {
+        if (!cache) {
+            const { data } = await api.get(`/channels/${channelId}${pending ? '?pending=true' : ''}`)
+            return data?.channel ?? null
         }
+
+        const options = channelQueryOptions(channelId, pending)
+        const entry = queryCache.ensure(options)
+        const state = await queryCache.fetch(entry, options)
+        if (state?.status === 'error') {
+            throw state.error || new Error('Channel query failed')
+        }
+        return state?.data?.channel ?? null
     }
 
     const createMediaSession = async ({ privateId }) => {
         const res = await api.post(`/channels/media/session/${privateId}`)
-        return res.data
+        return mutationResult({ ok: true, data: res.data })
     }
 
     const deleteResource = async resource => {
@@ -259,13 +245,13 @@ export const useChannelStore = defineStore('channel', () => {
                 }),
             onError: error => {
                 if (error?.__userCancelled) {
-                    return false
+                    return CANCELLED
                 }
             }
         })
 
-        if (response === false) {
-            return false
+        if (response === CANCELLED) {
+            return mutationResult({ ok: false, cancelled: true })
         }
 
         invalidateChannelsCache()
@@ -276,8 +262,7 @@ export const useChannelStore = defineStore('channel', () => {
         } else if (resource.type === 'media') {
             invalidateChannelCacheByMedia(resource.id)
         }
-        setChannels([])
-        await loadChannels(true)
+        return mutationResult({ ok: true })
     }
 
     const undeleteResource = async resource => {
@@ -307,8 +292,7 @@ export const useChannelStore = defineStore('channel', () => {
         } else {
             invalidateChannelCacheByMedia(resource.id)
         }
-        setChannels([])
-        await loadChannels(true)
+        return mutationResult({ ok: true })
     }
 
     const postUploadDraft = async payload => {
@@ -333,11 +317,11 @@ export const useChannelStore = defineStore('channel', () => {
         }
 
         setUpload(normalizedData.instructions)
-        return normalizedData
+        return mutationResult({ ok: true, data: normalizedData })
     }
 
     const confirmUpload = async media => {
-        const response = await runStoreMutation({
+        await runStoreMutation({
             request: () =>
                 api.put(`/channels/media/confirm/${media}`, null, {
                     __skipGlobalErrorNotify: true
@@ -345,11 +329,11 @@ export const useChannelStore = defineStore('channel', () => {
         })
         invalidateChannelsCache()
         invalidateChannelCacheByMedia(media)
-        return response
+        return mutationResult({ ok: true })
     }
 
     const abortUpload = async mediaId => {
-        const response = await runStoreMutation({
+        await runStoreMutation({
             request: () =>
                 api.delete(`/channels/media/${mediaId}/abort`, {
                     __skipGlobalErrorNotify: true
@@ -357,7 +341,7 @@ export const useChannelStore = defineStore('channel', () => {
         })
         invalidateChannelsCache()
         invalidateChannelCacheByMedia(mediaId)
-        return response
+        return mutationResult({ ok: true })
     }
 
     const updateMedia = async ({ mediaId, title, description = null, resourceDate = null, main }) => {
@@ -378,7 +362,7 @@ export const useChannelStore = defineStore('channel', () => {
         })
         invalidateChannelsCache()
         invalidateChannelCacheByMedia(mediaId)
-        return res.data
+        return mutationResult({ ok: true, data: res.data })
     }
 
     const updateAlbum = async ({
@@ -405,7 +389,7 @@ export const useChannelStore = defineStore('channel', () => {
         })
         invalidateChannelsCache()
         invalidateChannelCacheByAlbum(albumId)
-        return res.data
+        return mutationResult({ ok: true, data: res.data })
     }
 
     const updateChannel = async ({ channelPublicId, title }) => {
@@ -423,7 +407,7 @@ export const useChannelStore = defineStore('channel', () => {
         })
         invalidateChannelsCache()
         invalidateChannelCacheById(channelPublicId)
-        return res.data
+        return mutationResult({ ok: true, data: res.data })
     }
 
     const requestMediaPreviewUpload = ({ mediaId }) =>
@@ -459,7 +443,7 @@ export const useChannelStore = defineStore('channel', () => {
         })
         invalidateChannelsCache()
         invalidateChannelCacheByMedia(mediaId)
-        return response
+        return mutationResult({ ok: true, data: response?.data ?? null })
     }
 
     const confirmAlbumPosterUpload = async ({
@@ -486,7 +470,7 @@ export const useChannelStore = defineStore('channel', () => {
         })
         invalidateChannelsCache()
         invalidateChannelCacheByAlbum(albumId)
-        return response
+        return mutationResult({ ok: true, data: response?.data ?? null })
     }
 
     const confirmChannelCoverUpload = async ({ channelPublicId, objectName, title }) => {
@@ -503,7 +487,7 @@ export const useChannelStore = defineStore('channel', () => {
         })
         invalidateChannelsCache()
         invalidateChannelCacheById(channelPublicId)
-        return response
+        return mutationResult({ ok: true, data: response?.data ?? null })
     }
 
     const reportMedia = async ({ privateId, reason }) => {
@@ -520,15 +504,15 @@ export const useChannelStore = defineStore('channel', () => {
                 )
         })
         invalidatePrivateMediaCache(privateId)
-        return res.data
+        return mutationResult({ ok: true, data: res.data })
     }
 
     return {
         channels,
         upload,
-        loadChannels,
+        useChannelsQuery,
         resolveHistoryChannels,
-        loadChannel,
+        fetchChannel,
         createMediaSession,
         deleteResource,
         undeleteResource,

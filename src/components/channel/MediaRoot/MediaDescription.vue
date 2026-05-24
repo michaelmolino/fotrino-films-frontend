@@ -170,10 +170,11 @@ async function submitReport() {
   if (!props.media?.privateId) return
   submitting.value = true
   try {
-    const res = await channelStore.reportMedia({
+    const result = await channelStore.reportMedia({
       privateId: props.media.privateId,
       reason: reason.value
     })
+    const res = result?.data || {}
     const reported = !!res?.reported
     if (reported) {
       Notify.create({

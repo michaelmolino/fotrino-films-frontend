@@ -25,6 +25,7 @@ const accountStore = useAccountStore()
 const route = useRoute()
 const router = useRouter()
 const { loadChannel } = useChannelLoader({ manageMeta: true })
+accountStore.useProfileQuery()
 
 const showTerms = ref(false)
 
@@ -32,7 +33,6 @@ onMounted(async () => {
   if (process.env.NODE_ENV === 'development') {
     console.warn('WARNING: This is a development server and should not be exposed to the internet.')
   }
-  await accountStore.loadProfile()
   showTerms.value = route.query?.showTerms?.toLowerCase() === 'true'
 })
 

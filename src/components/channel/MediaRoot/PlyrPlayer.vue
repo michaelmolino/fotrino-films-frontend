@@ -115,7 +115,8 @@ async function refreshPlaybackUrl() {
   }
 
   try {
-    const session = await channelStore.createMediaSession({ privateId: props.media.privateId })
+    const result = await channelStore.createMediaSession({ privateId: props.media.privateId })
+    const session = result?.data
     playbackUrl.value = session?.playbackUrl || props.media?.src || null
   } catch (error) {
     console.debug('Failed to initialize playback URL:', error)

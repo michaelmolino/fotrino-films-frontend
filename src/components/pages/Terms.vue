@@ -190,17 +190,13 @@
 <script setup>
 defineOptions({ name: 'Terms-Page' })
 
-import { ref, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useAccountStore } from 'src/stores/account-store.js'
 
 const accountStore = useAccountStore()
+accountStore.useProvidersQuery()
 
-const oAuthProviders = ref([])
-
-onMounted(async () => {
-  const providers = await accountStore.loadProviders()
-  oAuthProviders.value = providers
-})
+const oAuthProviders = computed(() => accountStore.providers || [])
 </script>
 
 <style scoped>

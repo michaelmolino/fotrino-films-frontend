@@ -1,41 +1,14 @@
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
-import { useQueryCache } from '@pinia/colada'
+import { useQuery, useQueryCache } from '@pinia/colada'
 import { api } from 'src/clients/axios-client.js'
-import { getGlobalApiErrorPayload, isGlobalApiError } from 'src/utils/api-errors.js'
+import { isGlobalApiError } from 'src/utils/api-errors.js'
 
 export const useAdminStore = defineStore('admin', () => {
   const users = ref([])
   const jobs = ref([])
   const reportedMedia = ref([])
   const queryCache = useQueryCache()
-
-  const runStoreQuery = async ({ options, apply, onError }) => {
-    const entry = queryCache.ensure(options)
-
-    try {
-      const state = await queryCache.refresh(entry, options)
-      if (state?.status === 'error') {
-        throw state.error || new Error('Admin query failed')
-      }
-      const value = state?.data ?? null
-      if (typeof apply === 'function') {
-        apply(value)
-      }
-      return value
-    } catch (error) {
-      if (typeof apply === 'function') {
-        apply(null)
-      }
-      if (typeof onError === 'function') {
-        const maybe = onError(error)
-        if (maybe !== undefined) {
-          return maybe
-        }
-      }
-      throw error
-    }
-  }
 
   const runStoreMutation = async ({ request, onSuccess, onError }) => {
     try {
@@ -51,10 +24,16 @@ export const useAdminStore = defineStore('admin', () => {
           return maybe
         }
       }
-      getGlobalApiErrorPayload(error)
       throw error
     }
   }
+
+  const mutationResult = ({ ok, data = null, cancelled = false }) => ({
+    ok,
+    data,
+    cancelled
+  })
+  const CANCELLED = Symbol('cancelled')
 
   const usersQueryOptions = () => ({
     key: ['admin', 'users'],
@@ -112,29 +91,77 @@ export const useAdminStore = defineStore('admin', () => {
     reportedMedia.value = Array.isArray(value) ? value : []
   }
 
-  const loadUsers = () =>
-    runStoreQuery({
-      options: usersQueryOptions(),
-      apply: setUsers,
-      onError: error => {
-        if (isGlobalApiError(error, 'forbidden')) {
-          return null
-        }
-        getGlobalApiErrorPayload(error)
-      }
-    })
+  const useUsersQuery = () => {
+    const query = useQuery(usersQueryOptions)
 
-  const loadJobs = (statuses = []) =>
-    runStoreQuery({
-      options: jobsQueryOptions(statuses),
-      apply: setJobs,
-      onError: error => {
-        if (isGlobalApiError(error, 'forbidden')) {
-          return null
+    watch(
+      () => query.data.value,
+      value => {
+        setUsers(Array.isArray(value) ? value : [])
+      },
+      { immediate: true }
+    )
+
+    watch(
+      () => query.error.value,
+      error => {
+        if (error && isGlobalApiError(error, 'forbidden')) {
+          setUsers([])
         }
-        getGlobalApiErrorPayload(error)
-      }
-    })
+      },
+      { immediate: true }
+    )
+
+    return query
+  }
+
+  const useJobsQuery = (statuses = []) => {
+    const query = useQuery(() => jobsQueryOptions(statuses))
+
+    watch(
+      () => query.data.value,
+      value => {
+        setJobs(Array.isArray(value) ? value : [])
+      },
+      { immediate: true }
+    )
+
+    watch(
+      () => query.error.value,
+      error => {
+        if (error && isGlobalApiError(error, 'forbidden')) {
+          setJobs([])
+        }
+      },
+      { immediate: true }
+    )
+
+    return query
+  }
+
+  const useReportedMediaQuery = () => {
+    const query = useQuery(reportedMediaQueryOptions)
+
+    watch(
+      () => query.data.value,
+      value => {
+        setReportedMedia(Array.isArray(value) ? value : [])
+      },
+      { immediate: true }
+    )
+
+    watch(
+      () => query.error.value,
+      error => {
+        if (error && isGlobalApiError(error, 'forbidden')) {
+          setReportedMedia([])
+        }
+      },
+      { immediate: true }
+    )
+
+    return query
+  }
 
   const runJobAction = async job => {
     if (!job?.id || !job?.status) {
@@ -148,8 +175,7 @@ export const useAdminStore = defineStore('admin', () => {
           })
       })
       void queryCache.invalidateQueries({ key: ['admin', 'jobs'] })
-      await loadJobs()
-      return 'started'
+      return mutationResult({ ok: true, data: 'started' })
     }
     if (job.status === 'failed') {
       await runStoreMutation({
@@ -159,8 +185,7 @@ export const useAdminStore = defineStore('admin', () => {
           })
       })
       void queryCache.invalidateQueries({ key: ['admin', 'jobs'] })
-      await loadJobs()
-      return 'replayed'
+      return mutationResult({ ok: true, data: 'replayed' })
     }
     throw new Error(`No admin action available for status: ${job.status}`)
   }
@@ -173,20 +198,19 @@ export const useAdminStore = defineStore('admin', () => {
         }),
       onError: error => {
         if (error?.__userCancelled) {
-          return false
+          return CANCELLED
         }
       }
     })
-    if (response === false) {
-      return false
+    if (response === CANCELLED) {
+      return mutationResult({ ok: false, cancelled: true })
     }
 
     void queryCache.invalidateQueries({
       key: usersQueryOptions().key,
       exact: true
     })
-    setUsers([])
-    await loadUsers()
+    return mutationResult({ ok: true })
   }
 
   const approveUser = async userId => {
@@ -197,33 +221,20 @@ export const useAdminStore = defineStore('admin', () => {
         }),
       onError: error => {
         if (error?.__userCancelled) {
-          return false
+          return CANCELLED
         }
       }
     })
-    if (response === false) {
-      return false
+    if (response === CANCELLED) {
+      return mutationResult({ ok: false, cancelled: true })
     }
 
     void queryCache.invalidateQueries({
       key: usersQueryOptions().key,
       exact: true
     })
-    setUsers([])
-    await loadUsers()
+    return mutationResult({ ok: true })
   }
-
-  const loadReportedMedia = () =>
-    runStoreQuery({
-      options: reportedMediaQueryOptions(),
-      apply: setReportedMedia,
-      onError: error => {
-        if (isGlobalApiError(error, 'forbidden')) {
-          return null
-        }
-        getGlobalApiErrorPayload(error)
-      }
-    })
 
   const deleteMedia = async privateId => {
     const response = await runStoreMutation({
@@ -233,33 +244,34 @@ export const useAdminStore = defineStore('admin', () => {
         }),
       onError: error => {
         if (error?.__userCancelled) {
-          return false
+          return CANCELLED
         }
       }
     })
-    if (response === false) {
-      return false
+    if (response === CANCELLED) {
+      return mutationResult({ ok: false, cancelled: true })
     }
 
     void queryCache.invalidateQueries({
       key: reportedMediaQueryOptions().key,
       exact: true
     })
-    setReportedMedia([])
-    await loadReportedMedia()
-    return true
+    return mutationResult({ ok: true })
   }
 
   return {
     users,
     jobs,
     reportedMedia,
-    loadUsers,
-    loadJobs,
+    useUsersQuery,
+    useJobsQuery,
+    useReportedMediaQuery,
+    usersQueryOptions,
+    jobsQueryOptions,
+    reportedMediaQueryOptions,
     runJobAction,
     deleteUser,
     approveUser,
-    loadReportedMedia,
     deleteMedia
   }
 })

@@ -30,7 +30,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAccountStore } from 'src/stores/account-store.js'
 import { useQuasar } from 'quasar'
@@ -44,7 +44,7 @@ import yahooIcon from '@assets/icons/yahoo.svg'
 const $q = useQuasar()
 const accountStore = useAccountStore()
 const route = useRoute()
-const providerKeys = ref([])
+accountStore.useProvidersQuery()
 
 const providerMap = {
   google: {
@@ -79,7 +79,7 @@ function getProviderLoginHref(providerKey) {
 }
 
 const oauthProviders = computed(() => {
-  return providerKeys.value
+  return (accountStore.providers || [])
     .map(providerKey => {
       const base = providerMap[providerKey]
       if (!base) return null
@@ -89,10 +89,6 @@ const oauthProviders = computed(() => {
       }
     })
     .filter(Boolean)
-})
-
-onMounted(async () => {
-  providerKeys.value = await accountStore.loadProviders()
 })
 </script>
 

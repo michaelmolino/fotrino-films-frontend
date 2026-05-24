@@ -175,7 +175,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useAdminStore } from 'src/stores/admin-store.js'
 import { daysSince } from '@utils/date.js'
 import { getCountry } from '@utils/countries.js'
@@ -189,7 +189,8 @@ import appleIcon from '@assets/icons/apple.svg'
 import yahooIcon from '@assets/icons/yahoo.svg'
 
 const adminStore = useAdminStore()
-const loading = ref(true)
+const usersQuery = adminStore.useUsersQuery()
+const loading = computed(() => usersQuery.isLoading.value && (adminStore.users || []).length === 0)
 const USER_FILTER_KEY = 'admin.users.filterMode'
 const USER_FILTER_VALUES = new Set(['all', 'new'])
 
@@ -235,8 +236,8 @@ watch(filterMode, value => {
 
 const approveUser = async user => {
   try {
-    const approved = await adminStore.approveUser(user.id)
-    if (approved === false) return
+    const result = await adminStore.approveUser(user.id)
+    if (result?.cancelled || result?.ok === false) return
     notifySuccess(`Approved ${user.name}. Welcome email sent.`)
   } catch (err) {
     console.error('Failed to approve user:', err)
@@ -248,8 +249,8 @@ const approveUser = async user => {
 
 const deleteUser = async user => {
   try {
-    const deleted = await adminStore.deleteUser(user.id)
-    if (deleted === false) return
+    const result = await adminStore.deleteUser(user.id)
+    if (result?.cancelled || result?.ok === false) return
     notifySuccess(`Deleted ${user.name}.`)
   } catch (err) {
     console.error('Failed to delete user:', err)
@@ -259,17 +260,16 @@ const deleteUser = async user => {
   }
 }
 
-onMounted(async () => {
-  loading.value = true
-  try {
-    await adminStore.loadUsers()
-  } catch (err) {
+watch(
+  () => usersQuery.error.value,
+  err => {
+    if (!err) {
+      return
+    }
     console.error('Failed to load users:', err)
     notifyError(getComponentApiErrorMessage(err, 'Failed to load users.'), { timeout: 0 })
-  } finally {
-    loading.value = false
   }
-})
+)
 </script>
 
 <style scoped>

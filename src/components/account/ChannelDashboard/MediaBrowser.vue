@@ -89,8 +89,8 @@ function getMediaLink(type, id) {
 
 async function deleteResource(type, id) {
   try {
-    const deleted = await channelStore.deleteResource({ type, id })
-    if (deleted === false) return
+    const result = await channelStore.deleteResource({ type, id })
+    if (result?.cancelled || result?.ok === false) return
     notifySuccess('Deletion queued.')
   } catch (error) {
     notifyError(getComponentApiErrorMessage(error, 'Unable to delete this resource.'), {
@@ -142,7 +142,6 @@ async function abortPendingMedia(mediaId) {
 
   try {
     await channelStore.abortUpload(mediaId)
-    await channelStore.loadChannels(true)
     notifySuccess('Pending upload aborted.')
   } catch (error) {
     if (error?.__userCancelled || error?.code === 'ERR_CANCELED') {
@@ -165,7 +164,8 @@ async function runEditJourney({
 }) {
   try {
     if (upload?.shouldUpload) {
-      const instruction = await upload.prepare(upload.preparePayload)
+      const prepareResult = await upload.prepare(upload.preparePayload)
+      const instruction = prepareResult?.data
       if (!instruction?.objectName || instruction?.reference == null) {
         throw new Error('Invalid upload instruction returned by backend.')
       }
@@ -197,7 +197,6 @@ async function runEditJourney({
       await update(updatePayload)
     }
 
-    await channelStore.loadChannels(true)
     notifySuccess(successMessage)
   } catch (error) {
     notifyError(getComponentApiErrorMessage(error, errorMessage), { timeout: 0 })

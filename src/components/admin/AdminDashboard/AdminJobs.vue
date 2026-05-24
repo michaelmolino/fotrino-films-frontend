@@ -79,14 +79,13 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { Notify } from 'quasar'
 import { useAdminStore } from 'src/stores/admin-store.js'
 import { daysSince } from '@utils/date.js'
 import { getComponentApiErrorMessage } from 'src/utils/api-errors.js'
 
 const adminStore = useAdminStore()
-const loading = ref(true)
 const JOB_FILTER_KEY = 'admin.jobs.filterMode'
 const JOB_FILTER_VALUES = new Set(['all', 'todo', 'doing', 'failed'])
 
@@ -99,7 +98,9 @@ function getInitialJobFilterMode() {
 }
 
 const filterMode = ref(getInitialJobFilterMode())
+const jobsQuery = adminStore.useJobsQuery()
 const jobs = computed(() => adminStore.jobs || [])
+const loading = computed(() => jobsQuery.isLoading.value && jobs.value.length === 0)
 
 const FILTER_STATUSES = [
   { value: 'todo', label: 'Pending' },
@@ -191,7 +192,8 @@ function pretty(obj) {
 
 async function runAction(job) {
   try {
-    const action = await adminStore.runJobAction(job)
+    const result = await adminStore.runJobAction(job)
+    const action = result?.data
     Notify.create({
       type: 'positive',
       message:
@@ -211,11 +213,12 @@ async function runAction(job) {
   }
 }
 
-onMounted(async () => {
-  loading.value = true
-  try {
-    await adminStore.loadJobs()
-  } catch (err) {
+watch(
+  () => jobsQuery.error.value,
+  err => {
+    if (!err) {
+      return
+    }
     console.error('Failed to load jobs:', err)
     Notify.create({
       type: 'negative',
@@ -224,8 +227,6 @@ onMounted(async () => {
       timeout: 0,
       actions: [{ label: 'Dismiss', color: 'white' }]
     })
-  } finally {
-    loading.value = false
   }
-})
+)
 </script>

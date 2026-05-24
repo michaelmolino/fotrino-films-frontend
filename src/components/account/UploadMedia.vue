@@ -214,6 +214,7 @@ const IMAGE_RESOURCE_TYPES = new Set(['cover', 'poster', 'preview'])
 const accountStore = useAccountStore()
 const channelStore = useChannelStore()
 const route = useRoute()
+const channelsQuery = channelStore.useChannelsQuery(true)
 const step = ref(1)
 const stepper = ref(null)
 const albums = ref([])
@@ -505,7 +506,7 @@ const isNewUserProfile = computed(() => {
   }
   return profile.value.newUser === true
 })
-const channels = computed(() => channelStore.channels)
+const channels = computed(() => channelsQuery.data.value || [])
 const albumsById = computed(() => {
   const map = {}
   for (const item of albums.value || []) {
@@ -815,11 +816,11 @@ async function loadAlbumsForChannelUuid(publicId, requestToken = albumsLoadToken
     }
 
     // Avoid cache key collisions between pending/non-pending variants.
-    let chan = await channelStore.loadChannel({ channelId: publicId, pending: true, cache: false })
+    let chan = await channelStore.fetchChannel({ channelId: publicId, pending: true, cache: false })
     let albumList = Array.isArray(chan?.albums) ? chan.albums : []
 
     if (albumList.length === 0) {
-      chan = await channelStore.loadChannel({ channelId: publicId, pending: false, cache: false })
+      chan = await channelStore.fetchChannel({ channelId: publicId, pending: false, cache: false })
       albumList = Array.isArray(chan?.albums) ? chan.albums : []
     }
 
@@ -844,8 +845,8 @@ const beforeUnloadHandler = event => {
 }
 
 onMounted(async () => {
-  await channelStore.loadChannels(true)
-  const list = channelStore.channels || []
+  await channelsQuery.refresh()
+  const list = channels.value || []
   if (list.length === 1) {
     const requestToken = ++albumsLoadToken.value
     await loadAlbumsForChannelUuid(list[0].publicId, requestToken)

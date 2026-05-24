@@ -64,39 +64,16 @@
 import { useAccountStore } from 'src/stores/account-store.js'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
-import { ref, watch, onMounted } from 'vue'
 
 const $q = useQuasar()
 const accountStore = useAccountStore()
 const router = useRouter()
-const providers = ref([])
-
-async function fetchProviders() {
-  providers.value = await accountStore.loadProviders()
-}
 
 // Define props explicitly
-const props = defineProps({
+defineProps({
   profile: {
     type: Object,
     required: true
-  }
-})
-
-// Watch for changes in the profile prop
-watch(
-  () => props.profile,
-  newProfile => {
-    if (!newProfile) {
-      fetchProviders()
-    }
-  }
-)
-
-// Fetch providers on mount if not logged in
-onMounted(() => {
-  if (!props.profile) {
-    fetchProviders()
   }
 })
 
