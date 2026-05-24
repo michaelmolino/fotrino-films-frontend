@@ -69,7 +69,7 @@ export const useUploadStore = defineStore('upload', () => {
     const postUploadDraft = async payload => {
         const response = await runStoreMutation({
             request: () =>
-                api.post('/channels/media/draft', payload, {
+                api.post('/uploads/media/draft', payload, {
                     __skipGlobalErrorNotify: true,
                     headers: {
                         'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ export const useUploadStore = defineStore('upload', () => {
     const confirmUpload = async media => {
         await runStoreMutation({
             request: () =>
-                api.put(`/channels/media/confirm/${media}`, null, {
+                api.put(`/uploads/media/confirm/${media}`, null, {
                     __skipGlobalErrorNotify: true
                 })
         })
@@ -106,7 +106,7 @@ export const useUploadStore = defineStore('upload', () => {
     const abortUpload = async mediaId => {
         const response = await runStoreMutation({
             request: () =>
-                api.delete(`/channels/media/${mediaId}/abort`, {
+                api.delete(`/uploads/media/${mediaId}/abort`, {
                     __skipGlobalErrorNotify: true
                 }),
             onError: error => {
@@ -126,13 +126,13 @@ export const useUploadStore = defineStore('upload', () => {
     }
 
     const requestMediaPreviewUpload = ({ mediaId }) =>
-        requestUploadInstruction(`/channels/media/${mediaId}/preview`)
+        requestUploadInstruction(`/uploads/media/${mediaId}/preview`)
 
     const requestAlbumPosterUpload = ({ albumId }) =>
-        requestUploadInstruction(`/channels/album/${albumId}/poster`)
+        requestUploadInstruction(`/uploads/album/${albumId}/poster`)
 
     const requestChannelCoverUpload = ({ channelPublicId }) =>
-        requestUploadInstruction(`/channels/${channelPublicId}/cover`)
+        requestUploadInstruction(`/uploads/${channelPublicId}/cover`)
 
     const confirmMediaPreviewUpload = async ({
         mediaId,
@@ -145,7 +145,7 @@ export const useUploadStore = defineStore('upload', () => {
         const response = await runStoreMutation({
             request: () =>
                 api.put(
-                    `/channels/media/${mediaId}/preview/confirm`,
+                    `/uploads/media/${mediaId}/preview/confirm`,
                     {
                         objectName,
                         title: title?.trim(),
@@ -172,7 +172,7 @@ export const useUploadStore = defineStore('upload', () => {
         const response = await runStoreMutation({
             request: () =>
                 api.put(
-                    `/channels/album/${albumId}/poster/confirm`,
+                    `/uploads/album/${albumId}/poster/confirm`,
                     {
                         objectName,
                         title: title?.trim(),
@@ -192,7 +192,7 @@ export const useUploadStore = defineStore('upload', () => {
         const response = await runStoreMutation({
             request: () =>
                 api.put(
-                    `/channels/${channelPublicId}/cover/confirm`,
+                    `/uploads/${channelPublicId}/cover/confirm`,
                     {
                         objectName,
                         title: title?.trim()
