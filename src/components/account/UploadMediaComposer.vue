@@ -3,7 +3,6 @@
     <q-item class="q-pb-md">
       <q-item-section>
         <q-item-label class="text-h5">Upload Video</q-item-label>
-        <q-item-label caption>Composer Flow</q-item-label>
       </q-item-section>
     </q-item>
 
@@ -17,32 +16,33 @@
     </q-banner>
 
     <template v-else>
-      <q-card flat bordered class="q-mb-md">
-        <q-card-section>
-          <div class="text-subtitle2 q-mb-sm">Select Video</div>
-          <q-file
-            label="Video *"
-            outlined
-            :model-value="mediaFile"
-            accept="video/*"
-            color="accent"
-            data-cy="upload-media-file"
-            @update:model-value="onComposerMediaFileUpdate"
-            @rejected="onMediaFileRejected">
-            <template v-slot:prepend>
-              <q-icon name="movie" @click.stop.prevent />
-            </template>
-            <template v-slot:append>
-              <q-icon
-                name="close"
-                @click.stop.prevent="onComposerMediaFileUpdate(null)"
-                class="cursor-pointer" />
-            </template>
-          </q-file>
-        </q-card-section>
-      </q-card>
+      <template v-if="uploadPhase === 'editing'">
+        <q-card flat bordered class="q-mb-md">
+          <q-card-section>
+            <div class="text-subtitle2 q-mb-sm">Select Video</div>
+            <q-file
+              label="Video *"
+              outlined
+              :model-value="mediaFile"
+              accept="video/*"
+              color="accent"
+              data-cy="upload-media-file"
+              @update:model-value="onComposerMediaFileUpdate"
+              @rejected="onMediaFileRejected">
+              <template v-slot:prepend>
+                <q-icon name="movie" @click.stop.prevent />
+              </template>
+              <template v-slot:append>
+                <q-icon
+                  name="close"
+                  @click.stop.prevent="onComposerMediaFileUpdate(null)"
+                  class="cursor-pointer" />
+              </template>
+            </q-file>
+          </q-card-section>
+        </q-card>
 
-      <div class="composer-grid">
+        <div class="composer-grid">
         <q-card flat bordered class="q-pa-sm composer-summary-card">
           <q-card-section>
             <div class="text-subtitle1 q-mb-sm row items-center no-wrap q-gutter-xs">
@@ -575,28 +575,53 @@
             </div>
           </q-card-section>
         </q-card>
-      </div>
+        </div>
+      </template>
 
-      <q-banner v-if="uploadPhase === 'uploading'" rounded class="bg-grey-1 text-grey-9 q-mt-md">
-        <div class="row items-center no-wrap q-gutter-md">
-          <q-circular-progress
-            :indeterminate="progress === -1"
-            :value="progress"
-            size="52px"
-            color="accent"
-            track-color="grey-3"
-            show-value />
-          <div>
-            <div class="text-subtitle2">{{ media.title || 'Uploading media' }}</div>
-            <div class="text-caption">{{ statusText }}</div>
+      <div v-else class="composer-upload-focus" data-cy="upload-progress-overlay">
+        <div
+          class="composer-upload-preview-shell"
+          :class="{ 'is-featured': payload.album?.media?.main }">
+          <MediaPreview
+            :media="media"
+            :album="album"
+            :detail="false"
+            :interactive="false"
+            class="composer-upload-preview" />
+          <div class="composer-upload-overlay">
+            <template v-if="uploadPhase === 'uploading'">
+              <q-circular-progress
+                :indeterminate="progress === -1"
+                :value="progress"
+                size="80px"
+                color="accent"
+                track-color="transparent"
+                show-value
+                class="composer-upload-spinner" />
+              <div class="composer-upload-title q-mt-md">{{ media.title || 'Uploading media' }}</div>
+              <div class="composer-upload-status q-mt-sm">{{ statusText }}</div>
+            </template>
+            <q-icon v-else name="check_circle" size="84px" color="positive" />
           </div>
         </div>
-      </q-banner>
-
-      <q-banner v-if="uploadPhase === 'complete'" rounded class="bg-green-1 text-green-10 q-mt-md">
-        <div class="text-subtitle2">Upload complete</div>
-        <div>{{ media.title }} was uploaded successfully. We will email you when your video is live.</div>
-      </q-banner>
+        <div
+          v-if="uploadPhase === 'uploading'"
+          class="row q-col-gutter-sm items-center justify-center q-mt-md composer-upload-actions">
+          <div class="col-auto" v-if="isUploading">
+            <q-spinner-hourglass color="accent" size="1.35rem" />
+          </div>
+          <div class="col-auto" v-if="isUploading">
+            <q-btn flat icon="cancel" color="negative" label="Cancel" @click="cancelUpload" />
+          </div>
+          <div class="col-auto" v-else>
+            <q-btn flat icon="refresh" label="Retry Upload" @click="startUploadJourney" />
+          </div>
+        </div>
+        <q-banner v-else rounded class="bg-green-1 text-green-10 q-mt-md">
+          <div class="text-subtitle2">Upload complete</div>
+          <div>{{ media.title }} was uploaded successfully. We will email you when your video is live.</div>
+        </q-banner>
+      </div>
     </template>
   </div>
   <AuthRequired v-else type="login" message="Please log in to upload videos." />
@@ -1180,6 +1205,66 @@ function onMediaFileRejected(rejectedEntries) {
 
 .composer-actions-card {
   grid-area: actions;
+}
+
+.composer-upload-focus {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.composer-upload-preview-shell {
+  position: relative;
+  width: 100%;
+}
+
+.composer-upload-preview-shell.is-featured {
+  padding: 8px;
+  background: var(--q-accent);
+  box-sizing: border-box;
+}
+
+.composer-upload-preview {
+  width: 100%;
+}
+
+.composer-upload-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.42);
+  color: #fff;
+  pointer-events: none;
+  text-align: center;
+}
+
+.composer-upload-spinner {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  padding: 8px;
+}
+
+.composer-upload-title {
+  font-weight: 600;
+  font-size: 1.08rem;
+  max-width: min(560px, calc(100% - 48px));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.75);
+}
+
+.composer-upload-status {
+  font-size: 0.92rem;
+  opacity: 0.95;
+  max-width: min(560px, calc(100% - 48px));
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.75);
+}
+
+.composer-upload-actions {
+  width: 100%;
 }
 
 .expansion-wrapper.is-blocked {
