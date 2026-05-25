@@ -6,26 +6,29 @@
         <span>Upload Summary</span>
       </div>
       <MediaPreview :media="media" :album="album" :detail="isCompletePhase" />
-      <div class="summary-description-box q-mt-sm" :class="descriptionBoxClass">
+      <div class="summary-description-box q-mt-sm">
         <div class="text-caption text-grey-7 q-mb-xs">Description</div>
         <div
           v-if="hasSummaryDescription"
           class="summary-description-text"
           v-html="summaryDescriptionHtml"></div>
-        <p v-else class="summary-description-text">No description added yet.</p>
       </div>
       <q-list dense class="q-mt-md">
         <q-item>
           <q-item-section avatar class="summary-resource-avatar">
-            <q-icon
-              v-if="isVideoSummaryReady"
-              name="movie"
-              size="22px"
-              :color="videoIndicatorColor" />
+            <q-avatar v-if="isVideoSummaryReady" size="26px" class="summary-step-avatar">
+              <q-img
+                v-if="videoSummaryPreviewSrc"
+                :src="videoSummaryPreviewSrc"
+                fit="cover"
+                loading="lazy"
+                decoding="async" />
+              <q-icon v-else name="movie" size="14px" :color="iconColorOnSurface" />
+            </q-avatar>
             <span v-else class="summary-step-dot text-grey-6" aria-hidden="true" />
           </q-item-section>
-          <q-item-section>
-            <q-item-label>Video Details</q-item-label>
+          <q-item-section class="summary-item-section">
+            <q-item-label class="summary-item-label">{{ videoSummaryLabel }}</q-item-label>
           </q-item-section>
           <q-item-section side>
             <q-badge
@@ -143,8 +146,11 @@ const props = defineProps({
 })
 
 const isCompletePhase = computed(() => props.uploadPhase === 'complete')
-const descriptionBoxClass = computed(() => ({ 'is-empty': !props.hasSummaryDescription }))
-const videoIndicatorColor = computed(() => props.videoCheckColor || props.iconColorOnSurface)
+const videoSummaryLabel = computed(() => {
+  const title = props.media?.title
+  return typeof title === 'string' && title.trim().length > 0 ? title.trim() : 'Video'
+})
+const videoSummaryPreviewSrc = computed(() => props.media?.preview || null)
 const showAlbumSubtitle = computed(() => !!props.albumSummarySubtitle)
 const albumSummaryAvatarClass = computed(() => ({
   'summary-step-swatch': !props.albumSummaryPosterSrc
@@ -179,14 +185,9 @@ const albumSummaryAvatarStyle = computed(() => {
 }
 
 .summary-description-box {
-  border: 1px solid var(--q-grey-4);
+  border: 1px solid rgba(98, 112, 127, 0.35);
   border-radius: 6px;
   padding: 8px 10px;
-}
-
-.summary-description-box.is-empty {
-  border-style: dashed;
-  border-color: rgba(98, 112, 127, 0.35);
 }
 
 .summary-description-text {
@@ -203,12 +204,9 @@ const albumSummaryAvatarStyle = computed(() => {
   margin: 0;
 }
 
-.summary-description-box.is-empty .summary-description-text {
-  color: var(--q-grey-6);
-}
-
 .summary-step-avatar {
   overflow: hidden;
+  border-radius: 50% !important;
 }
 
 .summary-step-swatch {
