@@ -12,10 +12,7 @@
         <div class="profile-info">
           <div class="profile-title-row">
             <span class="text-weight-medium text-h6 ellipsis">{{ safeName }}</span>
-            <span
-              v-if="country"
-              class="flag-emoji q-ml-sm"
-              :title="country.name">
+            <span v-if="country" class="flag-emoji q-ml-sm" :title="country.name">
               {{ country.flag }}
             </span>
           </div>

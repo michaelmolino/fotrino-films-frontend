@@ -58,8 +58,8 @@ import { getComponentApiErrorMessage } from 'src/utils/apiErrors.js'
 const adminStore = useAdminStore()
 const reportedMediaQuery = adminStore.useReportedMediaQuery()
 const loadingRows = [1, 2, 3]
-const loading = computed(() =>
-  reportedMediaQuery.isLoading.value && (adminStore.reportedMedia || []).length === 0
+const loading = computed(
+  () => reportedMediaQuery.isLoading.value && (adminStore.reportedMedia || []).length === 0
 )
 const reportedMediaColumns = [
   { name: 'createdAt', label: 'Reported', field: 'createdAt', align: 'left' },

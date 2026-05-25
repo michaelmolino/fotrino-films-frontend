@@ -10,9 +10,7 @@
         data-cy="channel-item"
         v-on="channelItemListeners" />
     </q-list>
-    <div v-if="showEmptyState" class="q-pa-md text-grey-6 text-center">
-      No channels found
-    </div>
+    <div v-if="showEmptyState" class="q-pa-md text-grey-6 text-center">No channels found</div>
   </div>
 </template>
 

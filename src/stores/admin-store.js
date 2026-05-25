@@ -49,9 +49,9 @@ export const useAdminStore = defineStore('admin', () => {
   const jobsQueryOptions = (statuses = []) => {
     const normalizedStatuses = Array.isArray(statuses)
       ? [...statuses]
-        .filter(Boolean)
-        .map(String)
-        .sort((a, b) => a.localeCompare(b))
+          .filter(Boolean)
+          .map(String)
+          .sort((a, b) => a.localeCompare(b))
       : []
 
     return {
@@ -59,8 +59,7 @@ export const useAdminStore = defineStore('admin', () => {
       staleTime: 0,
       query: async () => {
         const { data } = await api.get('/admin/jobs', {
-          params:
-            normalizedStatuses.length > 0 ? { status: normalizedStatuses } : undefined,
+          params: normalizedStatuses.length > 0 ? { status: normalizedStatuses } : undefined,
           __skipGlobalErrorNotify: true
         })
         return Array.isArray(data) ? data : []

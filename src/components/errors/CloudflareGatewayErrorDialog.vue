@@ -13,7 +13,12 @@
         <div class="text-h6 q-mb-xs">{{ titleText }}</div>
         <div class="text-body1 q-mb-md">{{ whatYouShouldDo }}</div>
 
-        <q-markup-table dense flat bordered class="cf-error-table" data-cy="cloudflare-error-details">
+        <q-markup-table
+          dense
+          flat
+          bordered
+          class="cf-error-table"
+          data-cy="cloudflare-error-details">
           <tbody>
             <tr v-for="item in detailRows" :key="item.label">
               <th scope="row" class="text-left">{{ item.label }}</th>

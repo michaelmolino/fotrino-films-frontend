@@ -161,7 +161,9 @@ defineEmits(['delete', 'edit', 'abort', 'undelete'])
 const canDelete = computed(() => !props.pending && !props.hasPendingChildren)
 const showVisitAction = computed(() => !props.pending && !props.deleted && !!props.link)
 const showUndeleteAction = computed(() => !props.pending && props.deleted && props.undeletable)
-const showDeletedDisabledAction = computed(() => !props.pending && props.deleted && !props.undeletable)
+const showDeletedDisabledAction = computed(
+  () => !props.pending && props.deleted && !props.undeletable
+)
 const showPendingAction = computed(() => !!props.pending)
 const showAbortAction = computed(() => !!props.pending && !!props.abortable)
 const showEditAction = computed(() => !!props.editable && !props.pending && !props.deleted)

@@ -1,8 +1,6 @@
 <template>
   <div class="composer-upload-focus" data-cy="upload-progress-overlay">
-    <div
-      class="composer-upload-preview-shell"
-      :class="previewShellClass">
+    <div class="composer-upload-preview-shell" :class="previewShellClass">
       <MediaPreview
         :media="media"
         :album="album"
@@ -40,7 +38,9 @@
     </div>
     <q-banner v-else rounded class="bg-green-1 text-green-10 q-mt-md">
       <div class="text-subtitle2">Upload complete</div>
-      <div>{{ media.title }} was uploaded successfully. We will email you when your video is live.</div>
+      <div>
+        {{ media.title }} was uploaded successfully. We will email you when your video is live.
+      </div>
     </q-banner>
   </div>
 </template>

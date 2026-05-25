@@ -68,14 +68,7 @@
 </template>
 
 <script setup>
-import {
-  ref,
-  defineAsyncComponent,
-  watch,
-  onMounted,
-  onBeforeUnmount,
-  nextTick
-} from 'vue'
+import { ref, defineAsyncComponent, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { getViewPreference, setViewPreference } from '@utils/viewPreference.js'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'

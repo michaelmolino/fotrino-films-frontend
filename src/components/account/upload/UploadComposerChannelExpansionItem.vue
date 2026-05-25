@@ -22,7 +22,10 @@
             <q-card-section class="row items-center q-col-gutter-sm no-wrap">
               <div class="col-auto">
                 <q-avatar size="38px">
-                  <q-img v-if="channelCard.channel.cover" :src="channelCard.channel.cover" fit="cover" />
+                  <q-img
+                    v-if="channelCard.channel.cover"
+                    :src="channelCard.channel.cover"
+                    fit="cover" />
                   <q-icon v-else name="apps" color="grey-7" />
                 </q-avatar>
               </div>
@@ -161,7 +164,8 @@ const channelCards = computed(() => {
     key: `channel-${channel.publicId}`,
     channel,
     className: {
-      'is-selected': props.payload.channelMode === 'existing' && selectedPublicId.value === channel.publicId
+      'is-selected':
+        props.payload.channelMode === 'existing' && selectedPublicId.value === channel.publicId
     }
   }))
 })
@@ -231,7 +235,9 @@ function clearChannelCoverFile() {
 
 .composer-choice-card {
   cursor: pointer;
-  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
 }
 
 .composer-choice-card:hover {

@@ -36,10 +36,7 @@
         <q-icon name="image" @click.stop.prevent />
       </template>
       <template v-slot:append>
-        <q-icon
-          name="close"
-          @click.stop.prevent="clearPreviewFile"
-          class="cursor-pointer" />
+        <q-icon name="close" @click.stop.prevent="clearPreviewFile" class="cursor-pointer" />
       </template>
     </q-file>
 

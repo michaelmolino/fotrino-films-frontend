@@ -156,4 +156,3 @@ export async function resolveHistoryFromBackend(channelStore, { force = false } 
     resolveHistoryPromise = null
   }
 }
-

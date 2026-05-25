@@ -214,7 +214,8 @@ const albumCards = computed(() => {
       backgroundColor: item.posterColor || item.poster_color || '#000000'
     },
     className: {
-      'is-selected': props.payload.album?.projectMode === 'existing' && selectedAlbumId.value === item.id
+      'is-selected':
+        props.payload.album?.projectMode === 'existing' && selectedAlbumId.value === item.id
     }
   }))
 })
@@ -304,7 +305,9 @@ function onAlbumPosterColorUpdate(value) {
 
 .composer-choice-card {
   cursor: pointer;
-  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
 }
 
 .composer-choice-card:hover {

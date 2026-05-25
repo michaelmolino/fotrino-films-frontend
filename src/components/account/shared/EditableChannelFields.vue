@@ -26,10 +26,7 @@
         <q-icon name="image" @click.stop.prevent />
       </template>
       <template v-slot:append>
-        <q-icon
-          name="close"
-          @click.stop.prevent="clearCoverFile"
-          class="cursor-pointer" />
+        <q-icon name="close" @click.stop.prevent="clearCoverFile" class="cursor-pointer" />
       </template>
     </q-file>
 

@@ -19,9 +19,7 @@
           :aria-label="`Sign in with ${provider.name}`"
           size="md"
           class="col-xs-12">
-          <q-icon
-            :name="provider.icon"
-              :class="provider.iconClass" />
+          <q-icon :name="provider.icon" :class="provider.iconClass" />
           {{ provider.name }}
         </q-btn>
       </div>
@@ -47,9 +45,7 @@ const route = useRoute()
 accountStore.useProvidersQuery()
 
 const buttonLabel = computed(() => ($q.screen.gt.sm ? 'Sign Up/Login' : ''))
-const oauthIconClass = computed(() =>
-  $q.dark.isActive ? 'oauth-icon--white q-mr-md' : 'q-mr-md'
-)
+const oauthIconClass = computed(() => ($q.dark.isActive ? 'oauth-icon--white q-mr-md' : 'q-mr-md'))
 
 const providerMap = {
   google: {

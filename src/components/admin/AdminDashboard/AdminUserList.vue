@@ -2,11 +2,7 @@
   <div>
     <div class="q-mb-md flex items-center gap-sm">
       <span class="text-body2 text-weight-medium">Filter:</span>
-      <q-option-group
-        v-model="filterMode"
-        :options="filterOptions"
-        color="primary"
-        inline />
+      <q-option-group v-model="filterMode" :options="filterOptions" color="primary" inline />
     </div>
     <div v-if="loading">
       <q-skeleton type="rect" height="40px" class="q-mb-sm" />

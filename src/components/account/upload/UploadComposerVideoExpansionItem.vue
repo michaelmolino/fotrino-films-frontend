@@ -56,17 +56,12 @@
               <q-icon name="image" @click.stop.prevent />
             </template>
             <template #append>
-              <q-icon
-                name="close"
-                @click.stop.prevent="clearMediaPreview"
-                class="cursor-pointer" />
+              <q-icon name="close" @click.stop.prevent="clearMediaPreview" class="cursor-pointer" />
             </template>
           </q-file>
 
           <div class="composer-preview-with-action">
-            <div
-              class="composer-preview-frame"
-              :class="previewFrameClass">
+            <div class="composer-preview-frame" :class="previewFrameClass">
               <MediaPreview
                 v-if="composerPreviewImage"
                 class="composer-preview-media"
@@ -74,11 +69,7 @@
                 :interactive="false"
                 :show-badges="false"
                 :show-title-overlay="false" />
-              <q-skeleton
-                v-else
-                type="rect"
-                class="composer-preview-skeleton"
-                animation="none" />
+              <q-skeleton v-else type="rect" class="composer-preview-skeleton" animation="none" />
             </div>
             <q-btn
               v-if="showRefreshThumbnail"

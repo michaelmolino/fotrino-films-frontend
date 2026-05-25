@@ -85,7 +85,7 @@
         :album="album"
         :private="privateMode"
         private-scope="album" />
-      </div>
+    </div>
 
     <template v-else>
       <NothingText text="Album not found or unavailable." />

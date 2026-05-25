@@ -5,16 +5,10 @@
     data-cy="media-preview"
     :aria-label="mediaAriaLabel"
     :class="containerClasses">
-    <q-badge
-      v-if="showAudioBadge"
-      class="bg-accent q-pa-md z-top"
-      floating>
+    <q-badge v-if="showAudioBadge" class="bg-accent q-pa-md z-top" floating>
       <span class="text-bold text-white">Audio</span>
     </q-badge>
-    <q-badge
-      v-if="showPortraitBadge"
-      class="bg-info text-white q-pa-sm z-top"
-      floating>
+    <q-badge v-if="showPortraitBadge" class="bg-info text-white q-pa-sm z-top" floating>
       <q-icon name="smartphone" size="16px" />
     </q-badge>
     <q-img
@@ -29,7 +23,8 @@
       @error="onPreviewError">
       <div v-if="showTitleOverlay" class="absolute-bottom text-center">
         <div class="ellipsis">
-          <span>{{ titlePrimary }}</span><span v-if="titleSecondary"><br />{{ titleSecondary }}</span>
+          <span>{{ titlePrimary }}</span
+          ><span v-if="titleSecondary"><br />{{ titleSecondary }}</span>
         </div>
       </div>
       <template v-slot:error>
@@ -40,7 +35,8 @@
         </div>
         <div v-if="showTitleOverlay" class="absolute-bottom text-center">
           <div class="ellipsis">
-            <span>{{ titlePrimary }}</span><span v-if="titleSecondary"><br />{{ titleSecondary }}</span>
+            <span>{{ titlePrimary }}</span
+            ><span v-if="titleSecondary"><br />{{ titleSecondary }}</span>
           </div>
         </div>
       </template>
@@ -63,25 +59,17 @@ import { useWebP } from '@composables/useWebP'
 
 const previewCropPosition = '50% 28%'
 
-const {
-  media,
-  album,
-  detail,
-  showBadges,
-  showTitleOverlay,
-  interactive,
-  priority,
-  to
-} = defineProps({
-  media: { type: Object, required: true },
-  album: { type: Object, default: null },
-  detail: { type: Boolean, default: false },
-  showBadges: { type: Boolean, default: true },
-  showTitleOverlay: { type: Boolean, default: true },
-  interactive: { type: Boolean, default: true },
-  priority: { type: String, default: 'auto' }, // 'high', 'low', or 'auto'
-  to: { type: [String, Object], default: null }
-})
+const { media, album, detail, showBadges, showTitleOverlay, interactive, priority, to } =
+  defineProps({
+    media: { type: Object, required: true },
+    album: { type: Object, default: null },
+    detail: { type: Boolean, default: false },
+    showBadges: { type: Boolean, default: true },
+    showTitleOverlay: { type: Boolean, default: true },
+    interactive: { type: Boolean, default: true },
+    priority: { type: String, default: 'auto' }, // 'high', 'low', or 'auto'
+    to: { type: [String, Object], default: null }
+  })
 
 const containerClasses = computed(() => [
   interactive ? 'fit width720' : 'full-fit',
@@ -96,7 +84,9 @@ const rootBindings = computed(() =>
 const mediaAriaLabel = computed(() => `View ${media.title}`)
 const isAudio = computed(() => media.type?.startsWith('audio/'))
 const showAudioBadge = computed(() => showBadges && isAudio.value)
-const showPortraitBadge = computed(() => showBadges && media.orientation === 'portrait' && !isAudio.value)
+const showPortraitBadge = computed(
+  () => showBadges && media.orientation === 'portrait' && !isAudio.value
+)
 const imageLoadingMode = computed(() => (priority === 'high' ? 'eager' : 'lazy'))
 const titlePrimary = computed(() => media.title)
 const titleSecondary = computed(() => {

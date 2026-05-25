@@ -5,13 +5,8 @@
         <q-icon name="cloud_upload" size="18px" color="grey-8" />
         <span>Upload Summary</span>
       </div>
-      <MediaPreview
-        :media="media"
-        :album="album"
-        :detail="isCompletePhase" />
-      <div
-        class="summary-description-box q-mt-sm"
-        :class="descriptionBoxClass">
+      <MediaPreview :media="media" :album="album" :detail="isCompletePhase" />
+      <div class="summary-description-box q-mt-sm" :class="descriptionBoxClass">
         <div class="text-caption text-grey-7 q-mb-xs">Description</div>
         <div
           v-if="hasSummaryDescription"
@@ -151,7 +146,9 @@ const isCompletePhase = computed(() => props.uploadPhase === 'complete')
 const descriptionBoxClass = computed(() => ({ 'is-empty': !props.hasSummaryDescription }))
 const videoIndicatorColor = computed(() => props.videoCheckColor || props.iconColorOnSurface)
 const showAlbumSubtitle = computed(() => !!props.albumSummarySubtitle)
-const albumSummaryAvatarClass = computed(() => ({ 'summary-step-swatch': !props.albumSummaryPosterSrc }))
+const albumSummaryAvatarClass = computed(() => ({
+  'summary-step-swatch': !props.albumSummaryPosterSrc
+}))
 const albumSummaryAvatarStyle = computed(() => {
   if (props.albumSummaryPosterSrc) {
     return undefined

@@ -22,9 +22,7 @@ const sharedSortedAllMedia = computed(() => {
 const sharedAlbumsByPublicId = computed(
   () => sharedReadModel.value?.entities?.albumsByPublicId || {}
 )
-const sharedMediaByPublicId = computed(
-  () => sharedReadModel.value?.entities?.mediaByPublicId || {}
-)
+const sharedMediaByPublicId = computed(() => sharedReadModel.value?.entities?.mediaByPublicId || {})
 const sharedHydratedAlbumsByPublicId = computed(() => {
   const map = {}
   for (const album of sharedChannel.value?.albums || []) {

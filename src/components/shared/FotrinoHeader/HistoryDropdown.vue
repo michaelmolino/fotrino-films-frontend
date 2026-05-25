@@ -8,10 +8,7 @@
     no-caps
     size="md"
     content-class="my-history-dropdown-menu">
-    <div
-      v-for="entry in historyEntries"
-      :key="entry.key"
-      class="row">
+    <div v-for="entry in historyEntries" :key="entry.key" class="row">
       <q-btn
         :icon="entry.icon"
         align="left"
@@ -40,11 +37,7 @@
 import { computed, onMounted } from 'vue'
 import { Notify, useQuasar } from 'quasar'
 import { useChannelStore } from 'src/stores/channel-store.js'
-import {
-  historyChannels,
-  removeHistory,
-  resolveHistoryFromBackend
-} from '@utils/history.js'
+import { historyChannels, removeHistory, resolveHistoryFromBackend } from '@utils/history.js'
 
 const channelStore = useChannelStore()
 const $q = useQuasar()

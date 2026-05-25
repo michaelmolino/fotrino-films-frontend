@@ -126,33 +126,33 @@
               @album-poster-type-update="onComposerAlbumPosterTypeUpdate"
               @album-poster-file-update="onComposerAlbumPosterFileUpdate"
               @album-poster-color-update="onComposerAlbumPosterColorUpdate"
-                @update:album-color-dialog="onAlbumColorDialogUpdate" />
+              @update:album-color-dialog="onAlbumColorDialogUpdate" />
           </div>
 
-        <q-card flat bordered class="composer-actions-card">
-          <q-card-section>
-            <div class="row q-col-gutter-sm items-center">
-              <div class="col-auto" v-if="uploadPhase === 'editing'">
-                <q-btn
-                  color="primary"
-                  icon="cloud_upload"
-                  label="Upload Now"
-                  data-cy="upload-submit-button"
-                  :disable="!isReadyToUpload"
-                  @click="startUploadJourney" />
+          <q-card flat bordered class="composer-actions-card">
+            <q-card-section>
+              <div class="row q-col-gutter-sm items-center">
+                <div class="col-auto" v-if="uploadPhase === 'editing'">
+                  <q-btn
+                    color="primary"
+                    icon="cloud_upload"
+                    label="Upload Now"
+                    data-cy="upload-submit-button"
+                    :disable="!isReadyToUpload"
+                    @click="startUploadJourney" />
+                </div>
+                <div class="col-auto" v-if="uploadPhase === 'uploading' && isUploading">
+                  <q-btn flat icon="cancel" color="negative" label="Cancel" @click="cancelUpload" />
+                </div>
+                <div class="col-auto" v-if="uploadPhase === 'uploading' && !isUploading">
+                  <q-btn flat icon="refresh" label="Retry Upload" @click="startUploadJourney" />
+                </div>
+                <div class="col-auto" v-if="uploadPhase === 'complete'">
+                  <q-btn flat icon="add" label="Start Another Upload" @click="resetUploadFlow" />
+                </div>
               </div>
-              <div class="col-auto" v-if="uploadPhase === 'uploading' && isUploading">
-                <q-btn flat icon="cancel" color="negative" label="Cancel" @click="cancelUpload" />
-              </div>
-              <div class="col-auto" v-if="uploadPhase === 'uploading' && !isUploading">
-                <q-btn flat icon="refresh" label="Retry Upload" @click="startUploadJourney" />
-              </div>
-              <div class="col-auto" v-if="uploadPhase === 'complete'">
-                <q-btn flat icon="add" label="Start Another Upload" @click="resetUploadFlow" />
-              </div>
-            </div>
-          </q-card-section>
-        </q-card>
+            </q-card-section>
+          </q-card>
         </div>
       </template>
 
@@ -199,7 +199,7 @@ const flatAccentBtnStyle = computed(() =>
   $q.dark.isActive ? { background: 'rgba(255, 248, 220, 0.88)', borderRadius: '4px' } : undefined
 )
 
-  const {
+const {
   payload,
   profile,
   isNewUserProfile,
@@ -432,7 +432,9 @@ const albumCompletionSource = computed(() => {
   return 'user'
 })
 
-const videoCheckColor = computed(() => (videoCompletionSource.value === 'user' ? 'info' : undefined))
+const videoCheckColor = computed(() =>
+  videoCompletionSource.value === 'user' ? 'info' : undefined
+)
 const summaryDescriptionRaw = computed(() => media.value?.description || '')
 const summaryDescriptionHtml = computed(() => sanitizeHtml(summaryDescriptionRaw.value))
 const summaryDescriptionText = computed(() => sanitizeText(summaryDescriptionRaw.value).trim())
@@ -630,7 +632,10 @@ function onComposerAlbumTitleUpdate(value) {
 }
 
 function restoreDefaultAlbumTitle() {
-  if (payload.album?.projectMode === 'create' && (!payload.album?.title || payload.album.title.trim() === '')) {
+  if (
+    payload.album?.projectMode === 'create' &&
+    (!payload.album?.title || payload.album.title.trim() === '')
+  ) {
     onAlbumStepPayloadUpdate({
       ...payload,
       album: {
