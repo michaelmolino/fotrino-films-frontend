@@ -142,11 +142,11 @@ export type Main2 = boolean
 export type Resourcedate = string
 export type Title7 = string
 export type Description1 = string | null
-export type Filename = string
+export type Filename = string | null
 export type Main3 = boolean
 export type Mode = 'frame' | 'upload'
 export type Resourcedate1 = string
-export type Title8 = string
+export type Title8 = string | null
 export type Error8 = 'not_found'
 export type Message5 = string | null
 export type Status6 = 404
@@ -207,21 +207,26 @@ export type Reference = number
 export type Requiredresources = ('cover' | 'poster' | 'preview' | 'upload')[]
 export type Resourcetype = 'cover' | 'poster' | 'preview' | 'upload'
 export type Url = string
-export type Channel2 = ExistingChannelSelection | CreateChannelSelection
+export type Channel2 =
+  | ExistingChannelSelection
+  | CreateChannelSelection
+  | UnselectedChannelSelection
 export type Mode1 = 'existing'
 export type Publicid8 = string
 export type Mode2 = 'profile' | 'upload'
 export type Mode3 = 'create'
-export type Title11 = string
+export type Title11 = string | null
+export type Mode4 = 'unselected'
 export type Idempotencykey = string | null
-export type Project = ExistingProjectSelection | CreateProjectSelection
+export type Project = ExistingProjectSelection | CreateProjectSelection | UnselectedProjectSelection
 export type Id9 = number
-export type Mode4 = 'existing'
-export type Mode5 = 'create'
+export type Mode5 = 'existing'
+export type Mode6 = 'create'
 export type Color = string | null
-export type Mode6 = 'color' | 'upload'
+export type Mode7 = 'color' | 'upload'
 export type Subtitle2 = string | null
-export type Title12 = string
+export type Title12 = string | null
+export type Mode8 = 'unselected'
 export type UploadResourceType = 'cover' | 'poster' | 'preview' | 'upload'
 export type Error11 = string
 export type Error12 = string
@@ -460,11 +465,11 @@ export interface MediaUpdateRequest {
 }
 export interface MediaUploadPayload {
   description?: Description1
-  filename: Filename
+  filename?: Filename
   main?: Main3
   preview: MediaPreviewSelection
   resourceDate: Resourcedate1
-  title: Title8
+  title?: Title8
 }
 export interface MediaPreviewSelection {
   mode: Mode
@@ -560,24 +565,30 @@ export interface ExistingChannelSelection {
 export interface CreateChannelSelection {
   cover: ChannelCreateCover
   mode: Mode3
-  title: Title11
+  title?: Title11
 }
 export interface ChannelCreateCover {
   mode: Mode2
 }
-export interface ExistingProjectSelection {
-  id: Id9
+export interface UnselectedChannelSelection {
   mode: Mode4
 }
-export interface CreateProjectSelection {
+export interface ExistingProjectSelection {
+  id: Id9
   mode: Mode5
+}
+export interface CreateProjectSelection {
+  mode: Mode6
   poster: ProjectCreatePoster
   subtitle?: Subtitle2
-  title: Title12
+  title?: Title12
 }
 export interface ProjectCreatePoster {
   color?: Color
-  mode: Mode6
+  mode: Mode7
+}
+export interface UnselectedProjectSelection {
+  mode: Mode8
 }
 export interface ErrorDetailResponse1 {
   detail: Detail1
