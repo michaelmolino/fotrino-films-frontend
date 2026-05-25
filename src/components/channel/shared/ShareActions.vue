@@ -218,7 +218,7 @@ function buildMediaActions() {
       label: 'This album',
       description: 'Recipient can browse related videos in this album.',
       icon: 'folder',
-      path: privateAlbumPath.value,
+      path: privateMediaPath.value,
       cy: 'share-within-album'
     })
   }
