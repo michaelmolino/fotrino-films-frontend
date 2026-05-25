@@ -348,6 +348,7 @@ export function useUploadMediaForm() {
 
   function onMediaStepPayloadUpdate(partial) {
     Object.assign(payload.album.media, partial?.album?.media || partial?.media || {})
+    queueValidation()
   }
 
   async function onMediaStepFileUpdate(fileOrFiles) {
