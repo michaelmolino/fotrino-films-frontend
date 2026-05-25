@@ -44,7 +44,7 @@
 
         <div class="composer-grid">
           <div class="composer-summary-card q-pa-sm">
-            <UploadComposerSummary
+            <Summary
               :media="media"
               :album="album"
               :upload-phase="uploadPhase"
@@ -70,7 +70,7 @@
           </div>
 
           <div class="composer-details-pane">
-            <UploadComposerVideoExpansionItem
+            <VideoExpansionItem
               :active-section="activeSection"
               :media-file="mediaFile"
               :expansion-header-class="expansionHeaderClass"
@@ -89,7 +89,7 @@
               @media-preview-update="onComposerMediaPreviewUpdate"
               @media-refresh="onComposerMediaRefresh" />
 
-            <UploadComposerChannelExpansionItem
+            <ChannelExpansionItem
               :active-section="activeSection"
               :media-file="mediaFile"
               :expansion-header-class="expansionHeaderClass"
@@ -106,7 +106,7 @@
               @channel-cover-type-update="onComposerChannelCoverTypeUpdate"
               @channel-cover-file-update="onComposerChannelCoverFileUpdate" />
 
-            <UploadComposerProjectExpansionItem
+            <ProjectExpansionItem
               :active-section="activeSection"
               :media-file="mediaFile"
               :expansion-header-class="expansionHeaderClass"
@@ -156,7 +156,7 @@
         </div>
       </template>
 
-      <UploadComposerProgressView
+      <ProgressView
         v-else
         :upload-phase="uploadPhase"
         :payload="payload"
@@ -176,11 +176,11 @@
 import { computed, ref, watch } from 'vue'
 import { useQuasar } from 'quasar'
 import AuthRequired from '@components/shared/AuthRequired.vue'
-import UploadComposerSummary from '@components/account/upload/UploadComposerSummary.vue'
-import UploadComposerVideoExpansionItem from '@components/account/upload/UploadComposerVideoExpansionItem.vue'
-import UploadComposerChannelExpansionItem from '@components/account/upload/UploadComposerChannelExpansionItem.vue'
-import UploadComposerProjectExpansionItem from '@components/account/upload/UploadComposerProjectExpansionItem.vue'
-import UploadComposerProgressView from '@components/account/upload/UploadComposerProgressView.vue'
+import Summary from '@components/account/UploadMediaComposer/Summary.vue'
+import VideoExpansionItem from '@components/account/UploadMediaComposer/VideoExpansionItem.vue'
+import ChannelExpansionItem from '@components/account/UploadMediaComposer/ChannelExpansionItem.vue'
+import ProjectExpansionItem from '@components/account/UploadMediaComposer/ProjectExpansionItem.vue'
+import ProgressView from '@components/account/UploadMediaComposer/ProgressView.vue'
 import { useUploadMediaForm } from '@composables/useUploadMediaForm.js'
 import { daysSince } from '@utils/date.js'
 import { sanitizeHtml, sanitizeText } from '@utils/text.js'
