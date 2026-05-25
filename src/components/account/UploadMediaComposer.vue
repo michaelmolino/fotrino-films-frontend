@@ -801,5 +801,10 @@ function onMediaFileRejected(rejectedEntries) {
       'summary'
       'actions';
   }
+
+  :deep(.q-field__native),
+  :deep(.q-field__input) {
+    font-size: 16px;
+  }
 }
 </style>

@@ -16,7 +16,7 @@
       <q-list class="share-menu-list">
         <q-item class="share-menu-header" dense>
           <q-item-section>
-            <q-item-label class="share-menu-title">Share {{ shareTargetLabel }}</q-item-label>
+            <q-item-label class="share-menu-title">Share...</q-item-label>
             <q-item-label caption>Choose what people can access.</q-item-label>
           </q-item-section>
         </q-item>
@@ -101,15 +101,6 @@ const shareContext = computed(() => {
   return 'channel'
 })
 
-const shareTargetLabel = computed(() => {
-  const labels = {
-    media: 'this video',
-    album: 'this album',
-    channel: 'this channel'
-  }
-  return labels[shareContext.value]
-})
-
 const channelPath = computed(() => {
   if (!props.channel?.publicId || !props.channel?.slug) return null
   return `/c/${props.channel.publicId}/${props.channel.slug}`
@@ -173,7 +164,7 @@ function buildAlbumActions() {
     items.push({
       key: 'share-album-private',
       label: 'This album',
-      description: 'Recipient can browse videos in this album only.',
+      description: 'Recipient can browse videos from this album only.',
       icon: 'folder',
       path: privateAlbumPath.value,
       cy: 'share-only-album'
@@ -182,7 +173,7 @@ function buildAlbumActions() {
     items.push({
       key: 'share-album-public',
       label: 'This album',
-      description: 'Recipient can browse videos in this album.',
+      description: 'Recipient can only browse videos from this album.',
       icon: 'folder',
       path: albumPath.value,
       cy: 'share-only-album'
@@ -227,7 +218,7 @@ function buildMediaActions() {
       label: 'This album',
       description: 'Recipient can browse related videos in this album.',
       icon: 'folder',
-      path: privateMediaPath.value || privateAlbumPath.value,
+      path: privateAlbumPath.value,
       cy: 'share-within-album'
     })
   }

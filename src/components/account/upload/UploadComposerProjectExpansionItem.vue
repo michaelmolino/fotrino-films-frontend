@@ -63,6 +63,7 @@
             :model-value="albumTitle"
             label="Album Title *"
             data-cy="upload-album-title"
+            @clear="onAlbumTitleClear"
             @blur="onRestoreDefaultAlbumTitle"
             @update:model-value="onAlbumTitleUpdate" />
 
@@ -157,7 +158,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import AlbumPoster from '@components/channel/shared/AlbumPoster.vue'
 
 const emit = defineEmits([
@@ -203,6 +204,7 @@ const albumPosterColor = computed(() => props.payload.album?.posterColor || '#00
 const showPosterUploadInput = computed(() => posterType.value === 'new')
 const showColorAction = computed(() => posterType.value === 'default')
 const showColorDialog = computed(() => showNewAlbumForm.value && showColorAction.value)
+const skipNextRestoreOnBlur = ref(false)
 const albumCards = computed(() => {
   return (props.albums || []).map(item => ({
     key: `album-${item.id}`,
@@ -238,7 +240,15 @@ function onAlbumTitleUpdate(value) {
 }
 
 function onRestoreDefaultAlbumTitle() {
+  if (skipNextRestoreOnBlur.value) {
+    skipNextRestoreOnBlur.value = false
+    return
+  }
   emit('restore-default-album-title')
+}
+
+function onAlbumTitleClear() {
+  skipNextRestoreOnBlur.value = true
 }
 
 function onAlbumSubtitleUpdate(value) {

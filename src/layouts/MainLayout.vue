@@ -63,6 +63,12 @@ export default {
 }
 
 .bg-hero-light {
-  // TODO: Add light mode background gradients
+  background: transparent;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .bg-hero-dark::before {
+    position: absolute;
+  }
 }
 </style>

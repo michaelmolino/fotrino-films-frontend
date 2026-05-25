@@ -1,5 +1,5 @@
 <template>
-  <q-footer reveal class="bg-secondary" data-cy="app-footer">
+  <q-footer :reveal="!$q.platform.is.mobile" class="bg-secondary app-footer" data-cy="app-footer">
     <div class="row no-wrap">
       <q-btn
         flat
@@ -51,6 +51,11 @@ const showGithubText = computed(() => $q.screen.gt.xs)
 </script>
 
 <style scoped>
+.app-footer {
+  padding-bottom: env(safe-area-inset-bottom);
+  transform: translateZ(0);
+}
+
 :deep(.github-icon--white) {
   width: 20px;
   height: 20px;

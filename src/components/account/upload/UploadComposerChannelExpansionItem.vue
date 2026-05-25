@@ -60,6 +60,7 @@
             :model-value="channelTitle"
             label="Channel Title *"
             data-cy="upload-channel-title"
+            @clear="onChannelTitleClear"
             @blur="onRestoreDefaultChannelTitle"
             @update:model-value="onChannelTitleUpdate" />
 
@@ -118,7 +119,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 const emit = defineEmits([
   'section-toggle',
@@ -154,6 +155,7 @@ const showNewChannelForm = computed(() => props.payload.channelMode === 'create'
 const channelTitle = computed(() => props.payload.title)
 const coverType = computed(() => props.payload.coverType)
 const showCoverUploadInput = computed(() => coverType.value === 'new')
+const skipNextRestoreOnBlur = ref(false)
 const channelCards = computed(() => {
   return (props.channels || []).map(channel => ({
     key: `channel-${channel.publicId}`,
@@ -185,7 +187,15 @@ function onChannelTitleUpdate(value) {
 }
 
 function onRestoreDefaultChannelTitle() {
+  if (skipNextRestoreOnBlur.value) {
+    skipNextRestoreOnBlur.value = false
+    return
+  }
   emit('restore-default-channel-title')
+}
+
+function onChannelTitleClear() {
+  skipNextRestoreOnBlur.value = true
 }
 
 function onChannelCoverTypeUpdate(value) {

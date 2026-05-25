@@ -123,3 +123,12 @@ function parseResourceDate(value) {
   return new Date(year, month - 1, day)
 }
 </script>
+
+<style scoped>
+@media (max-width: 959px) {
+  :deep(.q-field__native),
+  :deep(.q-field__input) {
+    font-size: 16px;
+  }
+}
+</style>
