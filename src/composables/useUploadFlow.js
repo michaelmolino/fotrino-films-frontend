@@ -2,7 +2,7 @@ import { ref } from 'vue'
 import { useUppyPresignedUpload } from './useUppyPresignedUpload.js'
 import { usePendingUploadLock } from './usePendingUploadLock.js'
 
-export function useUploadFlow({ uploadStore, payload, stepper }) {
+export function useUploadFlow({ uploadStore, getDraftRequest, stepper }) {
   const isUploading = ref(false)
   const abortController = ref(null)
   const uploadLock = usePendingUploadLock()
@@ -30,7 +30,7 @@ export function useUploadFlow({ uploadStore, payload, stepper }) {
     isUploading.value = true
 
     try {
-      const draftResult = await uploadStore.postUploadDraft(payload)
+      const draftResult = await uploadStore.postUploadDraft(getDraftRequest())
       const uploadDraft = draftResult?.data
 
       if (abortController.value.signal.aborted) {

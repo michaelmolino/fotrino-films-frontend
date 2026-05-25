@@ -150,7 +150,7 @@ const isBlocked = computed(() => !props.mediaFile)
 const isSectionOpen = computed(() => props.activeSection === 'channel')
 const wrapperClass = computed(() => ({ 'is-blocked': isBlocked.value }))
 const selectedPublicId = computed(() => props.payload.publicId?.value)
-const showNewChannelForm = computed(() => selectedPublicId.value === 0)
+const showNewChannelForm = computed(() => props.payload.channelMode === 'create')
 const channelTitle = computed(() => props.payload.title)
 const coverType = computed(() => props.payload.coverType)
 const showCoverUploadInput = computed(() => coverType.value === 'new')
@@ -158,12 +158,14 @@ const channelCards = computed(() => {
   return (props.channels || []).map(channel => ({
     key: `channel-${channel.publicId}`,
     channel,
-    className: { 'is-selected': selectedPublicId.value === channel.publicId }
+    className: {
+      'is-selected': props.payload.channelMode === 'existing' && selectedPublicId.value === channel.publicId
+    }
   }))
 })
 const newChannelCardClass = computed(() => ({
-  'is-selected': selectedPublicId.value === 0,
-  'is-disabled': selectedPublicId.value === 0
+  'is-selected': props.payload.channelMode === 'create',
+  'is-disabled': props.payload.channelMode === 'create'
 }))
 
 function onSectionModelUpdate(value) {

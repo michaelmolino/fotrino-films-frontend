@@ -64,10 +64,10 @@ export const useUploadStore = defineStore('upload', () => {
         return mutationResult({ ok: true, data: res.data })
     }
 
-    const postUploadDraft = async payload => {
+    const postUploadDraft = async draftRequest => {
         const response = await runStoreMutation({
             request: () =>
-                api.post('/uploads/media/draft', payload, {
+                api.post('/uploads/media/drafts', draftRequest, {
                     headers: {
                         'Content-Type': 'application/json',
                         Accept: 'application/json'
@@ -86,6 +86,20 @@ export const useUploadStore = defineStore('upload', () => {
 
         setUpload(normalizedData.instructions)
         return mutationResult({ ok: true, data: normalizedData })
+    }
+
+    const validateUploadDraft = async draftRequest => {
+        const response = await runStoreMutation({
+            request: () =>
+                api.post('/uploads/media/drafts/validate', draftRequest, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json'
+                    }
+                })
+        })
+
+        return mutationResult({ ok: true, data: response?.data || { canSubmit: false, blockers: [] } })
     }
 
     const confirmUpload = async media => {
@@ -196,6 +210,7 @@ export const useUploadStore = defineStore('upload', () => {
     return {
         upload,
         postUploadDraft,
+        validateUploadDraft,
         confirmUpload,
         abortUpload,
         requestMediaPreviewUpload,

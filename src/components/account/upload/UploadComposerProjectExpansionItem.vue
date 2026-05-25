@@ -195,7 +195,7 @@ const isBlocked = computed(() => !props.mediaFile)
 const isSectionOpen = computed(() => props.activeSection === 'album')
 const wrapperClass = computed(() => ({ 'is-blocked': isBlocked.value }))
 const selectedAlbumId = computed(() => props.payload.album?.id?.value)
-const showNewAlbumForm = computed(() => selectedAlbumId.value === 0)
+const showNewAlbumForm = computed(() => props.payload.album?.projectMode === 'create')
 const albumTitle = computed(() => props.payload.album?.title)
 const albumSubtitle = computed(() => props.payload.album?.subtitle)
 const posterType = computed(() => props.payload.album?.posterType)
@@ -211,12 +211,14 @@ const albumCards = computed(() => {
     fallbackSwatchStyle: {
       backgroundColor: item.posterColor || item.poster_color || '#000000'
     },
-    className: { 'is-selected': selectedAlbumId.value === item.id }
+    className: {
+      'is-selected': props.payload.album?.projectMode === 'existing' && selectedAlbumId.value === item.id
+    }
   }))
 })
 const newAlbumCardClass = computed(() => ({
-  'is-selected': selectedAlbumId.value === 0,
-  'is-disabled': selectedAlbumId.value === 0
+  'is-selected': props.payload.album?.projectMode === 'create',
+  'is-disabled': props.payload.album?.projectMode === 'create'
 }))
 
 function onSectionModelUpdate(value) {

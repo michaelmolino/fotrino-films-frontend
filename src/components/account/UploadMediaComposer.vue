@@ -262,11 +262,10 @@ const videoCompletionSource = computed(() => {
 })
 
 const channelSummaryLabel = computed(() => {
-  const selectedPublicId = payload.publicId?.value
-  if (selectedPublicId == null) {
+  if (payload.channelMode === 'unselected') {
     return 'Channel'
   }
-  if (selectedPublicId === 0) {
+  if (payload.channelMode === 'create') {
     return payload.title || 'My Channel'
   }
   return payload.publicId?.label || 'Channel'
@@ -287,36 +286,33 @@ const channelSummaryAvatarSrc = computed(() => {
     return null
   }
 
-  const selectedPublicId = payload.publicId?.value
-  if (selectedPublicId == null) {
+  if (payload.channelMode === 'unselected') {
     return null
   }
 
-  if (selectedPublicId === 0) {
+  if (payload.channelMode === 'create') {
     return payload.coverType === 'new' ? coverThumb.value : profile.value?.avatar || null
   }
 
-  return channelCoverByPublicId.value[selectedPublicId] || null
+  return channelCoverByPublicId.value[payload.publicId?.value] || null
 })
 
 const albumSummaryLabel = computed(() => {
-  const selectedAlbumId = payload.album?.id?.value
-  if (selectedAlbumId == null) {
+  if (payload.album?.projectMode === 'unselected') {
     return 'Album'
   }
-  if (selectedAlbumId === 0) {
+  if (payload.album.projectMode === 'create') {
     return payload.album?.title || 'My Videos'
   }
   return payload.album?.id?.label || 'Album'
 })
 
 const albumSummarySubtitle = computed(() => {
-  const selectedAlbumId = payload.album?.id?.value
-  if (selectedAlbumId == null) {
+  if (payload.album?.projectMode === 'unselected') {
     return ''
   }
 
-  if (selectedAlbumId === 0) {
+  if (payload.album.projectMode === 'create') {
     return payload.album?.subtitle || ''
   }
 
@@ -335,7 +331,7 @@ const albumSummaryPosterColor = computed(() => {
     return '#000000'
   }
 
-  if (payload.album?.id?.value === 0) {
+  if (payload.album?.projectMode === 'create') {
     return payload.album?.posterColor || '#000000'
   }
 
@@ -357,9 +353,8 @@ const contentState = computed(() => {
 
 const isChannelAutoDefault = computed(() => {
   const channelList = channels.value || []
-  const selectedPublicId = payload.publicId?.value
 
-  if (selectedPublicId === 0) {
+  if (payload.channelMode === 'create') {
     return (
       (payload.title || 'My Channel') === 'My Channel' &&
       payload.coverType === 'profile' &&
@@ -376,7 +371,7 @@ const isChannelAutoDefault = computed(() => {
   }
 
   if (channelList.length === 1) {
-    return selectedPublicId === channelList[0].publicId
+    return payload.channelMode === 'existing' && payload.publicId?.value === channelList[0].publicId
   }
 
   return false
@@ -396,10 +391,9 @@ const channelCompletionSource = computed(() => {
 
 const isAlbumAutoDefault = computed(() => {
   const albumList = albums.value || []
-  const selectedAlbumId = payload.album?.id?.value
   const normalizedPosterColor = (payload.album?.posterColor || '#000000').toLowerCase()
 
-  if (selectedAlbumId === 0) {
+  if (payload.album?.projectMode === 'create') {
     const subtitle = (payload.album?.subtitle || '').trim()
     return (
       (payload.album?.title || 'My Videos') === 'My Videos' &&
@@ -420,7 +414,7 @@ const isAlbumAutoDefault = computed(() => {
   }
 
   if (albumList.length === 1) {
-    return selectedAlbumId === albumList[0].id
+    return payload.album?.projectMode === 'existing' && payload.album?.id?.value === albumList[0].id
   }
 
   return false
@@ -446,7 +440,7 @@ const hasSummaryDescription = computed(() => summaryDescriptionText.value.length
 const composerPreviewImage = computed(() => media.value?.preview || null)
 
 const channelEditorCoverSrc = computed(() => {
-  if (payload.coverType === 'new') {
+  if (payload.channelMode === 'create' && payload.coverType === 'new') {
     return coverThumb.value || null
   }
   return profile.value?.avatar || null
@@ -456,7 +450,7 @@ const albumEditorPosterSrc = computed(() => album.value?.poster || null)
 const albumEditorPosterColor = computed(() => payload.album?.posterColor || '#000000')
 const albumEditorPreview = computed(() => {
   const currentAlbum = album.value || {}
-  const isNew = payload.album?.id?.value === 0
+  const isNew = payload.album?.projectMode === 'create'
   const baseMedia = Array.isArray(currentAlbum.media) ? currentAlbum.media : []
   return {
     title: payload.album?.title || currentAlbum.title || 'My Videos',
@@ -539,6 +533,7 @@ function onComposerPreviewTypeUpdate(value) {
 function onComposerSelectExistingChannel(channel) {
   onChannelStepPayloadUpdate({
     ...payload,
+    channelMode: 'existing',
     publicId: { value: channel.publicId, label: channel.title }
   })
   activeSection.value = 'album'
@@ -547,14 +542,15 @@ function onComposerSelectExistingChannel(channel) {
 function onComposerSelectNewChannel() {
   onChannelStepPayloadUpdate({
     ...payload,
-    publicId: { value: 0, label: 'New...' },
+    channelMode: 'create',
+    publicId: null,
     title: payload.title || 'My Channel',
     coverType: payload.coverType || 'profile'
   })
 }
 
 function onComposerSelectNewChannelCard() {
-  if (payload.publicId?.value === 0) {
+  if (payload.channelMode === 'create') {
     return
   }
   onComposerSelectNewChannel()
@@ -568,7 +564,7 @@ function onComposerChannelTitleUpdate(value) {
 }
 
 function restoreDefaultChannelTitle() {
-  if (payload.publicId?.value === 0 && (!payload.title || payload.title.trim() === '')) {
+  if (payload.channelMode === 'create' && (!payload.title || payload.title.trim() === '')) {
     onChannelStepPayloadUpdate({
       ...payload,
       title: 'My Channel'
@@ -597,6 +593,7 @@ function onComposerSelectExistingAlbum(selectedAlbum) {
     ...payload,
     album: {
       ...payload.album,
+      projectMode: 'existing',
       id: { value: selectedAlbum.id, label: selectedAlbum.title }
     }
   })
@@ -607,7 +604,8 @@ function onComposerSelectNewAlbum() {
     ...payload,
     album: {
       ...payload.album,
-      id: { value: 0, label: 'New...' },
+      projectMode: 'create',
+      id: null,
       title: payload.album?.title || 'My Videos',
       posterType: payload.album?.posterType || 'default'
     }
@@ -615,7 +613,7 @@ function onComposerSelectNewAlbum() {
 }
 
 function onComposerSelectNewAlbumCard() {
-  if (payload.album?.id?.value === 0) {
+  if (payload.album?.projectMode === 'create') {
     return
   }
   onComposerSelectNewAlbum()
@@ -632,7 +630,7 @@ function onComposerAlbumTitleUpdate(value) {
 }
 
 function restoreDefaultAlbumTitle() {
-  if (payload.album?.id?.value === 0 && (!payload.album?.title || payload.album.title.trim() === '')) {
+  if (payload.album?.projectMode === 'create' && (!payload.album?.title || payload.album.title.trim() === '')) {
     onAlbumStepPayloadUpdate({
       ...payload,
       album: {

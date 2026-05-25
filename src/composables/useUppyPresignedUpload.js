@@ -11,7 +11,7 @@ import { useAccountStore } from 'src/stores/account-store'
 export function useUppyPresignedUpload() {
   const accountStore = useAccountStore()
   const progress = ref(0)
-  const statusText = ref(null)
+  const statusText = ref('')
   const uppy = shallowRef(null)
   const client = shallowRef(null)
   const uploadInstructions = ref([])

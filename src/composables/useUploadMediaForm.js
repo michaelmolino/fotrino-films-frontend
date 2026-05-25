@@ -22,15 +22,22 @@ function createUploadIdempotencyKey() {
 
 function createInitialPayload() {
     return {
+        channelMode: 'unselected',
         publicId: null,
         idempotencyKey: createUploadIdempotencyKey(),
         coverType: 'profile',
         title: 'My Channel',
         album: {
+            projectMode: 'unselected',
             id: null,
             posterType: 'default',
+            posterColor: '#000000',
             title: 'My Videos',
+            subtitle: null,
             media: {
+                filename: null,
+                title: null,
+                description: null,
                 main: false,
                 previewType: 'frame',
                 resourceDate: new Date().toISOString().split('T')[0]
@@ -65,6 +72,12 @@ export function useUploadMediaForm() {
     const extractingFrame = ref(false)
     const frameExtractionToken = ref(0)
     const uploadTriggered = ref(false)
+    const channelsHydrated = ref(false)
+    const validation = ref({ canSubmit: false, blockers: [] })
+    let validationInFlightPromise = null
+    let validationInFlightKey = ''
+    let lastValidationKey = ''
+    const validationQueued = ref(false)
     let dismissUploadErrorNotify = null
 
     const uploadPhaseStepper = ref({
@@ -75,15 +88,93 @@ export function useUploadMediaForm() {
 
     const { compressImageFile } = useImageFileProcessor()
     const { getRandomFrameFromFile, disposeFrameSession } = useVideoThumbnailProcessor()
-    const {
-        factoryUpload,
-        cancel: cancelUploadInternal,
-        progress,
-        statusText,
-        isUploading
-    } = useUploadFlow({
+
+    function buildChannelSelection() {
+        if (payload.channelMode === 'create') {
+            const coverMode = payload.coverType === 'new' ? 'upload' : 'profile'
+            return {
+                mode: 'create',
+                title: payload.title,
+                cover: {
+                    mode: coverMode
+                }
+            }
+        }
+
+        if (payload.channelMode === 'existing') {
+            const publicId = payload.publicId?.value || null
+            return {
+                mode: 'existing',
+                publicId
+            }
+        }
+
+        return {
+            mode: 'unselected'
+        }
+    }
+
+    function buildProjectSelection() {
+        if (payload.album.projectMode === 'create') {
+            const posterMode = payload.album.posterType === 'new' ? 'upload' : 'color'
+            const posterColor = payload.album.posterColor || '#000000'
+            return {
+                mode: 'create',
+                title: payload.album.title,
+                subtitle: payload.album.subtitle,
+                poster: {
+                    mode: posterMode,
+                    color: posterColor
+                }
+            }
+        }
+
+        if (payload.album.projectMode === 'existing') {
+            return {
+                mode: 'existing',
+                id: payload.album.id?.value ?? null
+            }
+        }
+
+        return {
+            mode: 'unselected'
+        }
+    }
+
+    function buildDraftRequest() {
+        const channel = buildChannelSelection()
+        const project = buildProjectSelection()
+
+        return {
+            idempotencyKey: payload.idempotencyKey,
+            channel,
+            project,
+            media: {
+                filename: payload.album.media.filename,
+                title: payload.album.media.title,
+                description: payload.album.media.description,
+                main: !!payload.album.media.main,
+                preview: {
+                    mode: payload.album.media.previewType === 'new' ? 'upload' : 'frame'
+                },
+                resourceDate: payload.album.media.resourceDate
+            },
+            files: {
+                upload: !!mediaFile.value,
+                preview: payload.album.media.previewType === 'new' ? !!previewFile.value : !!previewThumbRandom.value,
+                cover:
+                    payload.channelMode === 'create' && payload.coverType === 'new' ? !!coverFile.value : false,
+                poster:
+                    payload.album.projectMode === 'create' && payload.album.posterType === 'new'
+                        ? !!posterFile.value
+                        : false
+            }
+        }
+    }
+
+    const { factoryUpload, cancel: cancelUploadInternal, progress, statusText, isUploading } = useUploadFlow({
         uploadStore,
-        payload,
+        getDraftRequest: buildDraftRequest,
         stepper: uploadPhaseStepper
     })
 
@@ -123,17 +214,17 @@ export function useUploadMediaForm() {
     })
 
     const album = computed(() => {
-        if (payload.album.id?.value && payload.album.id.value !== 0) {
+        if (payload.album.projectMode === 'existing' && payload.album.id?.value) {
             return albumsById.value[payload.album.id.value]
         }
 
-        const poster =
-            payload.album.id?.value === 0 && payload.album.posterType === 'new' ? posterThumb.value : null
+        const poster = payload.album.projectMode === 'create' && payload.album.posterType === 'new' ? posterThumb.value : null
 
         return {
             title: payload.album.title,
             subtitle: payload.album.subtitle,
             poster,
+            posterColor: payload.album.posterColor,
             media: []
         }
     })
@@ -162,48 +253,21 @@ export function useUploadMediaForm() {
         }
     })
 
-    const isMediaReady = computed(() => {
-        return (
-            !!payload.album?.media?.title &&
-            !!mediaFile.value &&
-            !isPreviewProcessing.value &&
-            ((payload.album.media.previewType === 'new' && !!previewFile.value) ||
-                (payload.album.media.previewType === 'frame' && !!previewThumbRandom.value))
-        )
-    })
-
-    const isChannelReady = computed(() => {
-        return (
-            payload.publicId !== null &&
-            (!!payload.publicId?.value ||
-                (!!payload.title && (!!coverFile.value || payload.coverType === 'profile')))
-        )
-    })
-
-    const isAlbumReady = computed(() => {
-        return (
-            payload.album.id !== null &&
-            (!!payload.album.id?.value ||
-                (!!payload.album.title && (!!posterFile.value || payload.album.posterType === 'default')))
-        )
-    })
-
-    const isReadyToUpload = computed(() => {
-        return isMediaReady.value && isChannelReady.value && isAlbumReady.value
-    })
+    const isMediaReady = computed(() => !validation.value.blockers.some(blocker => blocker.startsWith('media.')))
+    const isChannelReady = computed(() => !validation.value.blockers.some(blocker => blocker.startsWith('channel.')))
+    const isAlbumReady = computed(() => !validation.value.blockers.some(blocker => blocker.startsWith('project.')))
+    const isReadyToUpload = computed(
+        () => validation.value.canSubmit && !isPreviewProcessing.value && !uploadTriggered.value
+    )
 
     const quickUploadAvailable = computed(() => {
-        const ch = channels.value || []
-        if (ch.length === 0) return true
-        if (ch.length === 1) {
-            const p = albums.value || []
-            return p.length <= 1
+        const channelList = channels.value || []
+        if (channelList.length === 0) return true
+        if (channelList.length === 1) {
+            const projectList = albums.value || []
+            return projectList.length <= 1
         }
         return false
-    })
-
-    const hasChannelSelection = computed(() => {
-        return payload.publicId?.value != null
     })
 
     function clearUploadErrorNotify() {
@@ -213,16 +277,64 @@ export function useUploadMediaForm() {
         }
     }
 
-    function patchPayload(partial) {
-        Object.assign(payload, partial)
+    async function refreshValidation({ force = false } = {}) {
+        const awaitingFramePreview =
+            payload.album.media.previewType === 'frame' &&
+            !!mediaFile.value &&
+            !previewThumbRandom.value
+
+        if (!force && awaitingFramePreview) {
+            return
+        }
+
+        const request = buildDraftRequest()
+        const requestKey = JSON.stringify(request)
+
+        if (!force && requestKey === lastValidationKey) {
+            return
+        }
+
+        if (validationInFlightPromise && requestKey === validationInFlightKey) {
+            await validationInFlightPromise
+            return
+        }
+
+        validationInFlightKey = requestKey
+        validationInFlightPromise = (async () => {
+            try {
+                const result = await uploadStore.validateUploadDraft(request)
+                validation.value = result?.data || { canSubmit: false, blockers: [] }
+                lastValidationKey = requestKey
+            } catch {
+                validation.value = { canSubmit: false, blockers: ['validation.unavailable'] }
+            } finally {
+                validationInFlightPromise = null
+                validationInFlightKey = ''
+            }
+        })()
+
+        await validationInFlightPromise
+    }
+
+    function queueValidation() {
+        if (validationQueued.value) {
+            return
+        }
+        validationQueued.value = true
+        queueMicrotask(async () => {
+            validationQueued.value = false
+            await refreshValidation()
+        })
     }
 
     function onMediaStepPayloadUpdate(partial) {
-        patchPayload(partial)
+        Object.assign(payload.album.media, partial?.album?.media || partial?.media || {})
     }
 
     async function onMediaStepFileUpdate(fileOrFiles) {
         const file = Array.isArray(fileOrFiles) ? fileOrFiles[0] : fileOrFiles
+
+        payload.album.media.filename = file?.name || null
 
         if (file) {
             try {
@@ -249,33 +361,42 @@ export function useUploadMediaForm() {
         }
 
         handleFile(file, 'upload')
+        queueValidation()
     }
 
     function onMediaStepPreviewUpdate(file) {
         handleFile(file, 'preview')
+        queueValidation()
     }
 
     function onChannelStepPayloadUpdate(partial) {
-        patchPayload(partial)
+        Object.assign(payload, partial)
+        queueValidation()
     }
 
     function onChannelStepCoverUpdate(file) {
         handleFile(file, 'cover')
+        queueValidation()
     }
 
     function onAlbumStepPayloadUpdate(partial) {
-        patchPayload(partial)
+        Object.assign(payload.album, partial?.album || partial)
+        queueValidation()
     }
 
     function onAlbumStepPosterUpdate(file) {
         handleFile(file, 'poster')
+        queueValidation()
     }
 
     function setSelectedFile(resourceType, file) {
         if (resourceType === 'cover') coverFile.value = file
         if (resourceType === 'poster') posterFile.value = file
         if (resourceType === 'preview') previewFile.value = file
-        if (resourceType === 'upload') mediaFile.value = file
+        if (resourceType === 'upload') {
+            mediaFile.value = file
+            payload.album.media.filename = file?.name || null
+        }
     }
 
     function clearUploadFile(resourceType) {
@@ -287,8 +408,7 @@ export function useUploadMediaForm() {
 
     function upsertUploadFile(resourceType, file, processing) {
         const uploadFileIndex = uploadFiles.value.findIndex(entry => entry.resourceType === resourceType)
-        const entry =
-            processing === undefined ? { resourceType, file } : { resourceType, file, processing }
+        const entry = processing === undefined ? { resourceType, file } : { resourceType, file, processing }
         if (uploadFileIndex === -1) {
             uploadFiles.value.push(entry)
             return
@@ -308,6 +428,7 @@ export function useUploadMediaForm() {
         if (!file) {
             setSelectedFile(resourceType, null)
             clearUploadFile(resourceType)
+            queueValidation()
             return
         }
 
@@ -319,9 +440,13 @@ export function useUploadMediaForm() {
         }
 
         if (IMAGE_RESOURCE_TYPES.has(resourceType)) {
-            compressAndStoreImage(resourceType, file).catch(err => {
-                console.error('Background file processing error:', err)
-            })
+            compressAndStoreImage(resourceType, file)
+                .catch(err => {
+                    console.error('Background file processing error:', err)
+                })
+                .finally(() => {
+                    queueValidation()
+                })
         }
     }
 
@@ -341,6 +466,7 @@ export function useUploadMediaForm() {
             return
         }
 
+        await refreshValidation()
         if (!isReadyToUpload.value) {
             Notify.create({
                 type: 'warning',
@@ -370,6 +496,7 @@ export function useUploadMediaForm() {
             dismissUploadErrorNotify = Notify.create({
                 type: 'negative',
                 timeout: 0,
+                multiLine: false,
                 message: statusText.value,
                 icon: 'warning',
                 actions: [{ label: 'Dismiss', color: 'white' }]
@@ -389,11 +516,7 @@ export function useUploadMediaForm() {
         }
 
         const freshPayload = createInitialPayload()
-        payload.idempotencyKey = freshPayload.idempotencyKey
-        payload.publicId = freshPayload.publicId
-        payload.coverType = freshPayload.coverType
-        payload.title = freshPayload.title
-        payload.album = freshPayload.album
+        Object.assign(payload, freshPayload)
 
         coverFile.value = null
         coverThumb.value = null
@@ -414,206 +537,16 @@ export function useUploadMediaForm() {
         clearUploadErrorNotify()
         disposeFrameSession()
         uploadFiles.value.splice(0, uploadFiles.value.length)
+        validation.value = { canSubmit: false, blockers: [] }
     }
 
     async function quickUpload() {
-        try {
-            if (!isMediaReady.value) return
-
-            const ch = channels.value || []
-            if (ch.length === 1) {
-                payload.publicId = { value: ch[0].publicId, label: ch[0].title }
-            } else if (ch.length === 0) {
-                payload.publicId = { value: 0, label: 'New...' }
-            }
-
-            albums.value = []
-            if (payload.publicId?.value && payload.publicId.value !== 0) {
-                await loadAlbumsForChannelUuid(payload.publicId.value)
-            }
-
-            if (albums.value.length === 1) {
-                const p = albums.value[0]
-                payload.album.id = { value: p.id, label: p.title }
-            } else {
-                payload.album.id = { value: 0, label: 'New...' }
-            }
-
-            await startUploadJourney()
-        } catch (err) {
-            console.error('Quick upload setup failed:', err)
-            Notify.create({
-                type: 'negative',
-                message: getComponentApiErrorMessage(err, 'Quick upload failed to initialize.')
-            })
-        }
-    }
-
-    watch(
-        () => payload.publicId?.value,
-        async newPublicId => {
-            try {
-                if (newPublicId == null) {
-                    albumsLoadToken.value++
-                    albums.value = []
-                    payload.album.id = null
-                    return
-                }
-
-                if (newPublicId === 0) {
-                    albumsLoadToken.value++
-                    albums.value = []
-                    if (payload.album?.id?.value !== 0) {
-                        payload.album.id = { value: 0, label: 'New...' }
-                    }
-                    return
-                }
-
-                const requestToken = ++albumsLoadToken.value
-                await loadAlbumsForChannelUuid(newPublicId, requestToken)
-                if (requestToken !== albumsLoadToken.value) return
-
-                const currentId = payload.album?.id?.value
-                const found = currentId && albumsById.value[currentId] != null
-                if (!found) {
-                    if (albums.value.length === 0) {
-                        payload.album.id = { value: 0, label: 'New...' }
-                    } else if (albums.value.length === 1) {
-                        const p = albums.value[0]
-                        payload.album.id = { value: p.id, label: p.title }
-                    } else {
-                        payload.album.id = null
-                    }
-                }
-            } catch (err) {
-                console.error('Failed syncing albums with channel selection:', err)
-                albums.value = []
-                payload.album.id = { value: 0, label: 'New...' }
-            }
-        }
-    )
-
-    watch(channels, ch => {
-        if (ch.length === 0 && !payload.publicId) {
-            payload.publicId = { value: 0, label: 'New...' }
-        }
-        if (ch.length === 1 && !payload.publicId) {
-            payload.publicId = ch.map(({ publicId, title }) => ({ value: publicId, label: title }))[0]
-        }
-        if (ch.length === 1) {
-            const requestToken = ++albumsLoadToken.value
-            loadAlbumsForChannelUuid(ch[0].publicId, requestToken)
-        } else {
-            albumsLoadToken.value++
-            albums.value = []
-        }
-    })
-
-    watch(albums, p => {
-        if (!hasChannelSelection.value) {
-            if (payload.album?.id != null) {
-                payload.album.id = null
-            }
+        await refreshValidation()
+        if (!isReadyToUpload.value) {
             return
         }
-
-        if (p.length === 0 && payload.album?.id?.value == null) {
-            payload.album.id = { value: 0, label: 'New...' }
-        }
-        if (p.length === 1 && payload.album?.id?.value == null) {
-            payload.album.id = p.map(({ id, title }) => ({ value: id, label: title }))[0]
-        }
-    })
-
-    function watchFileThumb(fileRef, thumbRef) {
-        watch(fileRef, (file, _, onCleanup) => {
-            if (!file) {
-                thumbRef.value = null
-                return
-            }
-            const url = URL.createObjectURL(file)
-            thumbRef.value = url
-            onCleanup(() => URL.revokeObjectURL(url))
-        })
+        await startUploadJourney()
     }
-
-    watchFileThumb(coverFile, coverThumb)
-    watchFileThumb(posterFile, posterThumb)
-    watchFileThumb(previewFile, previewThumb)
-
-    watch(mediaFile, file => {
-        if (file) {
-            payload.album.media.filename = file.name
-        } else {
-            payload.album.media.filename = null
-            disposeFrameSession()
-        }
-    })
-
-    watch([() => mediaFile.value, () => counter.value], async ([mf]) => {
-        const token = ++frameExtractionToken.value
-        if (payload.album.media.previewType !== 'frame' || !mf) {
-            if (!mf) {
-                setPreviewThumbRandom(null)
-            }
-            return
-        }
-        try {
-            extractingFrame.value = true
-            const result = await getRandomFrameFromFile(mf)
-            if (token !== frameExtractionToken.value) {
-                if (result?.url) URL.revokeObjectURL(result.url)
-                return
-            }
-            setPreviewThumbRandom(result?.url || null)
-            if (result?.blob) {
-                const file = new File([result.blob], 'frame.jpg', { type: 'image/jpeg' })
-                await compressAndStoreImage('preview', file)
-            }
-        } catch (err) {
-            console.error(err)
-            payload.album.media.previewType = 'new'
-            Notify.create({
-                type: 'negative',
-                timeout: 0,
-                message: 'Error extracting frames from video.',
-                icon: 'warning',
-                actions: [{ label: 'Dismiss', color: 'white' }]
-            })
-        } finally {
-            if (token === frameExtractionToken.value) {
-                extractingFrame.value = false
-            }
-        }
-    })
-
-    watch(
-        () => payload.album.media.previewType,
-        previewType => {
-            if (previewType !== 'frame') {
-                frameExtractionToken.value += 1
-                setPreviewThumbRandom(null)
-                extractingFrame.value = false
-                return
-            }
-
-            // If user switches back to frame mode with a selected media file,
-            // trigger extraction automatically so a random frame is available.
-            if (mediaFile.value) {
-                counter.value += 1
-            }
-        }
-    )
-
-    watch(
-        () => route.query.u,
-        freshUploadToken => {
-            if (!freshUploadToken) {
-                return
-            }
-            resetUploadFlow()
-        }
-    )
 
     async function loadAlbumsForChannelUuid(publicId, requestToken = albumsLoadToken.value) {
         try {
@@ -645,6 +578,223 @@ export function useUploadMediaForm() {
         }
     }
 
+    function setDefaultChannelSelection(channelList) {
+        if (payload.channelMode !== 'unselected') {
+            return
+        }
+
+        if (channelList.length === 0) {
+            payload.channelMode = 'create'
+            payload.publicId = null
+            return
+        }
+
+        if (channelList.length === 1) {
+            payload.channelMode = 'existing'
+            payload.publicId = { value: channelList[0].publicId, label: channelList[0].title }
+            return
+        }
+
+        payload.channelMode = 'unselected'
+        payload.publicId = null
+    }
+
+    function setDefaultProjectSelection(projectList) {
+        if (payload.album.projectMode !== 'unselected') {
+            return
+        }
+
+        if (projectList.length === 0) {
+            payload.album.projectMode = 'create'
+            payload.album.id = null
+            return
+        }
+
+        if (projectList.length === 1) {
+            payload.album.projectMode = 'existing'
+            payload.album.id = { value: projectList[0].id, label: projectList[0].title }
+            return
+        }
+
+        payload.album.projectMode = 'unselected'
+        payload.album.id = null
+    }
+
+    watch(
+        () => payload.publicId?.value,
+        async newPublicId => {
+            if (payload.channelMode === 'create') {
+                albumsLoadToken.value += 1
+                albums.value = []
+                payload.album.projectMode = 'create'
+                payload.album.id = null
+                queueValidation()
+                return
+            }
+
+            if (payload.channelMode !== 'existing' || !newPublicId) {
+                albumsLoadToken.value += 1
+                albums.value = []
+                payload.album.projectMode = 'unselected'
+                payload.album.id = null
+                queueValidation()
+                return
+            }
+
+            payload.album.projectMode = 'unselected'
+            payload.album.id = null
+
+            const requestToken = ++albumsLoadToken.value
+            await loadAlbumsForChannelUuid(newPublicId, requestToken)
+            if (requestToken !== albumsLoadToken.value) return
+
+            setDefaultProjectSelection(albums.value || [])
+            queueValidation()
+        }
+    )
+
+    watch(
+        () => payload.channelMode,
+        channelMode => {
+            if (channelMode === 'create') {
+                albumsLoadToken.value += 1
+                albums.value = []
+                payload.album.projectMode = 'create'
+                payload.album.id = null
+                queueValidation()
+                return
+            }
+
+            if (channelMode !== 'existing') {
+                albumsLoadToken.value += 1
+                albums.value = []
+                payload.album.projectMode = 'unselected'
+                payload.album.id = null
+                queueValidation()
+                return
+            }
+
+            if (!payload.publicId?.value) {
+                albumsLoadToken.value += 1
+                albums.value = []
+                payload.album.projectMode = 'unselected'
+                payload.album.id = null
+                queueValidation()
+            }
+        }
+    )
+
+    watch(channels, channelList => {
+        if (!channelsHydrated.value) {
+            return
+        }
+
+        setDefaultChannelSelection(channelList || [])
+
+        if (payload.channelMode === 'existing' && payload.publicId?.value) {
+            const requestToken = ++albumsLoadToken.value
+            void loadAlbumsForChannelUuid(payload.publicId.value, requestToken)
+        } else {
+            albumsLoadToken.value++
+            albums.value = []
+        }
+
+        queueValidation()
+    })
+
+    function watchFileThumb(fileRef, thumbRef) {
+        watch(fileRef, (file, _, onCleanup) => {
+            if (!file) {
+                thumbRef.value = null
+                return
+            }
+            const url = URL.createObjectURL(file)
+            thumbRef.value = url
+            onCleanup(() => URL.revokeObjectURL(url))
+        })
+    }
+
+    watchFileThumb(coverFile, coverThumb)
+    watchFileThumb(posterFile, posterThumb)
+    watchFileThumb(previewFile, previewThumb)
+
+    watch(mediaFile, file => {
+        if (file) {
+            payload.album.media.filename = file.name
+            if (payload.album.media.previewType === 'frame') {
+                setPreviewThumbRandom(null)
+            }
+        } else {
+            payload.album.media.filename = null
+            disposeFrameSession()
+        }
+        queueValidation()
+    })
+
+    watch([() => mediaFile.value, () => counter.value], async ([mf]) => {
+        const token = ++frameExtractionToken.value
+        if (payload.album.media.previewType !== 'frame' || !mf) {
+            if (!mf) {
+                setPreviewThumbRandom(null)
+            }
+            queueValidation()
+            return
+        }
+
+        try {
+            extractingFrame.value = true
+            const result = await getRandomFrameFromFile(mf)
+            if (token !== frameExtractionToken.value) {
+                if (result?.url) URL.revokeObjectURL(result.url)
+                return
+            }
+            setPreviewThumbRandom(result?.url || null)
+            if (result?.blob) {
+                const file = new File([result.blob], 'frame.jpg', { type: 'image/jpeg' })
+                await compressAndStoreImage('preview', file)
+            }
+        } catch (err) {
+            console.error(err)
+            payload.album.media.previewType = 'new'
+            Notify.create({
+                type: 'negative',
+                timeout: 0,
+                message: 'Error extracting frames from video.',
+                icon: 'warning',
+                actions: [{ label: 'Dismiss', color: 'white' }]
+            })
+        } finally {
+            if (token === frameExtractionToken.value) {
+                extractingFrame.value = false
+            }
+            queueValidation()
+        }
+    })
+
+    watch(
+        () => payload.album.media.previewType,
+        previewType => {
+            if (previewType !== 'frame') {
+                frameExtractionToken.value += 1
+                setPreviewThumbRandom(null)
+                extractingFrame.value = false
+            } else if (mediaFile.value) {
+                counter.value += 1
+            }
+            queueValidation()
+        }
+    )
+
+    watch(
+        () => route.query.u,
+        freshUploadToken => {
+            if (!freshUploadToken) {
+                return
+            }
+            resetUploadFlow()
+        }
+    )
+
     const beforeUnloadHandler = event => {
         if (isUploading.value) {
             event.preventDefault()
@@ -654,14 +804,18 @@ export function useUploadMediaForm() {
 
     onMounted(async () => {
         await channelsQuery.refresh()
+        channelsHydrated.value = true
+
         const list = channels.value || []
-        if (list.length === 1) {
+        setDefaultChannelSelection(list)
+
+        if (payload.channelMode === 'existing' && payload.publicId?.value) {
             const requestToken = ++albumsLoadToken.value
-            await loadAlbumsForChannelUuid(list[0].publicId, requestToken)
-        } else {
-            albumsLoadToken.value++
-            albums.value = []
+            await loadAlbumsForChannelUuid(payload.publicId.value, requestToken)
+            setDefaultProjectSelection(albums.value || [])
         }
+
+        await refreshValidation({ force: true })
         globalThis.addEventListener('beforeunload', beforeUnloadHandler)
     })
 
@@ -673,9 +827,7 @@ export function useUploadMediaForm() {
 
     onBeforeRouteLeave((to, from, next) => {
         if (isUploading.value) {
-            const answer = globalThis.confirm(
-                'You have uploads in progress. Are you sure you want to leave?'
-            )
+            const answer = globalThis.confirm('You have uploads in progress. Are you sure you want to leave?')
             if (!answer) {
                 next(false)
                 return
@@ -707,6 +859,7 @@ export function useUploadMediaForm() {
         isUploading,
         progress,
         statusText,
+        validation,
         cancelUpload,
         startUploadJourney,
         quickUpload,
