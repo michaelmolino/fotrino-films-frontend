@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md">
+  <div class="channel-root">
     <div v-if="contentState === 'loading'">
       <div class="row items-start q-col-gutter-md">
         <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" v-for="n in 6" :key="n">
@@ -28,9 +28,9 @@
         <q-separator spaced />
 
         <template v-if="showAlbumsView">
-          <div class="row q-mt-sm">
+          <div class="row q-mt-sm albums-grid-row">
             <div
-              class="col-xs-6 col-sm-6 col-md-4 col-lg-3 col-xl-2"
+              class="col-xs-6 col-sm-4 col-md-3 col-lg-2 col-xl-1"
               v-for="card in albumCards"
               :key="card.id">
               <AlbumPoster :album="card.album" :to="card.to" />
@@ -40,7 +40,7 @@
         </template>
 
         <template v-else>
-          <div class="row q-pt-md">
+          <div class="row q-pt-md media-grid-row">
             <div
               class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-sm text-center"
               v-for="card in mediaCards"
@@ -175,6 +175,10 @@ watch([loading, channel, selectedView, albumCount, allCount], () => {
 </script>
 
 <style scoped>
+.channel-root {
+  padding: 16px;
+}
+
 .skeleton-medium {
   width: 100%;
   height: 200px;
@@ -191,5 +195,24 @@ watch([loading, channel, selectedView, albumCount, allCount], () => {
 .channel-view-toggle--wrapped {
   margin-left: auto;
   margin-right: auto;
+}
+
+@media (orientation: landscape) and (max-height: 460px) {
+  .channel-root {
+    padding: 8px;
+  }
+
+  .channel-header {
+    row-gap: 4px;
+    margin-bottom: 4px;
+  }
+
+  .albums-grid-row {
+    margin-top: 4px;
+  }
+
+  .media-grid-row {
+    padding-top: 6px;
+  }
 }
 </style>

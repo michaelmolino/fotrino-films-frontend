@@ -1,5 +1,5 @@
 <template>
-  <nav class="breadcrumb-nav" data-cy="breadcrumbs">
+  <nav class="breadcrumb-nav" :class="{ 'breadcrumb-nav--compact': isShortLandscape }" data-cy="breadcrumbs">
     <div class="row items-start q-pa-md" :class="rowGutterClass">
       <q-avatar class="self-start" :size="avatarSize">
         <img
@@ -40,9 +40,21 @@ const props = defineProps({
   privateScope: { type: String, default: 'media' }
 })
 
-const rowGutterClass = computed(() => ($q.screen.lt.sm ? 'q-gutter-sm' : 'q-gutter-md'))
-const avatarSize = computed(() => ($q.screen.lt.sm ? '32px' : '40px'))
-const crumbTextClass = computed(() => ($q.screen.gt.xs ? 'text-h5' : 'text-subtitle1'))
+const isShortLandscape = computed(
+  () => $q.platform.is.mobile && $q.screen.landscape && $q.screen.height <= 460
+)
+const rowGutterClass = computed(() => {
+  if (isShortLandscape.value) return 'q-gutter-xs'
+  return $q.screen.lt.sm ? 'q-gutter-sm' : 'q-gutter-md'
+})
+const avatarSize = computed(() => {
+  if (isShortLandscape.value) return '28px'
+  return $q.screen.lt.sm ? '32px' : '40px'
+})
+const crumbTextClass = computed(() => {
+  if (isShortLandscape.value) return 'text-subtitle2'
+  return $q.screen.gt.xs ? 'text-h5' : 'text-subtitle1'
+})
 
 function withLastCrumbCurrent(items) {
   if (items.length > 0) {
@@ -140,5 +152,17 @@ const breadcrumbs = computed(() => {
 .breadcrumbs-list :deep(.q-breadcrumbs__el),
 .breadcrumbs-list :deep(.q-breadcrumbs__el .ellipsis) {
   white-space: nowrap;
+}
+
+.breadcrumb-nav--compact :deep(.q-breadcrumbs__el) {
+  line-height: 1.15;
+}
+
+.breadcrumb-nav--compact :deep(.q-breadcrumbs__el .ellipsis) {
+  font-size: 1rem;
+}
+
+.breadcrumb-nav--compact :deep(.text-caption) {
+  line-height: 1.15;
 }
 </style>
