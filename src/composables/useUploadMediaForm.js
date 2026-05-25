@@ -202,6 +202,10 @@ export function useUploadMediaForm() {
         return false
     })
 
+    const hasChannelSelection = computed(() => {
+        return payload.publicId?.value != null
+    })
+
     function clearUploadErrorNotify() {
         if (typeof dismissUploadErrorNotify === 'function') {
             dismissUploadErrorNotify()
@@ -449,7 +453,14 @@ export function useUploadMediaForm() {
         () => payload.publicId?.value,
         async newPublicId => {
             try {
-                if (!newPublicId || newPublicId === 0) {
+                if (newPublicId == null) {
+                    albumsLoadToken.value++
+                    albums.value = []
+                    payload.album.id = null
+                    return
+                }
+
+                if (newPublicId === 0) {
                     albumsLoadToken.value++
                     albums.value = []
                     if (payload.album?.id?.value !== 0) {
@@ -497,6 +508,13 @@ export function useUploadMediaForm() {
     })
 
     watch(albums, p => {
+        if (!hasChannelSelection.value) {
+            if (payload.album?.id != null) {
+                payload.album.id = null
+            }
+            return
+        }
+
         if (p.length === 0 && payload.album?.id?.value == null) {
             payload.album.id = { value: 0, label: 'New...' }
         }

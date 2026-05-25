@@ -57,9 +57,11 @@
               class="summary-description-box q-mt-sm"
               :class="{ 'is-empty': !hasSummaryDescription }">
               <div class="text-caption text-grey-7 q-mb-xs">Description</div>
-              <p class="summary-description-text">
-                {{ hasSummaryDescription ? summaryDescriptionText : 'No description added yet.' }}
-              </p>
+              <div
+                v-if="hasSummaryDescription"
+                class="summary-description-text"
+                v-html="summaryDescriptionHtml"></div>
+              <p v-else class="summary-description-text">No description added yet.</p>
             </div>
             <q-list dense class="q-mt-md">
               <q-item>
@@ -154,7 +156,7 @@
               </q-item>
             </q-list>
             <div class="summary-captured text-caption text-grey-7 q-mt-sm">
-              Captured {{ capturedSinceLabel }}
+              {{ capturedSummaryLabel }}
             </div>
           </q-card-section>
         </q-card>
@@ -169,20 +171,94 @@
               header-class="bg-grey-2"
               class="q-mb-sm"
               :disable="!mediaFile">
-              <div class="q-pt-md q-px-md q-pb-none">
-                <MediaStep
-                  :payload="payload"
-                  :media="media"
-                  :mediaFile="mediaFile"
-                  :previewFile="previewFile"
-                  :handleFile="handleFile"
-                  :previewProcessing="isPreviewProcessing"
-                  :showFileInput="false"
-                  :showPreviewElement="false"
-                  @update:payload="onComposerMediaPayloadUpdate"
-                  @update:mediaFile="onComposerMediaFileUpdate"
-                  @update:previewFile="onComposerMediaPreviewUpdate"
-                  @increment:counter="onComposerMediaRefresh" />
+              <div class="q-pt-md q-px-md q-pb-none composer-content-panel">
+                <q-input
+                  outlined
+                  :color="inputColor"
+                  class="q-pb-md"
+                  clearable
+                  :model-value="payload.album?.media?.title"
+                  label="Video Title *"
+                  data-cy="upload-media-title"
+                  @update:model-value="onComposerMediaTitleUpdate" />
+
+                <MediaMetadataFields
+                  :description="payload.album?.media?.description"
+                  :resource-date="payload.album?.media?.resourceDate"
+                  :main="payload.album?.media?.main"
+                  :input-color="inputColor"
+                  :show-description="true"
+                  :show-extended-attributes="true"
+                  @update:description="onComposerMediaDescriptionUpdate"
+                  @update:resource-date="onComposerMediaResourceDateUpdate"
+                  @update:main="onComposerMediaMainUpdate" />
+
+                <div class="text-overline q-mb-xs">Video Preview</div>
+                <q-btn-toggle
+                  unelevated
+                  no-caps
+                  class="q-mb-md"
+                  :model-value="payload.album?.media?.previewType"
+                  color="primary"
+                  toggle-color="accent"
+                  :options="[
+                    { label: 'Video Frame', value: 'frame' },
+                    { label: 'Upload Photo', value: 'new' }
+                  ]"
+                  @update:model-value="onComposerPreviewTypeUpdate" />
+
+                <q-file
+                  v-if="payload.album?.media?.previewType === 'new'"
+                  outlined
+                  label="Preview Image"
+                  :model-value="previewFile"
+                  accept="image/*"
+                  class="q-pb-md"
+                  color="accent"
+                  data-cy="preview-image-file"
+                  @update:model-value="onComposerMediaPreviewUpdate">
+                  <template v-slot:prepend>
+                    <q-icon name="image" @click.stop.prevent />
+                  </template>
+                  <template v-slot:append>
+                    <q-icon
+                      name="close"
+                      @click.stop.prevent="onComposerMediaPreviewUpdate(null)"
+                      class="cursor-pointer" />
+                  </template>
+                </q-file>
+
+                <div class="q-pb-sm">
+                  <div
+                    class="composer-preview-frame"
+                    :class="{ 'composer-preview-featured': payload.album?.media?.main }">
+                    <MediaPreview
+                      v-if="composerPreviewImage"
+                      class="full-fit"
+                      :media="{
+                        title: 'Video preview',
+                        preview: composerPreviewImage,
+                        main: payload.album?.media?.main
+                      }"
+                      :interactive="false"
+                      :show-badges="false"
+                      :show-title-overlay="false" />
+                    <q-skeleton v-else type="rect" class="full-fit" animation="none" />
+                  </div>
+                  <q-btn
+                    v-if="payload.album?.media?.previewType === 'frame'"
+                    class="q-mt-xs"
+                    :disable="!mediaFile || isPreviewProcessing"
+                    :loading="isPreviewProcessing"
+                    icon="autorenew"
+                    label="Refresh thumbnail"
+                    no-caps
+                    flat
+                    color="accent"
+                    @click="onComposerMediaRefresh">
+                    <q-tooltip>Refresh Thumbnail</q-tooltip>
+                  </q-btn>
+                </div>
               </div>
             </q-expansion-item>
             <q-tooltip v-if="!mediaFile" anchor="center left" self="center right">
@@ -199,16 +275,111 @@
               header-class="bg-grey-2"
               class="q-mb-sm"
               :disable="!mediaFile">
-              <div class="q-pa-md">
-                <ChannelStep
-                  :payload="payload"
-                  :channels="channels"
-                  :profile="profile"
-                  :coverFile="coverFile"
-                  :coverThumb="coverThumb"
-                  :handleFile="handleFile"
-                  @update:payload="onChannelStepPayloadUpdate"
-                  @update:coverFile="onChannelStepCoverUpdate" />
+              <div class="q-pa-md composer-content-panel">
+                <div class="text-overline q-mb-sm">Choose Channel</div>
+                <div class="composer-choice-grid q-mb-md">
+                  <q-card
+                    v-for="channel in channels"
+                    :key="`channel-${channel.publicId}`"
+                    flat
+                    bordered
+                    class="composer-choice-card"
+                    :class="{ 'is-selected': payload.publicId?.value === channel.publicId }"
+                    @click="onComposerSelectExistingChannel(channel)">
+                    <q-card-section class="row items-center q-col-gutter-sm no-wrap">
+                      <div class="col-auto">
+                        <q-avatar size="38px">
+                          <q-img v-if="channel.cover" :src="channel.cover" fit="cover" />
+                          <q-icon v-else name="apps" color="grey-7" />
+                        </q-avatar>
+                      </div>
+                      <div class="col">
+                        <div class="text-body2 ellipsis">{{ channel.title }}</div>
+                        <div class="text-caption text-grey-6">Existing channel</div>
+                      </div>
+                    </q-card-section>
+                  </q-card>
+
+                  <q-card
+                    flat
+                    bordered
+                    class="composer-choice-card"
+                    :class="{
+                      'is-selected': payload.publicId?.value === 0,
+                      'is-disabled': payload.publicId?.value === 0
+                    }"
+                    @click="onComposerSelectNewChannelCard">
+                    <q-card-section class="row items-center q-col-gutter-sm no-wrap">
+                      <div class="col-auto">
+                        <q-avatar size="38px" color="grey-2" text-color="grey-8" icon="add" />
+                      </div>
+                      <div class="col">
+                        <div class="text-body2">Create New Channel</div>
+                        <div class="text-caption text-grey-6">Set title and cover</div>
+                      </div>
+                    </q-card-section>
+                  </q-card>
+                </div>
+
+                <div v-if="payload.publicId?.value === 0">
+                  <q-input
+                    outlined
+                    :color="inputColor"
+                    class="q-pb-md"
+                    clearable
+                    :model-value="payload.title"
+                    label="Channel Title *"
+                    data-cy="upload-channel-title"
+                    @blur="restoreDefaultChannelTitle"
+                    @update:model-value="onComposerChannelTitleUpdate" />
+
+                  <div class="text-overline q-mb-xs">Channel Cover</div>
+                  <q-btn-toggle
+                    unelevated
+                    no-caps
+                    class="q-mb-md"
+                    :model-value="payload.coverType"
+                    color="primary"
+                    toggle-color="accent"
+                    :options="[
+                      { label: 'Profile Photo', value: 'profile' },
+                      { label: 'Upload Photo', value: 'new' }
+                    ]"
+                    @update:model-value="onComposerChannelCoverTypeUpdate" />
+
+                  <q-file
+                    v-if="payload.coverType === 'new'"
+                    outlined
+                    label="Channel Cover (Image)"
+                    :model-value="coverFile"
+                    accept="image/*"
+                    class="q-mb-md"
+                    color="accent"
+                    data-cy="upload-channel-cover-file"
+                    @update:model-value="onComposerChannelCoverFileUpdate">
+                    <template v-slot:prepend>
+                      <q-icon name="image" @click.stop.prevent />
+                    </template>
+                    <template v-slot:append>
+                      <q-icon
+                        name="close"
+                        @click.stop.prevent="onComposerChannelCoverFileUpdate(null)"
+                        class="cursor-pointer" />
+                    </template>
+                  </q-file>
+
+                  <div class="row items-center q-gutter-sm q-pb-sm">
+                    <q-avatar size="96px" class="composer-cover-preview">
+                      <q-img
+                        v-if="channelEditorCoverSrc"
+                        :src="channelEditorCoverSrc"
+                        fit="cover"
+                        loading="lazy"
+                        decoding="async" />
+                      <q-icon v-else name="person" color="grey-7" />
+                    </q-avatar>
+                  </div>
+                </div>
               </div>
             </q-expansion-item>
             <q-tooltip v-if="!mediaFile" anchor="center left" self="center right">
@@ -225,15 +396,149 @@
               header-class="bg-grey-2"
               class="q-mb-sm"
               :disable="!mediaFile">
-              <div class="q-pa-md">
-                <AlbumStep
-                  :payload="payload"
-                  :albums="albums"
-                  :album="album"
-                  :posterFile="posterFile"
-                  :handleFile="handleFile"
-                  @update:payload="onAlbumStepPayloadUpdate"
-                  @update:posterFile="onAlbumStepPosterUpdate" />
+              <div class="q-pa-md composer-content-panel">
+                <div class="text-overline q-mb-sm">Choose Album</div>
+                <div class="composer-choice-grid q-mb-md">
+                  <q-card
+                    v-for="item in albums"
+                    :key="`album-${item.id}`"
+                    flat
+                    bordered
+                    class="composer-choice-card"
+                    :class="{ 'is-selected': payload.album?.id?.value === item.id }"
+                    @click="onComposerSelectExistingAlbum(item)">
+                    <q-card-section class="row items-center q-col-gutter-sm no-wrap">
+                      <div class="col-auto">
+                        <q-avatar size="38px">
+                          <q-img v-if="item.poster" :src="item.poster" fit="cover" />
+                          <div
+                            v-else
+                            class="composer-color-swatch"
+                            :style="{ backgroundColor: item.posterColor || item.poster_color || '#000000' }" />
+                        </q-avatar>
+                      </div>
+                      <div class="col">
+                        <div class="text-body2 ellipsis">{{ item.title }}</div>
+                        <div class="text-caption text-grey-6 ellipsis">{{ item.subtitle || 'Existing album' }}</div>
+                      </div>
+                    </q-card-section>
+                  </q-card>
+
+                  <q-card
+                    flat
+                    bordered
+                    class="composer-choice-card"
+                    :class="{
+                      'is-selected': payload.album?.id?.value === 0,
+                      'is-disabled': payload.album?.id?.value === 0
+                    }"
+                    @click="onComposerSelectNewAlbumCard">
+                    <q-card-section class="row items-center q-col-gutter-sm no-wrap">
+                      <div class="col-auto">
+                        <q-avatar size="38px" color="grey-2" text-color="grey-8" icon="add" />
+                      </div>
+                      <div class="col">
+                        <div class="text-body2 ellipsis">Create New Album</div>
+                        <div class="text-caption text-grey-6 ellipsis">Set album details</div>
+                      </div>
+                    </q-card-section>
+                  </q-card>
+                </div>
+
+                <div v-if="payload.album?.id?.value === 0">
+                  <q-input
+                    outlined
+                    :color="inputColor"
+                    class="q-pb-md"
+                    clearable
+                    :model-value="payload.album?.title"
+                    label="Album Title *"
+                    data-cy="upload-album-title"
+                    @blur="restoreDefaultAlbumTitle"
+                    @update:model-value="onComposerAlbumTitleUpdate" />
+
+                  <q-input
+                    outlined
+                    :color="inputColor"
+                    class="q-pb-md"
+                    clearable
+                    :model-value="payload.album?.subtitle"
+                    label="Album Subtitle"
+                    data-cy="upload-album-subtitle"
+                    @update:model-value="onComposerAlbumSubtitleUpdate" />
+
+                  <div class="text-overline q-mb-xs">Album Poster</div>
+                  <q-btn-toggle
+                    unelevated
+                    no-caps
+                    class="q-mb-md"
+                    :model-value="payload.album?.posterType"
+                    color="primary"
+                    toggle-color="accent"
+                    :options="[
+                      { label: 'Solid Colour', value: 'default' },
+                      { label: 'Upload Photo', value: 'new' }
+                    ]"
+                    @update:model-value="onComposerAlbumPosterTypeUpdate" />
+
+                  <q-file
+                    v-if="payload.album?.posterType === 'new'"
+                    outlined
+                    label="Album Poster (Image)"
+                    :model-value="posterFile"
+                    accept="image/*"
+                    class="q-mb-md"
+                    color="accent"
+                    data-cy="upload-album-poster-file"
+                    @update:model-value="onComposerAlbumPosterFileUpdate">
+                    <template v-slot:prepend>
+                      <q-icon name="image" @click.stop.prevent />
+                    </template>
+                    <template v-slot:append>
+                      <q-icon
+                        name="close"
+                        @click.stop.prevent="onComposerAlbumPosterFileUpdate(null)"
+                        class="cursor-pointer" />
+                    </template>
+                  </q-file>
+
+                  <div class="q-pb-sm composer-album-poster-preview">
+                    <AlbumPoster :album="albumEditorPreview" />
+                  </div>
+                </div>
+
+                <div
+                  v-if="payload.album?.id?.value === 0 && payload.album?.posterType === 'default'"
+                  class="q-pb-sm">
+                  <q-btn
+                    flat
+                    no-caps
+                    color="accent"
+                    icon="palette"
+                    label="Change Colour"
+                    @click="albumColorDialog = true" />
+                </div>
+
+                <q-dialog
+                  v-model="albumColorDialog"
+                  v-if="payload.album?.id?.value === 0 && payload.album?.posterType === 'default'">
+                  <q-card style="min-width: 300px">
+                    <q-card-section class="q-pb-none">
+                      <div class="text-subtitle1">Choose Poster Colour</div>
+                    </q-card-section>
+                    <q-card-section>
+                      <q-color
+                        class="q-mt-sm"
+                        :model-value="payload.album?.posterColor || '#000000'"
+                        format="hex"
+                        default-view="palette"
+                        @update:model-value="onComposerAlbumPosterColorUpdate" />
+                    </q-card-section>
+                    <q-card-actions align="right">
+                      <q-btn flat label="Close" @click="albumColorDialog = false" />
+                    </q-card-actions>
+                  </q-card>
+                </q-dialog>
               </div>
             </q-expansion-item>
             <q-tooltip v-if="!mediaFile" anchor="center left" self="center right">
@@ -296,18 +601,20 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useQuasar } from 'quasar'
-import ChannelStep from './UploadMedia/ChannelStep.vue'
-import AlbumStep from './UploadMedia/AlbumStep.vue'
-import MediaStep from './UploadMedia/MediaStep.vue'
 import MediaPreview from '@components/channel/shared/MediaPreview.vue'
+import AlbumPoster from '@components/channel/shared/AlbumPoster.vue'
 import AuthRequired from '@components/shared/AuthRequired.vue'
+import MediaMetadataFields from '@components/account/shared/MediaMetadataFields.vue'
 import { useUploadMediaForm } from '@composables/useUploadMediaForm.js'
 import { daysSince } from '@utils/date.js'
+import { sanitizeHtml, sanitizeText } from '@utils/text.js'
 
 const $q = useQuasar()
 const activeSection = ref(null)
 const mediaUserModified = ref(false)
 const videoWasReady = ref(false)
+const albumColorDialog = ref(false)
+const inputColor = computed(() => ($q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'))
 
 const {
   payload,
@@ -334,7 +641,6 @@ const {
   cancelUpload,
   startUploadJourney,
   resetUploadFlow,
-  handleFile,
   incrementCounter: baseIncrementCounter,
   onMediaStepPayloadUpdate: baseOnMediaStepPayloadUpdate,
   onMediaStepFileUpdate: baseOnMediaStepFileUpdate,
@@ -457,9 +763,16 @@ const isChannelAutoDefault = computed(() => {
   const channelList = channels.value || []
   const selectedPublicId = payload.publicId?.value
 
+  if (selectedPublicId === 0) {
+    return (
+      (payload.title || 'My Channel') === 'My Channel' &&
+      payload.coverType === 'profile' &&
+      !coverFile.value
+    )
+  }
+
   if (channelList.length === 0) {
     return (
-      selectedPublicId === 0 &&
       (payload.title || 'My Channel') === 'My Channel' &&
       payload.coverType === 'profile' &&
       !coverFile.value
@@ -489,9 +802,18 @@ const isAlbumAutoDefault = computed(() => {
   const albumList = albums.value || []
   const selectedAlbumId = payload.album?.id?.value
 
+  if (selectedAlbumId === 0) {
+    const subtitle = (payload.album?.subtitle || '').trim()
+    return (
+      (payload.album?.title || 'My Videos') === 'My Videos' &&
+      payload.album?.posterType === 'default' &&
+      !posterFile.value &&
+      subtitle.length === 0
+    )
+  }
+
   if (albumList.length === 0) {
     return (
-      selectedAlbumId === 0 &&
       (payload.album?.title || 'My Videos') === 'My Videos' &&
       payload.album?.posterType === 'default' &&
       !posterFile.value
@@ -518,16 +840,251 @@ const albumCompletionSource = computed(() => {
 })
 
 const videoCheckColor = computed(() => (videoCompletionSource.value === 'user' ? 'info' : undefined))
-const summaryDescriptionText = computed(() => (media.value?.description || '').trim())
+const summaryDescriptionRaw = computed(() => media.value?.description || '')
+const summaryDescriptionHtml = computed(() => sanitizeHtml(summaryDescriptionRaw.value))
+const summaryDescriptionText = computed(() => sanitizeText(summaryDescriptionRaw.value).trim())
 const hasSummaryDescription = computed(() => summaryDescriptionText.value.length > 0)
+const composerPreviewImage = computed(() => media.value?.preview || null)
+
+const channelEditorCoverSrc = computed(() => {
+  if (payload.coverType === 'new') {
+    return coverThumb.value || null
+  }
+  return profile.value?.avatar || null
+})
+
+const albumEditorPosterSrc = computed(() => album.value?.poster || null)
+const albumEditorPosterColor = computed(() => payload.album?.posterColor || '#000000')
+const albumEditorPreview = computed(() => {
+  const currentAlbum = album.value || {}
+  return {
+    title: payload.album?.title || currentAlbum.title || 'My Videos',
+    subtitle: payload.album?.subtitle || currentAlbum.subtitle || '',
+    poster: albumEditorPosterSrc.value,
+    posterColor: albumEditorPosterColor.value,
+    media: Array.isArray(currentAlbum.media) ? currentAlbum.media : []
+  }
+})
+
 const capturedSinceLabel = computed(() => {
-  const resourceDate = payload.album?.media?.resourceDate
-  if (!resourceDate) {
-    return 'date not set'
+  if (!mediaFile.value) {
+    return 'No capture date'
   }
 
-  return daysSince(resourceDate, false)
+  const resourceDate = payload.album?.media?.resourceDate
+  if (!resourceDate) {
+    return 'No capture date'
+  }
+
+  return `Captured ${daysSince(resourceDate, false)}`
 })
+
+const capturedSummaryLabel = computed(() => capturedSinceLabel.value)
+
+function onComposerMediaTitleUpdate(value) {
+  onComposerMediaPayloadUpdate({
+    ...payload,
+    album: {
+      ...payload.album,
+      media: { ...payload.album.media, title: value }
+    }
+  })
+}
+
+function onComposerMediaDescriptionUpdate(value) {
+  onComposerMediaPayloadUpdate({
+    ...payload,
+    album: {
+      ...payload.album,
+      media: { ...payload.album.media, description: value }
+    }
+  })
+}
+
+function onComposerMediaResourceDateUpdate(value) {
+  onComposerMediaPayloadUpdate({
+    ...payload,
+    album: {
+      ...payload.album,
+      media: { ...payload.album.media, resourceDate: value ? value.replaceAll('/', '-') : value }
+    }
+  })
+}
+
+function onComposerMediaMainUpdate(value) {
+  onComposerMediaPayloadUpdate({
+    ...payload,
+    album: {
+      ...payload.album,
+      media: { ...payload.album.media, main: !!value }
+    }
+  })
+}
+
+function onComposerPreviewTypeUpdate(value) {
+  onComposerMediaPayloadUpdate({
+    ...payload,
+    album: {
+      ...payload.album,
+      media: { ...payload.album.media, previewType: value }
+    }
+  })
+
+  if (value !== 'new') {
+    onComposerMediaPreviewUpdate(null)
+  }
+}
+
+function onComposerSelectExistingChannel(channel) {
+  onChannelStepPayloadUpdate({
+    ...payload,
+    publicId: { value: channel.publicId, label: channel.title }
+  })
+  activeSection.value = 'album'
+}
+
+function onComposerSelectNewChannel() {
+  onChannelStepPayloadUpdate({
+    ...payload,
+    publicId: { value: 0, label: 'New...' },
+    title: payload.title || 'My Channel',
+    coverType: payload.coverType || 'profile'
+  })
+}
+
+function onComposerSelectNewChannelCard() {
+  if (payload.publicId?.value === 0) {
+    return
+  }
+  onComposerSelectNewChannel()
+}
+
+function onComposerChannelTitleUpdate(value) {
+  onChannelStepPayloadUpdate({
+    ...payload,
+    title: value
+  })
+}
+
+function restoreDefaultChannelTitle() {
+  if (payload.publicId?.value === 0 && (!payload.title || payload.title.trim() === '')) {
+    onChannelStepPayloadUpdate({
+      ...payload,
+      title: 'My Channel'
+    })
+  }
+}
+
+function onComposerChannelCoverTypeUpdate(value) {
+  onChannelStepPayloadUpdate({
+    ...payload,
+    coverType: value
+  })
+
+  if (value !== 'new') {
+    onChannelStepCoverUpdate(null)
+  }
+}
+
+function onComposerChannelCoverFileUpdate(fileOrFiles) {
+  const file = Array.isArray(fileOrFiles) ? fileOrFiles[0] : fileOrFiles
+  onChannelStepCoverUpdate(file)
+}
+
+function onComposerSelectExistingAlbum(selectedAlbum) {
+  onAlbumStepPayloadUpdate({
+    ...payload,
+    album: {
+      ...payload.album,
+      id: { value: selectedAlbum.id, label: selectedAlbum.title }
+    }
+  })
+}
+
+function onComposerSelectNewAlbum() {
+  onAlbumStepPayloadUpdate({
+    ...payload,
+    album: {
+      ...payload.album,
+      id: { value: 0, label: 'New...' },
+      title: payload.album?.title || 'My Videos',
+      posterType: payload.album?.posterType || 'default'
+    }
+  })
+}
+
+function onComposerSelectNewAlbumCard() {
+  if (payload.album?.id?.value === 0) {
+    return
+  }
+  onComposerSelectNewAlbum()
+}
+
+function onComposerAlbumTitleUpdate(value) {
+  onAlbumStepPayloadUpdate({
+    ...payload,
+    album: {
+      ...payload.album,
+      title: value
+    }
+  })
+}
+
+function restoreDefaultAlbumTitle() {
+  if (payload.album?.id?.value === 0 && (!payload.album?.title || payload.album.title.trim() === '')) {
+    onAlbumStepPayloadUpdate({
+      ...payload,
+      album: {
+        ...payload.album,
+        title: 'My Videos'
+      }
+    })
+  }
+}
+
+function onComposerAlbumSubtitleUpdate(value) {
+  onAlbumStepPayloadUpdate({
+    ...payload,
+    album: {
+      ...payload.album,
+      subtitle: value
+    }
+  })
+}
+
+function onComposerAlbumPosterTypeUpdate(value) {
+  onAlbumStepPayloadUpdate({
+    ...payload,
+    album: {
+      ...payload.album,
+      posterType: value
+    }
+  })
+
+  if (value !== 'new') {
+    onAlbumStepPosterUpdate(null)
+  }
+}
+
+function onComposerAlbumPosterColorUpdate(value) {
+  let normalizedColor = '#000000'
+  if (typeof value === 'string') {
+    normalizedColor = value.startsWith('#') ? value : `#${value}`
+  }
+
+  onAlbumStepPayloadUpdate({
+    ...payload,
+    album: {
+      ...payload.album,
+      posterColor: normalizedColor
+    }
+  })
+}
+
+function onComposerAlbumPosterFileUpdate(fileOrFiles) {
+  const file = Array.isArray(fileOrFiles) ? fileOrFiles[0] : fileOrFiles
+  onAlbumStepPosterUpdate(file)
+}
 
 function onComposerMediaPayloadUpdate(partial) {
   if (mediaFile.value) {
@@ -625,6 +1182,80 @@ function onMediaFileRejected(rejectedEntries) {
   cursor: not-allowed;
 }
 
+.composer-content-panel {
+  border: 1px solid var(--q-grey-3);
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+  background: color-mix(in srgb, var(--q-grey-1) 56%, white);
+}
+
+.composer-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.composer-choice-card {
+  cursor: pointer;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.composer-choice-card:hover {
+  border-color: var(--q-grey-5);
+}
+
+.composer-choice-card.is-selected {
+  border-color: var(--q-primary);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--q-primary) 30%, transparent);
+}
+
+.composer-choice-card.is-disabled,
+.composer-choice-card.is-disabled * {
+  cursor: not-allowed;
+}
+
+.composer-choice-card.is-disabled:hover {
+  border-color: var(--q-primary);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--q-primary) 30%, transparent);
+}
+
+.composer-cover-preview {
+  border: 1px solid var(--q-grey-4);
+  overflow: hidden;
+}
+
+.composer-color-swatch {
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  border: 1px solid #000;
+}
+
+.composer-cover-swatch {
+  border: 1px solid #000;
+}
+
+.composer-album-poster-preview {
+  width: 220px;
+}
+
+.composer-preview-frame {
+  width: 250px;
+  aspect-ratio: 16 / 9;
+  padding: 8px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.composer-preview-featured {
+  background: var(--q-accent);
+}
+
+.full-fit {
+  width: 100%;
+  height: 100%;
+}
+
 .summary-item-section {
   min-width: 0;
 }
@@ -653,6 +1284,7 @@ function onMediaFileRejected(rejectedEntries) {
 
 .summary-description-box.is-empty {
   border-style: dashed;
+  border-color: rgba(98, 112, 127, 0.35);
 }
 
 .summary-description-text {
@@ -663,6 +1295,10 @@ function onMediaFileRejected(rejectedEntries) {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.summary-description-text :deep(p) {
+  margin: 0;
 }
 
 .summary-description-box.is-empty .summary-description-text {
