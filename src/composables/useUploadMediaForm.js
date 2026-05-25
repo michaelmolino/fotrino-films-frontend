@@ -9,8 +9,10 @@ import { useImageFileProcessor } from '@composables/useImageFileProcessor.js'
 import { useVideoThumbnailProcessor } from '@composables/useVideoThumbnailProcessor.js'
 import { useUploadFlow } from '@composables/useUploadFlow.js'
 import { extractExifDate } from '@composables/useMediaMetadata.js'
+import { useDebounceFn } from '@vueuse/core'
 
 const IMAGE_RESOURCE_TYPES = new Set(['cover', 'poster', 'preview'])
+const VALIDATION_DEBOUNCE_MS = 300
 
 function createUploadIdempotencyKey() {
     const cryptoObj = globalThis.crypto
@@ -316,15 +318,14 @@ export function useUploadMediaForm() {
         await validationInFlightPromise
     }
 
+    const debouncedRefreshValidation = useDebounceFn(async () => {
+        validationQueued.value = false
+        await refreshValidation()
+    }, VALIDATION_DEBOUNCE_MS)
+
     function queueValidation() {
-        if (validationQueued.value) {
-            return
-        }
         validationQueued.value = true
-        queueMicrotask(async () => {
-            validationQueued.value = false
-            await refreshValidation()
-        })
+        debouncedRefreshValidation()
     }
 
     function onMediaStepPayloadUpdate(partial) {
@@ -821,6 +822,7 @@ export function useUploadMediaForm() {
 
     onBeforeUnmount(() => {
         globalThis.removeEventListener('beforeunload', beforeUnloadHandler)
+        debouncedRefreshValidation.cancel()
         setPreviewThumbRandom(null)
         disposeFrameSession()
     })

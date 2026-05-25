@@ -39,6 +39,39 @@ function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
 }
 
+function getRateLimitRetryAfterSeconds(error) {
+  const retryAfterHeader = error?.response?.headers?.['retry-after']
+  if (retryAfterHeader == null) {
+    return null
+  }
+
+  const retryAfterText = String(retryAfterHeader).trim()
+  if (!retryAfterText) {
+    return null
+  }
+
+  const numericSeconds = Number.parseFloat(retryAfterText)
+  if (Number.isFinite(numericSeconds) && numericSeconds > 0) {
+    return Math.ceil(numericSeconds)
+  }
+
+  const retryAt = new Date(retryAfterText).getTime()
+  if (!Number.isFinite(retryAt)) {
+    return null
+  }
+
+  const secondsUntilRetry = Math.ceil((retryAt - Date.now()) / 1000)
+  return secondsUntilRetry > 0 ? secondsUntilRetry : null
+}
+
+function getRateLimitMessage(error) {
+  const retryAfterSeconds = getRateLimitRetryAfterSeconds(error)
+  if (retryAfterSeconds != null) {
+    return `You are sending requests too quickly. Please wait ${retryAfterSeconds}s and try again.`
+  }
+  return 'You are sending requests too quickly. Please wait a moment and try again.'
+}
+
 /**
  * @param {unknown} error
  * @returns {Record<string, any> | null}
@@ -192,6 +225,10 @@ export function isGlobalApiError(error, code) {
  * @returns {string}
  */
 export function getGlobalApiErrorMessage(error, fallback = 'Something went wrong!') {
+  if (error?.response?.status === 429) {
+    return getRateLimitMessage(error)
+  }
+
   const payload = getGlobalApiErrorPayload(error)
   if (!payload) {
     return fallback
@@ -208,6 +245,10 @@ export function getGlobalApiErrorMessage(error, fallback = 'Something went wrong
 export function getComponentApiErrorMessage(error, fallback = 'Something went wrong!') {
   if (isGloballyHandledApiError(error)) {
     return ''
+  }
+
+  if (error?.response?.status === 429) {
+    return getRateLimitMessage(error)
   }
 
   const globalPayload = getGlobalApiErrorPayload(error)
