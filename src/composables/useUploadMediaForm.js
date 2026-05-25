@@ -822,7 +822,9 @@ export function useUploadMediaForm() {
 
     onBeforeUnmount(() => {
         globalThis.removeEventListener('beforeunload', beforeUnloadHandler)
-        debouncedRefreshValidation.cancel()
+        if (typeof debouncedRefreshValidation.cancel === 'function') {
+            debouncedRefreshValidation.cancel()
+        }
         setPreviewThumbRandom(null)
         disposeFrameSession()
     })
