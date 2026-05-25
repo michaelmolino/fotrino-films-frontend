@@ -234,7 +234,7 @@
                     :class="{ 'composer-preview-featured': payload.album?.media?.main }">
                     <MediaPreview
                       v-if="composerPreviewImage"
-                      class="full-fit"
+                      class="composer-preview-media"
                       :media="{
                         title: 'Video preview',
                         preview: composerPreviewImage,
@@ -243,11 +243,15 @@
                       :interactive="false"
                       :show-badges="false"
                       :show-title-overlay="false" />
-                    <q-skeleton v-else type="rect" class="full-fit" animation="none" />
+                    <q-skeleton
+                      v-else
+                      type="rect"
+                      class="composer-preview-skeleton"
+                      animation="none" />
                   </div>
                   <q-btn
                     v-if="payload.album?.media?.previewType === 'frame'"
-                    class="q-mt-xs"
+                    class="q-mt-sm"
                     :disable="!mediaFile || isPreviewProcessing"
                     :loading="isPreviewProcessing"
                     icon="autorenew"
@@ -1241,14 +1245,21 @@ function onMediaFileRejected(rejectedEntries) {
 
 .composer-preview-frame {
   width: 250px;
-  aspect-ratio: 16 / 9;
   padding: 8px;
-  overflow: hidden;
   box-sizing: border-box;
 }
 
 .composer-preview-featured {
   background: var(--q-accent);
+}
+
+.composer-preview-media {
+  width: 100%;
+}
+
+.composer-preview-skeleton {
+  width: 100%;
+  aspect-ratio: 16 / 9;
 }
 
 .full-fit {

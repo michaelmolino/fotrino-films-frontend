@@ -476,11 +476,13 @@ export function useUploadMediaForm() {
                 const currentId = payload.album?.id?.value
                 const found = currentId && albumsById.value[currentId] != null
                 if (!found) {
-                    if (albums.value.length === 1) {
+                    if (albums.value.length === 0) {
+                        payload.album.id = { value: 0, label: 'New...' }
+                    } else if (albums.value.length === 1) {
                         const p = albums.value[0]
                         payload.album.id = { value: p.id, label: p.title }
                     } else {
-                        payload.album.id = { value: 0, label: 'New...' }
+                        payload.album.id = null
                     }
                 }
             } catch (err) {
