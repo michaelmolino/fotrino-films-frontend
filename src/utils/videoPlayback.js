@@ -1,3 +1,5 @@
+import { Platform } from 'quasar'
+
 let HlsCtor = null
 
 async function getHlsCtor() {
@@ -11,14 +13,16 @@ async function getHlsCtor() {
 
 function supportsNativeHls(videoEl) {
   const support = videoEl.canPlayType('application/vnd.apple.mpegurl')
-  if (support !== 'probably' && support !== 'maybe') return false
+  const supportsNativeMime = support === 'probably' || support === 'maybe'
+  if (!supportsNativeMime) return false
 
-  // Favor native when AirPlay APIs exist; otherwise use hls.js.
   const hasAirPlayApi =
     typeof videoEl.webkitShowPlaybackTargetPicker === 'function' ||
     'WebKitPlaybackTargetAvailabilityEvent' in globalThis
+  const isIosFamily = Platform.is.ios || Platform.is.ipad || Platform.is.iphone || Platform.is.ipod
 
-  return hasAirPlayApi
+  // Use native playback when Apple platform integration is likely available (AirPlay/system media).
+  return isIosFamily || hasAirPlayApi
 }
 
 async function setupHlsJsPlayback({ videoEl, sourceUrl, exposeHlsGlobally }) {
@@ -26,7 +30,7 @@ async function setupHlsJsPlayback({ videoEl, sourceUrl, exposeHlsGlobally }) {
 
   if (!Hls.isSupported()) {
     console.error('HLS is not supported in this browser.')
-    return { hlsInstance: null, cleanup: () => {} }
+    return { hlsInstance: null, cleanup: () => { } }
   }
 
   const hlsInstance = new Hls({
@@ -96,13 +100,13 @@ function setupNativeHlsPlayback({ videoEl, sourceUrl }) {
 
   return {
     hlsInstance: null,
-    cleanup: () => {}
+    cleanup: () => { }
   }
 }
 
 export async function setupVideoPlayback({ videoEl, sourceUrl, exposeHlsGlobally = false }) {
   if (!videoEl || !sourceUrl) {
-    return { hlsInstance: null, cleanup: () => {} }
+    return { hlsInstance: null, cleanup: () => { } }
   }
 
   if (supportsNativeHls(videoEl)) {
