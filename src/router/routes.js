@@ -45,7 +45,7 @@ const routes = [
     component: () => import('@layouts/MainLayout.vue'),
     children: [
       { path: 'dashboard', component: () => import('@components/account/ChannelDashboard.vue') },
-      { path: 'upload', component: () => import('@components/account/UploadMedia.vue') }
+      { path: 'upload', component: () => import('@components/account/UploadMediaRouteEntry.vue') }
     ]
   },
   {

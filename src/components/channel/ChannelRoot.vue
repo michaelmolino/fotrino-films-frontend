@@ -51,7 +51,6 @@
                 :media="card.media"
                 :to="card.to"
                 :detail="true"
-                :showMainAccent="true"
                 :priority="card.priority" />
             </div>
             <NothingText v-if="showEmptyContent" text="No content available." />

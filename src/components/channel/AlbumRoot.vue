@@ -30,7 +30,6 @@
               :media="card.media"
               :to="card.to"
               :detail="true"
-              :showMainAccent="false"
               :priority="card.priority" />
           </div>
         </div>
@@ -57,7 +56,6 @@
                 :media="card.media"
                 :to="card.to"
                 :detail="true"
-                :showMainAccent="false"
                 :priority="card.priority" />
             </div>
           </div>

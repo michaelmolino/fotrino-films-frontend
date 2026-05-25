@@ -1,6 +1,7 @@
 <template>
   <div>
     <q-file
+      v-if="showFileInput"
       label="Video *"
       outlined
       :model-value="mediaFile"
@@ -17,9 +18,10 @@
         <q-icon name="close" @click.stop.prevent="emitUpdateMediaNull" class="cursor-pointer" />
       </template>
     </q-file>
-    <div v-if="mediaFile">
+    <div>
       <q-input
         outlined
+        :disable="!mediaFile"
         :color="inputColor"
         class="q-pb-md"
         clearable
@@ -35,7 +37,9 @@
             :preview-image="media?.preview || null"
             :show-featured-border="!!payload.album.media.main"
             :preview-processing="previewProcessing"
+            :disabled="!mediaFile"
             :frame-refresh-enabled="!!mediaFile"
+            :show-preview="showPreviewElement"
             @update:previewType="onUpdatePreviewType"
             @update:previewFile="onUpdatePreviewFile"
             @refresh:frame="emitCounterIncrement" />
@@ -47,6 +51,7 @@
             :resource-date="payload.album.media.resourceDate"
             :main="!!payload.album.media.main"
             :input-color="inputColor"
+            :disabled="!mediaFile"
             @update:description="onUpdateMediaDescription"
             @update:resourceDate="onUpdateResourceDate"
             @update:main="onUpdateMediaMain" />
@@ -67,7 +72,9 @@ const props = defineProps({
   mediaFile: { type: [File, Array], default: null },
   previewFile: { type: [File, Array], default: null },
   handleFile: { type: Function, default: null },
-  previewProcessing: { type: Boolean, default: false }
+  previewProcessing: { type: Boolean, default: false },
+  showFileInput: { type: Boolean, default: true },
+  showPreviewElement: { type: Boolean, default: true }
 })
 const emit = defineEmits([
   'update:payload',

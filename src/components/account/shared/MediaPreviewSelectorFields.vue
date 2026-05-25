@@ -8,6 +8,7 @@
       val="frame"
       label="Video Frame"
       color="accent"
+      :disable="disabled"
       @update:model-value="onUpdatePreviewType" />
     <q-radio
       v-if="allowFrameMode"
@@ -17,6 +18,7 @@
       label="Upload Photo"
       data-cy="preview-type-upload"
       color="accent"
+      :disable="disabled"
       @update:model-value="onUpdatePreviewType" />
 
     <q-file
@@ -27,6 +29,7 @@
       accept="image/*"
       class="q-pb-md"
       color="accent"
+      :disable="disabled"
       data-cy="preview-image-file"
       @update:model-value="onUpdatePreviewFile">
       <template v-slot:prepend>
@@ -41,7 +44,7 @@
     </q-file>
 
     <div class="row items-center q-gutter-sm">
-      <div class="col-auto">
+      <div v-if="showPreview" class="col-auto">
         <div
           class="preview-frame"
           :class="{ 'preview-frame-featured': showFeaturedBorder }"
@@ -52,15 +55,14 @@
             :media="{ title: 'Video preview', preview: previewImage, main: showFeaturedBorder }"
             :interactive="false"
             :show-badges="false"
-            :show-title-overlay="false"
-            :show-main-accent="showFeaturedBorder" />
+            :show-title-overlay="false" />
           <q-skeleton v-else type="rect" class="full-fit" animation="none" />
         </div>
       </div>
       <div class="col-auto">
         <q-btn
-          v-if="showRefreshButton"
-          :disable="!frameRefreshEnabled || previewProcessing"
+          v-if="showRefreshButton && showPreview"
+          :disable="disabled || !frameRefreshEnabled || previewProcessing"
           :loading="previewProcessing"
           icon="autorenew"
           flat
@@ -68,6 +70,20 @@
           @click="emitRefreshFrame">
           <q-tooltip>Refresh Thumbnail</q-tooltip>
         </q-btn>
+      </div>
+    </div>
+
+    <div v-if="showRefreshButton && !showPreview" class="q-mt-sm">
+      <q-btn
+        color="primary"
+        outline
+        icon="autorenew"
+        label="Pick Another Frame"
+        :disable="disabled || !frameRefreshEnabled || previewProcessing"
+        :loading="previewProcessing"
+        @click="emitRefreshFrame" />
+      <div class="text-caption text-grey-7 q-mt-xs">
+        Generates a different frame from your video for the preview image.
       </div>
     </div>
   </div>
@@ -113,6 +129,14 @@ const props = defineProps({
   frameRefreshEnabled: {
     type: Boolean,
     default: true
+  },
+  showPreview: {
+    type: Boolean,
+    default: true
+  },
+  disabled: {
+    type: Boolean,
+    default: false
   }
 })
 

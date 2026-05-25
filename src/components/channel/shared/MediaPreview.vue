@@ -67,7 +67,6 @@ const {
   media,
   album,
   detail,
-  showMainAccent,
   showBadges,
   showTitleOverlay,
   interactive,
@@ -77,7 +76,6 @@ const {
   media: { type: Object, required: true },
   album: { type: Object, default: null },
   detail: { type: Boolean, default: false },
-  showMainAccent: { type: Boolean, default: true },
   showBadges: { type: Boolean, default: true },
   showTitleOverlay: { type: Boolean, default: true },
   interactive: { type: Boolean, default: true },
@@ -87,7 +85,7 @@ const {
 
 const containerClasses = computed(() => [
   interactive ? 'fit width720' : 'full-fit',
-  { 'bg-accent': media.main && showMainAccent }
+  { 'bg-accent': media.main }
 ])
 
 const rootTag = computed(() => (interactive ? QBtn : 'div'))
@@ -149,9 +147,11 @@ function onPreviewError() {
 
 <style scoped>
 .preview-skeleton {
-  width: 250px;
-  height: 141px;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
 }
+
 .media-img {
   width: 100%;
   height: 100%;

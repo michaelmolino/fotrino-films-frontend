@@ -6,6 +6,7 @@
       outlined
       autogrow
       clearable
+      :disable="disabled"
       :color="inputColor"
       class="q-pb-md"
       label="Description - p, br, strong, and i tags allowed"
@@ -14,7 +15,7 @@
 
     <div v-if="showExtendedAttributes">
       <div class="text-overline">Extended Attributes</div>
-      <q-btn icon="event" flat class="q-mt-xs" :label="resourceDateLabel">
+      <q-btn icon="event" flat class="q-mt-xs" :label="resourceDateLabel" :disable="disabled">
         <q-popup-proxy cover transition-show="scale" transition-hide="scale">
           <q-date
             :model-value="resourceDate"
@@ -35,6 +36,7 @@
         <q-checkbox
           :model-value="main"
           outlined
+          :disable="disabled"
           label="Featured"
           class="q-pr-lg q-pl-sm"
           data-cy="media-featured-checkbox"
@@ -71,6 +73,10 @@ const props = defineProps({
   showExtendedAttributes: {
     type: Boolean,
     default: true
+  },
+  disabled: {
+    type: Boolean,
+    default: false
   }
 })
 

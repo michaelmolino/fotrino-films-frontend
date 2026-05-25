@@ -61,7 +61,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useQuasar } from 'quasar'
 import AlbumPoster from '@components/channel/shared/AlbumPoster.vue'
 import AlbumPosterFields from '@components/account/shared/AlbumPosterFields.vue'
@@ -77,6 +77,7 @@ const props = defineProps({
 const emit = defineEmits(['update:payload', 'update:posterFile'])
 const defaultColor = '#000000'
 const inputColor = computed(() => ($q.dark.isActive ? 'blue-grey-11' : 'blue-grey-10'))
+const albumTitleChangedDuringFocus = ref(false)
 
 // Filter albums that are eligible for the currently selected channel.
 // Parent now syncs albums per-channel, but keep this defensive.
@@ -127,6 +128,7 @@ function onUpdateAlbumId(val) {
   emit('update:payload', { ...props.payload, album: { ...props.payload.album, id: val } })
 }
 function onUpdateAlbumTitle(val) {
+  albumTitleChangedDuringFocus.value = true
   emit('update:payload', { ...props.payload, album: { ...props.payload.album, title: val } })
 }
 function onUpdateAlbumSubtitle(val) {
@@ -159,10 +161,13 @@ function emitUpdatePosterNull() {
   emit('update:posterFile', null)
 }
 function clearDefaultAlbumTitle() {
-  emit('update:payload', { ...props.payload, album: { ...props.payload.album, title: '' } })
+  albumTitleChangedDuringFocus.value = false
+  if (props.payload.album.title === 'My Videos') {
+    emit('update:payload', { ...props.payload, album: { ...props.payload.album, title: '' } })
+  }
 }
 function restoreDefaultAlbumTitle() {
-  if (props.payload.album.title === '') {
+  if (!albumTitleChangedDuringFocus.value && props.payload.album.title === '') {
     emit('update:payload', {
       ...props.payload,
       album: { ...props.payload.album, title: 'My Videos' }
