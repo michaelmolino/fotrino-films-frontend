@@ -78,12 +78,36 @@ export function createPresignedUppyClient({
   // AwsS3 plugin handles the `upload` resource type (video files).
   // For files >= MULTIPART_THRESHOLD it uses multipart; below that it uses
   // getUploadParameters for a standard presigned PUT.
+  const companionBase = uploadEndpoint.replace(/\/$/, '')
+
   uppy.use(AwsS3, {
     endpoint: uploadEndpoint,
     headers,
     retryDelays: MULTIPART_RETRY_DELAYS_MS,
     shouldUseMultipart: file =>
       file.meta?.resourceType === 'upload' && file.size >= MULTIPART_THRESHOLD,
+    async createMultipartUpload(file) {
+      const response = await fetch(`${companionBase}/s3/multipart`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          ...headers
+        },
+        body: JSON.stringify({
+          filename: file?.name || 'upload.bin',
+          type: file?.type || 'application/octet-stream',
+          resourceType: file?.meta?.resourceType,
+          reference: file?.meta?.reference ?? null
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`Multipart create failed (${response.status})`)
+      }
+
+      return response.json()
+    },
     async getUploadParameters(file) {
       const instruction = instructionByType.get(file.meta?.resourceType)
       if (!instruction?.url) {

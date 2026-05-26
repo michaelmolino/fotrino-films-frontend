@@ -37,7 +37,7 @@ const sharedHydratedAlbumsByPublicId = computed(() => {
   return map
 })
 
-const EMPTY_CHANNEL_VIEW_RESPONSE = { channel: null, readModel: null }
+const EMPTY_CHANNEL_VIEW_RESPONSE = { data: null, readModel: null }
 /**
  * Composable for loading and setting channel data based on route parameters
  * State is shared across composable callers so App-level route loading and
@@ -93,7 +93,7 @@ export function useChannelLoader({ manageMeta = false } = {}) {
   }
 
   const setChannelPayload = payload => {
-    channel.value = payload?.channel ?? null
+    channel.value = payload?.data ?? null
     readModel.value = payload?.readModel ?? null
     return payload
   }
@@ -158,7 +158,7 @@ export function useChannelLoader({ manageMeta = false } = {}) {
 
     if (hasLoadedChannelRouteTarget(target)) {
       return Promise.resolve({
-        channel: channel.value,
+        data: channel.value,
         readModel: readModel.value
       })
     }
@@ -247,9 +247,9 @@ export function useChannelLoader({ manageMeta = false } = {}) {
         return null
       }
 
-      channel.value = loaded.channel
+      channel.value = loaded.data
       readModel.value = loaded.readModel
-      const loadedChannel = loaded.channel
+      const loadedChannel = loaded.data
 
       syncChannelHistory(route, loadedChannel)
       syncPrivateHistory(route, loadedChannel)

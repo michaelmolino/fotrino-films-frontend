@@ -113,7 +113,7 @@ export function useUploadMediaForm() {
     }
   }
 
-  function buildProjectSelection() {
+  function buildAlbumSelection() {
     if (payload.album.projectMode === 'create') {
       const posterMode = payload.album.posterType === 'new' ? 'upload' : 'color'
       const posterColor = payload.album.posterColor || '#000000'
@@ -142,12 +142,12 @@ export function useUploadMediaForm() {
 
   function buildDraftRequest() {
     const channel = buildChannelSelection()
-    const project = buildProjectSelection()
+    const album = buildAlbumSelection()
 
     return {
       idempotencyKey: payload.idempotencyKey,
       channel,
-      project,
+      album,
       media: {
         filename: payload.album.media.filename,
         title: payload.album.media.title,
@@ -273,7 +273,7 @@ export function useUploadMediaForm() {
     () => !validation.value.blockers.some(blocker => blocker.startsWith('channel.'))
   )
   const isAlbumReady = computed(
-    () => !validation.value.blockers.some(blocker => blocker.startsWith('project.'))
+    () => !validation.value.blockers.some(blocker => blocker.startsWith('album.'))
   )
   const isReadyToUpload = computed(
     () => validation.value.canSubmit && !isPreviewProcessing.value && !uploadTriggered.value

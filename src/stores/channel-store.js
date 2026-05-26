@@ -180,7 +180,7 @@ export const useChannelStore = defineStore('channel', () => {
   const fetchChannel = async ({ channelId, pending = false, cache = true }) => {
     if (!cache) {
       const { data } = await api.get(`/channels/${channelId}${pending ? '?pending=true' : ''}`)
-      return data?.channel ?? null
+      return data?.data ?? null
     }
 
     const options = channelQueryOptions(channelId, pending)
@@ -189,7 +189,7 @@ export const useChannelStore = defineStore('channel', () => {
     if (state?.status === 'error') {
       throw state.error || new Error('Channel query failed')
     }
-    return state?.data?.channel ?? null
+    return state?.data?.data ?? null
   }
 
   const createMediaSession = async ({ privateId }) => {

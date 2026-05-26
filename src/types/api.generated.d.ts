@@ -207,26 +207,26 @@ export type Reference = number
 export type Requiredresources = ('cover' | 'poster' | 'preview' | 'upload')[]
 export type Resourcetype = 'cover' | 'poster' | 'preview' | 'upload'
 export type Url = string
+export type Album2 = ExistingAlbumSelection | CreateAlbumSelection | UnselectedAlbumSelection
+export type Id9 = number
+export type Mode1 = 'existing'
+export type Mode2 = 'create'
+export type Color = string | null
+export type Mode3 = 'color' | 'upload'
+export type Subtitle2 = string | null
+export type Title11 = string | null
+export type Mode4 = 'unselected'
 export type Channel2 =
   | ExistingChannelSelection
   | CreateChannelSelection
   | UnselectedChannelSelection
-export type Mode1 = 'existing'
-export type Publicid8 = string
-export type Mode2 = 'profile' | 'upload'
-export type Mode3 = 'create'
-export type Title11 = string | null
-export type Mode4 = 'unselected'
-export type Idempotencykey = string | null
-export type Project = ExistingProjectSelection | CreateProjectSelection | UnselectedProjectSelection
-export type Id9 = number
 export type Mode5 = 'existing'
-export type Mode6 = 'create'
-export type Color = string | null
-export type Mode7 = 'color' | 'upload'
-export type Subtitle2 = string | null
+export type Publicid8 = string
+export type Mode6 = 'profile' | 'upload'
+export type Mode7 = 'create'
 export type Title12 = string | null
 export type Mode8 = 'unselected'
+export type Idempotencykey = string | null
 export type UploadResourceType = 'cover' | 'poster' | 'preview' | 'upload'
 export type Error11 = string
 export type Error12 = string
@@ -552,42 +552,42 @@ export interface UploadInstruction {
   url: Url
 }
 export interface UploadMediaRequest {
+  album: Album2
   channel: Channel2
   files?: UploadDraftFiles | null
   idempotencyKey?: Idempotencykey
   media: MediaUploadPayload
-  project: Project
+}
+export interface ExistingAlbumSelection {
+  id: Id9
+  mode: Mode1
+}
+export interface CreateAlbumSelection {
+  mode: Mode2
+  poster: AlbumCreatePoster
+  subtitle?: Subtitle2
+  title?: Title11
+}
+export interface AlbumCreatePoster {
+  color?: Color
+  mode: Mode3
+}
+export interface UnselectedAlbumSelection {
+  mode: Mode4
 }
 export interface ExistingChannelSelection {
-  mode: Mode1
+  mode: Mode5
   publicId: Publicid8
 }
 export interface CreateChannelSelection {
   cover: ChannelCreateCover
-  mode: Mode3
-  title?: Title11
-}
-export interface ChannelCreateCover {
-  mode: Mode2
-}
-export interface UnselectedChannelSelection {
-  mode: Mode4
-}
-export interface ExistingProjectSelection {
-  id: Id9
-  mode: Mode5
-}
-export interface CreateProjectSelection {
-  mode: Mode6
-  poster: ProjectCreatePoster
-  subtitle?: Subtitle2
+  mode: Mode7
   title?: Title12
 }
-export interface ProjectCreatePoster {
-  color?: Color
-  mode: Mode7
+export interface ChannelCreateCover {
+  mode: Mode6
 }
-export interface UnselectedProjectSelection {
+export interface UnselectedChannelSelection {
   mode: Mode8
 }
 export interface ErrorDetailResponse1 {
