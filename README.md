@@ -23,7 +23,7 @@ The site is not ready for production use - I reserve the right to delete your co
 ### Backend
 
 - A [Python Flask](https://flask.palletsprojects.com/en/stable/) service exposes the main API which persists data to a [Postgres DB](https://www.postgresql.org/docs/current/index.html). Most `GET` requests are cached in [Redis](https://redis.io/docs/latest/).
-- Media processing is handled asynchronously (currently using [RQ](https://python-rq.org/)) by separately deployed workers. Work is orchestrated by a singleton [outbox](https://microservices.io/patterns/data/transactional-outbox.html) runner.
+- Media processing is handled asynchronously using [Procrastinate](https://procrastinate.readthedocs.io/en/stable/index.html).
 - Media processing is handled by [ffmpeg](https://ffmpeg.org/).
 - The backend is stored in a private repo that is not open source.
 
