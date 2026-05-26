@@ -1,4 +1,5 @@
 import { VideoThumbnailGenerator } from 'browser-video-thumbnail-generator'
+import { randomUnitInterval } from 'src/utils/random.js'
 
 const RANDOM_POSITION_PRECISION = 2
 // For large files, seeking to a random position deep in the file can take
@@ -32,7 +33,8 @@ function ensureFrameSession(file) {
 
 function getRandomFramePosition(fileSize) {
   const maxPosition = fileSize > LARGE_FILE_THRESHOLD_BYTES ? LARGE_FILE_MAX_POSITION : 100
-  return Number((Math.random() * maxPosition).toFixed(RANDOM_POSITION_PRECISION))
+  const randomFactor = randomUnitInterval()
+  return Number((randomFactor * maxPosition).toFixed(RANDOM_POSITION_PRECISION))
 }
 
 function withTimeout(promise, ms) {

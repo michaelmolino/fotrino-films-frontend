@@ -1,4 +1,6 @@
 // Pending upload lock logic for multi-tab safety
+import { createRandomId } from './random.js'
+
 const LOCK_PREFIX = 'fotrino.pending-upload.lock.'
 const TAB_ID_KEY = 'fotrino.upload.tab-id'
 const LOCK_TTL_MS = 45000
@@ -6,10 +8,7 @@ const HEARTBEAT_MS = 10000
 
 // Generate a unique tab ID for this browser tab
 function createTabId() {
-  if (globalThis.crypto?.randomUUID) {
-    return globalThis.crypto.randomUUID()
-  }
-  return `${Date.now()}-${Math.random().toString(36).slice(2)}`
+  return createRandomId()
 }
 
 // Get or create the tab ID for this tab

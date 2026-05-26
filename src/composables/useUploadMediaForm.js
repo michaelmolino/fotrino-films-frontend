@@ -9,17 +9,14 @@ import { useImageFileProcessor } from '@composables/useImageFileProcessor.js'
 import { useVideoThumbnailProcessor } from '@composables/useVideoThumbnailProcessor.js'
 import { useUploadFlow } from '@composables/useUploadFlow.js'
 import { extractExifDate } from '@composables/useMediaMetadata.js'
+import { createRandomId } from 'src/utils/random.js'
 import { useDebounceFn } from '@vueuse/core'
 
 const IMAGE_RESOURCE_TYPES = new Set(['cover', 'poster', 'preview'])
 const VALIDATION_DEBOUNCE_MS = 300
 
 function createUploadIdempotencyKey() {
-  const cryptoObj = globalThis.crypto
-  if (cryptoObj && typeof cryptoObj.randomUUID === 'function') {
-    return cryptoObj.randomUUID()
-  }
-  return `upload-${Date.now()}-${Math.random().toString(16).slice(2)}`
+  return createRandomId('upload')
 }
 
 function createInitialPayload() {
