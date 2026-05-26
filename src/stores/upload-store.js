@@ -37,26 +37,30 @@ export const useUploadStore = defineStore('upload', () => {
     upload.value = value
   }
 
+  const invalidateQueries = options => {
+    queryCache.invalidateQueries(options).catch(() => {})
+  }
+
   const invalidateChannelsCache = () => {
-    void queryCache.invalidateQueries({ key: ['channels', 'flat'], exact: true })
-    void queryCache.invalidateQueries({ key: ['channels', 'deep'], exact: true })
+    invalidateQueries({ key: ['channels', 'flat'], exact: true })
+    invalidateQueries({ key: ['channels', 'deep'], exact: true })
   }
 
   const invalidateChannelCacheById = channelId => {
     if (!channelId) return
-    void queryCache.invalidateQueries({
+    invalidateQueries({
       predicate: query => query.key?.[0] === 'channel' && query.key?.[1] === channelId
     })
   }
 
   const invalidateChannelCacheByAlbum = albumId => {
     if (!albumId) return
-    void queryCache.invalidateQueries({ key: ['channel', 'album', albumId], exact: true })
+    invalidateQueries({ key: ['channel', 'album', albumId], exact: true })
   }
 
   const invalidateChannelCacheByMedia = mediaId => {
     if (!mediaId) return
-    void queryCache.invalidateQueries({ key: ['channel', 'media', mediaId], exact: true })
+    invalidateQueries({ key: ['channel', 'media', mediaId], exact: true })
   }
 
   const requestUploadInstruction = async url => {

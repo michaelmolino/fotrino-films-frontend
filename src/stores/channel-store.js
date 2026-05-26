@@ -38,6 +38,10 @@ export const useChannelStore = defineStore('channel', () => {
     channels.value = value
   }
 
+  const invalidateQueries = options => {
+    queryCache.invalidateQueries(options).catch(() => {})
+  }
+
   const channelQueryOptions = (channelId, pending = false) => ({
     key: ['channel', channelId, pending ? 'pending' : 'current'],
     staleTime: API_CACHE_MEDIUM_MS,
@@ -107,11 +111,11 @@ export const useChannelStore = defineStore('channel', () => {
   })
 
   const invalidateChannelsCache = () => {
-    void queryCache.invalidateQueries({
+    invalidateQueries({
       key: channelsQueryOptions(false).key,
       exact: true
     })
-    void queryCache.invalidateQueries({
+    invalidateQueries({
       key: channelsQueryOptions(true).key,
       exact: true
     })
@@ -119,14 +123,14 @@ export const useChannelStore = defineStore('channel', () => {
 
   const invalidateChannelCacheById = channelId => {
     if (!channelId) return
-    void queryCache.invalidateQueries({
+    invalidateQueries({
       predicate: query => query.key?.[0] === 'channel' && query.key?.[1] === channelId
     })
   }
 
   const invalidateChannelCacheByAlbum = albumId => {
     if (!albumId) return
-    void queryCache.invalidateQueries({
+    invalidateQueries({
       key: channelByAlbumQueryOptions(albumId).key,
       exact: true
     })
@@ -134,7 +138,7 @@ export const useChannelStore = defineStore('channel', () => {
 
   const invalidateChannelCacheByMedia = mediaId => {
     if (!mediaId) return
-    void queryCache.invalidateQueries({
+    invalidateQueries({
       key: channelByMediaQueryOptions(mediaId).key,
       exact: true
     })
@@ -142,7 +146,7 @@ export const useChannelStore = defineStore('channel', () => {
 
   const invalidatePrivateMediaCache = privateMediaId => {
     if (!privateMediaId) return
-    void queryCache.invalidateQueries({
+    invalidateQueries({
       key: privateMediaQueryOptions(privateMediaId).key,
       exact: true
     })
@@ -150,7 +154,7 @@ export const useChannelStore = defineStore('channel', () => {
 
   const invalidatePrivateAlbumCache = privateAlbumId => {
     if (!privateAlbumId) return
-    void queryCache.invalidateQueries({
+    invalidateQueries({
       predicate: query =>
         query.key?.[0] === 'channel' &&
         query.key?.[1] === 'private-album' &&

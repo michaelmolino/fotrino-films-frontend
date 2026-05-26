@@ -64,8 +64,12 @@ export const useAccountStore = defineStore('account', () => {
     providers.value = Array.isArray(value) ? value : []
   }
 
+  const invalidateQueries = options => {
+    queryCache.invalidateQueries(options).catch(() => {})
+  }
+
   const clearProfileCache = () => {
-    void queryCache.invalidateQueries({
+    invalidateQueries({
       key: accountProfileQueryOptions().key,
       exact: true
     })

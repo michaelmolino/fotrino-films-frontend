@@ -90,6 +90,10 @@ export const useAdminStore = defineStore('admin', () => {
     reportedMedia.value = Array.isArray(value) ? value : []
   }
 
+  const invalidateQueries = options => {
+    queryCache.invalidateQueries(options).catch(() => {})
+  }
+
   const useUsersQuery = () => {
     const query = useQuery(usersQueryOptions)
 
@@ -170,14 +174,14 @@ export const useAdminStore = defineStore('admin', () => {
       await runStoreMutation({
         request: () => api.post(`/admin/jobs/pending/${job.id}/start-now`)
       })
-      void queryCache.invalidateQueries({ key: ['admin', 'jobs'] })
+      invalidateQueries({ key: ['admin', 'jobs'] })
       return mutationResult({ ok: true, data: 'started' })
     }
     if (job.status === 'failed') {
       await runStoreMutation({
         request: () => api.post(`/admin/jobs/failed/${job.id}/replay`)
       })
-      void queryCache.invalidateQueries({ key: ['admin', 'jobs'] })
+      invalidateQueries({ key: ['admin', 'jobs'] })
       return mutationResult({ ok: true, data: 'replayed' })
     }
     throw new Error(`No admin action available for status: ${job.status}`)
@@ -196,7 +200,7 @@ export const useAdminStore = defineStore('admin', () => {
       return mutationResult({ ok: false, cancelled: true })
     }
 
-    void queryCache.invalidateQueries({
+    invalidateQueries({
       key: usersQueryOptions().key,
       exact: true
     })
@@ -216,7 +220,7 @@ export const useAdminStore = defineStore('admin', () => {
       return mutationResult({ ok: false, cancelled: true })
     }
 
-    void queryCache.invalidateQueries({
+    invalidateQueries({
       key: usersQueryOptions().key,
       exact: true
     })
@@ -236,7 +240,7 @@ export const useAdminStore = defineStore('admin', () => {
       return mutationResult({ ok: false, cancelled: true })
     }
 
-    void queryCache.invalidateQueries({
+    invalidateQueries({
       key: reportedMediaQueryOptions().key,
       exact: true
     })
