@@ -21,8 +21,7 @@ import { useUploadStore } from 'src/stores/upload-store.js'
 import ChannelItem from './MediaBrowser/ChannelItem.vue'
 import { getComponentApiErrorMessage } from 'src/utils/apiErrors.js'
 import { useUppyPresignedUpload } from 'src/composables/useUppyPresignedUpload.js'
-import { isPendingUploadLockedByAnotherTab } from '@utils/pendingUploadLocks.js'
-import { notifyError, notifySuccess, notifyWarning } from 'src/utils/notify.js'
+import { notifyError, notifySuccess } from 'src/utils/notify.js'
 
 const channelStore = useChannelStore()
 const uploadStore = useUploadStore()
@@ -139,13 +138,6 @@ async function undeleteChannel(channelPublicId) {
 }
 
 async function abortPendingMedia(mediaId) {
-  if (isPendingUploadLockedByAnotherTab(mediaId)) {
-    notifyWarning('This upload is currently active in another tab. Cancel there first.', {
-      timeout: 3500
-    })
-    return
-  }
-
   try {
     await uploadStore.abortUpload(mediaId)
     notifySuccess('Pending upload aborted.')

@@ -1,11 +1,10 @@
 import { ref } from 'vue'
 import { useUppyPresignedUpload } from './useUppyPresignedUpload.js'
-import { usePendingUploadLock } from './usePendingUploadLock.js'
 
 export function useUploadFlow({ uploadStore, getDraftRequest, stepper }) {
   const isUploading = ref(false)
   const abortController = ref(null)
-  const uploadLock = usePendingUploadLock()
+  const activeMediaRef = ref(null)
 
   const {
     progress,
@@ -41,10 +40,10 @@ export function useUploadFlow({ uploadStore, getDraftRequest, stepper }) {
       if (mediaRef == null) {
         throw new Error('Upload draft did not include a media reference')
       }
+      activeMediaRef.value = mediaRef
 
       initializeUppy(uploadDraft)
       addFilesToUppy(uploadItems)
-      uploadLock.acquire(mediaRef)
 
       await startUpload()
 
@@ -66,18 +65,17 @@ export function useUploadFlow({ uploadStore, getDraftRequest, stepper }) {
       console.error('Error uploading:', err)
       throw err
     } finally {
-      uploadLock.release()
       cleanup()
       isUploading.value = false
       abortController.value = null
+      activeMediaRef.value = null
     }
   }
 
   function cancel() {
     abortController.value?.abort()
-    const mediaRef = uploadLock.activeMediaRef.value
+    const mediaRef = activeMediaRef.value
 
-    uploadLock.release()
     cancelUploads()
     isUploading.value = false
     progress.value = 0
