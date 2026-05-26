@@ -2,34 +2,11 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { api } from 'src/clients/axios-client.js'
 import { useQueryCache } from '@pinia/colada'
+import { mutationResult, runMutation } from 'src/utils/storeMutations.js'
 
 export const useUploadStore = defineStore('upload', () => {
   const upload = ref(null)
   const queryCache = useQueryCache()
-
-  const runStoreMutation = async ({ request, onSuccess, onError }) => {
-    try {
-      const result = await request()
-      if (typeof onSuccess === 'function') {
-        await onSuccess(result)
-      }
-      return result
-    } catch (error) {
-      if (typeof onError === 'function') {
-        const maybe = onError(error)
-        if (maybe !== undefined) {
-          return maybe
-        }
-      }
-      throw error
-    }
-  }
-
-  const mutationResult = ({ ok, data = null, cancelled = false }) => ({
-    ok,
-    data,
-    cancelled
-  })
 
   const CANCELLED = Symbol('cancelled')
 
@@ -38,7 +15,7 @@ export const useUploadStore = defineStore('upload', () => {
   }
 
   const invalidateQueries = options => {
-    queryCache.invalidateQueries(options).catch(() => {})
+    queryCache.invalidateQueries(options).catch(() => { })
   }
 
   const invalidateChannelsCache = () => {
@@ -69,7 +46,7 @@ export const useUploadStore = defineStore('upload', () => {
   }
 
   const postUploadDraft = async draftRequest => {
-    const response = await runStoreMutation({
+    const response = await runMutation({
       request: () =>
         api.post('/uploads/media/drafts', draftRequest, {
           headers: {
@@ -93,7 +70,7 @@ export const useUploadStore = defineStore('upload', () => {
   }
 
   const validateUploadDraft = async draftRequest => {
-    const response = await runStoreMutation({
+    const response = await runMutation({
       request: () =>
         api.post('/uploads/media/drafts/validate', draftRequest, {
           headers: {
@@ -107,7 +84,7 @@ export const useUploadStore = defineStore('upload', () => {
   }
 
   const confirmUpload = async media => {
-    await runStoreMutation({
+    await runMutation({
       request: () => api.put(`/uploads/media/confirm/${media}`)
     })
     invalidateChannelsCache()
@@ -116,7 +93,7 @@ export const useUploadStore = defineStore('upload', () => {
   }
 
   const abortUpload = async mediaId => {
-    const response = await runStoreMutation({
+    const response = await runMutation({
       request: () => api.delete(`/uploads/media/${mediaId}/abort`),
       onError: error => {
         if (error?.__userCancelled) {
@@ -151,7 +128,7 @@ export const useUploadStore = defineStore('upload', () => {
     resourceDate = null,
     main
   }) => {
-    const response = await runStoreMutation({
+    const response = await runMutation({
       request: () =>
         api.put(`/uploads/media/${mediaId}/preview/confirm`, {
           objectName,
@@ -174,7 +151,7 @@ export const useUploadStore = defineStore('upload', () => {
     posterType,
     posterColor = null
   }) => {
-    const response = await runStoreMutation({
+    const response = await runMutation({
       request: () =>
         api.put(`/uploads/album/${albumId}/poster/confirm`, {
           objectName,
@@ -190,7 +167,7 @@ export const useUploadStore = defineStore('upload', () => {
   }
 
   const confirmChannelCoverUpload = async ({ channelPublicId, objectName, title }) => {
-    const response = await runStoreMutation({
+    const response = await runMutation({
       request: () =>
         api.put(`/uploads/${channelPublicId}/cover/confirm`, {
           objectName,

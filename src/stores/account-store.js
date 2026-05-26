@@ -3,36 +3,13 @@ import { defineStore } from 'pinia'
 import { useQuery, useQueryCache } from '@pinia/colada'
 import { api } from 'src/clients/axios-client.js'
 import { API_CACHE_LONG_MS, API_CACHE_SHORT_MS } from 'src/stores/utils/cache-timeouts.js'
+import { mutationResult, runMutation } from 'src/utils/storeMutations.js'
 
 export const useAccountStore = defineStore('account', () => {
   const profile = ref(null)
   const providers = ref([])
   const providersLoadFailed = ref(false)
   const queryCache = useQueryCache()
-
-  const runStoreMutation = async ({ request, onSuccess, onError }) => {
-    try {
-      const result = await request()
-      if (typeof onSuccess === 'function') {
-        await onSuccess(result)
-      }
-      return result
-    } catch (error) {
-      if (typeof onError === 'function') {
-        const maybe = onError(error)
-        if (maybe !== undefined) {
-          return maybe
-        }
-      }
-      throw error
-    }
-  }
-
-  const mutationResult = ({ ok, data = null, cancelled = false }) => ({
-    ok,
-    data,
-    cancelled
-  })
 
   const accountProfileQueryOptions = (staleTime = API_CACHE_SHORT_MS) => ({
     key: ['account', 'profile'],
@@ -65,7 +42,7 @@ export const useAccountStore = defineStore('account', () => {
   }
 
   const invalidateQueries = options => {
-    queryCache.invalidateQueries(options).catch(() => {})
+    queryCache.invalidateQueries(options).catch(() => { })
   }
 
   const clearProfileCache = () => {
@@ -126,7 +103,7 @@ export const useAccountStore = defineStore('account', () => {
   }
 
   const logout = async () => {
-    await runStoreMutation({
+    await runMutation({
       request: () => api.post('/account/logout'),
       onSuccess: () => {
         clearProfileCache()

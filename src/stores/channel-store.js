@@ -3,35 +3,13 @@ import { defineStore } from 'pinia'
 import { api } from 'src/clients/axios-client.js'
 import { useQuery, useQueryCache } from '@pinia/colada'
 import { API_CACHE_MEDIUM_MS } from 'src/stores/utils/cache-timeouts.js'
+import { mutationResult, runMutation } from 'src/utils/storeMutations.js'
 
 export const useChannelStore = defineStore('channel', () => {
   const channels = ref([])
 
   const queryCache = useQueryCache()
 
-  const runStoreMutation = async ({ request, onSuccess, onError }) => {
-    try {
-      const result = await request()
-      if (typeof onSuccess === 'function') {
-        await onSuccess(result)
-      }
-      return result
-    } catch (error) {
-      if (typeof onError === 'function') {
-        const maybe = onError(error)
-        if (maybe !== undefined) {
-          return maybe
-        }
-      }
-      throw error
-    }
-  }
-
-  const mutationResult = ({ ok, data = null, cancelled = false }) => ({
-    ok,
-    data,
-    cancelled
-  })
   const CANCELLED = Symbol('cancelled')
 
   const setChannels = value => {
@@ -39,7 +17,7 @@ export const useChannelStore = defineStore('channel', () => {
   }
 
   const invalidateQueries = options => {
-    queryCache.invalidateQueries(options).catch(() => {})
+    queryCache.invalidateQueries(options).catch(() => { })
   }
 
   const channelQueryOptions = (channelId, pending = false) => ({
@@ -225,7 +203,7 @@ export const useChannelStore = defineStore('channel', () => {
         ? `/channels/${resource.id}`
         : `/channels/${resource.type}/${resource.id}`
 
-    const response = await runStoreMutation({
+    const response = await runMutation({
       request: () => api.delete(url),
       onError: error => {
         if (error?.__userCancelled) {
@@ -261,7 +239,7 @@ export const useChannelStore = defineStore('channel', () => {
       url = `/channels/${resource.id}/undelete`
     }
 
-    await runStoreMutation({
+    await runMutation({
       request: () => api.put(url, null)
     })
 
@@ -277,7 +255,7 @@ export const useChannelStore = defineStore('channel', () => {
   }
 
   const updateMedia = async ({ mediaId, title, description = null, resourceDate = null, main }) => {
-    const res = await runStoreMutation({
+    const res = await runMutation({
       request: () =>
         api.put(`/channels/media/${mediaId}`, {
           title: title?.trim(),
@@ -298,7 +276,7 @@ export const useChannelStore = defineStore('channel', () => {
     posterType,
     posterColor = null
   }) => {
-    const res = await runStoreMutation({
+    const res = await runMutation({
       request: () =>
         api.put(`/channels/album/${albumId}`, {
           title: title?.trim(),
@@ -313,7 +291,7 @@ export const useChannelStore = defineStore('channel', () => {
   }
 
   const updateChannel = async ({ channelPublicId, title }) => {
-    const res = await runStoreMutation({
+    const res = await runMutation({
       request: () =>
         api.put(`/channels/${channelPublicId}`, {
           title: title?.trim()
@@ -325,7 +303,7 @@ export const useChannelStore = defineStore('channel', () => {
   }
 
   const reportMedia = async ({ privateId, reason }) => {
-    const res = await runStoreMutation({
+    const res = await runMutation({
       request: () =>
         api.post(`/channels/media/private/${privateId}/report`, {
           reason: reason?.trim() || null

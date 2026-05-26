@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import { useQuery, useQueryCache } from '@pinia/colada'
 import { api } from 'src/clients/axios-client.js'
 import { isGlobalApiError } from 'src/utils/apiErrors.js'
+import { mutationResult, runMutation } from 'src/utils/storeMutations.js'
 
 export const useAdminStore = defineStore('admin', () => {
   const users = ref([])
@@ -10,29 +11,6 @@ export const useAdminStore = defineStore('admin', () => {
   const reportedMedia = ref([])
   const queryCache = useQueryCache()
 
-  const runStoreMutation = async ({ request, onSuccess, onError }) => {
-    try {
-      const result = await request()
-      if (typeof onSuccess === 'function') {
-        await onSuccess(result)
-      }
-      return result
-    } catch (error) {
-      if (typeof onError === 'function') {
-        const maybe = onError(error)
-        if (maybe !== undefined) {
-          return maybe
-        }
-      }
-      throw error
-    }
-  }
-
-  const mutationResult = ({ ok, data = null, cancelled = false }) => ({
-    ok,
-    data,
-    cancelled
-  })
   const CANCELLED = Symbol('cancelled')
 
   const usersQueryOptions = () => ({
@@ -49,9 +27,9 @@ export const useAdminStore = defineStore('admin', () => {
   const jobsQueryOptions = (statuses = []) => {
     const normalizedStatuses = Array.isArray(statuses)
       ? [...statuses]
-          .filter(Boolean)
-          .map(String)
-          .sort((a, b) => a.localeCompare(b))
+        .filter(Boolean)
+        .map(String)
+        .sort((a, b) => a.localeCompare(b))
       : []
 
     return {
@@ -91,7 +69,7 @@ export const useAdminStore = defineStore('admin', () => {
   }
 
   const invalidateQueries = options => {
-    queryCache.invalidateQueries(options).catch(() => {})
+    queryCache.invalidateQueries(options).catch(() => { })
   }
 
   const useUsersQuery = () => {
@@ -171,14 +149,14 @@ export const useAdminStore = defineStore('admin', () => {
       throw new Error('Invalid admin job payload.')
     }
     if (job.status === 'todo') {
-      await runStoreMutation({
+      await runMutation({
         request: () => api.post(`/admin/jobs/pending/${job.id}/start-now`)
       })
       invalidateQueries({ key: ['admin', 'jobs'] })
       return mutationResult({ ok: true, data: 'started' })
     }
     if (job.status === 'failed') {
-      await runStoreMutation({
+      await runMutation({
         request: () => api.post(`/admin/jobs/failed/${job.id}/replay`)
       })
       invalidateQueries({ key: ['admin', 'jobs'] })
@@ -188,7 +166,7 @@ export const useAdminStore = defineStore('admin', () => {
   }
 
   const deleteUser = async userId => {
-    const response = await runStoreMutation({
+    const response = await runMutation({
       request: () => api.delete(`/admin/users/${userId}`),
       onError: error => {
         if (error?.__userCancelled) {
@@ -208,7 +186,7 @@ export const useAdminStore = defineStore('admin', () => {
   }
 
   const approveUser = async userId => {
-    const response = await runStoreMutation({
+    const response = await runMutation({
       request: () => api.post(`/admin/users/${userId}/approve`),
       onError: error => {
         if (error?.__userCancelled) {
@@ -228,7 +206,7 @@ export const useAdminStore = defineStore('admin', () => {
   }
 
   const deleteMedia = async privateId => {
-    const response = await runStoreMutation({
+    const response = await runMutation({
       request: () => api.delete(`/admin/media/${privateId}`),
       onError: error => {
         if (error?.__userCancelled) {
