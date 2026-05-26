@@ -13,7 +13,9 @@
           x-webkit-airplay="allow"
           :key="media.id"
           :aria-label="`Video player for ${media.title}`"
-          preload="metadata"
+          :poster="videoPosterUrl || undefined"
+          :data-poster="videoPosterUrl || undefined"
+          preload="none"
           data-cy="video-player"
           class="videoEl"></video>
       </div>
@@ -146,13 +148,6 @@ async function setupPlayer() {
         'airplay'
       ]
 
-  if (isVideoView.value) {
-    if (videoPosterUrl.value) {
-      el.setAttribute('poster', videoPosterUrl.value)
-    } else {
-      el.removeAttribute('poster')
-    }
-  }
   if (!PlyrCtor) {
     const mod = await import('plyr')
     PlyrCtor = mod.default

@@ -97,10 +97,22 @@ export function getMetaData(route, channel, readModel = null) {
 
   // Open Graph URL
   const ogUrl = 'https://films.fotrino.com' + (route?.href?.split('?')[0] || '')
+  const link =
+    type === 'video' && image
+      ? {
+        preloadPoster: {
+          rel: 'preload',
+          as: 'image',
+          href: image,
+          fetchpriority: 'high'
+        }
+      }
+      : {}
 
   // Compose meta tags
   return {
     title,
+    link,
     meta: {
       description: { name: 'description', content: description },
       // Open Graph
