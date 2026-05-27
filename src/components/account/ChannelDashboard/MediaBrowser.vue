@@ -172,7 +172,7 @@ async function runEditJourney({
 
       // Use unified composable for upload orchestration
       initializeUppy({
-        mediaId: instruction.reference,
+        mediaPrivateId: instruction.reference,
         uploadEndpoint: '/api/upload',
         instructions: [
           {

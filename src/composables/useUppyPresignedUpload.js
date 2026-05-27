@@ -29,7 +29,7 @@ export function useUppyPresignedUpload() {
 
   /**
    * Initialize Uppy for presigned uploads.
-  * @param {Object} uploadDraft - Draft payload with { mediaId, instructions }, where mediaId is the internal media record ID.
+   * @param {Object} uploadDraft - Draft payload with { mediaPrivateId, instructions }, where mediaPrivateId is the opaque media private ID.
    */
   function initializeUppy(uploadDraft) {
     if (client.value) {
@@ -42,7 +42,7 @@ export function useUppyPresignedUpload() {
     }
 
     uploadInstructions.value = instructions
-    mediaReference.value = uploadDraft?.mediaId ?? null
+    mediaReference.value = uploadDraft?.mediaPrivateId ?? null
 
     const createdClient = createPresignedUppyClient({
       id: 'presigned-uploader',

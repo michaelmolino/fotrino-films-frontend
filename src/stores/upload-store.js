@@ -61,7 +61,7 @@ export const useUploadStore = defineStore('upload', () => {
 
     const data = response?.data || {}
     const normalizedData = {
-      mediaId: data?.mediaId ?? null,
+      mediaPrivateId: data?.mediaPrivateId ?? null,
       instructions: data.instructions
     }
 
@@ -84,12 +84,12 @@ export const useUploadStore = defineStore('upload', () => {
     return mutationResult({ ok: true, data: response?.data || { canSubmit: false, blockers: [] } })
   }
 
-  const confirmUpload = async media => {
+  const confirmUpload = async mediaPrivateId => {
     await runMutation({
-      request: () => api.put(`/uploads/media/confirm/${media}`)
+      request: () => api.put(`/uploads/media/confirm/${mediaPrivateId}`)
     })
     invalidateChannelsCache()
-    invalidateChannelCacheByMedia(media)
+    invalidateChannelCacheByMedia(mediaPrivateId)
     return mutationResult({ ok: true })
   }
 
