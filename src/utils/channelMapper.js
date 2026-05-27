@@ -1,8 +1,8 @@
-const buildMediaEntity = (media, albumId, albumPublicId) => ({
-  id: media.id,
+const buildMediaEntity = (media, albumPublicId) => ({
+  id: media.publicId,
   publicId: media.publicId,
   privateId: media.privateId,
-  album: albumId,
+  album: albumPublicId,
   albumPublicId,
   title: media.title,
   slug: media.slug,
@@ -19,19 +19,19 @@ const buildMediaEntity = (media, albumId, albumPublicId) => ({
   updatedAt: media.updatedAt
 })
 
-const buildAlbumEntity = (album, channelId, relationships, mediaByPublicId) => {
+const buildAlbumEntity = (album, channelPublicId, relationships, mediaByPublicId) => {
   const albumPublicId = album.publicId
   const mediaPublicIds = relationships.mediaPublicIdsByAlbumPublicId?.[albumPublicId] || []
   const media = mediaPublicIds
     .map(mediaPublicId => mediaByPublicId[mediaPublicId])
     .filter(Boolean)
-    .map(item => buildMediaEntity(item, album.id, albumPublicId))
+    .map(item => buildMediaEntity(item, albumPublicId))
 
   return {
-    id: album.id,
+    id: albumPublicId,
     publicId: albumPublicId,
     privateId: album.privateId,
-    channel: channelId,
+    channel: channelPublicId,
     title: album.title,
     slug: album.slug,
     subtitle: album.subtitle,
@@ -63,7 +63,7 @@ export const mapChannelReadModelToChannel = readModel => {
   if (!channelEntity) return null
 
   const baseChannel = {
-    id: channelEntity.id,
+    id: channelEntity.publicId,
     publicId: channelEntity.publicId,
     title: channelEntity.title,
     slug: channelEntity.slug,
@@ -78,7 +78,7 @@ export const mapChannelReadModelToChannel = readModel => {
   const albums = albumPublicIds
     .map(albumPublicId => albumsByPublicId[albumPublicId])
     .filter(Boolean)
-    .map(album => buildAlbumEntity(album, channelEntity.id, relationships, mediaByPublicId))
+    .map(album => buildAlbumEntity(album, channelEntity.publicId, relationships, mediaByPublicId))
 
   return {
     ...baseChannel,

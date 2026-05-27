@@ -89,18 +89,18 @@ const buildPublicBreadcrumbs = () => {
     id: 0,
     label: props.channel.title,
     to:
-      props.album?.id || props.media?.id
+      props.album?.publicId || props.media?.publicId
         ? `/c/${props.channel.publicId}/${props.channel.slug}`
         : null
   })
-  if (props.album?.id) {
+  if (props.album?.publicId) {
     arr.push({
       id: 1,
       label: props.album.title,
-      to: props.media?.id ? `/a/${props.album.publicId}/${props.album.slug}` : null
+      to: props.media?.publicId ? `/a/${props.album.publicId}/${props.album.slug}` : null
     })
   }
-  if (props.album?.id && props.media?.id) {
+  if (props.album?.publicId && props.media?.publicId) {
     arr.push({
       id: 2,
       label: props.media.title,

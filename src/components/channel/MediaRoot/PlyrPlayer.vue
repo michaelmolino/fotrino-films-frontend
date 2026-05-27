@@ -11,7 +11,7 @@
           id="video-player"
           controls
           x-webkit-airplay="allow"
-          :key="media.id"
+          :key="media.privateId"
           :aria-label="`Video player for ${media.title}`"
           :poster="videoPosterUrl || undefined"
           :data-poster="videoPosterUrl || undefined"
@@ -32,7 +32,7 @@
       <audio
         id="audio-player"
         controls
-        :key="media.id"
+        :key="media.privateId"
         :aria-label="`Audio player for ${media.title}`"
         data-cy="audio-player"
         class="audioEl"></audio>
@@ -220,7 +220,7 @@ onBeforeUnmount(() => {
 })
 
 watch(
-  () => props.media?.id,
+  () => props.media?.privateId,
   async () => {
     await refreshAudioPreviewSource()
     await rebuild()

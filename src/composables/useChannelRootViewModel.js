@@ -14,21 +14,25 @@ export function useChannelRootViewModel({ loading, channel, route, selectedView,
   const showAlbumsView = computed(() => selectedView.value === 'albums')
 
   const albumCards = computed(() => {
-    return albums.value.map(album => ({
-      id: album.id,
+    return albums.value
+      .filter(album => !!album?.privateId)
+      .map(album => ({
+        id: album.privateId,
       album,
       to: `/a/${album.publicId}/${album.slug}`
-    }))
+      }))
   })
 
   const mediaCards = computed(() => {
-    return sortedAllMedia.value.map((item, index) => ({
-      id: item.media.id,
+    return sortedAllMedia.value
+      .filter(item => !!item?.media?.privateId)
+      .map((item, index) => ({
+        id: item.media.privateId,
       album: item.album,
       media: item.media,
       to: `/m/${item.media.publicId}/${item.media.slug}`,
       priority: index === 0 ? 'high' : 'auto'
-    }))
+      }))
   })
 
   const showEmptyContent = computed(() => {

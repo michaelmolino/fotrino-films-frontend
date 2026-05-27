@@ -14,9 +14,8 @@ export function useMediaRootViewModel({ loading, channel, album, media, route })
   const albumPosterColor = computed(() => album.value?.posterColor || null)
 
   const relatedMedia = computed(() => {
-    return (album.value?.media || []).filter(
-      m => (m.id || m.privateId) !== (media.value?.id || media.value?.privateId)
-    )
+    const currentPrivateId = media.value?.privateId
+    return (album.value?.media || []).filter(m => m?.privateId && m.privateId !== currentPrivateId)
   })
 
   const showRelatedContent = computed(() => {
@@ -34,7 +33,7 @@ export function useMediaRootViewModel({ loading, channel, album, media, route })
 
   const relatedCards = computed(() => {
     return relatedMedia.value.map((related, index) => ({
-      id: related.id,
+      id: related.privateId,
       media: related,
       to: getRelatedPath(related),
       priority: index === 0 ? 'high' : 'auto'

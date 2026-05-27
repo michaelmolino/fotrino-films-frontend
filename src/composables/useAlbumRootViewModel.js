@@ -41,30 +41,36 @@ export function useAlbumRootViewModel({ loading, channel, album, route, privateM
   })
 
   const allMediaCards = computed(() => {
-    return allMedia.value.map((media, index) => ({
-      id: media.id,
-      media,
-      to: getMediaPath(media),
-      priority: index === 0 ? 'high' : 'auto'
-    }))
+    return allMedia.value
+      .filter(media => !!media?.privateId)
+      .map((media, index) => ({
+        id: media.privateId,
+        media,
+        to: getMediaPath(media),
+        priority: index === 0 ? 'high' : 'auto'
+      }))
   })
 
   const featuredMediaCards = computed(() => {
-    return featuredMedia.value.map((media, index) => ({
-      id: media.id,
-      media,
-      to: getMediaPath(media),
-      priority: index === 0 ? 'high' : 'auto'
-    }))
+    return featuredMedia.value
+      .filter(media => !!media?.privateId)
+      .map((media, index) => ({
+        id: media.privateId,
+        media,
+        to: getMediaPath(media),
+        priority: index === 0 ? 'high' : 'auto'
+      }))
   })
 
   const otherMediaCards = computed(() => {
-    return otherMedia.value.map((media, index) => ({
-      id: media.id,
-      media,
-      to: getMediaPath(media),
-      priority: index === 0 ? 'high' : 'auto'
-    }))
+    return otherMedia.value
+      .filter(media => !!media?.privateId)
+      .map((media, index) => ({
+        id: media.privateId,
+        media,
+        to: getMediaPath(media),
+        priority: index === 0 ? 'high' : 'auto'
+      }))
   })
 
   const showFeaturedSection = computed(() => featuredMediaCards.value.length > 0)
