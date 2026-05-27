@@ -16,34 +16,33 @@ export type Providers = string[]
 export type Avatar1 = string
 export type Cover = string
 export type Created1 = string
-export type Id = number
 export type PublicID = string
 export type Slug = string
 export type Title = string
-export type Channels = ChannelCoreResponse[]
+export type Channels = AdminChannelResponse[]
 export type Country1 = string | null
 export type Created2 = string
 export type Deleted1 = boolean
 export type Email1 = string
-export type Id1 = number
+export type Id = number
 export type IsAdmin1 = boolean
 export type LastLogin1 = string
 export type Name1 = string
 export type NewUser1 = boolean
 export type Providers1 = UserProviderResponse[]
-export type AdminUsersResponse = UserResponse[]
+export type AdminUsersResponse = AdminUserResponse[]
 export type Error = 'bad_request'
 export type Message = string | null
 export type Status = 400
 export type Channel = number
 export type Created3 = string
 export type Deleted2 = boolean
-export type Id2 = number
+export type Id1 = number
 export type Album = number
 export type Created4 = string
 export type Deleted3 = boolean
 export type DescriptionUnsafe = string | null
-export type Id3 = number
+export type Id2 = number
 export type Main = boolean
 export type Orientation = 'landscape' | 'portrait'
 export type Pending = boolean
@@ -70,7 +69,7 @@ export type UpdatedAt1 = string
 export type Channel1 = number
 export type Created5 = string
 export type Deleted4 = boolean
-export type Id4 = number
+export type Id3 = number
 export type Media1 = MediaResponse[]
 export type Pending2 = boolean
 export type Poster1 = string | null
@@ -86,7 +85,7 @@ export type Albums = AlbumResponse1[]
 export type Cover1 = string
 export type Created6 = string
 export type Deleted5 = boolean
-export type Id5 = number
+export type Id4 = number
 export type Owner = number
 export type Ownername = string
 export type Pending3 = boolean
@@ -97,7 +96,7 @@ export type Album1 = number
 export type Created7 = string
 export type Deleted6 = boolean
 export type DescriptionUnsafe1 = string | null
-export type Id6 = number
+export type Id5 = number
 export type Main1 = boolean
 export type Orientation1 = 'landscape' | 'portrait'
 export type Pending4 = boolean
@@ -113,7 +112,7 @@ export type UpdatedAt3 = string
 export type Cover2 = string
 export type Created8 = string
 export type Deleted7 = boolean
-export type Id7 = number
+export type Id6 = number
 export type Owner1 = number
 export type Pending5 = boolean
 export type PublicID6 = string
@@ -180,7 +179,6 @@ export type Cover3 = string
 export type Ownername1 = string
 export type Message6 = string | null
 export type Reported = boolean
-export type MediaId = number
 export type PrivateID5 = string
 export type PublicID7 = string
 export type CreatedAt = string
@@ -207,7 +205,7 @@ export type Requiredresources = ('cover' | 'poster' | 'preview' | 'upload')[]
 export type Resourcetype = 'cover' | 'poster' | 'preview' | 'upload'
 export type Url = string
 export type Album2 = ExistingAlbumSelection | CreateAlbumSelection | UnselectedAlbumSelection
-export type Id8 = number
+export type Id7 = number
 export type Mode1 = 'existing'
 export type Mode2 = 'create'
 export type Color = string | null
@@ -238,7 +236,7 @@ export type Jobsrunning = number
 export interface ApiContracts {
   AccountProfile: AccountProfileResponse
   AccountProvidersResponse: AccountProvidersResponse
-  AdminUser: UserResponse
+  AdminUser: AdminUserResponse
   AdminUsersResponse: AdminUsersResponse
   BadRequestErrorResponse: BadRequestErrorResponse
   ChannelAlbum: AlbumResponse
@@ -296,24 +294,23 @@ export interface UserProviderResponse {
 export interface AccountProvidersResponse {
   providers: Providers
 }
-export interface UserResponse {
+export interface AdminUserResponse {
   avatar: Avatar1
   channels: Channels
   country: Country1
   created: Created2
   deleted: Deleted1
   email: Email1
-  id: Id1
+  id: Id
   is_admin: IsAdmin1
   last_login: LastLogin1
   name: Name1
   new_user: NewUser1
   providers: Providers1
 }
-export interface ChannelCoreResponse {
+export interface AdminChannelResponse {
   cover: Cover
   created: Created1
-  id: Id
   publicId: PublicID
   slug: Slug
   title: Title
@@ -327,7 +324,7 @@ export interface AlbumResponse {
   channel: Channel
   created: Created3
   deleted?: Deleted2
-  id: Id2
+  id: Id1
   media?: Media
   pending?: Pending1
   poster: Poster
@@ -345,7 +342,7 @@ export interface MediaResponse {
   created: Created4
   deleted?: Deleted3
   description_unsafe: DescriptionUnsafe
-  id: Id3
+  id: Id2
   main: Main
   orientation: Orientation
   pending?: Pending
@@ -364,7 +361,7 @@ export interface ChannelDetailResponse {
   cover: Cover1
   created: Created6
   deleted?: Deleted5
-  id: Id5
+  id: Id4
   owner: Owner
   ownername: Ownername
   pending?: Pending3
@@ -376,7 +373,7 @@ export interface AlbumResponse1 {
   channel: Channel1
   created: Created5
   deleted?: Deleted4
-  id: Id4
+  id: Id3
   media?: Media1
   pending?: Pending2
   poster: Poster1
@@ -394,7 +391,7 @@ export interface MediaResponse1 {
   created: Created7
   deleted?: Deleted6
   description_unsafe: DescriptionUnsafe1
-  id: Id6
+  id: Id5
   main: Main1
   orientation: Orientation1
   pending?: Pending4
@@ -412,7 +409,7 @@ export interface ChannelSummaryResponse {
   cover: Cover2
   created: Created8
   deleted?: Deleted7
-  id: Id7
+  id: Id6
   owner: Owner1
   pending?: Pending5
   publicId: PublicID6
@@ -510,7 +507,6 @@ export interface ReportMediaResponse {
   reported: Reported
 }
 export interface ReportedMediaItemResponse {
-  media_id: MediaId
   private_id: PrivateID5
   publicId: PublicID7
   reports: Reports
@@ -557,7 +553,7 @@ export interface UploadMediaRequest {
   media: MediaUploadPayload
 }
 export interface ExistingAlbumSelection {
-  id: Id8
+  id: Id7
   mode: Mode1
 }
 export interface CreateAlbumSelection {
