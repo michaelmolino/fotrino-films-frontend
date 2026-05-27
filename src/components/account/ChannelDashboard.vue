@@ -23,7 +23,7 @@ const channelStore = useChannelStore()
 const channelsQuery = channelStore.useChannelsQuery(true)
 
 const profile = computed(() => accountStore.profile)
-const contentState = computed(() => (profile.value?.id ? 'ready' : 'auth-required'))
+const contentState = computed(() => (profile.value ? 'ready' : 'auth-required'))
 const channels = computed(() => channelsQuery.data.value || [])
 const hasChannels = computed(() => channels.value.length > 0)
 const mediaCount = computed(() =>

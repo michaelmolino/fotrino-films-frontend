@@ -339,7 +339,7 @@ const albumSummaryPosterColor = computed(() => {
 })
 
 const contentState = computed(() => {
-  if (!profile.value?.id) {
+  if (!profile.value) {
     return 'auth-required'
   }
   if (isNewUserProfile.value) {

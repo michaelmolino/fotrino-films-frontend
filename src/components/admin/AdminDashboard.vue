@@ -21,7 +21,7 @@ import AuthRequired from '@components/shared/AuthRequired.vue'
 
 const accountStore = useAccountStore()
 const profile = computed(() => accountStore.profile)
-const isAuthenticated = computed(() => !!profile.value?.id)
+const isAuthenticated = computed(() => !!profile.value)
 const isAdmin = computed(() => profile.value?.isAdmin === true)
 const contentState = computed(() => (isAdmin.value ? 'admin' : 'auth-required'))
 const authRequiredType = computed(() => (isAuthenticated.value ? 'admin' : 'login'))
