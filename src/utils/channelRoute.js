@@ -2,29 +2,29 @@ export const getChannelRouteTarget = route => {
   if (route?.params?.privateAlbumId && route?.params?.privateMediaId) {
     return {
       type: 'privateAlbumMedia',
-      albumId: route.params.privateAlbumId,
-      mediaId: route.params.privateMediaId
+      privateAlbumId: route.params.privateAlbumId,
+      privateMediaId: route.params.privateMediaId
     }
   }
 
   if (route?.params?.privateAlbumId) {
-    return { type: 'privateAlbum', albumId: route.params.privateAlbumId }
+    return { type: 'privateAlbum', privateAlbumId: route.params.privateAlbumId }
   }
 
-  if (route?.params?.channelId) {
-    return { type: 'channel', id: route.params.channelId }
+  if (route?.params?.channelPublicId) {
+    return { type: 'channel', publicId: route.params.channelPublicId }
   }
 
-  if (route?.params?.albumId) {
-    return { type: 'album', id: route.params.albumId }
+  if (route?.params?.albumPublicId) {
+    return { type: 'album', publicId: route.params.albumPublicId }
   }
 
-  if (route?.params?.mediaId) {
-    return { type: 'media', id: route.params.mediaId }
+  if (route?.params?.mediaPublicId) {
+    return { type: 'media', publicId: route.params.mediaPublicId }
   }
 
   if (route?.params?.privateMediaId) {
-    return { type: 'privateMedia', mediaId: route.params.privateMediaId }
+    return { type: 'privateMedia', privateMediaId: route.params.privateMediaId }
   }
 
   return null
@@ -32,27 +32,27 @@ export const getChannelRouteTarget = route => {
 
 const getChannelCanonicalPath = (route, channelContext) => {
   const channel = channelContext.channel
-  const channelId = channel?.publicId
-  if (channelId && channel.slug && channel.slug !== route.params.channelSlug) {
-    return `/c/${channelId}/${channel.slug}`
+  const channelPublicId = channel?.publicId
+  if (channelPublicId && channel.slug && channel.slug !== route.params.channelSlug) {
+    return `/c/${channelPublicId}/${channel.slug}`
   }
   return null
 }
 
 const getAlbumCanonicalPath = (route, channelContext, target) => {
-  const album = channelContext.findAlbumByPublicId(target.id)
-  const albumId = album?.publicId
-  if (albumId && album.slug && album.slug !== route.params.albumSlug) {
-    return `/a/${albumId}/${album.slug}`
+  const album = channelContext.findAlbumByPublicId(target.publicId)
+  const albumPublicId = album?.publicId
+  if (albumPublicId && album.slug && album.slug !== route.params.albumSlug) {
+    return `/a/${albumPublicId}/${album.slug}`
   }
   return null
 }
 
 const getMediaCanonicalPath = (route, channelContext, target) => {
-  const media = channelContext.findMediaByPublicId(target.id)
-  const mediaId = media?.publicId
-  if (mediaId && media.slug && media.slug !== route.params.mediaSlug) {
-    return `/m/${mediaId}/${media.slug}`
+  const media = channelContext.findMediaByPublicId(target.publicId)
+  const mediaPublicId = media?.publicId
+  if (mediaPublicId && media.slug && media.slug !== route.params.mediaSlug) {
+    return `/m/${mediaPublicId}/${media.slug}`
   }
   return null
 }

@@ -15,9 +15,9 @@ function getChannelMeta(route, channel) {
   }
 }
 
-function getAlbumMeta(albumId, readModel) {
+function getAlbumMeta(albumPublicId, readModel) {
   const { albumsByPublicId } = getReadModelLookups(readModel)
-  const album = albumsByPublicId[albumId] || null
+  const album = albumsByPublicId[albumPublicId] || null
   return {
     title: album?.title || null,
     description: sanitizeText(album?.subtitle || ''),
@@ -26,9 +26,9 @@ function getAlbumMeta(albumId, readModel) {
   }
 }
 
-function getMediaMeta(mediaId, readModel) {
+function getMediaMeta(mediaPublicId, readModel) {
   const { mediaByPublicId } = getReadModelLookups(readModel)
-  const media = mediaByPublicId[mediaId] || null
+  const media = mediaByPublicId[mediaPublicId] || null
   return {
     title: media?.title || null,
     description: sanitizeText(media?.descriptionUnsafe),
@@ -64,14 +64,14 @@ export function getMetaData(route, channel, readModel = null) {
   let meta = { title: null, description: '', image: null, type: 'website' }
 
   // Route type detection
-  if (route?.params.channelId) {
+  if (route?.params.channelPublicId) {
     meta = getChannelMeta(route, channel)
   }
-  if (route?.params.albumId) {
-    meta = getAlbumMeta(route.params.albumId, readModel)
+  if (route?.params.albumPublicId) {
+    meta = getAlbumMeta(route.params.albumPublicId, readModel)
   }
-  if (route?.params.mediaId) {
-    meta = getMediaMeta(route.params.mediaId, readModel)
+  if (route?.params.mediaPublicId) {
+    meta = getMediaMeta(route.params.mediaPublicId, readModel)
   }
   if (route?.params.privateAlbumId && !route?.params.privateMediaId) {
     meta = getPrivateAlbumMeta(channel)

@@ -36,11 +36,11 @@ export function useUploadFlow({ uploadStore, getDraftRequest, stepper }) {
         throw new Error('Upload cancelled')
       }
 
-      const mediaRef = uploadDraft?.mediaId
-      if (mediaRef == null) {
+      const mediaRecordId = uploadDraft?.mediaId
+      if (mediaRecordId == null) {
         throw new Error('Upload draft did not include a media reference')
       }
-      activeMediaRef.value = mediaRef
+      activeMediaRef.value = mediaRecordId
 
       initializeUppy(uploadDraft)
       addFilesToUppy(uploadItems)
@@ -51,7 +51,7 @@ export function useUploadFlow({ uploadStore, getDraftRequest, stepper }) {
         throw new Error('Upload cancelled')
       }
 
-      await uploadStore.confirmUpload(mediaRef)
+      await uploadStore.confirmUpload(mediaRecordId)
 
       statusText.value = 'Upload complete!'
       stepper.value?.next()
@@ -74,15 +74,15 @@ export function useUploadFlow({ uploadStore, getDraftRequest, stepper }) {
 
   function cancel() {
     abortController.value?.abort()
-    const mediaRef = activeMediaRef.value
+    const mediaRecordId = activeMediaRef.value
 
     cancelUploads()
     isUploading.value = false
     progress.value = 0
     statusText.value = 'Upload cancelled.'
 
-    if (mediaRef != null) {
-      uploadStore.abortUpload(mediaRef).catch(err => {
+    if (mediaRecordId != null) {
+      uploadStore.abortUpload(mediaRecordId).catch(err => {
         console.warn('Failed to abort pending upload on cancel:', err)
       })
     }

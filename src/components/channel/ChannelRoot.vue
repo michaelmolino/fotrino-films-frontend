@@ -30,7 +30,7 @@
         <template v-if="showAlbumsView">
           <div class="row q-mt-sm albums-grid-row">
             <div
-              class="col-xs-6 col-sm-4 col-md-3 col-lg-2 col-xl-1"
+              class="col-xs-6 col-sm-4 col-md-3 col-lg-2"
               v-for="card in albumCards"
               :key="card.id">
               <AlbumPoster :album="card.album" :to="card.to" />
@@ -161,7 +161,7 @@ onBeforeUnmount(() => {
 watch(
   [albumCount, channel, loading],
   ([count, currentChannel, isLoading]) => {
-    if (isLoading || !currentChannel || !route.params.channelId || count !== 1) return
+    if (isLoading || !currentChannel || !route.params.channelPublicId || count !== 1) return
     const onlyAlbum = albums.value[0]
     if (!onlyAlbum?.publicId || !onlyAlbum?.slug) return
     redirect(`/a/${onlyAlbum.publicId}/${onlyAlbum.slug}`)

@@ -104,9 +104,9 @@ async function deleteResource(type, id) {
   }
 }
 
-async function undeleteMedia(mediaId) {
+async function undeleteMedia(mediaRecordId) {
   try {
-    await channelStore.undeleteResource({ type: 'media', id: mediaId })
+    await channelStore.undeleteResource({ type: 'media', id: mediaRecordId })
     notifySuccess('Video restored.')
   } catch (error) {
     notifyError(getComponentApiErrorMessage(error, 'Unable to undelete this video.'), {
@@ -115,9 +115,9 @@ async function undeleteMedia(mediaId) {
   }
 }
 
-async function undeleteAlbum(albumId) {
+async function undeleteAlbum(albumRecordId) {
   try {
-    await channelStore.undeleteResource({ type: 'album', id: albumId })
+    await channelStore.undeleteResource({ type: 'album', id: albumRecordId })
     notifySuccess('Album restored.')
   } catch (error) {
     notifyError(getComponentApiErrorMessage(error, 'Unable to undelete this album.'), {
@@ -137,9 +137,9 @@ async function undeleteChannel(channelPublicId) {
   }
 }
 
-async function abortPendingMedia(mediaId) {
+async function abortPendingMedia(mediaRecordId) {
   try {
-    await uploadStore.abortUpload(mediaId)
+    await uploadStore.abortUpload(mediaRecordId)
     notifySuccess('Pending upload aborted.')
   } catch (error) {
     if (error?.__userCancelled || error?.code === 'ERR_CANCELED') {
@@ -205,7 +205,7 @@ async function saveMediaEdit(payload) {
   return runEditJourney({
     update: channelStore.updateMedia,
     updatePayload: {
-      mediaId: payload?.id,
+      mediaRecordId: payload?.id,
       title: payload?.title,
       description: payload?.description ?? null,
       resourceDate: payload?.resourceDate ?? null,
@@ -215,12 +215,12 @@ async function saveMediaEdit(payload) {
       shouldUpload: !!payload?.previewFile,
       prepare: uploadStore.requestMediaPreviewUpload,
       preparePayload: {
-        mediaId: payload?.id
+        mediaRecordId: payload?.id
       },
       file: payload?.previewFile,
       confirm: uploadStore.confirmMediaPreviewUpload,
       confirmPayload: {
-        mediaId: payload?.id
+        mediaRecordId: payload?.id
       }
     },
     successMessage: 'Video updated.',
@@ -232,7 +232,7 @@ async function saveAlbumEdit(payload) {
   return runEditJourney({
     update: channelStore.updateAlbum,
     updatePayload: {
-      albumId: payload?.id,
+      albumRecordId: payload?.id,
       title: payload?.title,
       subtitle: payload?.subtitle ?? null,
       posterType: payload?.posterType,
@@ -242,12 +242,12 @@ async function saveAlbumEdit(payload) {
       shouldUpload: payload?.posterType === 'new' && !!payload?.posterFile,
       prepare: uploadStore.requestAlbumPosterUpload,
       preparePayload: {
-        albumId: payload?.id
+        albumRecordId: payload?.id
       },
       file: payload?.posterFile,
       confirm: uploadStore.confirmAlbumPosterUpload,
       confirmPayload: {
-        albumId: payload?.id
+        albumRecordId: payload?.id
       }
     },
     successMessage: 'Album updated.',

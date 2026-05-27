@@ -122,8 +122,8 @@ function findAlbumByParams() {
   if (route.params.privateAlbumId) {
     return channel.value?.album || null
   }
-  if (route.params.albumId) {
-    return findAlbumByPublicId(route.params.albumId)
+  if (route.params.albumPublicId) {
+    return findAlbumByPublicId(route.params.albumPublicId)
   }
   return null
 }
@@ -169,7 +169,7 @@ watch(
     if (
       channel.value &&
       !newAlbum &&
-      (route.params.albumId || route.params.privateAlbumId) &&
+      (route.params.albumPublicId || route.params.privateAlbumId) &&
       !loading.value
     ) {
       redirect('/404')
@@ -188,7 +188,7 @@ watch(
       channel.value &&
       proj &&
       count === 1 &&
-      (route.params.albumId || route.params.privateAlbumId)
+      (route.params.albumPublicId || route.params.privateAlbumId)
     ) {
       const featured = featuredMedia.value[0]
       if (privateMode.value && route.params.privateAlbumId && featured?.privateId) {

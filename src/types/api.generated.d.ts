@@ -18,7 +18,7 @@ export type Avatar1 = string
 export type Cover = string
 export type Created1 = string
 export type Id1 = number
-export type Publicid = string
+export type PublicID = string
 export type Slug = string
 export type Title = string
 export type Channels = ChannelCoreResponse[]
@@ -49,8 +49,8 @@ export type Main = boolean
 export type Orientation = 'landscape' | 'portrait'
 export type Pending = boolean
 export type Preview = string
-export type PrivateId = string
-export type Publicid1 = string
+export type PrivateID = string
+export type PublicID1 = string
 export type ResourceDate = string
 export type Slug1 = string
 export type Src = string | null
@@ -61,8 +61,8 @@ export type Media = MediaResponse[]
 export type Pending1 = boolean
 export type Poster = string | null
 export type PosterColor = string | null
-export type PrivateId1 = string
-export type Publicid2 = string
+export type PrivateID1 = string
+export type PublicID2 = string
 export type ResourceDate1 = string
 export type Slug2 = string
 export type Subtitle = string | null
@@ -76,8 +76,8 @@ export type Media1 = MediaResponse[]
 export type Pending2 = boolean
 export type Poster1 = string | null
 export type PosterColor1 = string | null
-export type PrivateId2 = string
-export type Publicid3 = string
+export type PrivateID2 = string
+export type PublicID3 = string
 export type ResourceDate2 = string
 export type Slug3 = string
 export type Subtitle1 = string | null
@@ -91,7 +91,7 @@ export type Id6 = number
 export type Owner = number
 export type Ownername = string
 export type Pending3 = boolean
-export type Publicid4 = string
+export type PublicID4 = string
 export type Slug4 = string
 export type Title4 = string
 export type Album1 = number
@@ -103,8 +103,8 @@ export type Main1 = boolean
 export type Orientation1 = 'landscape' | 'portrait'
 export type Pending4 = boolean
 export type Preview1 = string
-export type PrivateId3 = string
-export type Publicid5 = string
+export type PrivateID3 = string
+export type PublicID5 = string
 export type ResourceDate3 = string
 export type Slug5 = string
 export type Src1 = string | null
@@ -117,7 +117,7 @@ export type Deleted7 = boolean
 export type Id8 = number
 export type Owner1 = number
 export type Pending5 = boolean
-export type Publicid6 = string
+export type PublicID6 = string
 export type Slug6 = string
 export type Title6 = string
 export type Error1 = 'conflict'
@@ -164,7 +164,7 @@ export type Created9 = string | null
 export type DescriptionUnsafe2 = string | null
 export type Orientation2 = ('landscape' | 'portrait') | null
 export type Preview2 = string | null
-export type PrivateId4 = string
+export type PrivateID4 = string
 export type ResourceDate4 = string | null
 export type Slug7 = string
 export type Src2 = string | null
@@ -182,8 +182,8 @@ export type Ownername1 = string
 export type Message6 = string | null
 export type Reported = boolean
 export type MediaId = number
-export type PrivateId5 = string
-export type Publicid7 = string
+export type PrivateID5 = string
+export type PublicID7 = string
 export type CreatedAt = string
 export type Reason = string | null
 export type Reporter = string
@@ -221,7 +221,7 @@ export type Channel2 =
   | CreateChannelSelection
   | UnselectedChannelSelection
 export type Mode5 = 'existing'
-export type Publicid8 = string
+export type PublicID8 = string
 export type Mode6 = 'profile' | 'upload'
 export type Mode7 = 'create'
 export type Title12 = string | null
@@ -316,7 +316,7 @@ export interface ChannelCoreResponse {
   cover: Cover
   created: Created1
   id: Id1
-  publicId: Publicid
+  publicId: PublicID
   slug: Slug
   title: Title
 }
@@ -334,8 +334,8 @@ export interface AlbumResponse {
   pending?: Pending1
   poster: Poster
   poster_color: PosterColor
-  private_id: PrivateId1
-  publicId: Publicid2
+  private_id: PrivateID1
+  publicId: PublicID2
   resource_date: ResourceDate1
   slug: Slug2
   subtitle: Subtitle
@@ -352,8 +352,8 @@ export interface MediaResponse {
   orientation: Orientation
   pending?: Pending
   preview: Preview
-  private_id: PrivateId
-  publicId: Publicid1
+  private_id: PrivateID
+  publicId: PublicID1
   resource_date: ResourceDate
   slug: Slug1
   src: Src
@@ -370,7 +370,7 @@ export interface ChannelDetailResponse {
   owner: Owner
   ownername: Ownername
   pending?: Pending3
-  publicId: Publicid4
+  publicId: PublicID4
   slug: Slug4
   title: Title4
 }
@@ -383,8 +383,8 @@ export interface AlbumResponse1 {
   pending?: Pending2
   poster: Poster1
   poster_color: PosterColor1
-  private_id: PrivateId2
-  publicId: Publicid3
+  private_id: PrivateID2
+  publicId: PublicID3
   resource_date: ResourceDate2
   slug: Slug3
   subtitle: Subtitle1
@@ -401,8 +401,8 @@ export interface MediaResponse1 {
   orientation: Orientation1
   pending?: Pending4
   preview: Preview1
-  private_id: PrivateId3
-  publicId: Publicid5
+  private_id: PrivateID3
+  publicId: PublicID5
   resource_date: ResourceDate3
   slug: Slug5
   src: Src1
@@ -417,7 +417,7 @@ export interface ChannelSummaryResponse {
   id: Id8
   owner: Owner1
   pending?: Pending5
-  publicId: Publicid6
+  publicId: PublicID6
   slug: Slug6
   title: Title6
 }
@@ -489,7 +489,7 @@ export interface PrivateMediaItemResponse {
   description_unsafe: DescriptionUnsafe2
   orientation?: Orientation2
   preview?: Preview2
-  private_id: PrivateId4
+  private_id: PrivateID4
   resource_date?: ResourceDate4
   slug: Slug7
   src?: Src2
@@ -513,8 +513,8 @@ export interface ReportMediaResponse {
 }
 export interface ReportedMediaItemResponse {
   media_id: MediaId
-  private_id: PrivateId5
-  publicId: Publicid7
+  private_id: PrivateID5
+  publicId: PublicID7
   reports: Reports
   slug: Slug8
   title: Title10
@@ -577,7 +577,7 @@ export interface UnselectedAlbumSelection {
 }
 export interface ExistingChannelSelection {
   mode: Mode5
-  publicId: Publicid8
+  publicId: PublicID8
 }
 export interface CreateChannelSelection {
   cover: ChannelCreateCover

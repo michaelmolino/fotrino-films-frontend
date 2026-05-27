@@ -23,21 +23,21 @@ export const useUploadStore = defineStore('upload', () => {
     invalidateQueries({ key: ['channels', 'deep'], exact: true })
   }
 
-  const invalidateChannelCacheById = channelId => {
-    if (!channelId) return
+  const invalidateChannelCacheById = channelPublicId => {
+    if (!channelPublicId) return
     invalidateQueries({
-      predicate: query => query.key?.[0] === 'channel' && query.key?.[1] === channelId
+      predicate: query => query.key?.[0] === 'channel' && query.key?.[1] === channelPublicId
     })
   }
 
-  const invalidateChannelCacheByAlbum = albumId => {
-    if (!albumId) return
-    invalidateQueries({ key: ['channel', 'album', albumId], exact: true })
+  const invalidateChannelCacheByAlbum = albumRecordId => {
+    if (!albumRecordId) return
+    invalidateQueries({ key: ['channel', 'album', albumRecordId], exact: true })
   }
 
-  const invalidateChannelCacheByMedia = mediaId => {
-    if (!mediaId) return
-    invalidateQueries({ key: ['channel', 'media', mediaId], exact: true })
+  const invalidateChannelCacheByMedia = mediaRecordId => {
+    if (!mediaRecordId) return
+    invalidateQueries({ key: ['channel', 'media', mediaRecordId], exact: true })
   }
 
   const requestUploadInstruction = async url => {
@@ -92,9 +92,9 @@ export const useUploadStore = defineStore('upload', () => {
     return mutationResult({ ok: true })
   }
 
-  const abortUpload = async mediaId => {
+  const abortUpload = async mediaRecordId => {
     const response = await runMutation({
-      request: () => api.delete(`/uploads/media/${mediaId}/abort`),
+      request: () => api.delete(`/uploads/media/${mediaRecordId}/abort`),
       onError: error => {
         if (error?.__userCancelled) {
           return CANCELLED
@@ -107,21 +107,21 @@ export const useUploadStore = defineStore('upload', () => {
     }
 
     invalidateChannelsCache()
-    invalidateChannelCacheByMedia(mediaId)
+    invalidateChannelCacheByMedia(mediaRecordId)
     return mutationResult({ ok: true })
   }
 
-  const requestMediaPreviewUpload = ({ mediaId }) =>
-    requestUploadInstruction(`/uploads/media/${mediaId}/preview`)
+  const requestMediaPreviewUpload = ({ mediaRecordId }) =>
+    requestUploadInstruction(`/uploads/media/${mediaRecordId}/preview`)
 
-  const requestAlbumPosterUpload = ({ albumId }) =>
-    requestUploadInstruction(`/uploads/album/${albumId}/poster`)
+  const requestAlbumPosterUpload = ({ albumRecordId }) =>
+    requestUploadInstruction(`/uploads/album/${albumRecordId}/poster`)
 
   const requestChannelCoverUpload = ({ channelPublicId }) =>
     requestUploadInstruction(`/uploads/${channelPublicId}/cover`)
 
   const confirmMediaPreviewUpload = async ({
-    mediaId,
+    mediaRecordId,
     objectName,
     title,
     description = null,
@@ -130,7 +130,7 @@ export const useUploadStore = defineStore('upload', () => {
   }) => {
     const response = await runMutation({
       request: () =>
-        api.put(`/uploads/media/${mediaId}/preview/confirm`, {
+        api.put(`/uploads/media/${mediaRecordId}/preview/confirm`, {
           objectName,
           title: title?.trim(),
           description: description?.trim() || null,
@@ -139,12 +139,12 @@ export const useUploadStore = defineStore('upload', () => {
         })
     })
     invalidateChannelsCache()
-    invalidateChannelCacheByMedia(mediaId)
+    invalidateChannelCacheByMedia(mediaRecordId)
     return mutationResult({ ok: true, data: response?.data ?? null })
   }
 
   const confirmAlbumPosterUpload = async ({
-    albumId,
+    albumRecordId,
     objectName,
     title,
     subtitle = null,
@@ -153,7 +153,7 @@ export const useUploadStore = defineStore('upload', () => {
   }) => {
     const response = await runMutation({
       request: () =>
-        api.put(`/uploads/album/${albumId}/poster/confirm`, {
+        api.put(`/uploads/album/${albumRecordId}/poster/confirm`, {
           objectName,
           title: title?.trim(),
           subtitle: subtitle?.trim() || null,
@@ -162,7 +162,7 @@ export const useUploadStore = defineStore('upload', () => {
         })
     })
     invalidateChannelsCache()
-    invalidateChannelCacheByAlbum(albumId)
+    invalidateChannelCacheByAlbum(albumRecordId)
     return mutationResult({ ok: true, data: response?.data ?? null })
   }
 

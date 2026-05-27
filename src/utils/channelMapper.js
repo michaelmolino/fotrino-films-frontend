@@ -23,7 +23,7 @@ const buildAlbumEntity = (album, channelId, relationships, mediaByPublicId) => {
   const albumPublicId = album.publicId
   const mediaPublicIds = relationships.mediaPublicIdsByAlbumPublicId?.[albumPublicId] || []
   const media = mediaPublicIds
-    .map(mediaId => mediaByPublicId[mediaId])
+    .map(mediaPublicId => mediaByPublicId[mediaPublicId])
     .filter(Boolean)
     .map(item => buildMediaEntity(item, album.id, albumPublicId))
 
@@ -76,7 +76,7 @@ export const mapChannelReadModelToChannel = readModel => {
 
   const albumPublicIds = relationships.albumPublicIdsByChannelPublicId?.[channelPublicId] || []
   const albums = albumPublicIds
-    .map(albumId => albumsByPublicId[albumId])
+    .map(albumPublicId => albumsByPublicId[albumPublicId])
     .filter(Boolean)
     .map(album => buildAlbumEntity(album, channelEntity.id, relationships, mediaByPublicId))
 

@@ -18,15 +18,15 @@ const routes = [
     { path: 'account-deleted', component: () => import('@components/errors/AccountDeleted.vue') }
   ]),
   withMainLayoutRoot(
-    '/c/:channelId([0-9A-Za-z_-]+)/:channelSlug([0-9a-zA-Z-]+)',
+    '/c/:channelPublicId([0-9A-Za-z_-]+)/:channelSlug([0-9a-zA-Z-]+)',
     () => import('@components/channel/ChannelRoot.vue')
   ),
   withMainLayoutRoot(
-    '/a/:albumId([0-9A-Za-z_-]+)/:albumSlug([0-9a-zA-Z-]+)',
+    '/a/:albumPublicId([0-9A-Za-z_-]+)/:albumSlug([0-9a-zA-Z-]+)',
     () => import('@components/channel/AlbumRoot.vue')
   ),
   withMainLayoutRoot(
-    '/m/:mediaId([0-9A-Za-z_-]+)/:mediaSlug([0-9a-zA-Z-]+)',
+    '/m/:mediaPublicId([0-9A-Za-z_-]+)/:mediaSlug([0-9a-zA-Z-]+)',
     () => import('@components/channel/MediaRoot.vue')
   ),
   withMainLayoutRoot(

@@ -3,7 +3,7 @@ import { computed } from 'vue'
 export function useAlbumRootViewModel({ loading, channel, album, route, privateMode }) {
   const contentState = computed(() => {
     if (loading.value) return 'loading'
-    const hasAlbumTarget = !!(route.params.albumId || route.params.privateAlbumId)
+    const hasAlbumTarget = !!(route.params.albumPublicId || route.params.privateAlbumId)
     return channel.value && album.value && hasAlbumTarget ? 'ready' : 'not-found'
   })
 

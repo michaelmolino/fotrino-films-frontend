@@ -8,7 +8,7 @@ export function useChannelRootViewModel({ loading, channel, route, selectedView,
 
   const contentState = computed(() => {
     if (loading.value) return 'loading'
-    return channel.value?.publicId === route.params.channelId ? 'ready' : 'not-found'
+    return channel.value?.publicId === route.params.channelPublicId ? 'ready' : 'not-found'
   })
 
   const showAlbumsView = computed(() => selectedView.value === 'albums')

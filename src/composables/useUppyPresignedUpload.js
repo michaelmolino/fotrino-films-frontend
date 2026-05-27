@@ -29,7 +29,7 @@ export function useUppyPresignedUpload() {
 
   /**
    * Initialize Uppy for presigned uploads.
-   * @param {Object} uploadDraft - Draft payload with { mediaId, instructions }
+  * @param {Object} uploadDraft - Draft payload with { mediaId, instructions }, where mediaId is the internal media record ID.
    */
   function initializeUppy(uploadDraft) {
     if (client.value) {

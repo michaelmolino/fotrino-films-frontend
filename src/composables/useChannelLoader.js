@@ -61,9 +61,9 @@ export function useChannelLoader({ manageMeta = false } = {}) {
   const needsChannelData = computed(
     () =>
       !!(
-        route.params?.channelId ||
-        route.params?.albumId ||
-        route.params?.mediaId ||
+        route.params?.channelPublicId ||
+        route.params?.albumPublicId ||
+        route.params?.mediaPublicId ||
         route.params?.privateAlbumId ||
         route.params?.privateMediaId
       )
@@ -111,35 +111,35 @@ export function useChannelLoader({ manageMeta = false } = {}) {
     if (!target || !channel.value) return false
 
     if (target.type === 'channel') {
-      return channel.value.publicId === target.id
+      return channel.value.publicId === target.publicId
     }
 
     if (target.type === 'album') {
-      return !!findAlbumByPublicId(target.id)
+      return !!findAlbumByPublicId(target.publicId)
     }
 
     if (target.type === 'media') {
-      return !!findMediaByPublicId(target.id)
+      return !!findMediaByPublicId(target.publicId)
     }
 
     if (target.type === 'privateMedia') {
       const media = channel.value?.album?.media || []
-      return media.some(item => item?.privateId === target.mediaId)
+      return media.some(item => item?.privateId === target.privateMediaId)
     }
 
     if (target.type === 'privateAlbum') {
-      return channel.value?.album?.privateId === target.albumId
+      return channel.value?.album?.privateId === target.privateAlbumId
     }
 
     if (target.type === 'privateAlbumMedia') {
-      if (channel.value?.album?.privateId !== target.albumId) {
+      if (channel.value?.album?.privateId !== target.privateAlbumId) {
         return false
       }
       const mediaItems = channel.value?.album?.media
       if (!Array.isArray(mediaItems)) {
         return false
       }
-      return mediaItems.some(item => item?.privateId === target.mediaId)
+      return mediaItems.some(item => item?.privateId === target.privateMediaId)
     }
 
     return false
@@ -164,22 +164,22 @@ export function useChannelLoader({ manageMeta = false } = {}) {
     }
 
     if (target.type === 'channel') {
-      return runRouteQuery(channelStore.channelQueryOptions(target.id))
+      return runRouteQuery(channelStore.channelQueryOptions(target.publicId))
     }
     if (target.type === 'album') {
-      return runRouteQuery(channelStore.channelByAlbumQueryOptions(target.id))
+      return runRouteQuery(channelStore.channelByAlbumQueryOptions(target.publicId))
     }
     if (target.type === 'media') {
-      return runRouteQuery(channelStore.channelByMediaQueryOptions(target.id))
+      return runRouteQuery(channelStore.channelByMediaQueryOptions(target.publicId))
     }
     if (target.type === 'privateAlbum') {
-      return runRouteQuery(channelStore.privateAlbumQueryOptions(target.albumId))
+      return runRouteQuery(channelStore.privateAlbumQueryOptions(target.privateAlbumId))
     }
     if (target.type === 'privateAlbumMedia') {
-      return runRouteQuery(channelStore.privateAlbumQueryOptions(target.albumId, target.mediaId))
+      return runRouteQuery(channelStore.privateAlbumQueryOptions(target.privateAlbumId, target.privateMediaId))
     }
     if (target.type === 'privateMedia') {
-      return runRouteQuery(channelStore.privateMediaQueryOptions(target.mediaId))
+      return runRouteQuery(channelStore.privateMediaQueryOptions(target.privateMediaId))
     }
     return Promise.resolve(EMPTY_CHANNEL_VIEW_RESPONSE)
   }

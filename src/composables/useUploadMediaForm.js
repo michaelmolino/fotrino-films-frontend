@@ -568,7 +568,7 @@ export function useUploadMediaForm() {
     await startUploadJourney()
   }
 
-  async function loadAlbumsForChannelUuid(publicId, requestToken = albumsLoadToken.value) {
+  async function loadAlbumsForChannelPublicId(publicId, requestToken = albumsLoadToken.value) {
     try {
       const existing = (channels.value || []).find(ch => ch?.publicId === publicId)
       if (Array.isArray(existing?.albums)) {
@@ -578,7 +578,7 @@ export function useUploadMediaForm() {
       }
 
       let chan = await channelStore.fetchChannel({
-        channelId: publicId,
+        channelPublicId: publicId,
         pending: true,
         cache: false
       })
@@ -586,7 +586,7 @@ export function useUploadMediaForm() {
 
       if (albumList.length === 0) {
         chan = await channelStore.fetchChannel({
-          channelId: publicId,
+          channelPublicId: publicId,
           pending: false,
           cache: false
         })
@@ -673,7 +673,7 @@ export function useUploadMediaForm() {
       payload.album.id = null
 
       const requestToken = ++albumsLoadToken.value
-      await loadAlbumsForChannelUuid(newPublicId, requestToken)
+      await loadAlbumsForChannelPublicId(newPublicId, requestToken)
       if (requestToken !== albumsLoadToken.value) return
 
       setDefaultProjectSelection(albums.value || [])
@@ -721,7 +721,7 @@ export function useUploadMediaForm() {
 
     if (payload.channelMode === 'existing' && payload.publicId?.value) {
       const requestToken = ++albumsLoadToken.value
-      void loadAlbumsForChannelUuid(payload.publicId.value, requestToken)
+      void loadAlbumsForChannelPublicId(payload.publicId.value, requestToken)
     } else {
       albumsLoadToken.value++
       albums.value = []
@@ -839,7 +839,7 @@ export function useUploadMediaForm() {
 
     if (payload.channelMode === 'existing' && payload.publicId?.value) {
       const requestToken = ++albumsLoadToken.value
-      await loadAlbumsForChannelUuid(payload.publicId.value, requestToken)
+      await loadAlbumsForChannelPublicId(payload.publicId.value, requestToken)
       setDefaultProjectSelection(albums.value || [])
     }
 

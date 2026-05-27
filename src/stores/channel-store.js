@@ -20,11 +20,11 @@ export const useChannelStore = defineStore('channel', () => {
     queryCache.invalidateQueries(options).catch(() => { })
   }
 
-  const channelQueryOptions = (channelId, pending = false) => ({
-    key: ['channel', channelId, pending ? 'pending' : 'current'],
+  const channelQueryOptions = (channelPublicId, pending = false) => ({
+    key: ['channel', channelPublicId, pending ? 'pending' : 'current'],
     staleTime: API_CACHE_MEDIUM_MS,
     query: async () => {
-      const url = `/channels/${channelId}${pending ? '?pending=true' : ''}`
+      const url = `/channels/${channelPublicId}${pending ? '?pending=true' : ''}`
       const { data } = await api.get(url, {
         __redirectNotFoundTo404: true
       })
@@ -41,22 +41,22 @@ export const useChannelStore = defineStore('channel', () => {
     }
   })
 
-  const channelByAlbumQueryOptions = albumId => ({
-    key: ['channel', 'album', albumId],
+  const channelByAlbumQueryOptions = albumPublicId => ({
+    key: ['channel', 'album', albumPublicId],
     staleTime: API_CACHE_MEDIUM_MS,
     query: async () => {
-      const { data } = await api.get(`/channels/album/${albumId}`, {
+      const { data } = await api.get(`/channels/album/${albumPublicId}`, {
         __redirectNotFoundTo404: true
       })
       return data
     }
   })
 
-  const channelByMediaQueryOptions = mediaId => ({
-    key: ['channel', 'media', mediaId],
+  const channelByMediaQueryOptions = mediaPublicId => ({
+    key: ['channel', 'media', mediaPublicId],
     staleTime: API_CACHE_MEDIUM_MS,
     query: async () => {
-      const { data } = await api.get(`/channels/media/${mediaId}`, {
+      const { data } = await api.get(`/channels/media/${mediaPublicId}`, {
         __redirectNotFoundTo404: true
       })
       return data
@@ -99,25 +99,25 @@ export const useChannelStore = defineStore('channel', () => {
     })
   }
 
-  const invalidateChannelCacheById = channelId => {
-    if (!channelId) return
+  const invalidateChannelCacheById = channelPublicId => {
+    if (!channelPublicId) return
     invalidateQueries({
-      predicate: query => query.key?.[0] === 'channel' && query.key?.[1] === channelId
+      predicate: query => query.key?.[0] === 'channel' && query.key?.[1] === channelPublicId
     })
   }
 
-  const invalidateChannelCacheByAlbum = albumId => {
-    if (!albumId) return
+  const invalidateChannelCacheByAlbum = albumPublicId => {
+    if (!albumPublicId) return
     invalidateQueries({
-      key: channelByAlbumQueryOptions(albumId).key,
+      key: channelByAlbumQueryOptions(albumPublicId).key,
       exact: true
     })
   }
 
-  const invalidateChannelCacheByMedia = mediaId => {
-    if (!mediaId) return
+  const invalidateChannelCacheByMedia = mediaPublicId => {
+    if (!mediaPublicId) return
     invalidateQueries({
-      key: channelByMediaQueryOptions(mediaId).key,
+      key: channelByMediaQueryOptions(mediaPublicId).key,
       exact: true
     })
   }
@@ -177,13 +177,13 @@ export const useChannelStore = defineStore('channel', () => {
     }
   }
 
-  const fetchChannel = async ({ channelId, pending = false, cache = true }) => {
+  const fetchChannel = async ({ channelPublicId, pending = false, cache = true }) => {
     if (!cache) {
-      const { data } = await api.get(`/channels/${channelId}${pending ? '?pending=true' : ''}`)
+      const { data } = await api.get(`/channels/${channelPublicId}${pending ? '?pending=true' : ''}`)
       return data?.data ?? null
     }
 
-    const options = channelQueryOptions(channelId, pending)
+    const options = channelQueryOptions(channelPublicId, pending)
     const entry = queryCache.ensure(options)
     const state = await queryCache.fetch(entry, options)
     if (state?.status === 'error') {
@@ -254,10 +254,10 @@ export const useChannelStore = defineStore('channel', () => {
     return mutationResult({ ok: true })
   }
 
-  const updateMedia = async ({ mediaId, title, description = null, resourceDate = null, main }) => {
+  const updateMedia = async ({ mediaRecordId, title, description = null, resourceDate = null, main }) => {
     const res = await runMutation({
       request: () =>
-        api.put(`/channels/media/${mediaId}`, {
+        api.put(`/channels/media/${mediaRecordId}`, {
           title: title?.trim(),
           description: description?.trim() || null,
           resourceDate: resourceDate?.trim() || null,
@@ -265,12 +265,12 @@ export const useChannelStore = defineStore('channel', () => {
         })
     })
     invalidateChannelsCache()
-    invalidateChannelCacheByMedia(mediaId)
+    invalidateChannelCacheByMedia(mediaRecordId)
     return mutationResult({ ok: true, data: res.data })
   }
 
   const updateAlbum = async ({
-    albumId,
+    albumRecordId,
     title,
     subtitle = null,
     posterType,
@@ -278,7 +278,7 @@ export const useChannelStore = defineStore('channel', () => {
   }) => {
     const res = await runMutation({
       request: () =>
-        api.put(`/channels/album/${albumId}`, {
+        api.put(`/channels/album/${albumRecordId}`, {
           title: title?.trim(),
           subtitle: subtitle?.trim() || null,
           posterType,
@@ -286,7 +286,7 @@ export const useChannelStore = defineStore('channel', () => {
         })
     })
     invalidateChannelsCache()
-    invalidateChannelCacheByAlbum(albumId)
+    invalidateChannelCacheByAlbum(albumRecordId)
     return mutationResult({ ok: true, data: res.data })
   }
 

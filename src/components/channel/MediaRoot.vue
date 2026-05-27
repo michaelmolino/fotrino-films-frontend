@@ -84,8 +84,8 @@ function redirect(pathOrObj) {
 }
 
 function findAlbumByParams() {
-  if (route.params.mediaId) {
-    return findAlbumByMediaPublicId(route.params.mediaId)
+  if (route.params.mediaPublicId) {
+    return findAlbumByMediaPublicId(route.params.mediaPublicId)
   }
   if (route.params.privateAlbumId && channel.value) {
     return channel.value?.album || null
@@ -107,8 +107,8 @@ function findMediaByParams(album) {
   if (route.params.privateMediaId) {
     return mediaItems.find(item => item?.privateId === route.params.privateMediaId) || null
   }
-  if (route.params.mediaId) {
-    return findMediaByPublicId(route.params.mediaId)
+  if (route.params.mediaPublicId) {
+    return findMediaByPublicId(route.params.mediaPublicId)
   }
   return null
 }
@@ -142,7 +142,7 @@ watch(
     if (
       channel.value &&
       !newAlbum &&
-      (route.params.mediaId || route.params.privateMediaId) &&
+      (route.params.mediaPublicId || route.params.privateMediaId) &&
       !loading.value
     ) {
       redirect('/404')
@@ -172,7 +172,7 @@ watch(
   newMedia => {
     if (!newMedia || loading.value) return
     if (
-      route.params.mediaId &&
+      route.params.mediaPublicId &&
       route.params.mediaSlug &&
       newMedia.slug !== route.params.mediaSlug
     ) {

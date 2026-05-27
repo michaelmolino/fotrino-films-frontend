@@ -6,7 +6,7 @@ export function useMediaRootViewModel({ loading, channel, album, media, route })
 
   const contentState = computed(() => {
     if (loading.value) return 'loading'
-    const hasTargetMedia = !!(route.params.privateMediaId || route.params.mediaId)
+    const hasTargetMedia = !!(route.params.privateMediaId || route.params.mediaPublicId)
     return channel.value && album.value && media.value && hasTargetMedia ? 'ready' : 'not-found'
   })
 
@@ -20,7 +20,7 @@ export function useMediaRootViewModel({ loading, channel, album, media, route })
   })
 
   const showRelatedContent = computed(() => {
-    const isPublicMedia = !!route.params.mediaId
+    const isPublicMedia = !!route.params.mediaPublicId
     const isPrivateAlbumMedia = !!route.params.privateAlbumId && !!route.params.privateMediaId
     return (isPublicMedia || isPrivateAlbumMedia) && relatedMedia.value.length > 0
   })
