@@ -79,7 +79,6 @@ export function useUploadMediaForm() {
 
   const uploadFiles = ref([])
   const uploadPhase = ref('editing')
-  const counter = ref(0)
   const albumsLoadToken = ref(0)
   const extractingFrame = ref(false)
   const frameExtractionToken = ref(0)
@@ -87,9 +86,6 @@ export function useUploadMediaForm() {
   const channelsHydrated = ref(false)
   const validation = ref({ canSubmit: false, blockers: [] })
   let validationInFlightPromise = null
-  let validationInFlightKey = ''
-  let lastValidationKey = ''
-  const validationQueued = ref(false)
   let dismissUploadErrorNotify = null
 
   const uploadPhaseStepper = ref({
@@ -153,6 +149,29 @@ export function useUploadMediaForm() {
     }
   }
 
+  function buildMediaBase() {
+    return {
+      title: payload.album.media.title,
+      description: payload.album.media.description,
+      main: !!payload.album.media.main
+    }
+  }
+
+  function buildDraftFiles() {
+    return {
+      upload: !!mediaFile.value,
+      preview:
+        payload.album.media.previewType === 'new'
+          ? !!previewFile.value
+          : !!previewThumbRandom.value,
+      cover: payload.channelMode === 'create' && payload.coverType === 'new' ? !!coverFile.value : false,
+      poster:
+        payload.album.projectMode === 'create' && payload.album.posterType === 'new'
+          ? !!posterFile.value
+          : false
+    }
+  }
+
   function buildDraftRequest() {
     const channel = buildChannelSelection()
     const album = buildAlbumSelection()
@@ -163,29 +182,13 @@ export function useUploadMediaForm() {
       album,
       media: {
         filename: payload.album.media.filename,
-        title: payload.album.media.title,
-        description: payload.album.media.description,
-        main: !!payload.album.media.main,
+        ...buildMediaBase(),
         preview: {
           mode: payload.album.media.previewType === 'new' ? 'upload' : 'frame'
         },
         resourceDate: payload.album.media.resourceDate
       },
-      files: {
-        upload: !!mediaFile.value,
-        preview:
-          payload.album.media.previewType === 'new'
-            ? !!previewFile.value
-            : !!previewThumbRandom.value,
-        cover:
-          payload.channelMode === 'create' && payload.coverType === 'new'
-            ? !!coverFile.value
-            : false,
-        poster:
-          payload.album.projectMode === 'create' && payload.album.posterType === 'new'
-            ? !!posterFile.value
-            : false
-      }
+      files: buildDraftFiles()
     }
   }
 
@@ -256,27 +259,20 @@ export function useUploadMediaForm() {
   })
 
   const media = computed(() => {
+    const base = buildMediaBase()
     if (mediaFile.value && payload.album.media.previewType === 'frame') {
       return {
-        title: payload.album.media.title,
-        description: payload.album.media.description,
-        main: payload.album.media.main,
+        ...base,
         preview: previewThumbRandom.value
       }
     }
     if (previewFile.value && payload.album.media.previewType === 'new') {
       return {
-        title: payload.album.media.title,
-        description: payload.album.media.description,
-        main: payload.album.media.main,
+        ...base,
         preview: previewThumb.value
       }
     }
-    return {
-      title: payload.album.media.title,
-      description: payload.album.media.description,
-      main: payload.album.media.main
-    }
+    return base
   })
 
   const isMediaReady = computed(
@@ -309,37 +305,74 @@ export function useUploadMediaForm() {
     }
   }
 
-  async function refreshValidation({ force = false } = {}) {
-    const awaitingFramePreview =
-      payload.album.media.previewType === 'frame' && !!mediaFile.value && !previewThumbRandom.value
+  function resetAlbumSelection(projectMode = 'unselected') {
+    albumsLoadToken.value += 1
+    albums.value = []
+    payload.album.projectMode = projectMode
+    payload.album.privateId = null
+  }
 
-    if (!force && awaitingFramePreview) {
+  async function refreshFramePreview() {
+    const token = ++frameExtractionToken.value
+    const media = mediaFile.value
+
+    if (payload.album.media.previewType !== 'frame' || !media) {
+      if (!media) {
+        setPreviewThumbRandom(null)
+      }
+      extractingFrame.value = false
+      queueValidation()
       return
     }
 
-    const request = buildDraftRequest()
-    const requestKey = JSON.stringify(request)
-
-    if (!force && requestKey === lastValidationKey) {
-      return
+    try {
+      extractingFrame.value = true
+      const result = await getRandomFrameFromFile(media)
+      if (token !== frameExtractionToken.value) {
+        if (result?.url) URL.revokeObjectURL(result.url)
+        return
+      }
+      setPreviewThumbRandom(result?.url || null)
+      if (result?.blob) {
+        const file = new File([result.blob], 'frame.jpg', { type: 'image/jpeg' })
+        await compressAndStoreImage('preview', file)
+      }
+    } catch (err) {
+      console.error(err)
+      payload.album.media.previewType = 'new'
+      Notify.create({
+        type: 'negative',
+        timeout: 0,
+        message: 'Error extracting frames from video.',
+        icon: 'warning',
+        actions: [{ label: 'Dismiss', color: 'white' }]
+      })
+    } finally {
+      if (token === frameExtractionToken.value) {
+        extractingFrame.value = false
+      }
+      queueValidation()
     }
+  }
 
-    if (validationInFlightPromise && requestKey === validationInFlightKey) {
+  function incrementCounter() {
+    void refreshFramePreview()
+  }
+
+  async function refreshValidation() {
+    if (validationInFlightPromise) {
       await validationInFlightPromise
       return
     }
 
-    validationInFlightKey = requestKey
     validationInFlightPromise = (async () => {
       try {
-        const result = await uploadStore.validateUploadDraft(request)
+        const result = await uploadStore.validateUploadDraft(buildDraftRequest())
         validation.value = result?.data || { canSubmit: false, blockers: [] }
-        lastValidationKey = requestKey
       } catch {
         validation.value = { canSubmit: false, blockers: ['validation.unavailable'] }
       } finally {
         validationInFlightPromise = null
-        validationInFlightKey = ''
       }
     })()
 
@@ -347,12 +380,10 @@ export function useUploadMediaForm() {
   }
 
   const debouncedRefreshValidation = useDebounceFn(async () => {
-    validationQueued.value = false
     await refreshValidation()
   }, VALIDATION_DEBOUNCE_MS)
 
   function queueValidation() {
-    validationQueued.value = true
     debouncedRefreshValidation()
   }
 
@@ -483,10 +514,6 @@ export function useUploadMediaForm() {
     }
   }
 
-  function incrementCounter() {
-    counter.value += 1
-  }
-
   function setPreviewThumbRandom(url) {
     if (previewThumbRandom.value && previewThumbRandom.value !== url) {
       URL.revokeObjectURL(previewThumbRandom.value)
@@ -558,7 +585,6 @@ export function useUploadMediaForm() {
     previewFile.value = null
     previewThumb.value = null
     mediaFile.value = null
-    counter.value = 0
     frameExtractionToken.value += 1
     extractingFrame.value = false
     uploadTriggered.value = false
@@ -665,25 +691,18 @@ export function useUploadMediaForm() {
     () => payload.publicId?.value,
     async newPublicId => {
       if (payload.channelMode === 'create') {
-        albumsLoadToken.value += 1
-        albums.value = []
-        payload.album.projectMode = 'create'
-        payload.album.privateId = null
+        resetAlbumSelection('create')
         queueValidation()
         return
       }
 
       if (payload.channelMode !== 'existing' || !newPublicId) {
-        albumsLoadToken.value += 1
-        albums.value = []
-        payload.album.projectMode = 'unselected'
-        payload.album.privateId = null
+        resetAlbumSelection()
         queueValidation()
         return
       }
 
-      payload.album.projectMode = 'unselected'
-      payload.album.privateId = null
+      resetAlbumSelection()
 
       const requestToken = ++albumsLoadToken.value
       await loadAlbumsForChannelPublicId(newPublicId, requestToken)
@@ -698,28 +717,19 @@ export function useUploadMediaForm() {
     () => payload.channelMode,
     channelMode => {
       if (channelMode === 'create') {
-        albumsLoadToken.value += 1
-        albums.value = []
-        payload.album.projectMode = 'create'
-        payload.album.privateId = null
+        resetAlbumSelection('create')
         queueValidation()
         return
       }
 
       if (channelMode !== 'existing') {
-        albumsLoadToken.value += 1
-        albums.value = []
-        payload.album.projectMode = 'unselected'
-        payload.album.privateId = null
+        resetAlbumSelection()
         queueValidation()
         return
       }
 
       if (!payload.publicId?.value) {
-        albumsLoadToken.value += 1
-        albums.value = []
-        payload.album.projectMode = 'unselected'
-        payload.album.privateId = null
+        resetAlbumSelection()
         queueValidation()
       }
     }
@@ -736,8 +746,7 @@ export function useUploadMediaForm() {
       const requestToken = ++albumsLoadToken.value
       void loadAlbumsForChannelPublicId(payload.publicId.value, requestToken)
     } else {
-      albumsLoadToken.value++
-      albums.value = []
+      resetAlbumSelection(payload.channelMode === 'create' ? 'create' : 'unselected')
     }
 
     queueValidation()
@@ -772,59 +781,9 @@ export function useUploadMediaForm() {
     queueValidation()
   })
 
-  watch([() => mediaFile.value, () => counter.value], async ([mf]) => {
-    const token = ++frameExtractionToken.value
-    if (payload.album.media.previewType !== 'frame' || !mf) {
-      if (!mf) {
-        setPreviewThumbRandom(null)
-      }
-      queueValidation()
-      return
-    }
-
-    try {
-      extractingFrame.value = true
-      const result = await getRandomFrameFromFile(mf)
-      if (token !== frameExtractionToken.value) {
-        if (result?.url) URL.revokeObjectURL(result.url)
-        return
-      }
-      setPreviewThumbRandom(result?.url || null)
-      if (result?.blob) {
-        const file = new File([result.blob], 'frame.jpg', { type: 'image/jpeg' })
-        await compressAndStoreImage('preview', file)
-      }
-    } catch (err) {
-      console.error(err)
-      payload.album.media.previewType = 'new'
-      Notify.create({
-        type: 'negative',
-        timeout: 0,
-        message: 'Error extracting frames from video.',
-        icon: 'warning',
-        actions: [{ label: 'Dismiss', color: 'white' }]
-      })
-    } finally {
-      if (token === frameExtractionToken.value) {
-        extractingFrame.value = false
-      }
-      queueValidation()
-    }
+  watch([mediaFile, () => payload.album.media.previewType], () => {
+    void refreshFramePreview()
   })
-
-  watch(
-    () => payload.album.media.previewType,
-    previewType => {
-      if (previewType !== 'frame') {
-        frameExtractionToken.value += 1
-        setPreviewThumbRandom(null)
-        extractingFrame.value = false
-      } else if (mediaFile.value) {
-        counter.value += 1
-      }
-      queueValidation()
-    }
-  )
 
   watch(
     () => route.query.u,
@@ -856,7 +815,7 @@ export function useUploadMediaForm() {
       setDefaultProjectSelection(albums.value || [])
     }
 
-    await refreshValidation({ force: true })
+    await refreshValidation()
     globalThis.addEventListener('beforeunload', beforeUnloadHandler)
   })
 
