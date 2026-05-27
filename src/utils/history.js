@@ -3,7 +3,7 @@ let hasResolvedHistory = false
 let resolveHistoryPromise = null
 import { parseStoredHistory, writeHistory, HISTORY_KEY } from './historyStorage.js'
 
-/** @typedef {{ publicId: string, type: 'channel' | 'privateMedia' | 'privateAlbum' }} HistoryEntry */
+/** @typedef {{ resourceId: string, type: 'channel' | 'privateMedia' | 'privateAlbum' }} HistoryEntry */
 
 import { LocalStorage } from 'quasar'
 const storedHistory = LocalStorage.getItem(HISTORY_KEY)
@@ -27,23 +27,23 @@ if (JSON.stringify(storedHistory) !== JSON.stringify(parsedHistory)) {
 export function addHistory(channel) {
   const historyId = getChannelHistoryId(channel)
   if (!historyId) return
-  _addEntry({ publicId: historyId, type: 'channel' }, channel)
+  _addEntry({ resourceId: historyId, type: 'channel' }, channel)
 }
 
 export function addPrivateHistory(privateId, details = {}) {
   if (!privateId) return
-  _addEntry({ publicId: privateId, type: 'privateMedia' }, { publicId: privateId, ...details })
+  _addEntry({ resourceId: privateId, type: 'privateMedia' }, { resourceId: privateId, ...details })
 }
 
 export function addPrivateAlbumHistory(privateId, details = {}) {
   if (!privateId) return
-  _addEntry({ publicId: privateId, type: 'privateAlbum' }, { publicId: privateId, ...details })
+  _addEntry({ resourceId: privateId, type: 'privateAlbum' }, { resourceId: privateId, ...details })
 }
 
 function _addEntry(entry, channelData) {
   const current = [...history.value]
-  const key = `${entry.type}:${entry.publicId}`
-  const existingKeys = new Set(current.map(item => `${item.type}:${item.publicId}`))
+  const key = `${entry.type}:${entry.resourceId}`
+  const existingKeys = new Set(current.map(item => `${item.type}:${item.resourceId}`))
   const isDupe = existingKeys.has(key)
   if (isDupe) return
 
@@ -56,7 +56,7 @@ function _addEntry(entry, channelData) {
     historyChannels.value = [
       ...historyChannels.value,
       {
-        publicId: entry.publicId,
+        resourceId: entry.resourceId,
         type: entry.type,
         title: channelData?.title || '',
         slug: channelData?.slug || null,
@@ -66,15 +66,15 @@ function _addEntry(entry, channelData) {
   }
 }
 
-export function removeHistory(publicId, type = null) {
+export function removeHistory(resourceId, type = null) {
   const updated = history.value.filter(item => {
-    if (item.publicId !== publicId) return true
+    if (item.resourceId !== resourceId) return true
     if (type == null) return false
     return item.type !== type
   })
   persistHistory(updated)
   historyChannels.value = historyChannels.value.filter(item => {
-    if (item.publicId !== publicId) return true
+    if (item.resourceId !== resourceId) return true
     if (type == null) return false
     return item.type !== type
   })
@@ -108,10 +108,10 @@ export async function resolveHistoryFromBackend(channelStore, { force = false } 
       if (deletedItems.length > 0) {
         const deletedSet = new Set(
           deletedItems
-            .filter(item => item?.type && item?.publicId)
-            .map(item => `${item.type}:${item.publicId}`)
+            .filter(item => item?.type && item?.resourceId)
+            .map(item => `${item.type}:${item.resourceId}`)
         )
-        const remaining = entries.filter(e => !deletedSet.has(`${e.type}:${e.publicId}`))
+        const remaining = entries.filter(e => !deletedSet.has(`${e.type}:${e.resourceId}`))
         if (remaining.length !== entries.length) {
           persistHistory(remaining)
         }
@@ -120,7 +120,7 @@ export async function resolveHistoryFromBackend(channelStore, { force = false } 
       const uniqueActiveEntries = []
       const seenEntryKeys = new Set()
       for (const entry of history.value) {
-        const entryKey = `${entry.type}:${entry.publicId}`
+        const entryKey = `${entry.type}:${entry.resourceId}`
         if (seenEntryKeys.has(entryKey)) continue
         seenEntryKeys.add(entryKey)
         uniqueActiveEntries.push(entry)
@@ -131,18 +131,18 @@ export async function resolveHistoryFromBackend(channelStore, { force = false } 
       }
 
       const itemsByKey = new Map(
-        items.filter(item => item?.publicId).map(item => [`${item.type}:${item.publicId}`, item])
+        items.filter(item => item?.resourceId).map(item => [`${item.type}:${item.resourceId}`, item])
       )
 
       // Entries added during the in-flight request are already in historyChannels
       // (optimistically appended by _addEntry). Preserve them for any key the
       // backend didn't return so they aren't lost when we rebuild the list.
       const optimisticByKey = new Map(
-        historyChannels.value.map(h => [`${h.type}:${h.publicId}`, h])
+        historyChannels.value.map(h => [`${h.type}:${h.resourceId}`, h])
       )
       historyChannels.value = uniqueActiveEntries
         .map(e => {
-          const key = `${e.type}:${e.publicId}`
+          const key = `${e.type}:${e.resourceId}`
           return itemsByKey.get(key) || optimisticByKey.get(key) || null
         })
         .filter(Boolean)

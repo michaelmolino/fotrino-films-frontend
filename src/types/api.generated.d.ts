@@ -83,11 +83,11 @@ export type Pending3 = boolean
 export type PublicID4 = string
 export type Slug4 = string
 export type Title4 = string
-export type PublicID5 = string
+export type HistoryResourceID = string
 export type Type1 = 'channel' | 'privateMedia' | 'privateAlbum'
 export type Deleteditems = HistoryDeletedItemResponse[]
 export type Cover2 = string | null
-export type PublicID6 = string
+export type HistoryResourceID1 = string
 export type Slug5 = string | null
 export type Title5 = string
 export type Type2 = 'channel' | 'privateMedia' | 'privateAlbum'
@@ -100,7 +100,7 @@ export type Orientation1 = 'landscape' | 'portrait'
 export type Pending4 = boolean
 export type Preview1 = string
 export type PrivateID3 = string
-export type PublicID7 = string
+export type PublicID5 = string
 export type Resourcedate3 = string
 export type Slug6 = string
 export type Src1 = string | null
@@ -111,7 +111,7 @@ export type Cover3 = string
 export type Created8 = string
 export type Deleted7 = boolean
 export type Pending5 = boolean
-export type PublicID8 = string
+export type PublicID6 = string
 export type Slug7 = string
 export type Title7 = string
 export type Error1 = 'conflict'
@@ -176,7 +176,7 @@ export type Ownername1 = string
 export type Message6 = string | null
 export type Reported = boolean
 export type PrivateID5 = string
-export type PublicID9 = string
+export type PublicID7 = string
 export type Createdat = string
 export type Reason = string | null
 export type Reporter = string
@@ -211,7 +211,7 @@ export type Title12 = string | null
 export type Mode4 = 'unselected'
 export type Channel = ExistingChannelSelection | CreateChannelSelection | UnselectedChannelSelection
 export type Mode5 = 'existing'
-export type PublicID10 = string
+export type PublicID8 = string
 export type Mode6 = 'profile' | 'upload'
 export type Mode7 = 'create'
 export type Title13 = string | null
@@ -380,12 +380,12 @@ export interface HistoryResponse {
   items: Items
 }
 export interface HistoryDeletedItemResponse {
-  publicId: PublicID5
+  resourceId: HistoryResourceID
   type: Type1
 }
 export interface HistoryItemResponse {
   cover?: Cover2
-  publicId: PublicID6
+  resourceId: HistoryResourceID1
   slug?: Slug5
   title: Title5
   type: Type2
@@ -399,7 +399,7 @@ export interface MediaResponse1 {
   pending?: Pending4
   preview: Preview1
   privateId: PrivateID3
-  publicId: PublicID7
+  publicId: PublicID5
   resourceDate: Resourcedate3
   slug: Slug6
   src: Src1
@@ -413,7 +413,7 @@ export interface ChannelSummaryResponse {
   created: Created8
   deleted?: Deleted7
   pending?: Pending5
-  publicId: PublicID8
+  publicId: PublicID6
   slug: Slug7
   title: Title7
   [k: string]: unknown
@@ -510,7 +510,7 @@ export interface ReportMediaResponse {
 }
 export interface ReportedMediaItemResponse {
   privateId: PrivateID5
-  publicId: PublicID9
+  publicId: PublicID7
   reports: Reports
   slug: Slug9
   title: Title11
@@ -573,7 +573,7 @@ export interface UnselectedAlbumSelection {
 }
 export interface ExistingChannelSelection {
   mode: Mode5
-  publicId: PublicID10
+  publicId: PublicID8
 }
 export interface CreateChannelSelection {
   cover: ChannelCreateCover

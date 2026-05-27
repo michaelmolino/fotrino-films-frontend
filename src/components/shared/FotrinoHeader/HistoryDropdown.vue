@@ -28,7 +28,7 @@
         class="col-xs-2"
         :aria-label="entry.removeLabel"
         size="md"
-        @click="removeHistory(entry.publicId, entry.type)" />
+        @click="removeHistory(entry.resourceId, entry.type)" />
     </div>
   </q-btn-dropdown>
 </template>
@@ -47,8 +47,8 @@ const dropdownLabel = computed(() => ($q.screen.gt.sm ? 'History' : ''))
 
 const historyEntries = computed(() => {
   return (historyChannels?.value || []).map(channel => ({
-    key: `${channel.type}:${channel.publicId}`,
-    publicId: channel.publicId,
+    key: `${channel.type}:${channel.resourceId}`,
+    resourceId: channel.resourceId,
     type: channel.type,
     title: channel.title,
     icon: channel.cover ? `img:${channel.cover}` : 'movie',
@@ -60,12 +60,12 @@ const historyEntries = computed(() => {
 
 function historyTarget(channel) {
   if (channel.type === 'privateAlbum') {
-    return `/private/a/${channel.publicId}/${channel.slug}`
+    return `/private/a/${channel.resourceId}/${channel.slug}`
   }
   if (channel.type === 'privateMedia') {
-    return `/private/m/${channel.publicId}/${channel.slug}`
+    return `/private/m/${channel.resourceId}/${channel.slug}`
   }
-  return `/c/${channel.publicId}/${channel.slug}`
+  return `/c/${channel.resourceId}/${channel.slug}`
 }
 
 function getRemovedHistoryMessage(removedCount) {

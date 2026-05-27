@@ -18,13 +18,13 @@ export function parseStoredHistory(value) {
 
   for (const item of value) {
     if (!item || typeof item !== 'object') continue
-    if (typeof item.publicId !== 'string') continue
+    if (typeof item.resourceId !== 'string') continue
     if (item.type !== 'channel' && item.type !== 'privateMedia' && item.type !== 'privateAlbum') {
       continue
     }
 
-    const entry = { publicId: item.publicId, type: item.type }
-    const key = `${entry.type}:${entry.publicId}`
+    const entry = { resourceId: item.resourceId, type: item.type }
+    const key = `${entry.type}:${entry.resourceId}`
     if (seen.has(key)) continue
     seen.add(key)
     entries.push(entry)
