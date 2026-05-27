@@ -33,7 +33,7 @@ const showEmptyState = computed(() => (props.channels || []).length === 0)
 
 const channelItemListeners = {
   deleteChannel: channelPublicId =>
-    deleteResource('channel', { privateId: channelPublicId, publicId: channelPublicId }),
+    deleteResource('channel', { channelPublicId, publicId: channelPublicId }),
   undeleteChannel,
   deleteAlbum: value => deleteResource('album', value),
   undeleteAlbum,
@@ -129,7 +129,7 @@ async function undeleteAlbum({ privateId, publicId }) {
 
 async function undeleteChannel(channelPublicId) {
   try {
-    await channelStore.undeleteResource({ type: 'channel', privateId: channelPublicId, publicId: channelPublicId })
+    await channelStore.undeleteResource({ type: 'channel', channelPublicId, publicId: channelPublicId })
     notifySuccess('Channel restored.')
   } catch (error) {
     notifyError(getComponentApiErrorMessage(error, 'Unable to undelete this channel.'), {

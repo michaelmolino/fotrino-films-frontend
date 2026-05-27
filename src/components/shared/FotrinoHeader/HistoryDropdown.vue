@@ -77,7 +77,7 @@ function getRemovedHistoryMessage(removedCount) {
 
 onMounted(async () => {
   const result = await resolveHistoryFromBackend(channelStore)
-  const removedCount = result?.deletedPublicIds?.length || 0
+  const removedCount = result?.deletedItems?.length || 0
 
   if (removedCount > 0) {
     Notify.create({

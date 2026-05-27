@@ -82,7 +82,7 @@ export function removeHistory(publicId, type = null) {
 
 export async function resolveHistoryFromBackend(channelStore, { force = false } = {}) {
   if (hasResolvedHistory && !force) {
-    return { channels: historyChannels.value, deletedPublicIds: [] }
+    return { channels: historyChannels.value, deletedItems: [] }
   }
 
   if (resolveHistoryPromise) {
@@ -95,19 +95,23 @@ export async function resolveHistoryFromBackend(channelStore, { force = false } 
     if (entries.length === 0) {
       historyChannels.value = []
       hasResolvedHistory = true
-      return { channels: [], deletedPublicIds: [] }
+      return { channels: [], deletedItems: [] }
     }
 
     try {
       const response = await channelStore.resolveHistoryChannels(entries)
       const items = Array.isArray(response?.items) ? response.items : []
-      const deletedPublicIds = Array.isArray(response?.deletedPublicIds)
-        ? response.deletedPublicIds
+      const deletedItems = Array.isArray(response?.deletedItems)
+        ? response.deletedItems
         : []
 
-      if (deletedPublicIds.length > 0) {
-        const deletedSet = new Set(deletedPublicIds)
-        const remaining = entries.filter(e => !deletedSet.has(e.publicId))
+      if (deletedItems.length > 0) {
+        const deletedSet = new Set(
+          deletedItems
+            .filter(item => item?.type && item?.publicId)
+            .map(item => `${item.type}:${item.publicId}`)
+        )
+        const remaining = entries.filter(e => !deletedSet.has(`${e.type}:${e.publicId}`))
         if (remaining.length !== entries.length) {
           persistHistory(remaining)
         }
@@ -144,9 +148,9 @@ export async function resolveHistoryFromBackend(channelStore, { force = false } 
         .filter(Boolean)
 
       hasResolvedHistory = true
-      return { channels: historyChannels.value, deletedPublicIds }
+      return { channels: historyChannels.value, deletedItems }
     } catch {
-      return { channels: historyChannels.value, deletedPublicIds: [] }
+      return { channels: historyChannels.value, deletedItems: [] }
     }
   })()
 

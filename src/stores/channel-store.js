@@ -166,14 +166,14 @@ export const useChannelStore = defineStore('channel', () => {
 
   const resolveHistoryChannels = async items => {
     if (!Array.isArray(items) || items.length === 0) {
-      return { items: [], deletedPublicIds: [] }
+      return { items: [], deletedItems: [] }
     }
 
     const { data } = await api.post('/channels/history', { items })
 
     return {
       items: Array.isArray(data?.items) ? data.items : [],
-      deletedPublicIds: Array.isArray(data?.deletedPublicIds) ? data.deletedPublicIds : []
+      deletedItems: Array.isArray(data?.deletedItems) ? data.deletedItems : []
     }
   }
 
@@ -198,10 +198,17 @@ export const useChannelStore = defineStore('channel', () => {
   }
 
   const deleteResource = async resource => {
-    const url =
-      resource.type === 'channel'
-        ? `/channels/${resource.privateId}`
-        : `/channels/${resource.type}/${resource.privateId}`
+    if (resource.type === 'channel' && !resource.channelPublicId) {
+      throw new Error('channelPublicId is required for channel deletion')
+    }
+    if (resource.type !== 'channel' && !resource.privateId) {
+      throw new Error('privateId is required for media/album deletion')
+    }
+
+    let url = `/channels/${resource.type}/${resource.privateId}`
+    if (resource.type === 'channel') {
+      url = `/channels/${resource.channelPublicId}`
+    }
 
     const response = await runMutation({
       request: () => api.delete(url),
@@ -231,12 +238,18 @@ export const useChannelStore = defineStore('channel', () => {
     if (!['media', 'album', 'channel'].includes(resource?.type)) {
       throw new Error('Unsupported undelete resource type')
     }
+    if (resource.type === 'channel' && !resource.channelPublicId) {
+      throw new Error('channelPublicId is required for channel undelete')
+    }
+    if (resource.type !== 'channel' && !resource.privateId) {
+      throw new Error('privateId is required for media/album undelete')
+    }
 
     let url = `/channels/media/${resource.privateId}/undelete`
     if (resource.type === 'album') {
       url = `/channels/album/${resource.privateId}/undelete`
     } else if (resource.type === 'channel') {
-      url = `/channels/${resource.privateId}/undelete`
+      url = `/channels/${resource.channelPublicId}/undelete`
     }
 
     await runMutation({
