@@ -15,6 +15,19 @@ import { useDebounceFn } from '@vueuse/core'
 const IMAGE_RESOURCE_TYPES = new Set(['cover', 'poster', 'preview'])
 const VALIDATION_DEBOUNCE_MS = 300
 
+function excludeDeletedAlbums(albums) {
+  return (albums || []).filter(item => !item?.deleted)
+}
+
+function excludeDeletedChannels(channels) {
+  return (channels || [])
+    .filter(item => !item?.deleted)
+    .map(item => ({
+      ...item,
+      albums: excludeDeletedAlbums(item?.albums)
+    }))
+}
+
 function createUploadIdempotencyKey() {
   return createRandomId('upload')
 }
@@ -131,7 +144,7 @@ export function useUploadMediaForm() {
     if (payload.album.projectMode === 'existing') {
       return {
         mode: 'existing',
-        id: payload.album.id?.value ?? null
+        privateId: payload.album.id?.value ?? null
       }
     }
 
@@ -211,13 +224,13 @@ export function useUploadMediaForm() {
     return profile.value.newUser === true
   })
 
-  const channels = computed(() => channelsQuery.data.value || [])
+  const channels = computed(() => excludeDeletedChannels(channelsQuery.data.value || []))
 
   const albumsById = computed(() => {
     const map = {}
     for (const item of albums.value || []) {
-      if (item?.id != null) {
-        map[item.id] = item
+      if (item?.privateId != null) {
+        map[item.privateId] = item
       }
     }
     return map
@@ -573,7 +586,7 @@ export function useUploadMediaForm() {
       const existing = (channels.value || []).find(ch => ch?.publicId === publicId)
       if (Array.isArray(existing?.albums)) {
         if (requestToken !== albumsLoadToken.value) return
-        albums.value = existing.albums
+        albums.value = excludeDeletedAlbums(existing.albums)
         return
       }
 
@@ -594,7 +607,7 @@ export function useUploadMediaForm() {
       }
 
       if (requestToken !== albumsLoadToken.value) return
-      albums.value = albumList
+      albums.value = excludeDeletedAlbums(albumList)
     } catch (err) {
       if (requestToken !== albumsLoadToken.value) return
       console.error('Failed to load channel albums:', err)
@@ -640,7 +653,7 @@ export function useUploadMediaForm() {
 
     if (projectList.length === 1) {
       payload.album.projectMode = 'existing'
-      payload.album.id = { value: projectList[0].id, label: projectList[0].title }
+      payload.album.id = { value: projectList[0].privateId, label: projectList[0].title }
       return
     }
 

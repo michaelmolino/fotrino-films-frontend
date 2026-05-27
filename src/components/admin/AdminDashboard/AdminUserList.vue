@@ -15,7 +15,7 @@
       bordered
       :rows="filteredUsers"
       :columns="userColumns"
-      row-key="id"
+      row-key="email"
       separator="cell"
       dense
       :pagination="{ rowsPerPage: 0 }">
@@ -239,7 +239,7 @@ watch(filterMode, value => {
 
 const approveUser = async user => {
   try {
-    const result = await adminStore.approveUser(user.id)
+    const result = await adminStore.approveUser(user.email)
     if (result?.cancelled || result?.ok === false) return
     notifySuccess(`Approved ${user.name}. Welcome email sent.`)
   } catch (err) {
@@ -252,7 +252,7 @@ const approveUser = async user => {
 
 const deleteUser = async user => {
   try {
-    const result = await adminStore.deleteUser(user.id)
+    const result = await adminStore.deleteUser(user.email)
     if (result?.cancelled || result?.ok === false) return
     notifySuccess(`Deleted ${user.name}.`)
   } catch (err) {

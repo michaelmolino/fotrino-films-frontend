@@ -8,7 +8,7 @@
       :deleted="media.deleted"
       undeletable
       editable
-      :link="getMediaLink('media', media.id)"
+      :link="getMediaLink('media', media.privateId)"
       :subtitle="mediaSubtitle"
       delete-color="warning"
       @delete="emitDeleteMedia"
@@ -115,15 +115,15 @@ const mediaSubtitle = computed(() =>
 )
 
 function emitDeleteMedia() {
-  emit('deleteMedia', props.media.id)
+  emit('deleteMedia', { privateId: props.media.privateId, publicId: props.media.publicId })
 }
 
 function emitUndeleteMedia() {
-  emit('undeleteMedia', props.media.id)
+  emit('undeleteMedia', { privateId: props.media.privateId, publicId: props.media.publicId })
 }
 
 function emitAbortMedia() {
-  emit('abortMedia', props.media.id)
+  emit('abortMedia', props.media.privateId)
 }
 
 function setLocalPreviewImage(url) {
@@ -195,7 +195,8 @@ async function onUpdatePreviewFile(fileOrFiles) {
 
 function saveEdit() {
   emit('editMedia', {
-    id: props.media?.id,
+    privateId: props.media?.privateId,
+    publicId: props.media?.publicId,
     title: editForm.value.title,
     description: editForm.value.description,
     resourceDate: editForm.value.resourceDate,

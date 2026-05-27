@@ -165,9 +165,9 @@ export const useAdminStore = defineStore('admin', () => {
     throw new Error(`No admin action available for status: ${job.status}`)
   }
 
-  const deleteUser = async userId => {
+  const deleteUser = async userEmail => {
     const response = await runMutation({
-      request: () => api.delete(`/admin/users/${userId}`),
+      request: () => api.delete(`/admin/users/email/${encodeURIComponent(userEmail)}`),
       onError: error => {
         if (error?.__userCancelled) {
           return CANCELLED
@@ -185,9 +185,9 @@ export const useAdminStore = defineStore('admin', () => {
     return mutationResult({ ok: true })
   }
 
-  const approveUser = async userId => {
+  const approveUser = async userEmail => {
     const response = await runMutation({
-      request: () => api.post(`/admin/users/${userId}/approve`),
+      request: () => api.post(`/admin/users/email/${encodeURIComponent(userEmail)}/approve`),
       onError: error => {
         if (error?.__userCancelled) {
           return CANCELLED

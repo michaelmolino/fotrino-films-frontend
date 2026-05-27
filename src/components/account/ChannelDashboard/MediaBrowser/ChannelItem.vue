@@ -14,7 +14,7 @@
         :deleted="channel.deleted"
         :undeletable="channel.deleted"
         :hasPending-children="hasPendingChildren"
-        :link="getMediaLink('channel', channel.id)"
+        :link="getMediaLink('channel', channel.publicId)"
         :avatarSize="'48px'"
         :badge="channel.isAdmin"
         badgeIcon="security"
@@ -29,7 +29,7 @@
 
     <AlbumItem
       v-for="album in channel.albums"
-      :key="album.id"
+      :key="album.privateId"
       :album="album"
       :channel="channel"
       data-cy="album-item"

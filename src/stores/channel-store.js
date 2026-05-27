@@ -200,8 +200,8 @@ export const useChannelStore = defineStore('channel', () => {
   const deleteResource = async resource => {
     const url =
       resource.type === 'channel'
-        ? `/channels/${resource.id}`
-        : `/channels/${resource.type}/${resource.id}`
+        ? `/channels/${resource.privateId}`
+        : `/channels/${resource.type}/${resource.privateId}`
 
     const response = await runMutation({
       request: () => api.delete(url),
@@ -218,11 +218,11 @@ export const useChannelStore = defineStore('channel', () => {
 
     invalidateChannelsCache()
     if (resource.type === 'channel') {
-      invalidateChannelCacheById(resource.id)
+      invalidateChannelCacheById(resource.publicId)
     } else if (resource.type === 'album') {
-      invalidateChannelCacheByAlbum(resource.id)
+      invalidateChannelCacheByAlbum(resource.publicId)
     } else if (resource.type === 'media') {
-      invalidateChannelCacheByMedia(resource.id)
+      invalidateChannelCacheByMedia(resource.publicId)
     }
     return mutationResult({ ok: true })
   }
@@ -232,11 +232,11 @@ export const useChannelStore = defineStore('channel', () => {
       throw new Error('Unsupported undelete resource type')
     }
 
-    let url = `/channels/media/${resource.id}/undelete`
+    let url = `/channels/media/${resource.privateId}/undelete`
     if (resource.type === 'album') {
-      url = `/channels/album/${resource.id}/undelete`
+      url = `/channels/album/${resource.privateId}/undelete`
     } else if (resource.type === 'channel') {
-      url = `/channels/${resource.id}/undelete`
+      url = `/channels/${resource.privateId}/undelete`
     }
 
     await runMutation({
@@ -245,19 +245,19 @@ export const useChannelStore = defineStore('channel', () => {
 
     invalidateChannelsCache()
     if (resource.type === 'album') {
-      invalidateChannelCacheByAlbum(resource.id)
+      invalidateChannelCacheByAlbum(resource.publicId)
     } else if (resource.type === 'channel') {
-      invalidateChannelCacheById(resource.id)
+      invalidateChannelCacheById(resource.publicId)
     } else {
-      invalidateChannelCacheByMedia(resource.id)
+      invalidateChannelCacheByMedia(resource.publicId)
     }
     return mutationResult({ ok: true })
   }
 
-  const updateMedia = async ({ mediaRecordId, title, description = null, resourceDate = null, main }) => {
+  const updateMedia = async ({ mediaPrivateId, mediaPublicId = null, title, description = null, resourceDate = null, main }) => {
     const res = await runMutation({
       request: () =>
-        api.put(`/channels/media/${mediaRecordId}`, {
+        api.put(`/channels/media/${mediaPrivateId}`, {
           title: title?.trim(),
           description: description?.trim() || null,
           resourceDate: resourceDate?.trim() || null,
@@ -265,12 +265,13 @@ export const useChannelStore = defineStore('channel', () => {
         })
     })
     invalidateChannelsCache()
-    invalidateChannelCacheByMedia(mediaRecordId)
+    if (mediaPublicId) invalidateChannelCacheByMedia(mediaPublicId)
     return mutationResult({ ok: true, data: res.data })
   }
 
   const updateAlbum = async ({
-    albumRecordId,
+    albumPrivateId,
+    albumPublicId = null,
     title,
     subtitle = null,
     posterType,
@@ -278,7 +279,7 @@ export const useChannelStore = defineStore('channel', () => {
   }) => {
     const res = await runMutation({
       request: () =>
-        api.put(`/channels/album/${albumRecordId}`, {
+        api.put(`/channels/album/${albumPrivateId}`, {
           title: title?.trim(),
           subtitle: subtitle?.trim() || null,
           posterType,
@@ -286,7 +287,7 @@ export const useChannelStore = defineStore('channel', () => {
         })
     })
     invalidateChannelsCache()
-    invalidateChannelCacheByAlbum(albumRecordId)
+    if (albumPublicId) invalidateChannelCacheByAlbum(albumPublicId)
     return mutationResult({ ok: true, data: res.data })
   }
 

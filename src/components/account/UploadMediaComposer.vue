@@ -414,7 +414,10 @@ const isAlbumAutoDefault = computed(() => {
   }
 
   if (albumList.length === 1) {
-    return payload.album?.projectMode === 'existing' && payload.album?.id?.value === albumList[0].id
+    return (
+      payload.album?.projectMode === 'existing' &&
+      payload.album?.id?.value === albumList[0].privateId
+    )
   }
 
   return false
@@ -596,7 +599,7 @@ function onComposerSelectExistingAlbum(selectedAlbum) {
     album: {
       ...payload.album,
       projectMode: 'existing',
-      id: { value: selectedAlbum.id, label: selectedAlbum.title }
+      id: { value: selectedAlbum.privateId, label: selectedAlbum.title }
     }
   })
 }

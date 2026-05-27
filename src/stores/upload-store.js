@@ -92,9 +92,9 @@ export const useUploadStore = defineStore('upload', () => {
     return mutationResult({ ok: true })
   }
 
-  const abortUpload = async mediaRecordId => {
+  const abortUpload = async mediaPrivateId => {
     const response = await runMutation({
-      request: () => api.delete(`/uploads/media/${mediaRecordId}/abort`),
+      request: () => api.delete(`/uploads/media/${mediaPrivateId}/abort`),
       onError: error => {
         if (error?.__userCancelled) {
           return CANCELLED
@@ -107,21 +107,21 @@ export const useUploadStore = defineStore('upload', () => {
     }
 
     invalidateChannelsCache()
-    invalidateChannelCacheByMedia(mediaRecordId)
     return mutationResult({ ok: true })
   }
 
-  const requestMediaPreviewUpload = ({ mediaRecordId }) =>
-    requestUploadInstruction(`/uploads/media/${mediaRecordId}/preview`)
+  const requestMediaPreviewUpload = ({ mediaPrivateId }) =>
+    requestUploadInstruction(`/uploads/media/${mediaPrivateId}/preview`)
 
-  const requestAlbumPosterUpload = ({ albumRecordId }) =>
-    requestUploadInstruction(`/uploads/album/${albumRecordId}/poster`)
+  const requestAlbumPosterUpload = ({ albumPrivateId }) =>
+    requestUploadInstruction(`/uploads/album/${albumPrivateId}/poster`)
 
   const requestChannelCoverUpload = ({ channelPublicId }) =>
     requestUploadInstruction(`/uploads/${channelPublicId}/cover`)
 
   const confirmMediaPreviewUpload = async ({
-    mediaRecordId,
+    mediaPrivateId,
+    mediaPublicId = null,
     objectName,
     title,
     description = null,
@@ -130,7 +130,7 @@ export const useUploadStore = defineStore('upload', () => {
   }) => {
     const response = await runMutation({
       request: () =>
-        api.put(`/uploads/media/${mediaRecordId}/preview/confirm`, {
+        api.put(`/uploads/media/${mediaPrivateId}/preview/confirm`, {
           objectName,
           title: title?.trim(),
           description: description?.trim() || null,
@@ -139,12 +139,13 @@ export const useUploadStore = defineStore('upload', () => {
         })
     })
     invalidateChannelsCache()
-    invalidateChannelCacheByMedia(mediaRecordId)
+    if (mediaPublicId) invalidateChannelCacheByMedia(mediaPublicId)
     return mutationResult({ ok: true, data: response?.data ?? null })
   }
 
   const confirmAlbumPosterUpload = async ({
-    albumRecordId,
+    albumPrivateId,
+    albumPublicId = null,
     objectName,
     title,
     subtitle = null,
@@ -153,7 +154,7 @@ export const useUploadStore = defineStore('upload', () => {
   }) => {
     const response = await runMutation({
       request: () =>
-        api.put(`/uploads/album/${albumRecordId}/poster/confirm`, {
+        api.put(`/uploads/album/${albumPrivateId}/poster/confirm`, {
           objectName,
           title: title?.trim(),
           subtitle: subtitle?.trim() || null,
@@ -162,7 +163,7 @@ export const useUploadStore = defineStore('upload', () => {
         })
     })
     invalidateChannelsCache()
-    invalidateChannelCacheByAlbum(albumRecordId)
+    if (albumPublicId) invalidateChannelCacheByAlbum(albumPublicId)
     return mutationResult({ ok: true, data: response?.data ?? null })
   }
 

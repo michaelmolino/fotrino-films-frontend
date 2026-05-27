@@ -32,7 +32,8 @@ const props = defineProps({
 const showEmptyState = computed(() => (props.channels || []).length === 0)
 
 const channelItemListeners = {
-  deleteChannel: value => deleteResource('channel', value),
+  deleteChannel: channelPublicId =>
+    deleteResource('channel', { privateId: channelPublicId, publicId: channelPublicId }),
   undeleteChannel,
   deleteAlbum: value => deleteResource('album', value),
   undeleteAlbum,
@@ -53,19 +54,19 @@ function buildEmptyLinks() {
 }
 
 function addChannelLink(links, channel) {
-  if (channel?.id && !channel?.pending) {
-    links.channel[channel.id] = `/c/${channel.publicId}/${channel.slug}`
+  if (channel?.publicId && !channel?.pending) {
+    links.channel[channel.publicId] = `/c/${channel.publicId}/${channel.slug}`
   }
 }
 
 function addAlbumAndMediaLinks(links, album) {
-  if (album?.id && !album?.pending) {
-    links.album[album.id] = `/a/${album.publicId}/${album.slug}`
+  if (album?.privateId && !album?.pending) {
+    links.album[album.privateId] = `/a/${album.publicId}/${album.slug}`
   }
 
   for (const media of album?.media || []) {
-    if (media?.id && !media?.pending) {
-      links.media[media.id] = `/m/${media.publicId}/${media.slug}`
+    if (media?.privateId && !media?.pending) {
+      links.media[media.privateId] = `/m/${media.publicId}/${media.slug}`
     }
   }
 }
@@ -92,9 +93,9 @@ function getMediaLink(type, id) {
   return null
 }
 
-async function deleteResource(type, id) {
+async function deleteResource(type, resource) {
   try {
-    const result = await channelStore.deleteResource({ type, id })
+    const result = await channelStore.deleteResource({ type, ...resource })
     if (result?.cancelled || result?.ok === false) return
     notifySuccess('Deletion queued.')
   } catch (error) {
@@ -104,9 +105,9 @@ async function deleteResource(type, id) {
   }
 }
 
-async function undeleteMedia(mediaRecordId) {
+async function undeleteMedia({ privateId, publicId }) {
   try {
-    await channelStore.undeleteResource({ type: 'media', id: mediaRecordId })
+    await channelStore.undeleteResource({ type: 'media', privateId, publicId })
     notifySuccess('Video restored.')
   } catch (error) {
     notifyError(getComponentApiErrorMessage(error, 'Unable to undelete this video.'), {
@@ -115,9 +116,9 @@ async function undeleteMedia(mediaRecordId) {
   }
 }
 
-async function undeleteAlbum(albumRecordId) {
+async function undeleteAlbum({ privateId, publicId }) {
   try {
-    await channelStore.undeleteResource({ type: 'album', id: albumRecordId })
+    await channelStore.undeleteResource({ type: 'album', privateId, publicId })
     notifySuccess('Album restored.')
   } catch (error) {
     notifyError(getComponentApiErrorMessage(error, 'Unable to undelete this album.'), {
@@ -128,7 +129,7 @@ async function undeleteAlbum(albumRecordId) {
 
 async function undeleteChannel(channelPublicId) {
   try {
-    await channelStore.undeleteResource({ type: 'channel', id: channelPublicId })
+    await channelStore.undeleteResource({ type: 'channel', privateId: channelPublicId, publicId: channelPublicId })
     notifySuccess('Channel restored.')
   } catch (error) {
     notifyError(getComponentApiErrorMessage(error, 'Unable to undelete this channel.'), {
@@ -137,9 +138,9 @@ async function undeleteChannel(channelPublicId) {
   }
 }
 
-async function abortPendingMedia(mediaRecordId) {
+async function abortPendingMedia(mediaPrivateId) {
   try {
-    await uploadStore.abortUpload(mediaRecordId)
+    await uploadStore.abortUpload(mediaPrivateId)
     notifySuccess('Pending upload aborted.')
   } catch (error) {
     if (error?.__userCancelled || error?.code === 'ERR_CANCELED') {
@@ -205,7 +206,8 @@ async function saveMediaEdit(payload) {
   return runEditJourney({
     update: channelStore.updateMedia,
     updatePayload: {
-      mediaRecordId: payload?.id,
+      mediaPrivateId: payload?.privateId,
+      mediaPublicId: payload?.publicId,
       title: payload?.title,
       description: payload?.description ?? null,
       resourceDate: payload?.resourceDate ?? null,
@@ -215,12 +217,13 @@ async function saveMediaEdit(payload) {
       shouldUpload: !!payload?.previewFile,
       prepare: uploadStore.requestMediaPreviewUpload,
       preparePayload: {
-        mediaRecordId: payload?.id
+        mediaPrivateId: payload?.privateId
       },
       file: payload?.previewFile,
       confirm: uploadStore.confirmMediaPreviewUpload,
       confirmPayload: {
-        mediaRecordId: payload?.id
+        mediaPrivateId: payload?.privateId,
+        mediaPublicId: payload?.publicId
       }
     },
     successMessage: 'Video updated.',
@@ -232,7 +235,8 @@ async function saveAlbumEdit(payload) {
   return runEditJourney({
     update: channelStore.updateAlbum,
     updatePayload: {
-      albumRecordId: payload?.id,
+      albumPrivateId: payload?.privateId,
+      albumPublicId: payload?.publicId,
       title: payload?.title,
       subtitle: payload?.subtitle ?? null,
       posterType: payload?.posterType,
@@ -242,12 +246,13 @@ async function saveAlbumEdit(payload) {
       shouldUpload: payload?.posterType === 'new' && !!payload?.posterFile,
       prepare: uploadStore.requestAlbumPosterUpload,
       preparePayload: {
-        albumRecordId: payload?.id
+        albumPrivateId: payload?.privateId
       },
       file: payload?.posterFile,
       confirm: uploadStore.confirmAlbumPosterUpload,
       confirmPayload: {
-        albumRecordId: payload?.id
+        albumPrivateId: payload?.privateId,
+        albumPublicId: payload?.publicId
       }
     },
     successMessage: 'Album updated.',

@@ -18,7 +18,7 @@
           :deleted="album.deleted"
           :undeletable="album.deleted"
           :hasPending-children="hasPendingChildren"
-          :link="getMediaLink('album', album.id)"
+          :link="getMediaLink('album', album.privateId)"
           :avatarSize="'40px'"
           :subtitle="albumSubtitle"
           editable
@@ -31,7 +31,7 @@
 
       <MediaItem
         v-for="media in album.media"
-        :key="media.id"
+        :key="media.privateId"
         :media="media"
         :album="album"
         :channel="channel"
@@ -153,11 +153,11 @@ const mediaItemListeners = {
 }
 
 function emitDeleteAlbum() {
-  emit('deleteAlbum', props.album.id)
+  emit('deleteAlbum', { privateId: props.album.privateId, publicId: props.album.publicId })
 }
 
 function emitUndeleteAlbum() {
-  emit('undeleteAlbum', props.album.id)
+  emit('undeleteAlbum', { privateId: props.album.privateId, publicId: props.album.publicId })
 }
 
 const editAlbumPreview = computed(() => {
@@ -243,7 +243,8 @@ async function onUpdatePosterFile(fileOrFiles) {
 
 function saveEdit() {
   emit('editAlbum', {
-    id: props.album?.id,
+    privateId: props.album?.privateId,
+    publicId: props.album?.publicId,
     title: editForm.value.title,
     subtitle: editForm.value.subtitle,
     posterType: editForm.value.posterType,

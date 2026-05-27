@@ -6,6 +6,7 @@ import { useRequestLoading } from 'src/composables/useRequestLoading'
 import { confirmDestructiveAction, notifyError } from 'src/utils/notify.js'
 import {
   getCloudflareGatewayErrorPayload,
+  getComponentApiErrorPayload,
   getGlobalApiErrorPayload,
   getGlobalApiErrorMessage,
   isCloudflareGatewayError,
@@ -31,7 +32,11 @@ export default boot(({ app, router }) => {
       hideLoader()
     },
     onApiError: ({ error, status, requestCanceled }) => {
-      const skipNotify = error?.config?.__skipGlobalErrorNotify === true || requestCanceled
+      const componentErrorPayload = getComponentApiErrorPayload(error)
+      const skipNotify =
+        error?.config?.__skipGlobalErrorNotify === true ||
+        requestCanceled ||
+        componentErrorPayload != null
       const cloudflareError = isCloudflareGatewayError(error)
       const cloudflarePayload = cloudflareError ? getCloudflareGatewayErrorPayload(error) : null
       const apiError = getGlobalApiErrorPayload(error)
@@ -65,8 +70,7 @@ export default boot(({ app, router }) => {
       if (!skipNotify) {
         if (!cloudflareError) {
           notifyError(msg, {
-            timeout,
-            multiLine: true
+            timeout
           })
         }
       }

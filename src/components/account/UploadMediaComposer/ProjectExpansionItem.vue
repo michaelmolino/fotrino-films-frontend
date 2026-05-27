@@ -207,7 +207,7 @@ const showColorDialog = computed(() => showNewAlbumForm.value && showColorAction
 const skipNextRestoreOnBlur = ref(false)
 const albumCards = computed(() => {
   return (props.albums || []).map(item => ({
-    key: `album-${item.id}`,
+    key: `album-${item.privateId}`,
     item,
     subtitle: item.subtitle || 'Existing album',
     fallbackSwatchStyle: {
@@ -215,7 +215,7 @@ const albumCards = computed(() => {
     },
     className: {
       'is-selected':
-        props.payload.album?.projectMode === 'existing' && selectedAlbumId.value === item.id
+        props.payload.album?.projectMode === 'existing' && selectedAlbumId.value === item.privateId
     }
   }))
 })
