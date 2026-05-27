@@ -25,10 +25,16 @@ export default boot(({ app, router }) => {
         cancelAction: { 'data-cy': 'cancel-delete' }
       })
     },
-    onRequestStart: () => {
+    onRequestStart: req => {
+      if (req?.__skipGlobalLoading === true) {
+        return
+      }
       showLoader()
     },
-    onRequestEnd: () => {
+    onRequestEnd: req => {
+      if (req?.__skipGlobalLoading === true) {
+        return
+      }
       hideLoader()
     },
     onApiError: ({ error, status, requestCanceled }) => {

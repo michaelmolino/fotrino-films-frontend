@@ -195,7 +195,7 @@ const posterTypeOptions = [
 const isBlocked = computed(() => !props.mediaFile)
 const isSectionOpen = computed(() => props.activeSection === 'album')
 const wrapperClass = computed(() => ({ 'is-blocked': isBlocked.value }))
-const selectedAlbumId = computed(() => props.payload.album?.id?.value)
+const selectedAlbumId = computed(() => props.payload.album?.privateId?.value)
 const showNewAlbumForm = computed(() => props.payload.album?.projectMode === 'create')
 const albumTitle = computed(() => props.payload.album?.title)
 const albumSubtitle = computed(() => props.payload.album?.subtitle)

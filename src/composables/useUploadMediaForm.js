@@ -41,7 +41,7 @@ function createInitialPayload() {
     title: 'My Channel',
     album: {
       projectMode: 'unselected',
-      id: null,
+      privateId: null,
       posterType: 'default',
       posterColor: '#000000',
       title: 'My Videos',
@@ -144,7 +144,7 @@ export function useUploadMediaForm() {
     if (payload.album.projectMode === 'existing') {
       return {
         mode: 'existing',
-        privateId: payload.album.id?.value ?? null
+        privateId: payload.album.privateId?.value ?? null
       }
     }
 
@@ -237,8 +237,8 @@ export function useUploadMediaForm() {
   })
 
   const album = computed(() => {
-    if (payload.album.projectMode === 'existing' && payload.album.id?.value) {
-      return albumsById.value[payload.album.id.value]
+    if (payload.album.projectMode === 'existing' && payload.album.privateId?.value) {
+      return albumsById.value[payload.album.privateId.value]
     }
 
     const poster =
@@ -647,18 +647,18 @@ export function useUploadMediaForm() {
 
     if (projectList.length === 0) {
       payload.album.projectMode = 'create'
-      payload.album.id = null
+      payload.album.privateId = null
       return
     }
 
     if (projectList.length === 1) {
       payload.album.projectMode = 'existing'
-      payload.album.id = { value: projectList[0].privateId, label: projectList[0].title }
+      payload.album.privateId = { value: projectList[0].privateId, label: projectList[0].title }
       return
     }
 
     payload.album.projectMode = 'unselected'
-    payload.album.id = null
+    payload.album.privateId = null
   }
 
   watch(
@@ -668,7 +668,7 @@ export function useUploadMediaForm() {
         albumsLoadToken.value += 1
         albums.value = []
         payload.album.projectMode = 'create'
-        payload.album.id = null
+        payload.album.privateId = null
         queueValidation()
         return
       }
@@ -677,13 +677,13 @@ export function useUploadMediaForm() {
         albumsLoadToken.value += 1
         albums.value = []
         payload.album.projectMode = 'unselected'
-        payload.album.id = null
+        payload.album.privateId = null
         queueValidation()
         return
       }
 
       payload.album.projectMode = 'unselected'
-      payload.album.id = null
+      payload.album.privateId = null
 
       const requestToken = ++albumsLoadToken.value
       await loadAlbumsForChannelPublicId(newPublicId, requestToken)
@@ -701,7 +701,7 @@ export function useUploadMediaForm() {
         albumsLoadToken.value += 1
         albums.value = []
         payload.album.projectMode = 'create'
-        payload.album.id = null
+        payload.album.privateId = null
         queueValidation()
         return
       }
@@ -710,7 +710,7 @@ export function useUploadMediaForm() {
         albumsLoadToken.value += 1
         albums.value = []
         payload.album.projectMode = 'unselected'
-        payload.album.id = null
+        payload.album.privateId = null
         queueValidation()
         return
       }
@@ -719,7 +719,7 @@ export function useUploadMediaForm() {
         albumsLoadToken.value += 1
         albums.value = []
         payload.album.projectMode = 'unselected'
-        payload.album.id = null
+        payload.album.privateId = null
         queueValidation()
       }
     }

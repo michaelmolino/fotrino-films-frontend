@@ -73,6 +73,7 @@ export const useUploadStore = defineStore('upload', () => {
     const response = await runMutation({
       request: () =>
         api.post('/uploads/media/drafts/validate', draftRequest, {
+          __skipGlobalLoading: true,
           headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json'

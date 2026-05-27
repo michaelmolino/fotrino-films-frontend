@@ -416,7 +416,7 @@ const isAlbumAutoDefault = computed(() => {
   if (albumList.length === 1) {
     return (
       payload.album?.projectMode === 'existing' &&
-      payload.album?.id?.value === albumList[0].privateId
+      payload.album?.privateId?.value === albumList[0].privateId
     )
   }
 
@@ -599,7 +599,7 @@ function onComposerSelectExistingAlbum(selectedAlbum) {
     album: {
       ...payload.album,
       projectMode: 'existing',
-      id: { value: selectedAlbum.privateId, label: selectedAlbum.title }
+      privateId: { value: selectedAlbum.privateId, label: selectedAlbum.title }
     }
   })
 }
@@ -610,7 +610,7 @@ function onComposerSelectNewAlbum() {
     album: {
       ...payload.album,
       projectMode: 'create',
-      id: null,
+      privateId: null,
       title: payload.album?.title || 'My Videos',
       posterType: payload.album?.posterType || 'default'
     }
