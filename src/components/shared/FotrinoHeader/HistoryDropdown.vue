@@ -38,6 +38,7 @@ import { computed, onMounted } from 'vue'
 import { Notify, useQuasar } from 'quasar'
 import { useChannelStore } from 'src/stores/channel-store.js'
 import { historyChannels, removeHistory, resolveHistoryFromBackend } from '@utils/history.js'
+import { buildHistoryTargetPath } from '@utils/channelRoute.js'
 
 const channelStore = useChannelStore()
 const $q = useQuasar()
@@ -59,13 +60,7 @@ const historyEntries = computed(() => {
 })
 
 function historyTarget(channel) {
-  if (channel.type === 'privateAlbum') {
-    return `/private/a/${channel.resourceId}/${channel.slug}`
-  }
-  if (channel.type === 'privateMedia') {
-    return `/private/m/${channel.resourceId}/${channel.slug}`
-  }
-  return `/c/${channel.resourceId}/${channel.slug}`
+  return buildHistoryTargetPath(channel)
 }
 
 function getRemovedHistoryMessage(removedCount) {

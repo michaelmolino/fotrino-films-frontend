@@ -110,10 +110,7 @@ export function isCloudflareGatewayError(error) {
  * @returns {boolean}
  */
 export function isGloballyHandledApiError(error) {
-  if (error?.__cloudflareDialogShown === true) {
-    return true
-  }
-  return isCloudflareGatewayError(error)
+  return getApiErrorContext(error).isGloballyHandled
 }
 
 /**
@@ -168,6 +165,20 @@ export function getGlobalApiErrorPayload(error) {
   }
 
   return /** @type {GlobalApiErrorResponse} */ (data)
+}
+
+function getApiErrorContext(error) {
+  const cloudflarePayload = getCloudflareGatewayErrorPayload(error)
+  const globalPayload = getGlobalApiErrorPayload(error)
+  const status = error?.response?.status
+
+  return {
+    status,
+    isRateLimited: status === 429,
+    cloudflarePayload,
+    globalPayload,
+    isGloballyHandled: error?.__cloudflareDialogShown === true || cloudflarePayload != null
+  }
 }
 
 /**
@@ -225,11 +236,13 @@ export function isGlobalApiError(error, code) {
  * @returns {string}
  */
 export function getGlobalApiErrorMessage(error, fallback = 'Something went wrong!') {
-  if (error?.response?.status === 429) {
+  const context = getApiErrorContext(error)
+
+  if (context.isRateLimited) {
     return getRateLimitMessage(error)
   }
 
-  const payload = getGlobalApiErrorPayload(error)
+  const payload = context.globalPayload
   if (!payload) {
     return fallback
   }
@@ -243,15 +256,17 @@ export function getGlobalApiErrorMessage(error, fallback = 'Something went wrong
  * @returns {string}
  */
 export function getComponentApiErrorMessage(error, fallback = 'Something went wrong!') {
-  if (isGloballyHandledApiError(error)) {
+  const context = getApiErrorContext(error)
+
+  if (context.isGloballyHandled) {
     return ''
   }
 
-  if (error?.response?.status === 429) {
+  if (context.isRateLimited) {
     return getRateLimitMessage(error)
   }
 
-  const globalPayload = getGlobalApiErrorPayload(error)
+  const globalPayload = context.globalPayload
   if (globalPayload) {
     return getGlobalApiErrorMessage(error, fallback)
   }

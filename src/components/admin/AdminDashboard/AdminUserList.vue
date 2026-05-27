@@ -114,7 +114,7 @@
                     </div>
                   </div>
                   <q-btn
-                    :to="`/c/${channel.publicId}/${channel.slug}`"
+                    :to="getChannelPath(channel)"
                     icon="link"
                     flat
                     dense
@@ -169,6 +169,7 @@ import { useQuasar } from 'quasar'
 import { useAdminStore } from 'src/stores/admin-store.js'
 import { daysSince } from '@utils/date.js'
 import { getCountry } from '@utils/countries.js'
+import { buildChannelPath } from '@utils/channelRoute.js'
 import { getComponentApiErrorMessage } from 'src/utils/apiErrors.js'
 import { notifyError, notifySuccess } from 'src/utils/notify.js'
 import googleIcon from '@assets/icons/google.svg'
@@ -226,6 +227,10 @@ const providerIconClass = computed(() =>
 function getChannelsLabel(user) {
   const count = user.channels?.length || 0
   return count > 0 ? `Show Channels (${count})` : 'No Channels'
+}
+
+function getChannelPath(channel) {
+  return buildChannelPath({ publicId: channel?.publicId, slug: channel?.slug })
 }
 
 watch(filterMode, value => {

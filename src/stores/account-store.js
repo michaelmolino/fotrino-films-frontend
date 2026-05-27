@@ -1,8 +1,13 @@
 import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { useQuery, useQueryCache } from '@pinia/colada'
-import { api } from 'src/clients/axios-client.js'
 import { API_CACHE_LONG_MS, API_CACHE_SHORT_MS } from 'src/stores/utils/cache-timeouts.js'
+import {
+  createApiGetQueryOptionsFactory,
+  invalidateQueriesSafely,
+  toArray
+} from 'src/stores/utils/query-helpers.js'
+import { api } from 'src/clients/axios-client.js'
 import { mutationResult, runMutation } from 'src/utils/storeMutations.js'
 
 export const useAccountStore = defineStore('account', () => {
@@ -11,26 +16,19 @@ export const useAccountStore = defineStore('account', () => {
   const providersLoadFailed = ref(false)
   const queryCache = useQueryCache()
 
-  const accountProfileQueryOptions = (staleTime = API_CACHE_SHORT_MS) => ({
+  const accountProfileQueryOptions = createApiGetQueryOptionsFactory({
     key: ['account', 'profile'],
-    staleTime,
-    query: async () => {
-      const { data } = await api.get('/account/profile', {
-        __skipGlobalErrorNotify: true
-      })
-      return data
-    }
+    staleTime: (staleTime = API_CACHE_SHORT_MS) => staleTime,
+    url: '/account/profile',
+    config: { __skipGlobalErrorNotify: true }
   })
 
-  const accountProvidersQueryOptions = (staleTime = API_CACHE_LONG_MS) => ({
+  const accountProvidersQueryOptions = createApiGetQueryOptionsFactory({
     key: ['account', 'providers'],
-    staleTime,
-    query: async () => {
-      const { data } = await api.get('/account/providers', {
-        __skipGlobalErrorNotify: true
-      })
-      return data.providers
-    }
+    staleTime: (staleTime = API_CACHE_LONG_MS) => staleTime,
+    url: '/account/providers',
+    config: { __skipGlobalErrorNotify: true },
+    transform: data => data?.providers
   })
 
   const setProfile = value => {
@@ -38,15 +36,11 @@ export const useAccountStore = defineStore('account', () => {
   }
 
   const setProviders = value => {
-    providers.value = Array.isArray(value) ? value : []
-  }
-
-  const invalidateQueries = options => {
-    queryCache.invalidateQueries(options).catch(() => { })
+    providers.value = toArray(value)
   }
 
   const clearProfileCache = () => {
-    invalidateQueries({
+    invalidateQueriesSafely(queryCache, {
       key: accountProfileQueryOptions().key,
       exact: true
     })

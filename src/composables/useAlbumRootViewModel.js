@@ -1,4 +1,5 @@
 import { computed } from 'vue'
+import { buildMediaPath, buildPrivateAlbumMediaPath } from '@utils/channelRoute.js'
 
 export function useAlbumRootViewModel({ loading, channel, album, route, privateMode }) {
   const contentState = computed(() => {
@@ -9,9 +10,13 @@ export function useAlbumRootViewModel({ loading, channel, album, route, privateM
 
   function getMediaPath(media) {
     if (privateMode.value && route.params.privateAlbumId) {
-      return `/private/a/${route.params.privateAlbumId}/m/${media.privateId}/${media.slug}`
+      return buildPrivateAlbumMediaPath({
+        privateAlbumId: route.params.privateAlbumId,
+        privateMediaId: media.privateId,
+        mediaSlug: media.slug
+      })
     }
-    return `/m/${media.publicId}/${media.slug}`
+    return buildMediaPath({ publicId: media.publicId, slug: media.slug })
   }
 
   const allMedia = computed(() => {

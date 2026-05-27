@@ -1,9 +1,14 @@
 import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { useQuery, useQueryCache } from '@pinia/colada'
-import { api } from 'src/clients/axios-client.js'
 import { isGlobalApiError } from 'src/utils/apiErrors.js'
 import { mutationResult, runMutation } from 'src/utils/storeMutations.js'
+import {
+  createApiGetQueryOptionsFactory,
+  invalidateQueriesSafely,
+  toArray
+} from 'src/stores/utils/query-helpers.js'
+import { api } from 'src/clients/axios-client.js'
 
 export const useAdminStore = defineStore('admin', () => {
   const users = ref([])
@@ -13,15 +18,12 @@ export const useAdminStore = defineStore('admin', () => {
 
   const CANCELLED = Symbol('cancelled')
 
-  const usersQueryOptions = () => ({
+  const usersQueryOptions = createApiGetQueryOptionsFactory({
     key: ['admin', 'users'],
     staleTime: 0,
-    query: async () => {
-      const { data } = await api.get('/admin/users', {
-        __skipGlobalErrorNotify: true
-      })
-      return Array.isArray(data) ? data : []
-    }
+    url: '/admin/users',
+    config: { __skipGlobalErrorNotify: true },
+    transform: data => toArray(data)
   })
 
   const jobsQueryOptions = (statuses = []) => {
@@ -32,28 +34,24 @@ export const useAdminStore = defineStore('admin', () => {
         .sort((a, b) => a.localeCompare(b))
       : []
 
-    return {
+    return createApiGetQueryOptionsFactory({
       key: ['admin', 'jobs', normalizedStatuses],
       staleTime: 0,
-      query: async () => {
-        const { data } = await api.get('/admin/jobs', {
-          params: normalizedStatuses.length > 0 ? { status: normalizedStatuses } : undefined,
-          __skipGlobalErrorNotify: true
-        })
-        return Array.isArray(data) ? data : []
-      }
-    }
+      url: '/admin/jobs',
+      config: {
+        params: normalizedStatuses.length > 0 ? { status: normalizedStatuses } : undefined,
+        __skipGlobalErrorNotify: true
+      },
+      transform: data => toArray(data)
+    })()
   }
 
-  const reportedMediaQueryOptions = () => ({
+  const reportedMediaQueryOptions = createApiGetQueryOptionsFactory({
     key: ['admin', 'media', 'reported'],
     staleTime: 0,
-    query: async () => {
-      const { data } = await api.get('/admin/media/reported', {
-        __skipGlobalErrorNotify: true
-      })
-      return Array.isArray(data) ? data : []
-    }
+    url: '/admin/media/reported',
+    config: { __skipGlobalErrorNotify: true },
+    transform: data => toArray(data)
   })
 
   const setUsers = value => {
@@ -61,15 +59,11 @@ export const useAdminStore = defineStore('admin', () => {
   }
 
   const setJobs = value => {
-    jobs.value = Array.isArray(value) ? value : []
+    jobs.value = toArray(value)
   }
 
   const setReportedMedia = value => {
-    reportedMedia.value = Array.isArray(value) ? value : []
-  }
-
-  const invalidateQueries = options => {
-    queryCache.invalidateQueries(options).catch(() => { })
+    reportedMedia.value = toArray(value)
   }
 
   const useUsersQuery = () => {
@@ -78,7 +72,7 @@ export const useAdminStore = defineStore('admin', () => {
     watch(
       () => query.data.value,
       value => {
-        setUsers(Array.isArray(value) ? value : [])
+        setUsers(toArray(value))
       },
       { immediate: true }
     )
@@ -102,7 +96,7 @@ export const useAdminStore = defineStore('admin', () => {
     watch(
       () => query.data.value,
       value => {
-        setJobs(Array.isArray(value) ? value : [])
+        setJobs(toArray(value))
       },
       { immediate: true }
     )
@@ -126,7 +120,7 @@ export const useAdminStore = defineStore('admin', () => {
     watch(
       () => query.data.value,
       value => {
-        setReportedMedia(Array.isArray(value) ? value : [])
+        setReportedMedia(toArray(value))
       },
       { immediate: true }
     )
@@ -152,14 +146,14 @@ export const useAdminStore = defineStore('admin', () => {
       await runMutation({
         request: () => api.post(`/admin/jobs/pending/${job.id}/start-now`)
       })
-      invalidateQueries({ key: ['admin', 'jobs'] })
+      invalidateQueriesSafely(queryCache, { key: ['admin', 'jobs'] })
       return mutationResult({ ok: true, data: 'started' })
     }
     if (job.status === 'failed') {
       await runMutation({
         request: () => api.post(`/admin/jobs/failed/${job.id}/replay`)
       })
-      invalidateQueries({ key: ['admin', 'jobs'] })
+      invalidateQueriesSafely(queryCache, { key: ['admin', 'jobs'] })
       return mutationResult({ ok: true, data: 'replayed' })
     }
     throw new Error(`No admin action available for status: ${job.status}`)
@@ -178,7 +172,7 @@ export const useAdminStore = defineStore('admin', () => {
       return mutationResult({ ok: false, cancelled: true })
     }
 
-    invalidateQueries({
+    invalidateQueriesSafely(queryCache, {
       key: usersQueryOptions().key,
       exact: true
     })
@@ -198,7 +192,7 @@ export const useAdminStore = defineStore('admin', () => {
       return mutationResult({ ok: false, cancelled: true })
     }
 
-    invalidateQueries({
+    invalidateQueriesSafely(queryCache, {
       key: usersQueryOptions().key,
       exact: true
     })
@@ -218,7 +212,7 @@ export const useAdminStore = defineStore('admin', () => {
       return mutationResult({ ok: false, cancelled: true })
     }
 
-    invalidateQueries({
+    invalidateQueriesSafely(queryCache, {
       key: reportedMediaQueryOptions().key,
       exact: true
     })

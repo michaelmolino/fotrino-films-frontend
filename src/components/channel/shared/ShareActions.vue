@@ -81,6 +81,14 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { Notify, copyToClipboard } from 'quasar'
+import {
+  buildAlbumPath,
+  buildChannelPath,
+  buildMediaPath,
+  buildPrivateAlbumMediaPath,
+  buildPrivateAlbumPath,
+  buildPrivateMediaPath
+} from '@utils/channelRoute.js'
 
 const props = defineProps({
   channel: { type: Object, required: true },
@@ -102,39 +110,63 @@ const shareContext = computed(() => {
 })
 
 const channelPath = computed(() => {
-  if (!props.channel?.publicId || !props.channel?.slug) return null
-  return `/c/${props.channel.publicId}/${props.channel.slug}`
+  return buildChannelPath({
+    publicId: props.channel?.publicId,
+    slug: props.channel?.slug
+  })
 })
 
 const albumPath = computed(() => {
-  if (!props.album?.publicId || !props.album?.slug) return null
-  return `/a/${props.album.publicId}/${props.album.slug}`
+  return buildAlbumPath({
+    publicId: props.album?.publicId,
+    slug: props.album?.slug
+  })
 })
 
 const privateAlbumPath = computed(() => {
-  if (!props.album?.privateId || !props.album?.slug) return null
-  return `/private/a/${props.album.privateId}/${props.album.slug}`
+  return buildPrivateAlbumPath({
+    privateId: props.album?.privateId,
+    slug: props.album?.slug
+  })
 })
 
 const publicMediaPath = computed(() => {
-  if (!props.media?.publicId || !props.media?.slug) return null
-  return `/m/${props.media.publicId}/${props.media.slug}`
+  return buildMediaPath({
+    publicId: props.media?.publicId,
+    slug: props.media?.slug
+  })
 })
 
 const privateMediaPath = computed(() => {
-  if (!props.media?.privateId || !props.media?.slug) return null
+  const mediaPrivateId = props.media?.privateId
+  const mediaSlug = props.media?.slug
+  if (!mediaPrivateId || !mediaSlug) return null
+
   if (route.params?.privateAlbumId) {
-    return `/private/a/${route.params.privateAlbumId}/m/${props.media.privateId}/${props.media.slug}`
+    return buildPrivateAlbumMediaPath({
+      privateAlbumId: route.params.privateAlbumId,
+      privateMediaId: mediaPrivateId,
+      mediaSlug
+    })
   }
   if (props.album?.privateId) {
-    return `/private/a/${props.album.privateId}/m/${props.media.privateId}/${props.media.slug}`
+    return buildPrivateAlbumMediaPath({
+      privateAlbumId: props.album.privateId,
+      privateMediaId: mediaPrivateId,
+      mediaSlug
+    })
   }
-  return `/private/m/${props.media.privateId}/${props.media.slug}`
+  return buildPrivateMediaPath({
+    privateId: mediaPrivateId,
+    slug: mediaSlug
+  })
 })
 
 const standalonePrivateMediaPath = computed(() => {
-  if (!props.media?.privateId || !props.media?.slug) return null
-  return `/private/m/${props.media.privateId}/${props.media.slug}`
+  return buildPrivateMediaPath({
+    privateId: props.media?.privateId,
+    slug: props.media?.slug
+  })
 })
 
 const isPrivateAlbumContext = computed(() => {

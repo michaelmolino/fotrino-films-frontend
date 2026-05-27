@@ -1,4 +1,5 @@
 import { computed } from 'vue'
+import { buildAlbumPath, buildMediaPath } from '@utils/channelRoute.js'
 
 export function useChannelRootViewModel({ loading, channel, route, selectedView, sortedAllMedia }) {
   const albums = computed(() => {
@@ -18,8 +19,8 @@ export function useChannelRootViewModel({ loading, channel, route, selectedView,
       .filter(album => !!album?.privateId)
       .map(album => ({
         id: album.privateId,
-      album,
-      to: `/a/${album.publicId}/${album.slug}`
+        album,
+        to: buildAlbumPath({ publicId: album.publicId, slug: album.slug })
       }))
   })
 
@@ -28,10 +29,10 @@ export function useChannelRootViewModel({ loading, channel, route, selectedView,
       .filter(item => !!item?.media?.privateId)
       .map((item, index) => ({
         id: item.media.privateId,
-      album: item.album,
-      media: item.media,
-      to: `/m/${item.media.publicId}/${item.media.slug}`,
-      priority: index === 0 ? 'high' : 'auto'
+        album: item.album,
+        media: item.media,
+        to: buildMediaPath({ publicId: item.media.publicId, slug: item.media.slug }),
+        priority: index === 0 ? 'high' : 'auto'
       }))
   })
 

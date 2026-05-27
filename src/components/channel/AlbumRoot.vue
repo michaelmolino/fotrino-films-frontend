@@ -98,6 +98,7 @@ import { computed, watch, defineAsyncComponent, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
 import { useAlbumRootViewModel } from '@composables/useAlbumRootViewModel.js'
+import { buildAlbumPath, buildMediaPath, buildPrivateAlbumMediaPath, buildPrivateAlbumPath } from '@utils/channelRoute.js'
 
 import BreadCrumbs from '@components/channel/shared/BreadCrumbs.vue'
 import ShareActions from '@components/channel/shared/ShareActions.vue'
@@ -160,9 +161,9 @@ watch(
       !loading.value
     ) {
       if (privateMode.value && newAlbum.privateId) {
-        redirect(`/private/a/${newAlbum.privateId}/${newAlbum.slug}`)
+        redirect(buildPrivateAlbumPath({ privateId: newAlbum.privateId, slug: newAlbum.slug }))
       } else {
-        redirect(`/a/${newAlbum.publicId}/${newAlbum.slug}`)
+        redirect(buildAlbumPath({ publicId: newAlbum.publicId, slug: newAlbum.slug }))
       }
       return
     }
@@ -193,10 +194,14 @@ watch(
       const featured = featuredMedia.value[0]
       if (privateMode.value && route.params.privateAlbumId && featured?.privateId) {
         redirect(
-          `/private/a/${route.params.privateAlbumId}/m/${featured.privateId}/${featured.slug}`
+          buildPrivateAlbumMediaPath({
+            privateAlbumId: route.params.privateAlbumId,
+            privateMediaId: featured.privateId,
+            mediaSlug: featured.slug
+          })
         )
       } else {
-        redirect(`/m/${featured.publicId}/${featured.slug}`)
+        redirect(buildMediaPath({ publicId: featured.publicId, slug: featured.slug }))
       }
     }
   },

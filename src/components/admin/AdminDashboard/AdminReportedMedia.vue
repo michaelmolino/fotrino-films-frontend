@@ -54,6 +54,7 @@ import { Notify } from 'quasar'
 import { useAdminStore } from 'src/stores/admin-store.js'
 import { daysSince } from '@utils/date.js'
 import { getComponentApiErrorMessage } from 'src/utils/apiErrors.js'
+import { buildPrivateMediaPath } from '@utils/channelRoute.js'
 
 const adminStore = useAdminStore()
 const reportedMediaQuery = adminStore.useReportedMediaQuery()
@@ -95,7 +96,7 @@ const flattenedReportedMediaRows = computed(() => {
 })
 
 function getReportedMediaPath(row) {
-  return `/private/m/${row.privateId}/${row.slug}`
+  return buildPrivateMediaPath({ privateId: row.privateId, slug: row.slug })
 }
 
 async function deleteMedia(privateId) {

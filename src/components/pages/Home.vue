@@ -42,10 +42,14 @@
 <script setup>
 import { computed } from 'vue'
 import { useQuasar } from 'quasar'
+import { buildChannelPath } from '@utils/channelRoute.js'
 
 defineOptions({ name: 'Home-Page' })
 const $q = useQuasar()
-const sampleChannelPath = `/c/${process.env.SAMPLE_CHANNEL_ID}/${process.env.SAMPLE_CHANNEL_SLUG}`
+const sampleChannelPath = buildChannelPath({
+  publicId: process.env.SAMPLE_CHANNEL_ID,
+  slug: process.env.SAMPLE_CHANNEL_SLUG
+})
 const textToneClass = computed(() => ($q.dark.isActive ? 'text-white' : 'text-primary'))
 const content = {
   titlePrimaryLeft: 'Fotrino ',

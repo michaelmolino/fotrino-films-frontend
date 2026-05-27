@@ -70,6 +70,7 @@
 <script setup>
 import { ref, defineAsyncComponent, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { getViewPreference, setViewPreference } from '@utils/viewPreference.js'
+import { buildAlbumPath } from '@utils/channelRoute.js'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
 import { useChannelRootViewModel } from '@composables/useChannelRootViewModel.js'
@@ -164,7 +165,7 @@ watch(
     if (isLoading || !currentChannel || !route.params.channelPublicId || count !== 1) return
     const onlyAlbum = albums.value[0]
     if (!onlyAlbum?.publicId || !onlyAlbum?.slug) return
-    redirect(`/a/${onlyAlbum.publicId}/${onlyAlbum.slug}`)
+    redirect(buildAlbumPath({ publicId: onlyAlbum.publicId, slug: onlyAlbum.slug }))
   },
   { immediate: true }
 )

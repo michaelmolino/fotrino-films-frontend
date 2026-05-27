@@ -56,6 +56,7 @@ import { computed, watch, defineAsyncComponent, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
 import { useMediaRootViewModel } from '@composables/useMediaRootViewModel.js'
+import { buildMediaPath, buildPrivateAlbumMediaPath, buildPrivateMediaPath } from '@utils/channelRoute.js'
 
 import BreadCrumbs from '@components/channel/shared/BreadCrumbs.vue'
 import MediaPreview from '@components/channel/shared/MediaPreview.vue'
@@ -176,7 +177,7 @@ watch(
       route.params.mediaSlug &&
       newMedia.slug !== route.params.mediaSlug
     ) {
-      redirect(`/m/${newMedia.publicId}/${newMedia.slug}`)
+      redirect(buildMediaPath({ publicId: newMedia.publicId, slug: newMedia.slug }))
       return
     }
     if (
@@ -185,11 +186,17 @@ watch(
       newMedia.slug !== route.params.mediaSlug
     ) {
       if (route.params.privateAlbumId && album.value?.privateId && newMedia.privateId) {
-        redirect(`/private/a/${album.value.privateId}/m/${newMedia.privateId}/${newMedia.slug}`)
+        redirect(
+          buildPrivateAlbumMediaPath({
+            privateAlbumId: album.value.privateId,
+            privateMediaId: newMedia.privateId,
+            mediaSlug: newMedia.slug
+          })
+        )
         return
       }
       if (newMedia.privateId) {
-        redirect(`/private/m/${newMedia.privateId}/${newMedia.slug}`)
+        redirect(buildPrivateMediaPath({ privateId: newMedia.privateId, slug: newMedia.slug }))
       }
     }
   },

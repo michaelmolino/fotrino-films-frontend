@@ -1,9 +1,14 @@
 import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
-import { api } from 'src/clients/axios-client.js'
 import { useQuery, useQueryCache } from '@pinia/colada'
 import { API_CACHE_MEDIUM_MS } from 'src/stores/utils/cache-timeouts.js'
 import { mutationResult, runMutation } from 'src/utils/storeMutations.js'
+import {
+  createApiGetQueryOptionsFactory,
+  invalidateQueriesSafely,
+  toArray
+} from 'src/stores/utils/query-helpers.js'
+import { api } from 'src/clients/axios-client.js'
 
 export const useChannelStore = defineStore('channel', () => {
   const channels = ref([])
@@ -16,84 +21,69 @@ export const useChannelStore = defineStore('channel', () => {
     channels.value = value
   }
 
-  const invalidateQueries = options => {
-    queryCache.invalidateQueries(options).catch(() => { })
-  }
-
-  const channelQueryOptions = (channelPublicId, pending = false) => ({
-    key: ['channel', channelPublicId, pending ? 'pending' : 'current'],
+  const channelQueryOptions = createApiGetQueryOptionsFactory({
+    key: (channelPublicId, pending = false) => [
+      'channel',
+      channelPublicId,
+      pending ? 'pending' : 'current'
+    ],
     staleTime: API_CACHE_MEDIUM_MS,
-    query: async () => {
-      const url = `/channels/${channelPublicId}${pending ? '?pending=true' : ''}`
-      const { data } = await api.get(url, {
-        __redirectNotFoundTo404: true
-      })
-      return data
-    }
+    url: (channelPublicId, pending = false) =>
+      `/channels/${channelPublicId}${pending ? '?pending=true' : ''}`,
+    config: { __redirectNotFoundTo404: true }
   })
 
-  const channelsQueryOptions = (deep = false) => ({
-    key: ['channels', deep ? 'deep' : 'flat'],
+  const channelsQueryOptions = createApiGetQueryOptionsFactory({
+    key: (deep = false) => ['channels', deep ? 'deep' : 'flat'],
     staleTime: API_CACHE_MEDIUM_MS,
-    query: async () => {
-      const { data } = await api.get(deep ? '/channels/deep' : '/channels')
-      return Array.isArray(data) ? data : []
-    }
+    url: (deep = false) => (deep ? '/channels/deep' : '/channels'),
+    transform: data => toArray(data)
   })
 
-  const channelByAlbumQueryOptions = albumPublicId => ({
-    key: ['channel', 'album', albumPublicId],
+  const channelByAlbumQueryOptions = createApiGetQueryOptionsFactory({
+    key: albumPublicId => ['channel', 'album', albumPublicId],
     staleTime: API_CACHE_MEDIUM_MS,
-    query: async () => {
-      const { data } = await api.get(`/channels/album/${albumPublicId}`, {
-        __redirectNotFoundTo404: true
-      })
-      return data
-    }
+    url: albumPublicId => `/channels/album/${albumPublicId}`,
+    config: { __redirectNotFoundTo404: true }
   })
 
-  const channelByMediaQueryOptions = mediaPublicId => ({
-    key: ['channel', 'media', mediaPublicId],
+  const channelByMediaQueryOptions = createApiGetQueryOptionsFactory({
+    key: mediaPublicId => ['channel', 'media', mediaPublicId],
     staleTime: API_CACHE_MEDIUM_MS,
-    query: async () => {
-      const { data } = await api.get(`/channels/media/${mediaPublicId}`, {
-        __redirectNotFoundTo404: true
-      })
-      return data
-    }
+    url: mediaPublicId => `/channels/media/${mediaPublicId}`,
+    config: { __redirectNotFoundTo404: true }
   })
 
-  const privateMediaQueryOptions = privateMediaId => ({
-    key: ['channel', 'private-media', privateMediaId],
+  const privateMediaQueryOptions = createApiGetQueryOptionsFactory({
+    key: privateMediaId => ['channel', 'private-media', privateMediaId],
     staleTime: API_CACHE_MEDIUM_MS,
-    query: async () => {
-      const { data } = await api.get(`/channels/media/private/${privateMediaId}`, {
-        __redirectNotFoundTo404: true
-      })
-      return data
-    }
+    url: privateMediaId => `/channels/media/private/${privateMediaId}`,
+    config: { __redirectNotFoundTo404: true }
   })
 
-  const privateAlbumQueryOptions = (privateAlbumId, privateMediaId = null) => ({
-    key: ['channel', 'private-album', privateAlbumId, privateMediaId || 'root'],
+  const privateAlbumQueryOptions = createApiGetQueryOptionsFactory({
+    key: (privateAlbumId, privateMediaId = null) => [
+      'channel',
+      'private-album',
+      privateAlbumId,
+      privateMediaId || 'root'
+    ],
     staleTime: API_CACHE_MEDIUM_MS,
-    query: async () => {
+    url: (privateAlbumId, privateMediaId = null) => {
       const mediaQuery = privateMediaId
         ? `?mediaPrivateId=${encodeURIComponent(privateMediaId)}`
         : ''
-      const { data } = await api.get(`/channels/album/private/${privateAlbumId}${mediaQuery}`, {
-        __redirectNotFoundTo404: true
-      })
-      return data
-    }
+      return `/channels/album/private/${privateAlbumId}${mediaQuery}`
+    },
+    config: { __redirectNotFoundTo404: true }
   })
 
   const invalidateChannelsCache = () => {
-    invalidateQueries({
+    invalidateQueriesSafely(queryCache, {
       key: channelsQueryOptions(false).key,
       exact: true
     })
-    invalidateQueries({
+    invalidateQueriesSafely(queryCache, {
       key: channelsQueryOptions(true).key,
       exact: true
     })
@@ -101,14 +91,14 @@ export const useChannelStore = defineStore('channel', () => {
 
   const invalidateChannelCacheById = channelPublicId => {
     if (!channelPublicId) return
-    invalidateQueries({
+    invalidateQueriesSafely(queryCache, {
       predicate: query => query.key?.[0] === 'channel' && query.key?.[1] === channelPublicId
     })
   }
 
   const invalidateChannelCacheByAlbum = albumPublicId => {
     if (!albumPublicId) return
-    invalidateQueries({
+    invalidateQueriesSafely(queryCache, {
       key: channelByAlbumQueryOptions(albumPublicId).key,
       exact: true
     })
@@ -116,7 +106,7 @@ export const useChannelStore = defineStore('channel', () => {
 
   const invalidateChannelCacheByMedia = mediaPublicId => {
     if (!mediaPublicId) return
-    invalidateQueries({
+    invalidateQueriesSafely(queryCache, {
       key: channelByMediaQueryOptions(mediaPublicId).key,
       exact: true
     })
@@ -124,7 +114,7 @@ export const useChannelStore = defineStore('channel', () => {
 
   const invalidatePrivateMediaCache = privateMediaId => {
     if (!privateMediaId) return
-    invalidateQueries({
+    invalidateQueriesSafely(queryCache, {
       key: privateMediaQueryOptions(privateMediaId).key,
       exact: true
     })
@@ -132,7 +122,7 @@ export const useChannelStore = defineStore('channel', () => {
 
   const invalidatePrivateAlbumCache = privateAlbumId => {
     if (!privateAlbumId) return
-    invalidateQueries({
+    invalidateQueriesSafely(queryCache, {
       predicate: query =>
         query.key?.[0] === 'channel' &&
         query.key?.[1] === 'private-album' &&
@@ -146,7 +136,7 @@ export const useChannelStore = defineStore('channel', () => {
     watch(
       () => query.data.value,
       value => {
-        setChannels(Array.isArray(value) ? value : [])
+        setChannels(toArray(value))
       },
       { immediate: true }
     )

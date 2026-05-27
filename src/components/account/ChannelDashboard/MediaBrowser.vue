@@ -22,6 +22,7 @@ import ChannelItem from './MediaBrowser/ChannelItem.vue'
 import { getComponentApiErrorMessage } from 'src/utils/apiErrors.js'
 import { useUppyPresignedUpload } from 'src/composables/useUppyPresignedUpload.js'
 import { notifyError, notifySuccess } from 'src/utils/notify.js'
+import { buildAlbumPath, buildChannelPath, buildMediaPath } from '@utils/channelRoute.js'
 
 const channelStore = useChannelStore()
 const uploadStore = useUploadStore()
@@ -55,18 +56,27 @@ function buildEmptyLinks() {
 
 function addChannelLink(links, channel) {
   if (channel?.publicId && !channel?.pending) {
-    links.channel[channel.publicId] = `/c/${channel.publicId}/${channel.slug}`
+    links.channel[channel.publicId] = buildChannelPath({
+      publicId: channel.publicId,
+      slug: channel.slug
+    })
   }
 }
 
 function addAlbumAndMediaLinks(links, album) {
   if (album?.privateId && !album?.pending) {
-    links.album[album.privateId] = `/a/${album.publicId}/${album.slug}`
+    links.album[album.privateId] = buildAlbumPath({
+      publicId: album.publicId,
+      slug: album.slug
+    })
   }
 
   for (const media of album?.media || []) {
     if (media?.privateId && !media?.pending) {
-      links.media[media.privateId] = `/m/${media.publicId}/${media.slug}`
+      links.media[media.privateId] = buildMediaPath({
+        publicId: media.publicId,
+        slug: media.slug
+      })
     }
   }
 }
