@@ -44,3 +44,26 @@ export function assertChannelViewResponse(data) {
     throw new TypeError('Channel view response must include readModel')
   }
 }
+
+export function assertUploadDraftValidationResponse(data) {
+  assertObjectResponse(data, 'Upload draft validation')
+  if (typeof data.canSubmit !== 'boolean') {
+    throw new TypeError('Upload draft validation response canSubmit must be a boolean')
+  }
+  if (!Array.isArray(data.blockers)) {
+    throw new TypeError('Upload draft validation response blockers must be an array')
+  }
+  assertObjectResponse(data.requiredFiles, 'Upload draft validation requiredFiles')
+  if (typeof data.requiredFiles.upload !== 'boolean') {
+    throw new TypeError('Upload draft validation requiredFiles.upload must be a boolean')
+  }
+  if (typeof data.requiredFiles.preview !== 'boolean') {
+    throw new TypeError('Upload draft validation requiredFiles.preview must be a boolean')
+  }
+  if (typeof data.requiredFiles.cover !== 'boolean') {
+    throw new TypeError('Upload draft validation requiredFiles.cover must be a boolean')
+  }
+  if (typeof data.requiredFiles.poster !== 'boolean') {
+    throw new TypeError('Upload draft validation requiredFiles.poster must be a boolean')
+  }
+}

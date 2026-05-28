@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import { api } from 'src/clients/axios-client.js'
 import { useQueryCache } from '@pinia/colada'
 import { mutationResult, runMutation } from 'src/utils/storeMutations.js'
+import { assertUploadDraftValidationResponse } from 'src/utils/responseGuards.js'
 
 export const useUploadStore = defineStore('upload', () => {
   const upload = ref(null)
@@ -74,6 +75,7 @@ export const useUploadStore = defineStore('upload', () => {
       request: () =>
         api.post('/uploads/media/drafts/validate', draftRequest, {
           __skipGlobalLoading: true,
+          __responseGuard: assertUploadDraftValidationResponse,
           headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json'

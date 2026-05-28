@@ -70,7 +70,6 @@
 <script setup>
 import { ref, defineAsyncComponent, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { getViewPreference, setViewPreference } from '@utils/viewPreference.js'
-import { buildAlbumPath } from '@utils/channelRoute.js'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
 import { useChannelRootViewModel } from '@composables/useChannelRootViewModel.js'
@@ -160,12 +159,12 @@ onBeforeUnmount(() => {
 })
 
 watch(
-  [albumCount, channel, loading],
-  ([count, currentChannel, isLoading]) => {
-    if (isLoading || !currentChannel || !route.params.channelPublicId || count !== 1) return
-    const onlyAlbum = albums.value[0]
-    if (!onlyAlbum?.publicId || !onlyAlbum?.slug) return
-    redirect(buildAlbumPath({ publicId: onlyAlbum.publicId, slug: onlyAlbum.slug }))
+  [channel, loading],
+  ([currentChannel, isLoading]) => {
+    if (isLoading || !currentChannel || !route.params.channelPublicId) return
+    const preferredContentPath = currentChannel?.uiHints?.preferredContentPath
+    if (!preferredContentPath || preferredContentPath === route.path) return
+    redirect(preferredContentPath)
   },
   { immediate: true }
 )

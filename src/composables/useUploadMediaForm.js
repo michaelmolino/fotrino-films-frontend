@@ -164,11 +164,8 @@ export function useUploadMediaForm() {
         payload.album.media.previewType === 'new'
           ? !!previewFile.value
           : !!previewThumbRandom.value,
-      cover: payload.channelMode === 'create' && payload.coverType === 'new' ? !!coverFile.value : false,
-      poster:
-        payload.album.projectMode === 'create' && payload.album.posterType === 'new'
-          ? !!posterFile.value
-          : false
+      cover: !!coverFile.value,
+      poster: !!posterFile.value
     }
   }
 
