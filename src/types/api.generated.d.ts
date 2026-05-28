@@ -609,6 +609,7 @@ export interface Detail2 {
 export interface UploadValidationResponse {
   blockers: Blockers
   canSubmit: Cansubmit
+  requiredFiles: UploadDraftFiles
 }
 export interface WorkerStatusResponse {
   idle: Idle
