@@ -25,6 +25,7 @@ export const useAccountStore = defineStore('account', () => {
     staleTime: (staleTime = API_CACHE_SHORT_MS) => staleTime,
     url: '/account/profile',
     config: {
+      __skipGlobalLoading: true,
       __skipGlobalErrorNotify: true,
       __responseGuard: assertAccountProfileResponse
     }
@@ -35,6 +36,7 @@ export const useAccountStore = defineStore('account', () => {
     staleTime: (staleTime = API_CACHE_LONG_MS) => staleTime,
     url: '/account/providers',
     config: {
+      __skipGlobalLoading: true,
       __skipGlobalErrorNotify: true,
       __responseGuard: assertAccountProvidersResponse
     },

@@ -183,6 +183,7 @@ export const useChannelStore = defineStore('channel', () => {
     }
 
     const { data } = await api.post('/channels/history', { items }, {
+      __skipGlobalLoading: true,
       __responseGuard: assertHistoryResolveResponse
     })
 
