@@ -75,6 +75,7 @@ export type Subtitle1 = string | null
 export type Title3 = string
 export type Updatedat2 = string
 export type Albums = AlbumResponse1[]
+export type Canonicalpath = string | null
 export type Cover1 = string
 export type Created6 = string
 export type Deleted5 = boolean
@@ -107,6 +108,7 @@ export type Src1 = string | null
 export type Title6 = string
 export type Type3 = string | null
 export type Updatedat3 = string
+export type Canonicalpath1 = string | null
 export type Cover3 = string
 export type Created8 = string
 export type Deleted7 = boolean
@@ -171,6 +173,7 @@ export type Postercolor2 = string | null
 export type Media3 = PrivateMediaItemResponse[]
 export type Poster3 = string | null
 export type Postercolor3 = string | null
+export type Canonicalpath2 = string | null
 export type Cover4 = string
 export type Ownername1 = string
 export type Message6 = string | null
@@ -349,6 +352,7 @@ export interface MediaResponse {
 }
 export interface ChannelDetailResponse {
   albums?: Albums
+  canonicalPath?: Canonicalpath
   cover: Cover1
   created: Created6
   deleted?: Deleted5
@@ -409,6 +413,7 @@ export interface MediaResponse1 {
   [k: string]: unknown
 }
 export interface ChannelSummaryResponse {
+  canonicalPath?: Canonicalpath1
   cover: Cover3
   created: Created8
   deleted?: Deleted7
@@ -496,6 +501,7 @@ export interface PrivateMediaItemResponse {
 }
 export interface PrivateMediaChannelResponse {
   album: PrivateMediaAlbumResponse1
+  canonicalPath?: Canonicalpath2
   cover: Cover4
   ownerName: Ownername1
 }

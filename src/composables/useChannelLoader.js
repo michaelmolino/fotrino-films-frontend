@@ -217,14 +217,59 @@ export function useChannelLoader({ manageMeta = false } = {}) {
     router.replace({ path, query })
   }
 
+  const CANONICAL_PREFIX_BY_TYPE = {
+    channel: '/c/',
+    album: '/a/',
+    media: '/m/',
+    privateMedia: '/private/m/'
+  }
+
+  const getPathSegments = path => path.split('/').filter(Boolean)
+
+  const isPrivateAlbumPath = path => {
+    const segments = getPathSegments(path)
+    return segments.length === 4 && segments[0] === 'private' && segments[1] === 'a'
+  }
+
+  const isPrivateAlbumMediaPath = path => {
+    const segments = getPathSegments(path)
+    return (
+      segments.length === 6 &&
+      segments[0] === 'private' &&
+      segments[1] === 'a' &&
+      segments[3] === 'm'
+    )
+  }
+
+  const isCanonicalPathCompatibleWithTarget = (canonicalPath, target) => {
+    if (!canonicalPath || !target?.type) return false
+
+    if (target.type === 'privateAlbum') {
+      return isPrivateAlbumPath(canonicalPath)
+    }
+
+    if (target.type === 'privateAlbumMedia') {
+      return isPrivateAlbumMediaPath(canonicalPath)
+    }
+
+    const prefix = CANONICAL_PREFIX_BY_TYPE[target.type]
+    return !!prefix && canonicalPath.startsWith(prefix)
+  }
+
   const syncCanonicalSlugs = route => {
-    const canonicalPath = getCanonicalChannelRoutePath(route, {
+    const target = getChannelRouteTarget(route)
+    const hintedCanonicalPath = channel.value?.canonicalPath
+    const fallbackCanonicalPath = getCanonicalChannelRoutePath(route, {
       channel: channel.value,
       findAlbumByPublicId,
       findMediaByPublicId,
       findAlbumByMediaPublicId
     })
-    if (canonicalPath) {
+    const canonicalPath = isCanonicalPathCompatibleWithTarget(hintedCanonicalPath, target)
+      ? hintedCanonicalPath
+      : fallbackCanonicalPath
+
+    if (canonicalPath && canonicalPath !== route.path) {
       replacePath(canonicalPath, route.query)
     }
   }

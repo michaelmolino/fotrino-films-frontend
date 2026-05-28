@@ -312,6 +312,38 @@ export function useUploadMediaForm() {
     payload.album.privateId = null
   }
 
+  function resetAlbumsAndQueueValidation(projectMode = 'unselected') {
+    resetAlbumSelection(projectMode)
+    queueValidation()
+  }
+
+  function syncAlbumSelectionForChannelMode(channelMode, publicId) {
+    if (channelMode === 'create') {
+      resetAlbumsAndQueueValidation('create')
+      return false
+    }
+
+    if (channelMode !== 'existing' || !publicId) {
+      resetAlbumsAndQueueValidation()
+      return false
+    }
+
+    return true
+  }
+
+  async function syncExistingChannelAlbums(publicId) {
+    resetAlbumSelection()
+
+    const requestToken = ++albumsLoadToken.value
+    await loadAlbumsForChannelPublicId(publicId, requestToken)
+    if (requestToken !== albumsLoadToken.value) {
+      return
+    }
+
+    setDefaultProjectSelection(albums.value || [])
+    queueValidation()
+  }
+
   async function refreshFramePreview() {
     const token = ++frameExtractionToken.value
     const media = mediaFile.value
@@ -690,48 +722,18 @@ export function useUploadMediaForm() {
   watch(
     () => payload.publicId?.value,
     async newPublicId => {
-      if (payload.channelMode === 'create') {
-        resetAlbumSelection('create')
-        queueValidation()
+      if (!syncAlbumSelectionForChannelMode(payload.channelMode, newPublicId)) {
         return
       }
 
-      if (payload.channelMode !== 'existing' || !newPublicId) {
-        resetAlbumSelection()
-        queueValidation()
-        return
-      }
-
-      resetAlbumSelection()
-
-      const requestToken = ++albumsLoadToken.value
-      await loadAlbumsForChannelPublicId(newPublicId, requestToken)
-      if (requestToken !== albumsLoadToken.value) return
-
-      setDefaultProjectSelection(albums.value || [])
-      queueValidation()
+      await syncExistingChannelAlbums(newPublicId)
     }
   )
 
   watch(
     () => payload.channelMode,
     channelMode => {
-      if (channelMode === 'create') {
-        resetAlbumSelection('create')
-        queueValidation()
-        return
-      }
-
-      if (channelMode !== 'existing') {
-        resetAlbumSelection()
-        queueValidation()
-        return
-      }
-
-      if (!payload.publicId?.value) {
-        resetAlbumSelection()
-        queueValidation()
-      }
+      syncAlbumSelectionForChannelMode(channelMode, payload.publicId?.value)
     }
   )
 
@@ -743,13 +745,11 @@ export function useUploadMediaForm() {
     setDefaultChannelSelection(channelList || [])
 
     if (payload.channelMode === 'existing' && payload.publicId?.value) {
-      const requestToken = ++albumsLoadToken.value
-      void loadAlbumsForChannelPublicId(payload.publicId.value, requestToken)
+      void syncExistingChannelAlbums(payload.publicId.value)
     } else {
       resetAlbumSelection(payload.channelMode === 'create' ? 'create' : 'unselected')
+      queueValidation()
     }
-
-    queueValidation()
   })
 
   function watchFileThumb(fileRef, thumbRef) {

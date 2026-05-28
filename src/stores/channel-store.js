@@ -9,6 +9,11 @@ import {
   toArray
 } from 'src/stores/utils/query-helpers.js'
 import { api } from 'src/clients/axios-client.js'
+import {
+  assertArrayResponse,
+  assertChannelViewResponse,
+  assertHistoryResolveResponse
+} from 'src/utils/responseGuards.js'
 
 export const useChannelStore = defineStore('channel', () => {
   const channels = ref([])
@@ -30,13 +35,19 @@ export const useChannelStore = defineStore('channel', () => {
     staleTime: API_CACHE_MEDIUM_MS,
     url: (channelPublicId, pending = false) =>
       `/channels/${channelPublicId}${pending ? '?pending=true' : ''}`,
-    config: { __redirectNotFoundTo404: true }
+    config: {
+      __redirectNotFoundTo404: true,
+      __responseGuard: assertChannelViewResponse
+    }
   })
 
   const channelsQueryOptions = createApiGetQueryOptionsFactory({
     key: (deep = false) => ['channels', deep ? 'deep' : 'flat'],
     staleTime: API_CACHE_MEDIUM_MS,
     url: (deep = false) => (deep ? '/channels/deep' : '/channels'),
+    config: {
+      __responseGuard: data => assertArrayResponse(data, 'Channels list')
+    },
     transform: data => toArray(data)
   })
 
@@ -44,21 +55,30 @@ export const useChannelStore = defineStore('channel', () => {
     key: albumPublicId => ['channel', 'album', albumPublicId],
     staleTime: API_CACHE_MEDIUM_MS,
     url: albumPublicId => `/channels/album/${albumPublicId}`,
-    config: { __redirectNotFoundTo404: true }
+    config: {
+      __redirectNotFoundTo404: true,
+      __responseGuard: assertChannelViewResponse
+    }
   })
 
   const channelByMediaQueryOptions = createApiGetQueryOptionsFactory({
     key: mediaPublicId => ['channel', 'media', mediaPublicId],
     staleTime: API_CACHE_MEDIUM_MS,
     url: mediaPublicId => `/channels/media/${mediaPublicId}`,
-    config: { __redirectNotFoundTo404: true }
+    config: {
+      __redirectNotFoundTo404: true,
+      __responseGuard: assertChannelViewResponse
+    }
   })
 
   const privateMediaQueryOptions = createApiGetQueryOptionsFactory({
     key: privateMediaId => ['channel', 'private-media', privateMediaId],
     staleTime: API_CACHE_MEDIUM_MS,
     url: privateMediaId => `/channels/media/private/${privateMediaId}`,
-    config: { __redirectNotFoundTo404: true }
+    config: {
+      __redirectNotFoundTo404: true,
+      __responseGuard: assertChannelViewResponse
+    }
   })
 
   const privateAlbumQueryOptions = createApiGetQueryOptionsFactory({
@@ -75,7 +95,10 @@ export const useChannelStore = defineStore('channel', () => {
         : ''
       return `/channels/album/private/${privateAlbumId}${mediaQuery}`
     },
-    config: { __redirectNotFoundTo404: true }
+    config: {
+      __redirectNotFoundTo404: true,
+      __responseGuard: assertChannelViewResponse
+    }
   })
 
   const invalidateChannelsCache = () => {
@@ -159,7 +182,9 @@ export const useChannelStore = defineStore('channel', () => {
       return { items: [], deletedItems: [] }
     }
 
-    const { data } = await api.post('/channels/history', { items })
+    const { data } = await api.post('/channels/history', { items }, {
+      __responseGuard: assertHistoryResolveResponse
+    })
 
     return {
       items: Array.isArray(data?.items) ? data.items : [],

@@ -8,6 +8,10 @@ import {
   toArray
 } from 'src/stores/utils/query-helpers.js'
 import { api } from 'src/clients/axios-client.js'
+import {
+  assertAccountProfileResponse,
+  assertAccountProvidersResponse
+} from 'src/utils/responseGuards.js'
 import { mutationResult, runMutation } from 'src/utils/storeMutations.js'
 
 export const useAccountStore = defineStore('account', () => {
@@ -20,14 +24,20 @@ export const useAccountStore = defineStore('account', () => {
     key: ['account', 'profile'],
     staleTime: (staleTime = API_CACHE_SHORT_MS) => staleTime,
     url: '/account/profile',
-    config: { __skipGlobalErrorNotify: true }
+    config: {
+      __skipGlobalErrorNotify: true,
+      __responseGuard: assertAccountProfileResponse
+    }
   })
 
   const accountProvidersQueryOptions = createApiGetQueryOptionsFactory({
     key: ['account', 'providers'],
     staleTime: (staleTime = API_CACHE_LONG_MS) => staleTime,
     url: '/account/providers',
-    config: { __skipGlobalErrorNotify: true },
+    config: {
+      __skipGlobalErrorNotify: true,
+      __responseGuard: assertAccountProvidersResponse
+    },
     transform: data => data?.providers
   })
 

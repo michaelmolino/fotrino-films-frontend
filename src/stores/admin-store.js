@@ -9,6 +9,7 @@ import {
   toArray
 } from 'src/stores/utils/query-helpers.js'
 import { api } from 'src/clients/axios-client.js'
+import { assertArrayResponse } from 'src/utils/responseGuards.js'
 
 export const useAdminStore = defineStore('admin', () => {
   const users = ref([])
@@ -22,7 +23,10 @@ export const useAdminStore = defineStore('admin', () => {
     key: ['admin', 'users'],
     staleTime: 0,
     url: '/admin/users',
-    config: { __skipGlobalErrorNotify: true },
+    config: {
+      __skipGlobalErrorNotify: true,
+      __responseGuard: data => assertArrayResponse(data, 'Admin users')
+    },
     transform: data => toArray(data)
   })
 
@@ -40,7 +44,8 @@ export const useAdminStore = defineStore('admin', () => {
       url: '/admin/jobs',
       config: {
         params: normalizedStatuses.length > 0 ? { status: normalizedStatuses } : undefined,
-        __skipGlobalErrorNotify: true
+        __skipGlobalErrorNotify: true,
+        __responseGuard: data => assertArrayResponse(data, 'Admin jobs')
       },
       transform: data => toArray(data)
     })()
@@ -50,7 +55,10 @@ export const useAdminStore = defineStore('admin', () => {
     key: ['admin', 'media', 'reported'],
     staleTime: 0,
     url: '/admin/media/reported',
-    config: { __skipGlobalErrorNotify: true },
+    config: {
+      __skipGlobalErrorNotify: true,
+      __responseGuard: data => assertArrayResponse(data, 'Admin reported media')
+    },
     transform: data => toArray(data)
   })
 

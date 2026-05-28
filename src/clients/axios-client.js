@@ -81,6 +81,21 @@ const installApiClientInterceptors = ({
 
   api.interceptors.response.use(
     response => {
+      const responseGuard = response?.config?.__responseGuard
+      if (typeof responseGuard === 'function') {
+        try {
+          responseGuard(response.data)
+        } catch (error) {
+          const validationError = new Error(
+            error?.message || 'Invalid API response received from server.'
+          )
+          validationError.code = 'ERR_INVALID_RESPONSE'
+          validationError.__invalidApiResponse = true
+          validationError.__cause = error
+          throw validationError
+        }
+      }
+
       if (typeof onRequestEnd === 'function') {
         onRequestEnd(response?.config)
       }
