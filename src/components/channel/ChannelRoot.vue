@@ -69,7 +69,7 @@
 
 <script setup>
 import { ref, defineAsyncComponent, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import { getViewPreference, setViewPreference } from '@utils/viewPreference.js'
+import { getViewPreference, setViewPreference } from '@utils/view-preference.js'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
 import { useChannelRootViewModel } from '@composables/useChannelRootViewModel.js'
@@ -92,7 +92,6 @@ const isViewToggleWrapped = ref(false)
 let headerResizeObserver = null
 const { channel, sortedAllMedia, loading } = useChannelLoader()
 const {
-  albums,
   contentState,
   showAlbumsView,
   albumCards,

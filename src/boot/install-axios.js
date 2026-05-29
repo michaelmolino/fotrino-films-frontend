@@ -10,7 +10,7 @@ import {
   REQUEST_POLICY_NOTIFY,
   REQUEST_POLICY_NOT_FOUND,
   resolveRequestPolicy
-} from 'src/utils/requestPolicy.js'
+} from 'src/utils/request-policy.js'
 import {
   getGlobalApiErrorMessage,
   normalizeApiError

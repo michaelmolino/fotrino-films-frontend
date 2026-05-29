@@ -98,7 +98,7 @@ import { computed, watch, defineAsyncComponent, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
 import { useAlbumRootViewModel } from '@composables/useAlbumRootViewModel.js'
-import { buildAlbumPath, buildMediaPath, buildPrivateAlbumMediaPath, buildPrivateAlbumPath } from '@utils/channelRoute.js'
+import { buildAlbumPath, buildMediaPath, buildPrivateAlbumMediaPath, buildPrivateAlbumPath } from '@utils/channel-route.js'
 
 import BreadCrumbs from '@components/channel/shared/BreadCrumbs.vue'
 import ShareActions from '@components/channel/shared/ShareActions.vue'

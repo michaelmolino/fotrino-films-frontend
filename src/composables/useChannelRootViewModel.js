@@ -1,5 +1,5 @@
 import { computed } from 'vue'
-import { buildAlbumPath, buildMediaPath } from '@utils/channelRoute.js'
+import { buildAlbumPath, buildMediaPath } from '@utils/channel-route.js'
 
 export function useChannelRootViewModel({ loading, channel, route, selectedView, sortedAllMedia }) {
   const albums = computed(() => {

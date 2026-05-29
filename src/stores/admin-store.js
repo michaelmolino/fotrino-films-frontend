@@ -2,14 +2,14 @@ import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { useQuery, useQueryCache } from '@pinia/colada'
 import { isGlobalApiError } from 'src/utils/api-error-service.js'
-import { mutationResult, runMutation } from 'src/utils/storeMutations.js'
+import { mutationResult, runMutation } from 'src/utils/store-mutations.js'
 import {
   createApiGetQueryOptionsFactory,
   invalidateQueriesSafely,
   toArray
 } from 'src/stores/utils/query-helpers.js'
 import { api } from 'src/clients/axios-client.js'
-import { assertDataEnvelopeArrayResponse } from 'src/utils/responseGuards.js'
+import { assertDataEnvelopeArrayResponse } from 'src/utils/response-guards.js'
 
 export const useAdminStore = defineStore('admin', () => {
   const users = ref([])

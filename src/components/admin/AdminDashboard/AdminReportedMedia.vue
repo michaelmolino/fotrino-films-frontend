@@ -54,7 +54,7 @@ import { Notify } from 'quasar'
 import { useAdminStore } from 'src/stores/admin-store.js'
 import { daysSince } from '@utils/date.js'
 import { getComponentApiErrorMessage } from 'src/utils/api-error-service.js'
-import { buildPrivateMediaPath } from '@utils/channelRoute.js'
+import { buildPrivateMediaPath } from '@utils/channel-route.js'
 import { notifyError } from 'src/utils/notify.js'
 
 const adminStore = useAdminStore()

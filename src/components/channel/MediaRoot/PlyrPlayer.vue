@@ -45,7 +45,7 @@ import { computed, onMounted, onBeforeUnmount, watch, ref, nextTick } from 'vue'
 import { useChannelStore } from 'src/stores/channel-store.js'
 import 'plyr/dist/plyr.css'
 import '@css/plyr.sass'
-import { setupVideoPlayback } from '@utils/videoPlayback'
+import { setupVideoPlayback } from '@utils/video-playback'
 import { useWebP } from '@composables/useWebP'
 
 const props = defineProps({

@@ -5,7 +5,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useMeta } from 'quasar'
 import { getMetaData } from '@utils/meta.js'
 import { addHistory, addPrivateHistory, addPrivateAlbumHistory } from '@utils/history.js'
-import { getCanonicalChannelRoutePath, getChannelRouteTarget } from '@utils/channelRoute.js'
+import { getCanonicalChannelRoutePath, getChannelRouteTarget } from '@utils/channel-route.js'
 
 // Shared loader state so the App-level loader and page-level loaders stay in sync.
 const sharedChannel = ref(null)

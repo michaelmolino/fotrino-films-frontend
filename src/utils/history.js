@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 let hasResolvedHistory = false
 let resolveHistoryPromise = null
-import { parseStoredHistory, writeHistory, HISTORY_KEY } from './historyStorage.js'
+import { parseStoredHistory, writeHistory, HISTORY_KEY } from './history-storage.js'
 
 /** @typedef {{ resourceId: string, type: 'channel' | 'privateMedia' | 'privateAlbum' }} HistoryEntry */
 

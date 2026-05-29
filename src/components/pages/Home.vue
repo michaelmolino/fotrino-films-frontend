@@ -42,7 +42,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useQuasar } from 'quasar'
-import { buildChannelPath } from '@utils/channelRoute.js'
+import { buildChannelPath } from '@utils/channel-route.js'
 
 defineOptions({ name: 'Home-Page' })
 const $q = useQuasar()

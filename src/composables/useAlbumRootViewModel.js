@@ -1,5 +1,5 @@
 import { computed } from 'vue'
-import { buildMediaPath, buildPrivateAlbumMediaPath } from '@utils/channelRoute.js'
+import { buildMediaPath, buildPrivateAlbumMediaPath } from '@utils/channel-route.js'
 
 export function useAlbumRootViewModel({ loading, channel, album, route, privateMode }) {
   const contentState = computed(() => {

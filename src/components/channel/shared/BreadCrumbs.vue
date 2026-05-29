@@ -29,7 +29,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useQuasar } from 'quasar'
-import { buildAlbumPath, buildChannelPath, buildPrivateAlbumPath } from '@utils/channelRoute.js'
+import { buildAlbumPath, buildChannelPath, buildPrivateAlbumPath } from '@utils/channel-route.js'
 
 const $q = useQuasar()
 

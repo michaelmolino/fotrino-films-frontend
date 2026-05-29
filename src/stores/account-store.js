@@ -11,8 +11,8 @@ import { api } from 'src/clients/axios-client.js'
 import {
   assertAccountProfileResponse,
   assertAccountProvidersResponse
-} from 'src/utils/responseGuards.js'
-import { mutationResult, runMutation } from 'src/utils/storeMutations.js'
+} from 'src/utils/response-guards.js'
+import { mutationResult, runMutation } from 'src/utils/store-mutations.js'
 
 export const useAccountStore = defineStore('account', () => {
   const profile = ref(null)

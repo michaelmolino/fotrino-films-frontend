@@ -2,7 +2,7 @@ import { ref, watch, toValue } from 'vue'
 import { defineStore } from 'pinia'
 import { useQuery, useQueryCache } from '@pinia/colada'
 import { API_CACHE_MEDIUM_MS } from 'src/stores/utils/cache-timeouts.js'
-import { mutationResult, runMutation } from 'src/utils/storeMutations.js'
+import { mutationResult, runMutation } from 'src/utils/store-mutations.js'
 import {
   createApiGetQueryOptionsFactory,
   invalidateQueriesSafely,
@@ -13,7 +13,7 @@ import {
   assertDataEnvelopeArrayResponse,
   assertChannelViewResponse,
   assertHistoryResolveResponse
-} from 'src/utils/responseGuards.js'
+} from 'src/utils/response-guards.js'
 
 export const useChannelStore = defineStore('channel', () => {
   const channels = ref([])
