@@ -2,12 +2,7 @@ import { markRaw, ref, shallowRef } from 'vue'
 import { createPresignedUppyClient } from '@clients/uppy-upload-client.js'
 import { useAccountStore } from 'src/stores/account-store'
 
-/**
- * Composable for managing presigned URL uploads with Uppy.
- * Owns and exposes upload progress and status as reactive refs.
- *
- * @returns {Object} uppy instance, methods, progress, statusText, and state
- */
+// Manage presigned uploads and expose reactive upload state.
 export function useUppyPresignedUpload() {
   const accountStore = useAccountStore()
   const progress = ref(0)
@@ -27,10 +22,7 @@ export function useUppyPresignedUpload() {
     progress.value = 0
   }
 
-  /**
-   * Initialize Uppy for presigned uploads.
-   * @param {Object} uploadDraft - Draft payload with { mediaPrivateId, instructions }, where mediaPrivateId is the opaque media private ID.
-   */
+  // Initialize a new Uppy client from draft upload instructions.
   function initializeUppy(uploadDraft) {
     if (client.value) {
       client.value.destroy()
@@ -74,10 +66,7 @@ export function useUppyPresignedUpload() {
     return uppy.value
   }
 
-  /**
-   * Add files to Uppy for uploading.
-   * @param {Array<{ file: File, resourceType: string }>} uploadItems
-   */
+  // Queue validated upload items into Uppy and reset progress counters.
   function addFilesToUppy(uploadItems) {
     if (!client.value) {
       throw new Error('Uppy not initialized. Call initializeUppy() first.')
@@ -109,10 +98,7 @@ export function useUppyPresignedUpload() {
     statusText.value = 'Ready to upload...'
   }
 
-  /**
-   * Start the upload process.
-   * @returns {Promise} Resolves when all uploads complete or rejects on error
-   */
+  // Start upload and fail if any file reports as failed.
   async function startUpload() {
     if (!client.value || totalCount.value === 0) {
       throw new Error('No files to upload. Add files with addFilesToUppy() first.')
@@ -142,18 +128,14 @@ export function useUppyPresignedUpload() {
     }
   }
 
-  /**
-   * Cancel all active uploads and cleanup Uppy instance.
-   */
+  // Cancel all active transfers while keeping the current client instance.
   function cancelUploads() {
     if (uppy.value) {
       uppy.value.cancelAll()
     }
   }
 
-  /**
-   * Cleanup and destroy Uppy instance.
-   */
+  // Destroy client and reset all local upload state.
   function cleanup() {
     if (client.value) {
       client.value.destroy()

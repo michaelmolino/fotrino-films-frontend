@@ -54,15 +54,7 @@ const sharedHydratedAlbumsByPublicId = computed(() => {
 })
 
 const EMPTY_CHANNEL_VIEW_RESPONSE = { data: null }
-/**
- * Composable for loading and setting channel data based on route parameters
- * State is shared across composable callers so App-level route loading and
- * page-level rendering consume the same reactive data.
- * Can optionally manage page metadata updates
- * @param {Object} [options]
- * @param {boolean} [options.manageMeta=false] - Whether this instance should register and update page meta tags
- * @returns {Object} - Object with loadChannel method and metaData ref
- */
+// Shared route loader for channel/album/media data. Can optionally own meta updates.
 export function useChannelLoader({ manageMeta = false } = {}) {
   const channelStore = useChannelStore()
   const queryCache = useQueryCache()

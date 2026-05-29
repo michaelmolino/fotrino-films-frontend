@@ -96,20 +96,12 @@ export function normalizeApiError(error, options = {}) {
   }
 }
 
-/**
- * @param {unknown} error
- * @param {GlobalApiErrorCode} code
- * @returns {boolean}
- */
+// Check whether an error matches a specific global API error code.
 export function isGlobalApiError(error, code) {
   return getGlobalApiErrorPayload(error)?.error === code
 }
 
-/**
- * @param {unknown} error
- * @param {string} [fallback='Something went wrong!']
- * @returns {string}
- */
+// Prefer backend/global message mapping and fall back to a safe generic message.
 export function getGlobalApiErrorMessage(error, fallback = 'Something went wrong!') {
   const context = normalizeApiError(error)
 
@@ -125,11 +117,7 @@ export function getGlobalApiErrorMessage(error, fallback = 'Something went wrong
   return payload.message || DEFAULT_GLOBAL_API_ERROR_MESSAGES[payload.error] || fallback
 }
 
-/**
- * @param {unknown} error
- * @param {string} [fallback='Something went wrong!']
- * @returns {string}
- */
+// Build component-level errors, suppressing messages already handled globally.
 export function getComponentApiErrorMessage(error, fallback = 'Something went wrong!') {
   const context = normalizeApiError(error)
 

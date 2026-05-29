@@ -1,13 +1,10 @@
 import Uppy from '@uppy/core'
 import AwsS3 from '@uppy/aws-s3'
 
-/** Minimum file size (bytes) for multipart upload. Only applies to `upload` resource type. */
+// Minimum size (bytes) to switch `upload` resources to multipart flow.
 const MULTIPART_THRESHOLD = 100 * 1024 * 1024 // 100 MB
 
-/**
- * Extend multipart retries beyond Uppy defaults so brief backend restarts
- * (signing endpoints) do not fail active uploads.
- */
+// Extend retries so brief backend restarts do not fail active multipart uploads.
 const MULTIPART_RETRY_DELAYS_MS = [0, 1000, 2000, 4000, 8000, 16000, 32000]
 
 export function destroyUppy(uppy) {
@@ -29,27 +26,8 @@ function buildInstructionMap(instructions = []) {
   return map
 }
 
-/**
- * Create a configured Uppy client that handles both single-part (images) and
- * multipart (large video files) uploads.
- *
- * - Images (cover, poster, preview): single-part presigned PUT via backend `/upload/s3/params`.
- * - Videos (`upload` resource type, ≥ MULTIPART_THRESHOLD): multipart via backend
- *   companion-compatible `/upload/s3/multipart/*` endpoints.
- * - Videos below the threshold: single-part PUT via the same `/upload/s3/params` endpoint.
- *
- * @param {{
- *   id?: string,
- *   instructions: Array<{ resourceType: string, url: string, reference?: number }>,
- *   maxFileSize?: number,
- *   uploadEndpoint?: string,
- *   headers?: Record<string, string>,
- *   onTotalProgress?: (percent: number) => void,
- *   onProgress?: (progressData: any) => void,
- *   onUploadSuccess?: (file: any, instruction: any) => void,
- *   onUploadError?: (file: any, error: Error) => void,
- * }} options
- */
+// Create an Uppy client that uploads images with single-part PUT and switches
+// `upload` resources to multipart only when size reaches MULTIPART_THRESHOLD.
 export function createPresignedUppyClient({
   id = 'presigned-uploader',
   instructions = [],
