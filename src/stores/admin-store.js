@@ -9,7 +9,7 @@ import {
   toArray
 } from 'src/stores/utils/query-helpers.js'
 import { api } from 'src/clients/axios-client.js'
-import { assertArrayResponse } from 'src/utils/responseGuards.js'
+import { assertDataEnvelopeArrayResponse } from 'src/utils/responseGuards.js'
 
 export const useAdminStore = defineStore('admin', () => {
   const users = ref([])
@@ -25,9 +25,9 @@ export const useAdminStore = defineStore('admin', () => {
     url: '/admin/users',
     config: {
       __skipGlobalErrorNotify: true,
-      __responseGuard: data => assertArrayResponse(data, 'Admin users')
+      __responseGuard: data => assertDataEnvelopeArrayResponse(data, 'Admin users')
     },
-    transform: data => toArray(data)
+    transform: data => toArray(data?.data)
   })
 
   const jobsQueryOptions = (statuses = []) => {
@@ -45,9 +45,9 @@ export const useAdminStore = defineStore('admin', () => {
       config: {
         params: normalizedStatuses.length > 0 ? { status: normalizedStatuses } : undefined,
         __skipGlobalErrorNotify: true,
-        __responseGuard: data => assertArrayResponse(data, 'Admin jobs')
+        __responseGuard: data => assertDataEnvelopeArrayResponse(data, 'Admin jobs')
       },
-      transform: data => toArray(data)
+      transform: data => toArray(data?.data)
     })()
   }
 
@@ -57,9 +57,9 @@ export const useAdminStore = defineStore('admin', () => {
     url: '/admin/media/reported',
     config: {
       __skipGlobalErrorNotify: true,
-      __responseGuard: data => assertArrayResponse(data, 'Admin reported media')
+      __responseGuard: data => assertDataEnvelopeArrayResponse(data, 'Admin reported media')
     },
-    transform: data => toArray(data)
+    transform: data => toArray(data?.data)
   })
 
   const setUsers = value => {

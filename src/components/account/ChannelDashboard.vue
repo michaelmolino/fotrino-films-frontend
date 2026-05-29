@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-page q-pa-md" data-cy="dashboard">
     <template v-if="contentState === 'ready'">
-      <ProfileCard :profile="profile" :mediaCount="mediaCount" data-cy="profile-card" />
+      <ProfileCard :profile="profile" data-cy="profile-card" />
       <MediaBrowser v-if="hasChannels" :channels="channels" data-cy="media-browser" />
       <NothingText v-else text="Your videos will appear here (once you have some)." />
     </template>
@@ -20,18 +20,12 @@ import AuthRequired from '@components/shared/AuthRequired.vue'
 
 const accountStore = useAccountStore()
 const channelStore = useChannelStore()
-const channelsQuery = channelStore.useChannelsQuery(true)
+const channelsQuery = channelStore.useChannelsQuery()
 
 const profile = computed(() => accountStore.profile)
 const contentState = computed(() => (profile.value ? 'ready' : 'auth-required'))
-const channels = computed(() => channelsQuery.data.value || [])
+const channels = computed(() => (Array.isArray(channelsQuery.data.value) ? channelsQuery.data.value : []))
 const hasChannels = computed(() => channels.value.length > 0)
-const mediaCount = computed(() =>
-  channels.value.reduce((total, ch) => {
-    const albumMediaCount = (ch.albums || []).reduce((sum, p) => sum + (p.media || []).length, 0)
-    return total + albumMediaCount
-  }, 0)
-)
 </script>
 
 <style scoped>

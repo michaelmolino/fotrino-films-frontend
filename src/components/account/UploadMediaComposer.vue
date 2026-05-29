@@ -304,7 +304,7 @@ const albumSummaryLabel = computed(() => {
   if (payload.album.projectMode === 'create') {
     return payload.album?.title || 'My Videos'
   }
-  return payload.album?.id?.label || 'Album'
+  return payload.album?.privateId?.label || 'Album'
 })
 
 const albumSummarySubtitle = computed(() => {

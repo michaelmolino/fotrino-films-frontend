@@ -22,10 +22,13 @@ function excludeDeletedAlbums(albums) {
 function excludeDeletedChannels(channels) {
   return (channels || [])
     .filter(item => !item?.deleted)
-    .map(item => ({
-      ...item,
-      albums: excludeDeletedAlbums(item?.albums)
-    }))
+    .map(item => {
+      const mapped = { ...item }
+      if (Array.isArray(item?.albums)) {
+        mapped.albums = excludeDeletedAlbums(item.albums)
+      }
+      return mapped
+    })
 }
 
 function createUploadIdempotencyKey() {
@@ -63,7 +66,7 @@ export function useUploadMediaForm() {
   const channelStore = useChannelStore()
   const uploadStore = useUploadStore()
   const route = useRoute()
-  const channelsQuery = channelStore.useChannelsQuery(true)
+  const channelsQuery = channelStore.useChannelsQuery()
 
   const payload = reactive(createInitialPayload())
   const albums = ref([])
@@ -648,7 +651,7 @@ export function useUploadMediaForm() {
       let chan = await channelStore.fetchChannel({
         channelPublicId: publicId,
         pending: true,
-        cache: false
+        cache: true
       })
       let albumList = Array.isArray(chan?.albums) ? chan.albums : []
 
@@ -656,7 +659,7 @@ export function useUploadMediaForm() {
         chan = await channelStore.fetchChannel({
           channelPublicId: publicId,
           pending: false,
-          cache: false
+          cache: true
         })
         albumList = Array.isArray(chan?.albums) ? chan.albums : []
       }

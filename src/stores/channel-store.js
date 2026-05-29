@@ -1,4 +1,4 @@
-import { ref, watch } from 'vue'
+import { ref, watch, toValue } from 'vue'
 import { defineStore } from 'pinia'
 import { useQuery, useQueryCache } from '@pinia/colada'
 import { API_CACHE_MEDIUM_MS } from 'src/stores/utils/cache-timeouts.js'
@@ -10,7 +10,7 @@ import {
 } from 'src/stores/utils/query-helpers.js'
 import { api } from 'src/clients/axios-client.js'
 import {
-  assertArrayResponse,
+  assertDataEnvelopeArrayResponse,
   assertChannelViewResponse,
   assertHistoryResolveResponse
 } from 'src/utils/responseGuards.js'
@@ -42,13 +42,13 @@ export const useChannelStore = defineStore('channel', () => {
   })
 
   const channelsQueryOptions = createApiGetQueryOptionsFactory({
-    key: (deep = false) => ['channels', deep ? 'deep' : 'flat'],
+    key: ['channels', 'flat'],
     staleTime: API_CACHE_MEDIUM_MS,
-    url: (deep = false) => (deep ? '/channels/deep' : '/channels'),
+    url: '/channels',
     config: {
-      __responseGuard: data => assertArrayResponse(data, 'Channels list')
+      __responseGuard: data => assertDataEnvelopeArrayResponse(data, 'Channels list')
     },
-    transform: data => toArray(data)
+    transform: data => toArray(data?.data)
   })
 
   const channelByAlbumQueryOptions = createApiGetQueryOptionsFactory({
@@ -103,11 +103,7 @@ export const useChannelStore = defineStore('channel', () => {
 
   const invalidateChannelsCache = () => {
     invalidateQueriesSafely(queryCache, {
-      key: channelsQueryOptions(false).key,
-      exact: true
-    })
-    invalidateQueriesSafely(queryCache, {
-      key: channelsQueryOptions(true).key,
+      key: channelsQueryOptions().key,
       exact: true
     })
   }
@@ -153,8 +149,8 @@ export const useChannelStore = defineStore('channel', () => {
     })
   }
 
-  const useChannelsQuery = (deep = false) => {
-    const query = useQuery(() => channelsQueryOptions(deep))
+  const useChannelsQuery = () => {
+    const query = useQuery(() => channelsQueryOptions())
 
     watch(
       () => query.data.value,
@@ -188,8 +184,8 @@ export const useChannelStore = defineStore('channel', () => {
     })
 
     return {
-      items: Array.isArray(data?.items) ? data.items : [],
-      deletedItems: Array.isArray(data?.deletedItems) ? data.deletedItems : []
+      items: Array.isArray(data?.data?.items) ? data.data.items : [],
+      deletedItems: Array.isArray(data?.data?.deletedItems) ? data.data.deletedItems : []
     }
   }
 
@@ -210,7 +206,7 @@ export const useChannelStore = defineStore('channel', () => {
 
   const createMediaSession = async ({ privateId }) => {
     const res = await api.post(`/channels/media/session/${privateId}`)
-    return mutationResult({ ok: true, data: res.data })
+    return mutationResult({ ok: true, data: res.data?.data ?? null })
   }
 
   const deleteResource = async resource => {
@@ -295,7 +291,7 @@ export const useChannelStore = defineStore('channel', () => {
     })
     invalidateChannelsCache()
     if (mediaPublicId) invalidateChannelCacheByMedia(mediaPublicId)
-    return mutationResult({ ok: true, data: res.data })
+    return mutationResult({ ok: true, data: res.data?.data ?? null })
   }
 
   const updateAlbum = async ({
@@ -317,7 +313,7 @@ export const useChannelStore = defineStore('channel', () => {
     })
     invalidateChannelsCache()
     if (albumPublicId) invalidateChannelCacheByAlbum(albumPublicId)
-    return mutationResult({ ok: true, data: res.data })
+    return mutationResult({ ok: true, data: res.data?.data ?? null })
   }
 
   const updateChannel = async ({ channelPublicId, title }) => {
@@ -329,7 +325,7 @@ export const useChannelStore = defineStore('channel', () => {
     })
     invalidateChannelsCache()
     invalidateChannelCacheById(channelPublicId)
-    return mutationResult({ ok: true, data: res.data })
+    return mutationResult({ ok: true, data: res.data?.data ?? null })
   }
 
   const reportMedia = async ({ privateId, reason }) => {
@@ -343,9 +339,17 @@ export const useChannelStore = defineStore('channel', () => {
     return mutationResult({ ok: true, data: res.data })
   }
 
+  const useChannelQuery = (channelPublicId, enabled = true) => {
+    return useQuery(() => ({
+      ...channelQueryOptions(toValue(channelPublicId)),
+      enabled: toValue(enabled)
+    }))
+  }
+
   return {
     channels,
     useChannelsQuery,
+    useChannelQuery,
     resolveHistoryChannels,
     fetchChannel,
     createMediaSession,

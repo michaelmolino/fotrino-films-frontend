@@ -19,7 +19,7 @@
           <div class="text-grey-6 text-caption ellipsis">{{ safeEmail }}</div>
           <div class="text-grey-6 text-caption q-mt-xs">Joined {{ joinedText }}</div>
           <div class="text-grey-6 text-caption q-mt-xs" data-cy="video-count">
-            {{ mediaCount }} videos
+            {{ profile.mediaCount ?? 0 }} videos
           </div>
         </div>
       </div>
@@ -49,8 +49,7 @@ const PROVIDER_ICON_MAP = {
 }
 
 const props = defineProps({
-  profile: { type: Object, default: null },
-  mediaCount: { type: Number, default: 0 }
+  profile: { type: Object, default: null }
 })
 
 const profilePic = computed(() => props.profile?.avatar || undefined)

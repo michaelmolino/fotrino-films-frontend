@@ -81,14 +81,6 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { Notify, copyToClipboard } from 'quasar'
-import {
-  buildAlbumPath,
-  buildChannelPath,
-  buildMediaPath,
-  buildPrivateAlbumMediaPath,
-  buildPrivateAlbumPath,
-  buildPrivateMediaPath
-} from '@utils/channelRoute.js'
 
 const props = defineProps({
   channel: { type: Object, required: true },
@@ -109,81 +101,56 @@ const shareContext = computed(() => {
   return 'channel'
 })
 
-const channelPath = computed(() => {
-  return buildChannelPath({
-    publicId: props.channel?.publicId,
-    slug: props.channel?.slug
-  })
-})
-
-const albumPath = computed(() => {
-  return buildAlbumPath({
-    publicId: props.album?.publicId,
-    slug: props.album?.slug
-  })
-})
-
-const privateAlbumPath = computed(() => {
-  return buildPrivateAlbumPath({
-    privateId: props.album?.privateId,
-    slug: props.album?.slug
-  })
-})
-
-const publicMediaPath = computed(() => {
-  return buildMediaPath({
-    publicId: props.media?.publicId,
-    slug: props.media?.slug
-  })
-})
-
-const privateMediaPath = computed(() => {
-  const mediaPrivateId = props.media?.privateId
-  const mediaSlug = props.media?.slug
-  if (!mediaPrivateId || !mediaSlug) return null
-
-  if (route.params?.privateAlbumId) {
-    return buildPrivateAlbumMediaPath({
-      privateAlbumId: route.params.privateAlbumId,
-      privateMediaId: mediaPrivateId,
-      mediaSlug
-    })
+function getCanonicalPathValue(canonicalPath, key) {
+  if (!canonicalPath) return null
+  if (typeof canonicalPath === 'string') {
+    return key === 'publicPath' ? canonicalPath : null
   }
-  if (props.album?.privateId) {
-    return buildPrivateAlbumMediaPath({
-      privateAlbumId: props.album.privateId,
-      privateMediaId: mediaPrivateId,
-      mediaSlug
-    })
+  if (typeof canonicalPath === 'object') {
+    return canonicalPath[key] || null
   }
-  return buildPrivateMediaPath({
-    privateId: mediaPrivateId,
-    slug: mediaSlug
-  })
-})
+  return null
+}
 
-const standalonePrivateMediaPath = computed(() => {
-  return buildPrivateMediaPath({
-    privateId: props.media?.privateId,
-    slug: props.media?.slug
-  })
-})
+const channelPublicPath = computed(() =>
+  getCanonicalPathValue(props.channel?.canonicalPath, 'publicPath')
+)
+
+const albumPublicPath = computed(() =>
+  getCanonicalPathValue(props.album?.canonicalPath, 'publicPath')
+)
+
+const albumPrivatePath = computed(() =>
+  getCanonicalPathValue(props.album?.canonicalPath, 'privatePath')
+)
+
+const mediaPublicPath = computed(() =>
+  getCanonicalPathValue(props.media?.canonicalPath, 'publicPath')
+)
+
+const mediaPrivatePath = computed(() =>
+  getCanonicalPathValue(props.media?.canonicalPath, 'privatePath')
+)
+
+const mediaPrivateAlbumPath = computed(() =>
+  getCanonicalPathValue(props.media?.canonicalPath, 'privateAlbumPath')
+)
 
 const isPrivateAlbumContext = computed(() => {
   return Boolean(
-    props.private || route.params?.privateAlbumId || (!albumPath.value && privateAlbumPath.value)
+    props.private || route.params?.privateAlbumId || (!albumPublicPath.value && albumPrivatePath.value)
   )
 })
 
 function buildChannelActions() {
-  if (!channelPath.value) return []
+  if (!channelPublicPath.value) return []
   return [
     {
       key: 'share-channel',
       label: 'Entire channel',
       description: 'Recipient can browse everything in this channel.',
       icon: 'apps',
-      path: channelPath.value,
+      path: channelPublicPath.value,
       cy: 'share-channel'
     }
   ]
@@ -192,22 +159,22 @@ function buildChannelActions() {
 function buildAlbumActions() {
   const items = []
 
-  if (privateAlbumPath.value) {
+  if (albumPrivatePath.value) {
     items.push({
       key: 'share-album-private',
       label: 'This album',
       description: 'Recipient can browse videos from this album only.',
       icon: 'folder',
-      path: privateAlbumPath.value,
+      path: albumPrivatePath.value,
       cy: 'share-only-album'
     })
-  } else if (albumPath.value) {
+  } else if (albumPublicPath.value) {
     items.push({
       key: 'share-album-public',
       label: 'This album',
       description: 'Recipient can only browse videos from this album.',
       icon: 'folder',
-      path: albumPath.value,
+      path: albumPublicPath.value,
       cy: 'share-only-album'
     })
   }
@@ -216,13 +183,13 @@ function buildAlbumActions() {
     return items
   }
 
-  if (channelPath.value) {
+  if (channelPublicPath.value) {
     items.push({
       key: 'share-album-channel',
       label: 'Entire channel',
       description: 'Recipient can browse everything in this channel.',
       icon: 'apps',
-      path: albumPath.value || channelPath.value,
+      path: albumPublicPath.value || channelPublicPath.value,
       cy: 'share-within-channel'
     })
   }
@@ -233,35 +200,35 @@ function buildAlbumActions() {
 function buildMediaActions() {
   const items = []
 
-  if (standalonePrivateMediaPath.value || privateMediaPath.value || publicMediaPath.value) {
+  if (mediaPrivatePath.value || mediaPrivateAlbumPath.value || mediaPublicPath.value) {
     items.push({
       key: 'share-media-only',
       label: 'Only this video',
       description: 'Recipient can watch this video only.',
       icon: 'movie',
-      path: standalonePrivateMediaPath.value || privateMediaPath.value || publicMediaPath.value,
+      path: mediaPrivatePath.value || mediaPrivateAlbumPath.value || mediaPublicPath.value,
       cy: 'share-only-video'
     })
   }
 
-  if (privateAlbumPath.value) {
+  if (mediaPrivateAlbumPath.value) {
     items.push({
       key: 'share-media-album',
       label: 'This album',
       description: 'Recipient can browse related videos in this album.',
       icon: 'folder',
-      path: privateMediaPath.value,
+      path: mediaPrivateAlbumPath.value,
       cy: 'share-within-album'
     })
   }
 
-  if (channelPath.value && !isPrivateAlbumContext.value) {
+  if (channelPublicPath.value && !isPrivateAlbumContext.value) {
     items.push({
       key: 'share-media-channel',
       label: 'Entire channel',
       description: 'Recipient can browse everything in this channel.',
       icon: 'apps',
-      path: publicMediaPath.value || channelPath.value,
+      path: mediaPublicPath.value || channelPublicPath.value,
       cy: 'share-within-channel'
     })
   }

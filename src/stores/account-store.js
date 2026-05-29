@@ -28,7 +28,8 @@ export const useAccountStore = defineStore('account', () => {
       __skipGlobalLoading: true,
       __skipGlobalErrorNotify: true,
       __responseGuard: assertAccountProfileResponse
-    }
+    },
+    transform: data => data?.data ?? null
   })
 
   const accountProvidersQueryOptions = createApiGetQueryOptionsFactory({
@@ -40,7 +41,7 @@ export const useAccountStore = defineStore('account', () => {
       __skipGlobalErrorNotify: true,
       __responseGuard: assertAccountProvidersResponse
     },
-    transform: data => data?.providers
+    transform: data => data?.data
   })
 
   const setProfile = value => {

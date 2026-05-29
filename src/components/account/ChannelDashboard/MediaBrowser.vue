@@ -22,7 +22,6 @@ import ChannelItem from './MediaBrowser/ChannelItem.vue'
 import { getComponentApiErrorMessage } from 'src/utils/apiErrors.js'
 import { useUppyPresignedUpload } from 'src/composables/useUppyPresignedUpload.js'
 import { notifyError, notifySuccess } from 'src/utils/notify.js'
-import { buildAlbumPath, buildChannelPath, buildMediaPath } from '@utils/channelRoute.js'
 
 const channelStore = useChannelStore()
 const uploadStore = useUploadStore()
@@ -54,29 +53,29 @@ function buildEmptyLinks() {
   }
 }
 
+function getPublicPath(canonicalPath) {
+  if (!canonicalPath) return null
+  if (typeof canonicalPath === 'string') return canonicalPath
+  if (typeof canonicalPath === 'object') {
+    return canonicalPath.publicPath || null
+  }
+  return null
+}
+
 function addChannelLink(links, channel) {
   if (channel?.publicId && !channel?.pending) {
-    links.channel[channel.publicId] = buildChannelPath({
-      publicId: channel.publicId,
-      slug: channel.slug
-    })
+    links.channel[channel.publicId] = getPublicPath(channel.canonicalPath)
   }
 }
 
 function addAlbumAndMediaLinks(links, album) {
   if (album?.privateId && !album?.pending) {
-    links.album[album.privateId] = buildAlbumPath({
-      publicId: album.publicId,
-      slug: album.slug
-    })
+    links.album[album.privateId] = getPublicPath(album.canonicalPath)
   }
 
   for (const media of album?.media || []) {
     if (media?.privateId && !media?.pending) {
-      links.media[media.privateId] = buildMediaPath({
-        publicId: media.publicId,
-        slug: media.slug
-      })
+      links.media[media.privateId] = getPublicPath(media.canonicalPath)
     }
   }
 }
@@ -95,8 +94,21 @@ const resourceLinks = computed(() => {
   return links
 })
 
-function getMediaLink(type, id) {
-  if (!type || id == null) return null
+function resolveResourcePath(resource) {
+  if (!resource || resource.pending) return null
+  return getPublicPath(resource.canonicalPath)
+}
+
+function getMediaLink(type, resourceOrId) {
+  if (!type || resourceOrId == null) return null
+
+  const resource =
+    typeof resourceOrId === 'object' && resourceOrId !== null ? resourceOrId : null
+  const resourcePath = resolveResourcePath(resource)
+  if (resourcePath) return resourcePath
+
+  const id = resource?.privateId || resource?.publicId || resourceOrId
+  if (id == null) return null
   if (type === 'channel') return resourceLinks.value.channel[id] || null
   if (type === 'album') return resourceLinks.value.album[id] || null
   if (type === 'media') return resourceLinks.value.media[id] || null

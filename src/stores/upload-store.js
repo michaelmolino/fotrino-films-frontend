@@ -21,7 +21,6 @@ export const useUploadStore = defineStore('upload', () => {
 
   const invalidateChannelsCache = () => {
     invalidateQueries({ key: ['channels', 'flat'], exact: true })
-    invalidateQueries({ key: ['channels', 'deep'], exact: true })
   }
 
   const invalidateChannelCacheById = channelPublicId => {

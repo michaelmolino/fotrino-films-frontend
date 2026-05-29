@@ -107,43 +107,6 @@ export function isCloudflareGatewayError(error) {
 
 /**
  * @param {unknown} error
- * @returns {boolean}
- */
-export function isGloballyHandledApiError(error) {
-  return getApiErrorContext(error).isGloballyHandled
-}
-
-/**
- * @param {Record<string, any>} payload
- * @returns {{ message: string, caption: string }}
- */
-export function formatCloudflareGatewayError(payload) {
-  let message = 'Temporary upstream error. Please retry in a moment.'
-  if (typeof payload.what_you_should_do === 'string' && payload.what_you_should_do.trim()) {
-    message = payload.what_you_should_do.trim().replaceAll('**', '')
-  } else if (typeof payload.detail === 'string' && payload.detail.trim()) {
-    message = payload.detail.trim()
-  }
-
-  const detailParts = []
-  if (payload.error_name) {
-    detailParts.push(`Type: ${payload.error_name}`)
-  }
-  if (payload.ray_id) {
-    detailParts.push(`Ray ID: ${payload.ray_id}`)
-  }
-  if (Number.isFinite(Number(payload.retry_after))) {
-    detailParts.push(`Retry after: ${Number(payload.retry_after)}s`)
-  }
-
-  return {
-    message,
-    caption: detailParts.join(' | ')
-  }
-}
-
-/**
- * @param {unknown} error
  * @returns {GlobalApiErrorResponse | null}
  */
 export function getGlobalApiErrorPayload(error) {

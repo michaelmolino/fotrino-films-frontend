@@ -18,7 +18,7 @@
           :deleted="album.deleted"
           :undeletable="album.deleted"
           :hasPending-children="hasPendingChildren"
-          :link="getMediaLink('album', album.privateId)"
+          :link="getMediaLink('album', album)"
           :avatarSize="'40px'"
           :subtitle="albumSubtitle"
           editable

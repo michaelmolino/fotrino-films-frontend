@@ -1,9 +1,24 @@
 import { sanitizeText } from '@utils/text.js'
 
-const getReadModelLookups = readModel => ({
-  albumsByPublicId: readModel?.entities?.albumsByPublicId || {},
-  mediaByPublicId: readModel?.entities?.mediaByPublicId || {}
-})
+function findAlbum(channel, albumPublicId) {
+  if (!channel || !albumPublicId) {
+    return null
+  }
+  return (channel.albums || []).find(item => item?.publicId === albumPublicId) || null
+}
+
+function findMedia(channel, mediaPublicId) {
+  if (!channel || !mediaPublicId) {
+    return null
+  }
+  for (const album of channel.albums || []) {
+    const found = (album.media || []).find(item => item?.publicId === mediaPublicId)
+    if (found) {
+      return found
+    }
+  }
+  return null
+}
 
 // Helpers for each route type
 function getChannelMeta(route, channel) {
@@ -15,9 +30,8 @@ function getChannelMeta(route, channel) {
   }
 }
 
-function getAlbumMeta(albumPublicId, readModel) {
-  const { albumsByPublicId } = getReadModelLookups(readModel)
-  const album = albumsByPublicId[albumPublicId] || null
+function getAlbumMeta(channel, albumPublicId) {
+  const album = findAlbum(channel, albumPublicId)
   return {
     title: album?.title || null,
     description: sanitizeText(album?.subtitle || ''),
@@ -26,9 +40,8 @@ function getAlbumMeta(albumPublicId, readModel) {
   }
 }
 
-function getMediaMeta(mediaPublicId, readModel) {
-  const { mediaByPublicId } = getReadModelLookups(readModel)
-  const media = mediaByPublicId[mediaPublicId] || null
+function getMediaMeta(channel, mediaPublicId) {
+  const media = findMedia(channel, mediaPublicId)
   return {
     title: media?.title || null,
     description: sanitizeText(media?.descriptionUnsafe),
@@ -60,7 +73,7 @@ function getPrivateAlbumMeta(channel) {
 }
 
 // Main meta generator
-export function getMetaData(route, channel, readModel = null) {
+export function getMetaData(route, channel) {
   let meta = { title: null, description: '', image: null, type: 'website' }
 
   // Route type detection
@@ -68,10 +81,10 @@ export function getMetaData(route, channel, readModel = null) {
     meta = getChannelMeta(route, channel)
   }
   if (route?.params.albumPublicId) {
-    meta = getAlbumMeta(route.params.albumPublicId, readModel)
+    meta = getAlbumMeta(channel, route.params.albumPublicId)
   }
   if (route?.params.mediaPublicId) {
-    meta = getMediaMeta(route.params.mediaPublicId, readModel)
+    meta = getMediaMeta(channel, route.params.mediaPublicId)
   }
   if (route?.params.privateAlbumId && !route?.params.privateMediaId) {
     meta = getPrivateAlbumMeta(channel)

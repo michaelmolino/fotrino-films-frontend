@@ -19,10 +19,26 @@ const sharedSortedAllMedia = computed(() => {
     (album.media || []).map(media => ({ media, album }))
   )
 })
-const sharedAlbumsByPublicId = computed(
-  () => sharedReadModel.value?.entities?.albumsByPublicId || {}
-)
-const sharedMediaByPublicId = computed(() => sharedReadModel.value?.entities?.mediaByPublicId || {})
+const sharedAlbumsByPublicId = computed(() => {
+  const map = {}
+  for (const album of sharedChannel.value?.albums || []) {
+    if (album?.publicId) {
+      map[album.publicId] = album
+    }
+  }
+  return map
+})
+const sharedMediaByPublicId = computed(() => {
+  const map = {}
+  for (const album of sharedChannel.value?.albums || []) {
+    for (const media of album?.media || []) {
+      if (media?.publicId) {
+        map[media.publicId] = { ...media, albumPublicId: album.publicId }
+      }
+    }
+  }
+  return map
+})
 const sharedHydratedAlbumsByPublicId = computed(() => {
   const map = {}
   for (const album of sharedChannel.value?.albums || []) {
@@ -37,7 +53,7 @@ const sharedHydratedAlbumsByPublicId = computed(() => {
   return map
 })
 
-const EMPTY_CHANNEL_VIEW_RESPONSE = { data: null, readModel: null }
+const EMPTY_CHANNEL_VIEW_RESPONSE = { data: null }
 /**
  * Composable for loading and setting channel data based on route parameters
  * State is shared across composable callers so App-level route loading and
@@ -94,7 +110,7 @@ export function useChannelLoader({ manageMeta = false } = {}) {
 
   const setChannelPayload = payload => {
     channel.value = payload?.data ?? null
-    readModel.value = payload?.readModel ?? null
+    readModel.value = null
     return payload
   }
 
@@ -158,8 +174,7 @@ export function useChannelLoader({ manageMeta = false } = {}) {
 
     if (hasLoadedChannelRouteTarget(target)) {
       return Promise.resolve({
-        data: channel.value,
-        readModel: readModel.value
+        data: channel.value
       })
     }
 
@@ -256,9 +271,31 @@ export function useChannelLoader({ manageMeta = false } = {}) {
     return !!prefix && canonicalPath.startsWith(prefix)
   }
 
+  const getCanonicalPathForTarget = (canonicalPath, target) => {
+    if (!canonicalPath || !target?.type) return null
+
+    if (typeof canonicalPath === 'string') {
+      return canonicalPath
+    }
+
+    if (typeof canonicalPath !== 'object') {
+      return null
+    }
+
+    if (target.type === 'privateAlbumMedia') {
+      return canonicalPath.privateAlbumPath || canonicalPath.privatePath || null
+    }
+
+    if (target.type === 'privateAlbum' || target.type === 'privateMedia') {
+      return canonicalPath.privatePath || null
+    }
+
+    return canonicalPath.publicPath || null
+  }
+
   const syncCanonicalSlugs = route => {
     const target = getChannelRouteTarget(route)
-    const hintedCanonicalPath = channel.value?.canonicalPath
+    const hintedCanonicalPath = getCanonicalPathForTarget(channel.value?.canonicalPath, target)
     const fallbackCanonicalPath = getCanonicalChannelRoutePath(route, {
       channel: channel.value,
       findAlbumByPublicId,
@@ -293,7 +330,7 @@ export function useChannelLoader({ manageMeta = false } = {}) {
       }
 
       channel.value = loaded.data
-      readModel.value = loaded.readModel
+      readModel.value = null
       const loadedChannel = loaded.data
 
       syncChannelHistory(route, loadedChannel)
@@ -301,7 +338,7 @@ export function useChannelLoader({ manageMeta = false } = {}) {
       syncPrivateAlbumHistory(route, loadedChannel)
       syncCanonicalSlugs(route)
 
-      metaData.value = getMetaData(route, loadedChannel, readModel.value)
+      metaData.value = getMetaData(route, loadedChannel)
       loadStatus.value = 'success'
       return loadedChannel
     } catch (error) {
@@ -311,7 +348,7 @@ export function useChannelLoader({ manageMeta = false } = {}) {
 
       setChannelPayload(null)
       loadStatus.value = 'error'
-      metaData.value = getMetaData(null, null, null)
+      metaData.value = getMetaData(null, null)
       console.error('Failed to load channel:', error)
       return null
     }

@@ -10,9 +10,10 @@ export type Externalid = string
 export type Provider = string
 export type Isadmin = boolean
 export type Lastlogin = string
+export type Mediacount = number
 export type Name = string
 export type Newuser = boolean
-export type Providers = string[]
+export type AccountProvidersResponse = string[]
 export type Avatar1 = string
 export type Cover = string
 export type Created1 = string
@@ -28,13 +29,17 @@ export type Isadmin1 = boolean
 export type Lastlogin1 = string
 export type Name1 = string
 export type Newuser1 = boolean
-export type Providers1 = UserProviderResponse[]
+export type Providers = UserProviderResponse[]
 export type AdminUsersResponse = AdminUserResponse[]
 export type Error = 'bad_request'
 export type Message = string | null
-export type Status = 400
+export type Privatepath = string | null
+export type Publicpath = string | null
 export type Created3 = string
 export type Deleted2 = boolean
+export type Privatealbumpath = string | null
+export type Privatepath1 = string | null
+export type Publicpath1 = string | null
 export type Created4 = string
 export type Deleted3 = boolean
 export type Descriptionunsafe = string | null
@@ -75,7 +80,7 @@ export type Subtitle1 = string | null
 export type Title3 = string
 export type Updatedat2 = string
 export type Albums = AlbumResponse1[]
-export type Canonicalpath = string | null
+export type Publicpath2 = string | null
 export type Cover1 = string
 export type Created6 = string
 export type Deleted5 = boolean
@@ -108,7 +113,6 @@ export type Src1 = string | null
 export type Title6 = string
 export type Type3 = string | null
 export type Updatedat3 = string
-export type Canonicalpath1 = string | null
 export type Cover3 = string
 export type Created8 = string
 export type Deleted7 = boolean
@@ -118,21 +122,17 @@ export type Slug7 = string
 export type Title7 = string
 export type Error1 = 'conflict'
 export type Message1 = string | null
-export type Status1 = 409
 export type CoverMode = 'profile' | 'upload'
 export type Error2 = string
 export type Error3 = string
 export type Error4 = string
 export type Error5 = 'forbidden'
 export type Message2 = string | null
-export type Status2 = 403
 export type Error6 = string
 export type Message3 = string | null
-export type Status3 = number
-export type Status4 = string
+export type Status = string
 export type Error7 = 'internal_server_error'
 export type Message4 = string | null
-export type Status5 = 500
 export type Description = string | null
 export type Main2 = boolean
 export type Resourcedate4 = string
@@ -145,7 +145,6 @@ export type Resourcedate5 = string
 export type Title9 = string | null
 export type Error8 = 'not_found'
 export type Message5 = string | null
-export type Status6 = 404
 export type OAuthProvider =
   | 'apple'
   | 'facebook'
@@ -170,15 +169,16 @@ export type Updatedat4 = string | null
 export type Media2 = PrivateMediaItemResponse[]
 export type Poster2 = string | null
 export type Postercolor2 = string | null
+export type PrivateID5 = string | null
 export type Media3 = PrivateMediaItemResponse[]
 export type Poster3 = string | null
 export type Postercolor3 = string | null
-export type Canonicalpath2 = string | null
+export type PrivateID6 = string | null
 export type Cover4 = string
 export type Ownername1 = string
 export type Message6 = string | null
 export type Reported = boolean
-export type PrivateID5 = string
+export type PrivateID7 = string
 export type PublicID7 = string
 export type Createdat = string
 export type Reason = string | null
@@ -191,10 +191,8 @@ export type Reason1 = string | null
 export type Reporter1 = string
 export type Error9 = 'unauthorized'
 export type Message7 = string | null
-export type Status7 = 401
 export type Error10 = 'unprocessable_entity'
 export type Message8 = string | null
-export type Status8 = 422
 export type Cover5 = boolean
 export type Poster4 = boolean
 export type Preview3 = boolean
@@ -281,15 +279,13 @@ export interface AccountProfileResponse {
   identityProvider: UserProviderResponse | null
   isAdmin: Isadmin
   lastLogin: Lastlogin
+  mediaCount?: Mediacount
   name: Name
   newUser: Newuser
 }
 export interface UserProviderResponse {
   externalId: Externalid
   provider: Provider
-}
-export interface AccountProvidersResponse {
-  providers: Providers
 }
 export interface AdminUserResponse {
   avatar: Avatar1
@@ -302,7 +298,7 @@ export interface AdminUserResponse {
   lastLogin: Lastlogin1
   name: Name1
   newUser: Newuser1
-  providers: Providers1
+  providers: Providers
 }
 export interface AdminChannelResponse {
   cover: Cover
@@ -312,11 +308,12 @@ export interface AdminChannelResponse {
   title: Title
 }
 export interface BadRequestErrorResponse {
+  detail?: unknown
   error: Error
   message?: Message
-  status: Status
 }
 export interface AlbumResponse {
+  canonicalPath?: AlbumCanonicalPathResponse | null
   created: Created3
   deleted?: Deleted2
   media?: Media
@@ -332,7 +329,12 @@ export interface AlbumResponse {
   updatedAt: Updatedat1
   [k: string]: unknown
 }
+export interface AlbumCanonicalPathResponse {
+  privatePath?: Privatepath
+  publicPath?: Publicpath
+}
 export interface MediaResponse {
+  canonicalPath?: MediaCanonicalPathResponse | null
   created: Created4
   deleted?: Deleted3
   descriptionUnsafe: Descriptionunsafe
@@ -350,9 +352,14 @@ export interface MediaResponse {
   updatedAt: Updatedat
   [k: string]: unknown
 }
+export interface MediaCanonicalPathResponse {
+  privateAlbumPath?: Privatealbumpath
+  privatePath?: Privatepath1
+  publicPath?: Publicpath1
+}
 export interface ChannelDetailResponse {
   albums?: Albums
-  canonicalPath?: Canonicalpath
+  canonicalPath?: ChannelCanonicalPathResponse | null
   cover: Cover1
   created: Created6
   deleted?: Deleted5
@@ -364,6 +371,7 @@ export interface ChannelDetailResponse {
   [k: string]: unknown
 }
 export interface AlbumResponse1 {
+  canonicalPath?: AlbumCanonicalPathResponse | null
   created: Created5
   deleted?: Deleted4
   media?: Media1
@@ -378,6 +386,9 @@ export interface AlbumResponse1 {
   title: Title3
   updatedAt: Updatedat2
   [k: string]: unknown
+}
+export interface ChannelCanonicalPathResponse {
+  publicPath?: Publicpath2
 }
 export interface HistoryResponse {
   deletedItems?: Deleteditems
@@ -395,6 +406,7 @@ export interface HistoryItemResponse {
   type: Type2
 }
 export interface MediaResponse1 {
+  canonicalPath?: MediaCanonicalPathResponse | null
   created: Created7
   deleted?: Deleted6
   descriptionUnsafe: Descriptionunsafe1
@@ -413,7 +425,7 @@ export interface MediaResponse1 {
   [k: string]: unknown
 }
 export interface ChannelSummaryResponse {
-  canonicalPath?: Canonicalpath1
+  canonicalPath?: ChannelCanonicalPathResponse | null
   cover: Cover3
   created: Created8
   deleted?: Deleted7
@@ -424,40 +436,40 @@ export interface ChannelSummaryResponse {
   [k: string]: unknown
 }
 export interface ConflictErrorResponse {
+  detail?: unknown
   error: Error1
   message?: Message1
-  status: Status1
 }
 export interface ErrorResponse {
   error: Error2
 }
 export interface ErrorDetailResponse {
-  detail: Detail
+  detail: Detail2
   error: Error3
 }
-export interface Detail {
+export interface Detail2 {
   [k: string]: unknown
 }
 export interface ErrorResponse1 {
   error: Error4
 }
 export interface ForbiddenErrorResponse {
+  detail?: unknown
   error: Error5
   message?: Message2
-  status: Status2
 }
 export interface GlobalHttpErrorResponse {
+  detail?: unknown
   error: Error6
   message?: Message3
-  status: Status3
 }
 export interface HealthResponse {
-  status: Status4
+  status: Status
 }
 export interface InternalServerErrorResponse {
+  detail?: unknown
   error: Error7
   message?: Message4
-  status: Status5
 }
 export interface MediaUpdateRequest {
   description?: Description
@@ -477,14 +489,15 @@ export interface MediaPreviewSelection {
   mode: Mode
 }
 export interface NotFoundErrorResponse {
+  detail?: unknown
   error: Error8
   message?: Message5
-  status: Status6
 }
 export interface PrivateMediaAlbumResponse {
   media?: Media2
   poster?: Poster2
   posterColor?: Postercolor2
+  privateId?: PrivateID5
 }
 export interface PrivateMediaItemResponse {
   created?: Created9
@@ -501,7 +514,7 @@ export interface PrivateMediaItemResponse {
 }
 export interface PrivateMediaChannelResponse {
   album: PrivateMediaAlbumResponse1
-  canonicalPath?: Canonicalpath2
+  canonicalPath?: MediaCanonicalPathResponse | null
   cover: Cover4
   ownerName: Ownername1
 }
@@ -509,13 +522,14 @@ export interface PrivateMediaAlbumResponse1 {
   media?: Media3
   poster?: Poster3
   posterColor?: Postercolor3
+  privateId?: PrivateID6
 }
 export interface ReportMediaResponse {
   message?: Message6
   reported: Reported
 }
 export interface ReportedMediaItemResponse {
-  privateId: PrivateID5
+  privateId: PrivateID7
   publicId: PublicID7
   reports: Reports
   slug: Slug9
@@ -532,14 +546,14 @@ export interface ReportedMediaReportResponse1 {
   reporter: Reporter1
 }
 export interface UnauthorizedErrorResponse {
+  detail?: unknown
   error: Error9
   message?: Message7
-  status: Status7
 }
 export interface UnprocessableEntityErrorResponse {
+  detail?: unknown
   error: Error10
   message?: Message8
-  status: Status8
 }
 export interface UploadDraftFiles {
   cover?: Cover5
@@ -593,17 +607,17 @@ export interface UnselectedChannelSelection {
   mode: Mode8
 }
 export interface ErrorDetailResponse1 {
-  detail: Detail1
+  detail: Detail9
   error: Error11
 }
-export interface Detail1 {
+export interface Detail9 {
   [k: string]: unknown
 }
 export interface ErrorDetailResponse2 {
-  detail: Detail2
+  detail: Detail10
   error: Error12
 }
-export interface Detail2 {
+export interface Detail10 {
   [k: string]: unknown
 }
 export interface UploadValidationResponse {

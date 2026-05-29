@@ -5,7 +5,8 @@
     expand-icon-toggle
     expand-separator
     switch-toggle-side
-    :disable="channel.pending">
+    :disable="channel.pending"
+    @show="onExpand">
     <template #header>
       <ResourceActions
         :title="channel.title"
@@ -27,11 +28,15 @@
         @undelete="emitUndeleteChannel" />
     </template>
 
+    <div v-if="channelQuery.isLoading.value" class="q-pa-md text-grey-6 text-center">
+      <q-spinner-dots size="24px" />
+    </div>
     <AlbumItem
-      v-for="album in channel.albums"
+      v-else
+      v-for="album in displayAlbums"
       :key="album.privateId"
       :album="album"
-      :channel="channel"
+      :channel="displayChannel"
       data-cy="album-item"
       v-on="albumItemListeners"
       :getMediaLink="getMediaLink" />
@@ -76,11 +81,27 @@ import AlbumItem from './AlbumItem.vue'
 import EditableChannelFields from '@components/account/shared/EditableChannelFields.vue'
 import { daysSince } from '@utils/date.js'
 import { useImageSelectionProcessing } from '@composables/useImageFileProcessor.js'
+import { useChannelStore } from 'src/stores/channel-store.js'
 
 const props = defineProps({
   channel: Object,
   getMediaLink: Function
 })
+
+const channelStore = useChannelStore()
+const hasBeenExpanded = ref(false)
+const channelQuery = channelStore.useChannelQuery(
+  computed(() => props.channel.publicId),
+  hasBeenExpanded
+)
+
+const deepChannel = computed(() => channelQuery.data.value?.data ?? null)
+const displayChannel = computed(() => deepChannel.value || props.channel)
+const displayAlbums = computed(() => displayChannel.value.albums || [])
+
+function onExpand() {
+  hasBeenExpanded.value = true
+}
 
 const emit = defineEmits([
   'deleteChannel',
@@ -96,7 +117,7 @@ const emit = defineEmits([
 ])
 
 const hasPendingChildren = computed(() => {
-  for (const album of props.channel.albums || []) {
+  for (const album of displayAlbums.value) {
     if (album?.pending) {
       return true
     }

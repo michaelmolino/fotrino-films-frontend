@@ -35,28 +35,6 @@ export function notifySuccess(message, options = {}) {
   })
 }
 
-// Notify info
-export function notifyInfo(message, options = {}) {
-  return Notify.create({
-    type: 'info',
-    icon: 'info',
-    timeout: 2000,
-    message,
-    ...options
-  })
-}
-
-// Notify warning
-export function notifyWarning(message, options = {}) {
-  return Notify.create({
-    type: 'warning',
-    icon: 'warning',
-    timeout: 3000,
-    message,
-    ...options
-  })
-}
-
 // Notify error with persistent dismiss
 export function notifyError(message, options = {}) {
   if (typeof message !== 'string' || !message.trim()) {

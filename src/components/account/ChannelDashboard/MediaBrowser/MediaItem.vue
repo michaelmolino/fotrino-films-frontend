@@ -8,7 +8,7 @@
       :deleted="media.deleted"
       undeletable
       editable
-      :link="getMediaLink('media', media.privateId)"
+      :link="getMediaLink('media', media)"
       :subtitle="mediaSubtitle"
       delete-color="warning"
       @delete="emitDeleteMedia"
