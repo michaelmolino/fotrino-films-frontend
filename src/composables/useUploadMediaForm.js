@@ -4,13 +4,14 @@ import { Notify } from 'quasar'
 import { useAccountStore } from 'src/stores/account-store.js'
 import { useChannelStore } from 'src/stores/channel-store.js'
 import { useUploadStore } from 'src/stores/upload-store.js'
-import { getComponentApiErrorMessage } from 'src/utils/apiErrors.js'
+import { getComponentApiErrorMessage } from 'src/utils/api-error-service.js'
 import { useImageFileProcessor } from '@composables/useImageFileProcessor.js'
 import { useVideoThumbnailProcessor } from '@composables/useVideoThumbnailProcessor.js'
 import { useUploadFlow } from '@composables/useUploadFlow.js'
 import { extractExifDate } from '@composables/useMediaMetadata.js'
 import { createRandomId } from 'src/utils/random.js'
 import { useDebounceFn } from '@vueuse/core'
+import { notifyError } from 'src/utils/notify.js'
 
 const IMAGE_RESOURCE_TYPES = new Set(['cover', 'poster', 'preview'])
 const VALIDATION_DEBOUNCE_MS = 300
@@ -66,7 +67,8 @@ export function useUploadMediaForm() {
   const channelStore = useChannelStore()
   const uploadStore = useUploadStore()
   const route = useRoute()
-  const channelsQuery = channelStore.useChannelsQuery()
+  const isAuthenticated = computed(() => !!accountStore.profile)
+  const channelsQuery = channelStore.useChannelsQuery(isAuthenticated)
 
   const payload = reactive(createInitialPayload())
   const albums = ref([])
@@ -372,12 +374,8 @@ export function useUploadMediaForm() {
     } catch (err) {
       console.error(err)
       payload.album.media.previewType = 'new'
-      Notify.create({
-        type: 'negative',
-        timeout: 0,
-        message: 'Error extracting frames from video.',
-        icon: 'warning',
-        actions: [{ label: 'Dismiss', color: 'white' }]
+      notifyError('Error extracting frames from video.', {
+        timeout: 0
       })
     } finally {
       if (token === frameExtractionToken.value) {
@@ -392,6 +390,11 @@ export function useUploadMediaForm() {
   }
 
   async function refreshValidation() {
+    if (!isAuthenticated.value) {
+      validation.value = { canSubmit: false, blockers: [] }
+      return
+    }
+
     if (validationInFlightPromise) {
       await validationInFlightPromise
       return
@@ -585,13 +588,9 @@ export function useUploadMediaForm() {
     } catch (err) {
       statusText.value = getComponentApiErrorMessage(err, 'Something went wrong!')
       clearUploadErrorNotify()
-      dismissUploadErrorNotify = Notify.create({
-        type: 'negative',
+      dismissUploadErrorNotify = notifyError(statusText.value, {
         timeout: 0,
-        multiLine: false,
-        message: statusText.value,
-        icon: 'warning',
-        actions: [{ label: 'Dismiss', color: 'white' }]
+        multiLine: false
       })
     } finally {
       uploadTriggered.value = false
@@ -670,10 +669,7 @@ export function useUploadMediaForm() {
       if (requestToken !== albumsLoadToken.value) return
       console.error('Failed to load channel albums:', err)
       albums.value = []
-      Notify.create({
-        type: 'negative',
-        message: getComponentApiErrorMessage(err, 'Failed to load channel albums.')
-      })
+      notifyError(getComponentApiErrorMessage(err, 'Failed to load channel albums.'))
     }
   }
 
@@ -803,8 +799,10 @@ export function useUploadMediaForm() {
   }
 
   onMounted(async () => {
-    await channelsQuery.refresh()
-    channelsHydrated.value = true
+    if (isAuthenticated.value) {
+      await channelsQuery.refresh()
+      channelsHydrated.value = true
+    }
 
     const list = channels.value || []
     setDefaultChannelSelection(list)

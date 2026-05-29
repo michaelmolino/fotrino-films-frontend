@@ -20,7 +20,8 @@ import AuthRequired from '@components/shared/AuthRequired.vue'
 
 const accountStore = useAccountStore()
 const channelStore = useChannelStore()
-const channelsQuery = channelStore.useChannelsQuery()
+const isAuthenticated = computed(() => !!accountStore.profile)
+const channelsQuery = channelStore.useChannelsQuery(isAuthenticated)
 
 const profile = computed(() => accountStore.profile)
 const contentState = computed(() => (profile.value ? 'ready' : 'auth-required'))

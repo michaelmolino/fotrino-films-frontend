@@ -81,7 +81,8 @@ import { computed, ref, watch } from 'vue'
 import { Notify } from 'quasar'
 import { useAdminStore } from 'src/stores/admin-store.js'
 import { daysSince } from '@utils/date.js'
-import { getComponentApiErrorMessage } from 'src/utils/apiErrors.js'
+import { getComponentApiErrorMessage } from 'src/utils/api-error-service.js'
+import { notifyError } from 'src/utils/notify.js'
 
 const adminStore = useAdminStore()
 const JOB_FILTER_KEY = 'admin.jobs.filterMode'
@@ -203,12 +204,8 @@ async function runAction(job) {
     })
   } catch (err) {
     console.error('Failed to run admin job action:', err)
-    Notify.create({
-      type: 'negative',
-      message: getComponentApiErrorMessage(err, 'Failed to run admin job action.'),
-      icon: 'warning',
-      timeout: 0,
-      actions: [{ label: 'Dismiss', color: 'white' }]
+    notifyError(getComponentApiErrorMessage(err, 'Failed to run admin job action.'), {
+      timeout: 0
     })
   }
 }
@@ -220,12 +217,8 @@ watch(
       return
     }
     console.error('Failed to load jobs:', err)
-    Notify.create({
-      type: 'negative',
-      message: getComponentApiErrorMessage(err, 'Failed to load jobs.'),
-      icon: 'warning',
-      timeout: 0,
-      actions: [{ label: 'Dismiss', color: 'white' }]
+    notifyError(getComponentApiErrorMessage(err, 'Failed to load jobs.'), {
+      timeout: 0
     })
   }
 )

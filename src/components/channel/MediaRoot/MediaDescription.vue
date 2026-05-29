@@ -115,7 +115,8 @@ import { Notify, useQuasar } from 'quasar'
 import { sanitizeHtml } from '@utils/text.js'
 import { daysSince } from '@utils/date.js'
 import { useChannelStore } from 'src/stores/channel-store.js'
-import { getComponentApiErrorMessage } from 'src/utils/apiErrors.js'
+import { getComponentApiErrorMessage } from 'src/utils/api-error-service.js'
+import { notifyError } from 'src/utils/notify.js'
 
 const props = defineProps({
   media: Object,
@@ -194,10 +195,7 @@ async function submitReport() {
     reason.value = ''
   } catch (e) {
     console.debug(e)
-    Notify.create({
-      type: 'negative',
-      message: getComponentApiErrorMessage(e, 'Unable to submit report right now.'),
-      icon: 'warning',
+    notifyError(getComponentApiErrorMessage(e, 'Unable to submit report right now.'), {
       timeout: 3000
     })
   } finally {

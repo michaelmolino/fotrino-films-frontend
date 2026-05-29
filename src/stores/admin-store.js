@@ -1,7 +1,7 @@
 import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { useQuery, useQueryCache } from '@pinia/colada'
-import { isGlobalApiError } from 'src/utils/apiErrors.js'
+import { isGlobalApiError } from 'src/utils/api-error-service.js'
 import { mutationResult, runMutation } from 'src/utils/storeMutations.js'
 import {
   createApiGetQueryOptionsFactory,
@@ -24,7 +24,9 @@ export const useAdminStore = defineStore('admin', () => {
     staleTime: 0,
     url: '/admin/users',
     config: {
-      __skipGlobalErrorNotify: true,
+      __policy: {
+        notify: 'local'
+      },
       __responseGuard: data => assertDataEnvelopeArrayResponse(data, 'Admin users')
     },
     transform: data => toArray(data?.data)
@@ -44,7 +46,9 @@ export const useAdminStore = defineStore('admin', () => {
       url: '/admin/jobs',
       config: {
         params: normalizedStatuses.length > 0 ? { status: normalizedStatuses } : undefined,
-        __skipGlobalErrorNotify: true,
+        __policy: {
+          notify: 'local'
+        },
         __responseGuard: data => assertDataEnvelopeArrayResponse(data, 'Admin jobs')
       },
       transform: data => toArray(data?.data)
@@ -56,7 +60,9 @@ export const useAdminStore = defineStore('admin', () => {
     staleTime: 0,
     url: '/admin/media/reported',
     config: {
-      __skipGlobalErrorNotify: true,
+      __policy: {
+        notify: 'local'
+      },
       __responseGuard: data => assertDataEnvelopeArrayResponse(data, 'Admin reported media')
     },
     transform: data => toArray(data?.data)

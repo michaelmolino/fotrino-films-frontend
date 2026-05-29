@@ -36,7 +36,9 @@ export const useChannelStore = defineStore('channel', () => {
     url: (channelPublicId, pending = false) =>
       `/channels/${channelPublicId}${pending ? '?pending=true' : ''}`,
     config: {
-      __redirectNotFoundTo404: true,
+      __policy: {
+        notFound: 'route404'
+      },
       __responseGuard: assertChannelViewResponse
     }
   })
@@ -56,7 +58,9 @@ export const useChannelStore = defineStore('channel', () => {
     staleTime: API_CACHE_MEDIUM_MS,
     url: albumPublicId => `/channels/album/${albumPublicId}`,
     config: {
-      __redirectNotFoundTo404: true,
+      __policy: {
+        notFound: 'route404'
+      },
       __responseGuard: assertChannelViewResponse
     }
   })
@@ -66,7 +70,9 @@ export const useChannelStore = defineStore('channel', () => {
     staleTime: API_CACHE_MEDIUM_MS,
     url: mediaPublicId => `/channels/media/${mediaPublicId}`,
     config: {
-      __redirectNotFoundTo404: true,
+      __policy: {
+        notFound: 'route404'
+      },
       __responseGuard: assertChannelViewResponse
     }
   })
@@ -76,7 +82,9 @@ export const useChannelStore = defineStore('channel', () => {
     staleTime: API_CACHE_MEDIUM_MS,
     url: privateMediaId => `/channels/media/private/${privateMediaId}`,
     config: {
-      __redirectNotFoundTo404: true,
+      __policy: {
+        notFound: 'route404'
+      },
       __responseGuard: assertChannelViewResponse
     }
   })
@@ -96,7 +104,9 @@ export const useChannelStore = defineStore('channel', () => {
       return `/channels/album/private/${privateAlbumId}${mediaQuery}`
     },
     config: {
-      __redirectNotFoundTo404: true,
+      __policy: {
+        notFound: 'route404'
+      },
       __responseGuard: assertChannelViewResponse
     }
   })
@@ -149,8 +159,11 @@ export const useChannelStore = defineStore('channel', () => {
     })
   }
 
-  const useChannelsQuery = () => {
-    const query = useQuery(() => channelsQueryOptions())
+  const useChannelsQuery = (enabled = true) => {
+    const query = useQuery(() => ({
+      ...channelsQueryOptions(),
+      enabled: toValue(enabled)
+    }))
 
     watch(
       () => query.data.value,
@@ -179,7 +192,9 @@ export const useChannelStore = defineStore('channel', () => {
     }
 
     const { data } = await api.post('/channels/history', { items }, {
-      __skipGlobalLoading: true,
+      __policy: {
+        loading: 'none'
+      },
       __responseGuard: assertHistoryResolveResponse
     })
 

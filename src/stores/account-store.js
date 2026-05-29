@@ -25,8 +25,10 @@ export const useAccountStore = defineStore('account', () => {
     staleTime: (staleTime = API_CACHE_SHORT_MS) => staleTime,
     url: '/account/profile',
     config: {
-      __skipGlobalLoading: true,
-      __skipGlobalErrorNotify: true,
+      __policy: {
+        loading: 'none',
+        notify: 'local'
+      },
       __responseGuard: assertAccountProfileResponse
     },
     transform: data => data?.data ?? null
@@ -37,8 +39,10 @@ export const useAccountStore = defineStore('account', () => {
     staleTime: (staleTime = API_CACHE_LONG_MS) => staleTime,
     url: '/account/providers',
     config: {
-      __skipGlobalLoading: true,
-      __skipGlobalErrorNotify: true,
+      __policy: {
+        loading: 'none',
+        notify: 'local'
+      },
       __responseGuard: assertAccountProvidersResponse
     },
     transform: data => data?.data

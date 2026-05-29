@@ -5,13 +5,17 @@ import { api, installApiClientInterceptors } from 'src/clients/axios-client.js'
 import { useRequestLoading } from 'src/composables/useRequestLoading'
 import { confirmDestructiveAction, notifyError } from 'src/utils/notify.js'
 import {
-  getCloudflareGatewayErrorPayload,
-  getComponentApiErrorPayload,
-  getGlobalApiErrorPayload,
+  REQUEST_POLICY_AUTH_REDIRECT,
+  REQUEST_POLICY_LOADING,
+  REQUEST_POLICY_NOTIFY,
+  REQUEST_POLICY_NOT_FOUND,
+  resolveRequestPolicy
+} from 'src/utils/requestPolicy.js'
+import {
   getGlobalApiErrorMessage,
-  isCloudflareGatewayError,
-  isGlobalApiError
-} from 'src/utils/apiErrors.js'
+  normalizeApiError
+} from 'src/utils/api-error-service.js'
+import { getComponentApiErrorPayload } from 'src/utils/api-error-payloads.js'
 import CloudflareGatewayErrorDialog from '@components/errors/CloudflareGatewayErrorDialog.vue'
 
 export default boot(({ app, router }) => {
@@ -26,68 +30,67 @@ export default boot(({ app, router }) => {
       })
     },
     onRequestStart: req => {
-      if (req?.__skipGlobalLoading === true) {
+      const requestPolicy = resolveRequestPolicy(req)
+      if (requestPolicy.loading !== REQUEST_POLICY_LOADING.GLOBAL) {
         return
       }
       showLoader()
     },
     onRequestEnd: req => {
-      if (req?.__skipGlobalLoading === true) {
+      const requestPolicy = resolveRequestPolicy(req)
+      if (requestPolicy.loading !== REQUEST_POLICY_LOADING.GLOBAL) {
         return
       }
       hideLoader()
     },
     onApiError: ({ error, status, requestCanceled }) => {
+      const requestPolicy = resolveRequestPolicy(error?.config)
+      const normalized = normalizeApiError(error, { status, requestCanceled })
       const componentErrorPayload = getComponentApiErrorPayload(error)
       const skipNotify =
-        error?.config?.__skipGlobalErrorNotify === true ||
-        requestCanceled ||
+        requestPolicy.notify !== REQUEST_POLICY_NOTIFY.GLOBAL ||
+        normalized.requestCanceled ||
         componentErrorPayload != null
-      const cloudflareError = isCloudflareGatewayError(error)
-      const cloudflarePayload = cloudflareError ? getCloudflareGatewayErrorPayload(error) : null
-      const apiError = getGlobalApiErrorPayload(error)
-      const resolvedStatus = apiError?.status ?? status
+      const resolvedStatus = normalized.status
 
-      if (cloudflareError && !requestCanceled) {
+      if (normalized.requestCanceled) {
+        return
+      }
+
+      if (normalized.isCloudflareGateway) {
         Dialog.create({
           component: CloudflareGatewayErrorDialog,
           componentProps: {
-            payload: cloudflarePayload,
+            payload: normalized.cloudflarePayload,
             requestMethod: error?.config?.method,
             requestUrl: error?.config?.url,
             requestStatus: resolvedStatus ?? error?.response?.status
           }
         })
         error.__cloudflareDialogShown = true
+        error.__globalErrorHandled = true
       }
 
-      if (isGlobalApiError(error, 'not_found') && error?.config?.__redirectNotFoundTo404 === true) {
+      if (normalized.isNotFound && requestPolicy.notFound === REQUEST_POLICY_NOT_FOUND.ROUTE_404) {
+        error.__globalErrorHandled = true
         router.replace('/404')
+        return
+      }
+
+      if (normalized.isUnauthorized && requestPolicy.authRedirect === REQUEST_POLICY_AUTH_REDIRECT.GLOBAL) {
+        error.__globalErrorHandled = true
+        router.replace('/')
         return
       }
 
       let msg = getGlobalApiErrorMessage(error)
       const timeout = 0
 
-      if (!apiError && resolvedStatus === 402)
-        msg = 'You have exceeded a limit for your account type.'
-      else if (!apiError && resolvedStatus === 501) msg = 'Not yet implemented.'
-
-      if (!skipNotify) {
-        if (!cloudflareError) {
-          notifyError(msg, {
-            timeout
-          })
-        }
-      }
-
-      if (
-        isGlobalApiError(error, 'unauthorized') ||
-        isGlobalApiError(error, 'forbidden') ||
-        resolvedStatus === 401 ||
-        resolvedStatus === 403
-      ) {
-        router.replace('/')
+      if (!skipNotify && !normalized.isCloudflareGateway) {
+        error.__globalErrorHandled = true
+        notifyError(msg, {
+          timeout
+        })
       }
     }
   })

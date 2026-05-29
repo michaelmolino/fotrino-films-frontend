@@ -1,5 +1,6 @@
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
+import { parseRetryAfterSeconds } from 'src/utils/api-error-rate-limit.js'
 
 const shouldRetryApi = error => {
   const method = (error?.config?.method || '').toLowerCase()
@@ -19,14 +20,10 @@ const shouldRetryApi = error => {
 
 const retryDelay = (retryCount, error) => {
   if (error?.response?.status === 429) {
-    const retryAfter = error.response.headers?.['retry-after']
-    if (retryAfter) {
-      const seconds = Number.parseFloat(retryAfter)
-      if (!Number.isNaN(seconds) && seconds > 0) {
-        return seconds * 1000
-      }
+    const retryAfter = parseRetryAfterSeconds(error?.response?.headers?.['retry-after'])
+    if (retryAfter != null) {
+      return retryAfter * 1000
     }
-    return Math.pow(2, retryCount) * 1000
   }
   return axiosRetry.exponentialDelay(retryCount, error)
 }
@@ -81,25 +78,37 @@ const installApiClientInterceptors = ({
 
   api.interceptors.response.use(
     response => {
-      const responseGuard = response?.config?.__responseGuard
-      if (typeof responseGuard === 'function') {
-        try {
+      try {
+        const responseGuard = response?.config?.__responseGuard
+        if (typeof responseGuard === 'function') {
           responseGuard(response.data)
-        } catch (error) {
-          const validationError = new Error(
-            error?.message || 'Invalid API response received from server.'
-          )
-          validationError.code = 'ERR_INVALID_RESPONSE'
-          validationError.__invalidApiResponse = true
-          validationError.__cause = error
-          throw validationError
+        }
+        return response
+      } catch (error) {
+        const validationError = new Error(
+          error?.message || 'Invalid API response received from server.'
+        )
+        validationError.code = 'ERR_INVALID_RESPONSE'
+        validationError.__invalidApiResponse = true
+        validationError.__cause = error
+        validationError.config = response?.config
+        validationError.response = response
+
+        if (typeof onApiError === 'function') {
+          onApiError({
+            error: validationError,
+            status: response?.status,
+            requestCanceled: false
+          })
+          validationError.__apiErrorHandled = true
+        }
+
+        return Promise.reject(validationError)
+      } finally {
+        if (typeof onRequestEnd === 'function') {
+          onRequestEnd(response?.config)
         }
       }
-
-      if (typeof onRequestEnd === 'function') {
-        onRequestEnd(response?.config)
-      }
-      return response
     },
     error => {
       if (typeof onRequestEnd === 'function') {
@@ -107,9 +116,12 @@ const installApiClientInterceptors = ({
       }
 
       const status = error?.response?.status
-      const requestCanceled = error?.code === 'ERR_CANCELED' || error?.name === 'CanceledError'
+      const requestCanceled =
+        error?.__userCancelled === true ||
+        error?.code === 'ERR_CANCELED' ||
+        error?.name === 'CanceledError'
 
-      if (typeof onApiError === 'function') {
+      if (typeof onApiError === 'function' && error?.__apiErrorHandled !== true) {
         onApiError({
           error,
           status,

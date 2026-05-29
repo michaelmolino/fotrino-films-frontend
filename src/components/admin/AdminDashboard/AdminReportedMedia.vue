@@ -53,8 +53,9 @@ import { computed, watch } from 'vue'
 import { Notify } from 'quasar'
 import { useAdminStore } from 'src/stores/admin-store.js'
 import { daysSince } from '@utils/date.js'
-import { getComponentApiErrorMessage } from 'src/utils/apiErrors.js'
+import { getComponentApiErrorMessage } from 'src/utils/api-error-service.js'
 import { buildPrivateMediaPath } from '@utils/channelRoute.js'
+import { notifyError } from 'src/utils/notify.js'
 
 const adminStore = useAdminStore()
 const reportedMediaQuery = adminStore.useReportedMediaQuery()
@@ -111,10 +112,7 @@ async function deleteMedia(privateId) {
     })
   } catch (err) {
     console.error('Failed to delete reported media:', err)
-    Notify.create({
-      type: 'negative',
-      message: getComponentApiErrorMessage(err, 'Failed to delete reported videos.'),
-      icon: 'warning',
+    notifyError(getComponentApiErrorMessage(err, 'Failed to delete reported videos.'), {
       timeout: 0
     })
   }
@@ -127,10 +125,7 @@ watch(
       return
     }
     console.error('Failed to fetch reported media:', err)
-    Notify.create({
-      type: 'negative',
-      message: getComponentApiErrorMessage(err, 'Failed to load reported videos.'),
-      icon: 'warning',
+    notifyError(getComponentApiErrorMessage(err, 'Failed to load reported videos.'), {
       timeout: 0
     })
   }

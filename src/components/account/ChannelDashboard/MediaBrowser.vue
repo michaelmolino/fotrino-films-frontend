@@ -19,7 +19,7 @@ import { computed } from 'vue'
 import { useChannelStore } from 'src/stores/channel-store.js'
 import { useUploadStore } from 'src/stores/upload-store.js'
 import ChannelItem from './MediaBrowser/ChannelItem.vue'
-import { getComponentApiErrorMessage } from 'src/utils/apiErrors.js'
+import { getComponentApiErrorMessage } from 'src/utils/api-error-service.js'
 import { useUppyPresignedUpload } from 'src/composables/useUppyPresignedUpload.js'
 import { notifyError, notifySuccess } from 'src/utils/notify.js'
 
