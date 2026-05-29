@@ -45,23 +45,23 @@ export default boot(({ app, router }) => {
     },
     onApiError: ({ error, status, requestCanceled }) => {
       const requestPolicy = resolveRequestPolicy(error?.config)
-      const normalized = normalizeApiError(error, { status, requestCanceled })
+      const normalizedError = normalizeApiError(error, { status, requestCanceled })
       const componentErrorPayload = getComponentApiErrorPayload(error)
       const skipNotify =
         requestPolicy.notify !== REQUEST_POLICY_NOTIFY.GLOBAL ||
-        normalized.requestCanceled ||
+        normalizedError.requestCanceled ||
         componentErrorPayload != null
-      const resolvedStatus = normalized.status
+      const resolvedStatus = normalizedError.status
 
-      if (normalized.requestCanceled) {
+      if (normalizedError.requestCanceled) {
         return
       }
 
-      if (normalized.isCloudflareGateway) {
+      if (normalizedError.isCloudflareGateway) {
         Dialog.create({
           component: CloudflareGatewayErrorDialog,
           componentProps: {
-            payload: normalized.cloudflarePayload,
+            payload: normalizedError.cloudflarePayload,
             requestMethod: error?.config?.method,
             requestUrl: error?.config?.url,
             requestStatus: resolvedStatus ?? error?.response?.status
@@ -71,13 +71,13 @@ export default boot(({ app, router }) => {
         error.__globalErrorHandled = true
       }
 
-      if (normalized.isNotFound && requestPolicy.notFound === REQUEST_POLICY_NOT_FOUND.ROUTE_404) {
+      if (normalizedError.isNotFound && requestPolicy.notFound === REQUEST_POLICY_NOT_FOUND.ROUTE_404) {
         error.__globalErrorHandled = true
         router.replace('/404')
         return
       }
 
-      if (normalized.isUnauthorized && requestPolicy.authRedirect === REQUEST_POLICY_AUTH_REDIRECT.GLOBAL) {
+      if (normalizedError.isUnauthorized && requestPolicy.authRedirect === REQUEST_POLICY_AUTH_REDIRECT.GLOBAL) {
         error.__globalErrorHandled = true
         router.replace('/')
         return
@@ -86,7 +86,7 @@ export default boot(({ app, router }) => {
       let msg = getGlobalApiErrorMessage(error)
       const timeout = 0
 
-      if (!skipNotify && !normalized.isCloudflareGateway) {
+      if (!skipNotify && !normalizedError.isCloudflareGateway) {
         error.__globalErrorHandled = true
         notifyError(msg, {
           timeout
