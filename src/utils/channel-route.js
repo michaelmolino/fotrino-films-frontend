@@ -76,6 +76,262 @@ export const getChannelRouteTarget = route => {
   return null
 }
 
+export const resolveChannelRouteContext = route => {
+  const channelSlug = route?.params?.channelSlug || null
+  const albumSlug = route?.params?.albumSlug || null
+  const mediaSlug = route?.params?.mediaSlug || null
+  const target = getChannelRouteTarget(route)
+
+  const baseContext = {
+    channelPublicId: null,
+    albumPublicId: null,
+    mediaPublicId: null,
+    privateAlbumId: null,
+    privateMediaId: null,
+    channelSlug,
+    albumSlug,
+    mediaSlug,
+    hasAlbumTarget: false,
+    hasMediaTarget: false
+  }
+
+  if (!target) {
+    return {
+      type: 'unknown',
+      scope: null,
+      isPrivate: false,
+      privateScope: null,
+      ...baseContext
+    }
+  }
+
+  const contextByType = {
+    channel: {
+      type: 'channel',
+      scope: 'channel',
+      isPrivate: false,
+      privateScope: null,
+      channelPublicId: target.publicId
+    },
+    album: {
+      type: 'album',
+      scope: 'album',
+      isPrivate: false,
+      privateScope: null,
+      albumPublicId: target.publicId,
+      hasAlbumTarget: true
+    },
+    media: {
+      type: 'media',
+      scope: 'media',
+      isPrivate: false,
+      privateScope: null,
+      mediaPublicId: target.publicId,
+      hasMediaTarget: true
+    },
+    privateAlbum: {
+      type: 'privateAlbum',
+      scope: 'album',
+      isPrivate: true,
+      privateScope: 'album',
+      privateAlbumId: target.privateAlbumId,
+      hasAlbumTarget: true
+    },
+    privateAlbumMedia: {
+      type: 'privateAlbumMedia',
+      scope: 'media',
+      isPrivate: true,
+      privateScope: 'album',
+      privateAlbumId: target.privateAlbumId,
+      privateMediaId: target.privateMediaId,
+      hasAlbumTarget: true,
+      hasMediaTarget: true
+    },
+    privateMedia: {
+      type: 'privateMedia',
+      scope: 'media',
+      isPrivate: true,
+      privateScope: 'media',
+      privateMediaId: target.privateMediaId,
+      hasMediaTarget: true
+    }
+  }
+
+  return {
+    ...baseContext,
+    ...(contextByType[target.type] || contextByType.privateMedia)
+  }
+}
+
+export const isChannelRouteTargetLoaded = ({
+  target,
+  channel,
+  findAlbumByPublicId,
+  findMediaByPublicId
+}) => {
+  if (!target || !channel) return false
+
+  const matchers = {
+    channel: () => channel.publicId === target.publicId,
+    album: () => !!findAlbumByPublicId(target.publicId),
+    media: () => !!findMediaByPublicId(target.publicId),
+    privateMedia: () => {
+      const media = channel?.album?.media || []
+      return media.some(item => item?.privateId === target.privateMediaId)
+    },
+    privateAlbum: () => channel?.album?.privateId === target.privateAlbumId,
+    privateAlbumMedia: () => {
+      if (channel?.album?.privateId !== target.privateAlbumId) {
+        return false
+      }
+      const mediaItems = channel?.album?.media
+      if (!Array.isArray(mediaItems)) {
+        return false
+      }
+      return mediaItems.some(item => item?.privateId === target.privateMediaId)
+    }
+  }
+
+  const matcher = matchers[target.type]
+  return matcher ? matcher() : false
+}
+
+export const toChannelRouteTargetFromContext = context => {
+  if (!context || context.type === 'unknown') return null
+
+  if (context.type === 'channel') {
+    return { type: 'channel', publicId: context.channelPublicId }
+  }
+
+  if (context.type === 'album') {
+    return { type: 'album', publicId: context.albumPublicId }
+  }
+
+  if (context.type === 'media') {
+    return { type: 'media', publicId: context.mediaPublicId }
+  }
+
+  if (context.type === 'privateAlbum') {
+    return { type: 'privateAlbum', privateAlbumId: context.privateAlbumId }
+  }
+
+  if (context.type === 'privateAlbumMedia') {
+    return {
+      type: 'privateAlbumMedia',
+      privateAlbumId: context.privateAlbumId,
+      privateMediaId: context.privateMediaId
+    }
+  }
+
+  return { type: 'privateMedia', privateMediaId: context.privateMediaId }
+}
+
+const CANONICAL_PREFIX_BY_TYPE = {
+  channel: '/c/',
+  album: '/a/',
+  media: '/m/',
+  privateMedia: '/private/m/'
+}
+
+const getPathSegments = path => path.split('/').filter(Boolean)
+
+const isPrivateAlbumPath = path => {
+  const segments = getPathSegments(path)
+  return segments.length === 4 && segments[0] === 'private' && segments[1] === 'a'
+}
+
+const isPrivateAlbumMediaPath = path => {
+  const segments = getPathSegments(path)
+  return (
+    segments.length === 6 &&
+    segments[0] === 'private' &&
+    segments[1] === 'a' &&
+    segments[3] === 'm'
+  )
+}
+
+export const isCanonicalPathCompatibleWithRouteTarget = (canonicalPath, target) => {
+  if (!canonicalPath || !target?.type) return false
+
+  if (target.type === 'privateAlbum') {
+    return isPrivateAlbumPath(canonicalPath)
+  }
+
+  if (target.type === 'privateAlbumMedia') {
+    return isPrivateAlbumMediaPath(canonicalPath)
+  }
+
+  const prefix = CANONICAL_PREFIX_BY_TYPE[target.type]
+  return !!prefix && canonicalPath.startsWith(prefix)
+}
+
+export const getCanonicalPathForRouteTarget = (canonicalPath, target) => {
+  if (!canonicalPath || !target?.type) return null
+
+  if (typeof canonicalPath === 'string') {
+    return canonicalPath
+  }
+
+  if (typeof canonicalPath !== 'object') {
+    return null
+  }
+
+  if (target.type === 'privateAlbumMedia') {
+    return canonicalPath.privateAlbumPath || canonicalPath.privatePath || null
+  }
+
+  if (target.type === 'privateAlbum' || target.type === 'privateMedia') {
+    return canonicalPath.privatePath || null
+  }
+
+  return canonicalPath.publicPath || null
+}
+
+export const resolveCanonicalPathForRoute = ({ route, context, canonicalPath, channelContext }) => {
+  const target = toChannelRouteTargetFromContext(context)
+  const hintedCanonicalPath = getCanonicalPathForRouteTarget(canonicalPath, target)
+  const fallbackCanonicalPath = getCanonicalChannelRoutePath(route, channelContext)
+
+  return isCanonicalPathCompatibleWithRouteTarget(hintedCanonicalPath, target)
+    ? hintedCanonicalPath
+    : fallbackCanonicalPath
+}
+
+export const buildMediaPathForRouteContext = ({ context, media, album = null }) => {
+  if (!context || !media) return null
+
+  if (context.type === 'privateAlbum' || context.type === 'privateAlbumMedia') {
+    const privateAlbumId = context.privateAlbumId || album?.privateId
+    return buildPrivateAlbumMediaPath({
+      privateAlbumId,
+      privateMediaId: media.privateId,
+      mediaSlug: media.slug
+    })
+  }
+
+  if (context.type === 'privateMedia') {
+    return buildPrivateMediaPath({
+      privateId: media.privateId,
+      slug: media.slug
+    })
+  }
+
+  return buildMediaPath({ publicId: media.publicId, slug: media.slug })
+}
+
+export const buildAlbumPathForRouteContext = ({ context, album }) => {
+  if (!context || !album) return null
+
+  if (context.type === 'privateAlbum' || context.type === 'privateAlbumMedia') {
+    return buildPrivateAlbumPath({
+      privateId: album.privateId,
+      slug: album.slug
+    })
+  }
+
+  return buildAlbumPath({ publicId: album.publicId, slug: album.slug })
+}
+
 const getChannelCanonicalPath = (route, channelContext) => {
   const channel = channelContext.channel
   const channelPublicId = channel?.publicId

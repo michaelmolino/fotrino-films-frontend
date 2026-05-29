@@ -14,10 +14,11 @@
 </template>
 
 <script setup>
-import { ref, watch, defineAsyncComponent, onMounted } from 'vue'
+import { computed, ref, watch, defineAsyncComponent, onMounted } from 'vue'
 import { useAccountStore } from 'src/stores/account-store.js'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
+import { resolveChannelRouteContext } from '@utils/channel-route.js'
 
 const Terms = defineAsyncComponent(() => import('@components/pages/Terms.vue'))
 
@@ -25,6 +26,7 @@ const accountStore = useAccountStore()
 const route = useRoute()
 const router = useRouter()
 const { loadChannel } = useChannelLoader({ manageMeta: true })
+const routeContext = computed(() => resolveChannelRouteContext(route))
 accountStore.useProfileQuery()
 
 const showTerms = ref(false)
@@ -38,11 +40,12 @@ onMounted(async () => {
 
 watch(
   [
-    () => route.params.channelPublicId,
-    () => route.params.albumPublicId,
-    () => route.params.mediaPublicId,
-    () => route.params.privateAlbumId,
-    () => route.params.privateMediaId
+    () => routeContext.value.type,
+    () => routeContext.value.channelPublicId,
+    () => routeContext.value.albumPublicId,
+    () => routeContext.value.mediaPublicId,
+    () => routeContext.value.privateAlbumId,
+    () => routeContext.value.privateMediaId
   ],
   async () => {
     await loadChannel(route)

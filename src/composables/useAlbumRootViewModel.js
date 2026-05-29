@@ -1,22 +1,19 @@
 import { computed } from 'vue'
-import { buildMediaPath, buildPrivateAlbumMediaPath } from '@utils/channel-route.js'
+import { buildMediaPathForRouteContext } from '@utils/channel-route.js'
 
-export function useAlbumRootViewModel({ loading, channel, album, route, privateMode }) {
+export function useAlbumRootViewModel({ loading, channel, album, routeContext }) {
   const contentState = computed(() => {
     if (loading.value) return 'loading'
-    const hasAlbumTarget = !!(route.params.albumPublicId || route.params.privateAlbumId)
+    const hasAlbumTarget = routeContext.value.hasAlbumTarget
     return channel.value && album.value && hasAlbumTarget ? 'ready' : 'not-found'
   })
 
   function getMediaPath(media) {
-    if (privateMode.value && route.params.privateAlbumId) {
-      return buildPrivateAlbumMediaPath({
-        privateAlbumId: route.params.privateAlbumId,
-        privateMediaId: media.privateId,
-        mediaSlug: media.slug
-      })
-    }
-    return buildMediaPath({ publicId: media.publicId, slug: media.slug })
+    return buildMediaPathForRouteContext({
+      context: routeContext.value,
+      album: album.value,
+      media
+    })
   }
 
   const allMedia = computed(() => {

@@ -1,7 +1,7 @@
 import { computed } from 'vue'
 import { buildAlbumPath, buildMediaPath } from '@utils/channel-route.js'
 
-export function useChannelRootViewModel({ loading, channel, route, selectedView, sortedAllMedia }) {
+export function useChannelRootViewModel({ loading, channel, routeContext, selectedView, sortedAllMedia }) {
   const albums = computed(() => {
     if (loading.value || !channel.value) return []
     return channel.value.albums || []
@@ -9,7 +9,7 @@ export function useChannelRootViewModel({ loading, channel, route, selectedView,
 
   const contentState = computed(() => {
     if (loading.value) return 'loading'
-    return channel.value?.publicId === route.params.channelPublicId ? 'ready' : 'not-found'
+    return channel.value?.publicId === routeContext.value.channelPublicId ? 'ready' : 'not-found'
   })
 
   const showAlbumsView = computed(() => selectedView.value === 'albums')

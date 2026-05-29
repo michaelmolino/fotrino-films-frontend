@@ -11,8 +11,7 @@
         :channel="channel"
         :album="album"
         :media="null"
-        :private="privateMode"
-        private-scope="album" />
+        :route-context="routeContext" />
 
       <template v-if="displayState === 'empty'">
         <NothingText text="No content available." />
@@ -83,8 +82,7 @@
       <ShareActions
         :channel="channel"
         :album="album"
-        :private="privateMode"
-        private-scope="album" />
+        :route-context="routeContext" />
     </div>
 
     <template v-else>
@@ -94,11 +92,13 @@
 </template>
 
 <script setup>
-import { computed, watch, defineAsyncComponent, ref } from 'vue'
+import { computed, defineAsyncComponent, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
 import { useAlbumRootViewModel } from '@composables/useAlbumRootViewModel.js'
-import { buildAlbumPath, buildMediaPath, buildPrivateAlbumMediaPath, buildPrivateAlbumPath } from '@utils/channel-route.js'
+import { useAlbumRouteEntities } from '@composables/useChannelRouteEntities.js'
+import { useAlbumRootRouteOrchestrator } from '@composables/useChannelRouteOrchestrator.js'
+import { resolveChannelRouteContext } from '@utils/channel-route.js'
 
 import BreadCrumbs from '@components/channel/shared/BreadCrumbs.vue'
 import ShareActions from '@components/channel/shared/ShareActions.vue'
@@ -111,7 +111,7 @@ const redirecting = ref(false)
 
 const { channel, loading, findAlbumByPublicId } = useChannelLoader()
 
-const privateMode = computed(() => !!route.params.privateAlbumId)
+const routeContext = computed(() => resolveChannelRouteContext(route))
 
 function redirect(pathOrObj) {
   if (redirecting.value) return
@@ -119,18 +119,10 @@ function redirect(pathOrObj) {
   router.replace(pathOrObj)
 }
 
-function findAlbumByParams() {
-  if (route.params.privateAlbumId) {
-    return channel.value?.album || null
-  }
-  if (route.params.albumPublicId) {
-    return findAlbumByPublicId(route.params.albumPublicId)
-  }
-  return null
-}
-
-const album = computed(() => {
-  return findAlbumByParams()
+const { album } = useAlbumRouteEntities({
+  channel,
+  routeContext,
+  findAlbumByPublicId
 })
 const {
   contentState,
@@ -146,67 +138,18 @@ const {
   loading,
   channel,
   album,
-  route,
-  privateMode
+  routeContext
 })
 
-watch(
+useAlbumRootRouteOrchestrator({
+  channel,
   album,
-  newAlbum => {
-    if (
-      channel.value &&
-      newAlbum &&
-      route.params.albumSlug &&
-      newAlbum.slug !== route.params.albumSlug &&
-      !loading.value
-    ) {
-      if (privateMode.value && newAlbum.privateId) {
-        redirect(buildPrivateAlbumPath({ privateId: newAlbum.privateId, slug: newAlbum.slug }))
-      } else {
-        redirect(buildAlbumPath({ publicId: newAlbum.publicId, slug: newAlbum.slug }))
-      }
-      return
-    }
-    if (
-      channel.value &&
-      !newAlbum &&
-      (route.params.albumPublicId || route.params.privateAlbumId) &&
-      !loading.value
-    ) {
-      redirect('/404')
-    }
-  },
-  { immediate: true }
-)
-
-// If exactly one featured media and we're on the album (not media) route,
-// redirect to the media route to use MediaRoot instead
-watch(
-  [featuredMediaCount, album, loading],
-  ([count, proj, isLoading]) => {
-    if (
-      !isLoading &&
-      channel.value &&
-      proj &&
-      count === 1 &&
-      (route.params.albumPublicId || route.params.privateAlbumId)
-    ) {
-      const featured = featuredMedia.value[0]
-      if (privateMode.value && route.params.privateAlbumId && featured?.privateId) {
-        redirect(
-          buildPrivateAlbumMediaPath({
-            privateAlbumId: route.params.privateAlbumId,
-            privateMediaId: featured.privateId,
-            mediaSlug: featured.slug
-          })
-        )
-      } else {
-        redirect(buildMediaPath({ publicId: featured.publicId, slug: featured.slug }))
-      }
-    }
-  },
-  { immediate: true }
-)
+  loading,
+  routeContext,
+  featuredMedia,
+  featuredMediaCount,
+  redirect
+})
 </script>
 
 <style scoped>

@@ -11,8 +11,7 @@
         :channel="channel"
         :album="album"
         :media="media"
-        :private="privateMode"
-        :private-scope="privateScope" />
+        :route-context="routeContext" />
 
       <PlyrPlayer :media="media" :artist="channel?.ownerName" class="q-py-md plyrplayer" />
       <div class="plyrplayer" data-cy="media-description-container">
@@ -41,8 +40,7 @@
         :channel="channel"
         :album="album"
         :media="media"
-        :private="privateMode"
-        :private-scope="privateScope" />
+        :route-context="routeContext" />
     </div>
 
     <template v-else>
@@ -52,11 +50,13 @@
 </template>
 
 <script setup>
-import { computed, watch, defineAsyncComponent, ref } from 'vue'
+import { computed, defineAsyncComponent, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
 import { useMediaRootViewModel } from '@composables/useMediaRootViewModel.js'
-import { buildMediaPath, buildPrivateAlbumMediaPath, buildPrivateMediaPath } from '@utils/channel-route.js'
+import { useMediaRouteEntities } from '@composables/useChannelRouteEntities.js'
+import { useMediaRootRouteOrchestrator } from '@composables/useChannelRouteOrchestrator.js'
+import { resolveChannelRouteContext } from '@utils/channel-route.js'
 
 import BreadCrumbs from '@components/channel/shared/BreadCrumbs.vue'
 import MediaPreview from '@components/channel/shared/MediaPreview.vue'
@@ -75,6 +75,7 @@ const NothingText = defineAsyncComponent(() => import('@components/shared/Nothin
 const route = useRoute()
 const router = useRouter()
 const redirecting = ref(false)
+const routeContext = computed(() => resolveChannelRouteContext(route))
 
 const { channel, loading, findAlbumByMediaPublicId, findMediaByPublicId } = useChannelLoader()
 
@@ -84,46 +85,13 @@ function redirect(pathOrObj) {
   router.replace(pathOrObj)
 }
 
-function findAlbumByParams() {
-  if (route.params.mediaPublicId) {
-    return findAlbumByMediaPublicId(route.params.mediaPublicId)
-  }
-  if (route.params.privateAlbumId && channel.value) {
-    return channel.value?.album || null
-  }
-  if (route.params.privateMediaId && channel.value) {
-    return channel.value?.album || null
-  }
-  return null
-}
-
-function findMediaByParams(album) {
-  if (!album) return null
-  const mediaItems = album.media || []
-
-  if (route.params.privateAlbumId && route.params.privateMediaId) {
-    return mediaItems.find(item => item?.privateId === route.params.privateMediaId) || null
-  }
-
-  if (route.params.privateMediaId) {
-    return mediaItems.find(item => item?.privateId === route.params.privateMediaId) || null
-  }
-  if (route.params.mediaPublicId) {
-    return findMediaByPublicId(route.params.mediaPublicId)
-  }
-  return null
-}
-
-const album = computed(() => {
-  return findAlbumByParams()
-})
-
-const media = computed(() => {
-  return findMediaByParams(album.value)
+const { album, media } = useMediaRouteEntities({
+  channel,
+  routeContext,
+  findAlbumByMediaPublicId,
+  findMediaByPublicId
 })
 const {
-  privateMode,
-  privateScope,
   contentState,
   albumPoster,
   albumPosterColor,
@@ -134,74 +102,17 @@ const {
   channel,
   album,
   media,
-  route
+  routeContext
 })
 
-watch(
+useMediaRootRouteOrchestrator({
+  channel,
   album,
-  newAlbum => {
-    if (
-      channel.value &&
-      !newAlbum &&
-      (route.params.mediaPublicId || route.params.privateMediaId) &&
-      !loading.value
-    ) {
-      redirect('/404')
-    }
-  },
-  { immediate: true }
-)
-
-watch(
   media,
-  newMedia => {
-    if (
-      channel.value &&
-      album.value &&
-      (album.value.media?.length || 0) > 0 &&
-      !newMedia &&
-      !loading.value
-    ) {
-      redirect('/404')
-    }
-  },
-  { immediate: true }
-)
-
-watch(
-  media,
-  newMedia => {
-    if (!newMedia || loading.value) return
-    if (
-      route.params.mediaPublicId &&
-      route.params.mediaSlug &&
-      newMedia.slug !== route.params.mediaSlug
-    ) {
-      redirect(buildMediaPath({ publicId: newMedia.publicId, slug: newMedia.slug }))
-      return
-    }
-    if (
-      route.params.privateMediaId &&
-      route.params.mediaSlug &&
-      newMedia.slug !== route.params.mediaSlug
-    ) {
-      if (route.params.privateAlbumId && album.value?.privateId && newMedia.privateId) {
-        redirect(
-          buildPrivateAlbumMediaPath({
-            privateAlbumId: album.value.privateId,
-            privateMediaId: newMedia.privateId,
-            mediaSlug: newMedia.slug
-          })
-        )
-        return
-      }
-      if (newMedia.privateId) {
-        redirect(buildPrivateMediaPath({ privateId: newMedia.privateId, slug: newMedia.slug }))
-      }
-    }
-  },
-  { immediate: true }
-)
+  loading,
+  routeContext,
+  redirect
+})
 </script>
 
 <style scoped>

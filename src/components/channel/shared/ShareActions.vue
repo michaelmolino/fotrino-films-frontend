@@ -79,18 +79,15 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
 import { Notify, copyToClipboard } from 'quasar'
 
 const props = defineProps({
   channel: { type: Object, required: true },
   album: { type: Object, default: null },
   media: { type: Object, default: null },
-  private: { type: Boolean, default: false },
-  privateScope: { type: String, default: 'media' }
+  routeContext: { type: Object, default: null }
 })
 
-const route = useRoute()
 const showAdvanced = ref(false)
 const menuOpen = ref(false)
 const containerRef = ref(null)
@@ -138,7 +135,9 @@ const mediaPrivateAlbumPath = computed(() =>
 
 const isPrivateAlbumContext = computed(() => {
   return Boolean(
-    props.private || route.params?.privateAlbumId || (!albumPublicPath.value && albumPrivatePath.value)
+    props.routeContext?.type === 'privateAlbum' ||
+      props.routeContext?.type === 'privateAlbumMedia' ||
+      (!albumPublicPath.value && albumPrivatePath.value)
   )
 })
 

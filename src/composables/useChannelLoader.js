@@ -4,12 +4,16 @@ import { useChannelStore } from 'src/stores/channel-store.js'
 import { useRoute, useRouter } from 'vue-router'
 import { useMeta } from 'quasar'
 import { getMetaData } from '@utils/meta.js'
-import { addHistory, addPrivateHistory, addPrivateAlbumHistory } from '@utils/history.js'
-import { getCanonicalChannelRoutePath, getChannelRouteTarget } from '@utils/channel-route.js'
+import { syncChannelRouteHistory } from '@utils/channel-history.js'
+import {
+  isChannelRouteTargetLoaded,
+  resolveCanonicalPathForRoute,
+  resolveChannelRouteContext,
+  toChannelRouteTargetFromContext
+} from '@utils/channel-route.js'
 
 // Shared loader state so the App-level loader and page-level loaders stay in sync.
 const sharedChannel = ref(null)
-const sharedReadModel = ref(null)
 const sharedLoadStatus = ref('idle')
 const sharedMetaData = ref(getMetaData(null, null))
 const sharedLoadVersion = ref(0)
@@ -61,21 +65,12 @@ export function useChannelLoader({ manageMeta = false } = {}) {
   const route = useRoute()
   const router = useRouter()
   const channel = sharedChannel
-  const readModel = sharedReadModel
   const loadStatus = sharedLoadStatus
   const sortedAllMedia = sharedSortedAllMedia
   const metaData = sharedMetaData
   const loadVersion = sharedLoadVersion
-  const needsChannelData = computed(
-    () =>
-      !!(
-        route.params?.channelPublicId ||
-        route.params?.albumPublicId ||
-        route.params?.mediaPublicId ||
-        route.params?.privateAlbumId ||
-        route.params?.privateMediaId
-      )
-  )
+  const routeContext = computed(() => resolveChannelRouteContext(route))
+  const needsChannelData = computed(() => routeContext.value.type !== 'unknown')
   const loading = computed(
     () => loadStatus.value === 'loading' || (loadStatus.value === 'idle' && needsChannelData.value)
   )
@@ -100,12 +95,6 @@ export function useChannelLoader({ manageMeta = false } = {}) {
     return albumPublicId ? findAlbumByPublicId(albumPublicId) : null
   }
 
-  const setChannelPayload = payload => {
-    channel.value = payload?.data ?? null
-    readModel.value = null
-    return payload
-  }
-
   const runRouteQuery = async options => {
     const entry = queryCache.ensure(options)
     const state = await queryCache.refresh(entry, options)
@@ -115,191 +104,53 @@ export function useChannelLoader({ manageMeta = false } = {}) {
     return state?.data ?? EMPTY_CHANNEL_VIEW_RESPONSE
   }
 
-  const hasLoadedChannelRouteTarget = target => {
-    if (!target || !channel.value) return false
-
-    if (target.type === 'channel') {
-      return channel.value.publicId === target.publicId
-    }
-
-    if (target.type === 'album') {
-      return !!findAlbumByPublicId(target.publicId)
-    }
-
-    if (target.type === 'media') {
-      return !!findMediaByPublicId(target.publicId)
-    }
-
-    if (target.type === 'privateMedia') {
-      const media = channel.value?.album?.media || []
-      return media.some(item => item?.privateId === target.privateMediaId)
-    }
-
-    if (target.type === 'privateAlbum') {
-      return channel.value?.album?.privateId === target.privateAlbumId
-    }
-
-    if (target.type === 'privateAlbumMedia') {
-      if (channel.value?.album?.privateId !== target.privateAlbumId) {
-        return false
-      }
-      const mediaItems = channel.value?.album?.media
-      if (!Array.isArray(mediaItems)) {
-        return false
-      }
-      return mediaItems.some(item => item?.privateId === target.privateMediaId)
-    }
-
-    return false
-  }
-
   // Only one owner should register meta updates to avoid conflicting page titles.
   if (manageMeta) {
     useMeta(() => metaData.value)
   }
 
-  const fetchChannelByRoute = route => {
-    const target = getChannelRouteTarget(route)
+  const fetchChannelByRouteContext = context => {
+    const target = toChannelRouteTargetFromContext(context)
     if (!target) {
       return Promise.resolve(EMPTY_CHANNEL_VIEW_RESPONSE)
     }
 
-    if (hasLoadedChannelRouteTarget(target)) {
+    if (
+      isChannelRouteTargetLoaded({
+        target,
+        channel: channel.value,
+        findAlbumByPublicId,
+        findMediaByPublicId
+      })
+    ) {
       return Promise.resolve({
         data: channel.value
       })
     }
 
-    if (target.type === 'channel') {
-      return runRouteQuery(channelStore.channelQueryOptions(target.publicId))
+    const options = channelStore.routeTargetQueryOptions(target)
+    if (options) {
+      return runRouteQuery(options)
     }
-    if (target.type === 'album') {
-      return runRouteQuery(channelStore.channelByAlbumQueryOptions(target.publicId))
-    }
-    if (target.type === 'media') {
-      return runRouteQuery(channelStore.channelByMediaQueryOptions(target.publicId))
-    }
-    if (target.type === 'privateAlbum') {
-      return runRouteQuery(channelStore.privateAlbumQueryOptions(target.privateAlbumId))
-    }
-    if (target.type === 'privateAlbumMedia') {
-      return runRouteQuery(channelStore.privateAlbumQueryOptions(target.privateAlbumId, target.privateMediaId))
-    }
-    if (target.type === 'privateMedia') {
-      return runRouteQuery(channelStore.privateMediaQueryOptions(target.privateMediaId))
-    }
+
     return Promise.resolve(EMPTY_CHANNEL_VIEW_RESPONSE)
   }
 
-  const syncPrivateHistory = (route, channel) => {
-    // If this is a private-album route (with or without focused media),
-    // the album is the top-level shared resource we track in history.
-    if (!route.params?.privateMediaId || route.params?.privateAlbumId || !channel) return
-    const media =
-      (channel?.album?.media || []).find(item => item?.privateId === route.params.privateMediaId) ||
-      null
-    addPrivateHistory(route.params.privateMediaId, {
-      title: media?.title || channel?.title || '',
-      cover: media?.preview || channel?.cover || null,
-      slug: media?.slug || route.params.mediaSlug || null
+  const syncCanonicalSlugs = ({ route, context }) => {
+    const canonicalPath = resolveCanonicalPathForRoute({
+      route,
+      context,
+      canonicalPath: channel.value?.canonicalPath,
+      channelContext: {
+        channel: channel.value,
+        findAlbumByPublicId,
+        findMediaByPublicId,
+        findAlbumByMediaPublicId
+      }
     })
-  }
-
-  const syncPrivateAlbumHistory = (route, channel) => {
-    if (!route.params?.privateAlbumId || !channel?.album) return
-    const album = channel.album
-    addPrivateAlbumHistory(route.params.privateAlbumId, {
-      title: album?.title || channel?.title || '',
-      cover: album?.poster || channel?.cover || null,
-      slug: album?.slug || route.params.albumSlug || null
-    })
-  }
-
-  const syncChannelHistory = (route, channel) => {
-    if (route.params?.privateMediaId || route.params?.privateAlbumId || !channel) return
-    addHistory(channel)
-  }
-
-  const replacePath = (path, query) => {
-    router.replace({ path, query })
-  }
-
-  const CANONICAL_PREFIX_BY_TYPE = {
-    channel: '/c/',
-    album: '/a/',
-    media: '/m/',
-    privateMedia: '/private/m/'
-  }
-
-  const getPathSegments = path => path.split('/').filter(Boolean)
-
-  const isPrivateAlbumPath = path => {
-    const segments = getPathSegments(path)
-    return segments.length === 4 && segments[0] === 'private' && segments[1] === 'a'
-  }
-
-  const isPrivateAlbumMediaPath = path => {
-    const segments = getPathSegments(path)
-    return (
-      segments.length === 6 &&
-      segments[0] === 'private' &&
-      segments[1] === 'a' &&
-      segments[3] === 'm'
-    )
-  }
-
-  const isCanonicalPathCompatibleWithTarget = (canonicalPath, target) => {
-    if (!canonicalPath || !target?.type) return false
-
-    if (target.type === 'privateAlbum') {
-      return isPrivateAlbumPath(canonicalPath)
-    }
-
-    if (target.type === 'privateAlbumMedia') {
-      return isPrivateAlbumMediaPath(canonicalPath)
-    }
-
-    const prefix = CANONICAL_PREFIX_BY_TYPE[target.type]
-    return !!prefix && canonicalPath.startsWith(prefix)
-  }
-
-  const getCanonicalPathForTarget = (canonicalPath, target) => {
-    if (!canonicalPath || !target?.type) return null
-
-    if (typeof canonicalPath === 'string') {
-      return canonicalPath
-    }
-
-    if (typeof canonicalPath !== 'object') {
-      return null
-    }
-
-    if (target.type === 'privateAlbumMedia') {
-      return canonicalPath.privateAlbumPath || canonicalPath.privatePath || null
-    }
-
-    if (target.type === 'privateAlbum' || target.type === 'privateMedia') {
-      return canonicalPath.privatePath || null
-    }
-
-    return canonicalPath.publicPath || null
-  }
-
-  const syncCanonicalSlugs = route => {
-    const target = getChannelRouteTarget(route)
-    const hintedCanonicalPath = getCanonicalPathForTarget(channel.value?.canonicalPath, target)
-    const fallbackCanonicalPath = getCanonicalChannelRoutePath(route, {
-      channel: channel.value,
-      findAlbumByPublicId,
-      findMediaByPublicId,
-      findAlbumByMediaPublicId
-    })
-    const canonicalPath = isCanonicalPathCompatibleWithTarget(hintedCanonicalPath, target)
-      ? hintedCanonicalPath
-      : fallbackCanonicalPath
 
     if (canonicalPath && canonicalPath !== route.path) {
-      replacePath(canonicalPath, route.query)
+      router.replace({ path: canonicalPath, query: route.query })
     }
   }
 
@@ -311,24 +162,22 @@ export function useChannelLoader({ manageMeta = false } = {}) {
   const loadChannel = async route => {
     const requestVersion = ++loadVersion.value
     const isStale = () => requestVersion !== loadVersion.value
+    const context = resolveChannelRouteContext(route)
 
     loadStatus.value = 'loading'
 
     try {
-      const loaded = await fetchChannelByRoute(route)
+      const loaded = await fetchChannelByRouteContext(context)
 
       if (isStale()) {
         return null
       }
 
       channel.value = loaded.data
-      readModel.value = null
       const loadedChannel = loaded.data
 
-      syncChannelHistory(route, loadedChannel)
-      syncPrivateHistory(route, loadedChannel)
-      syncPrivateAlbumHistory(route, loadedChannel)
-      syncCanonicalSlugs(route)
+      syncChannelRouteHistory({ context, channel: loadedChannel })
+      syncCanonicalSlugs({ route, context })
 
       metaData.value = getMetaData(route, loadedChannel)
       loadStatus.value = 'success'
@@ -338,7 +187,7 @@ export function useChannelLoader({ manageMeta = false } = {}) {
         return null
       }
 
-      setChannelPayload(null)
+      channel.value = null
       loadStatus.value = 'error'
       metaData.value = getMetaData(null, null)
       console.error('Failed to load channel:', error)
@@ -348,10 +197,10 @@ export function useChannelLoader({ manageMeta = false } = {}) {
 
   return {
     channel,
-    readModel,
     sortedAllMedia,
     loadStatus,
     loading,
+    routeContext,
     findAlbumByPublicId,
     findMediaByPublicId,
     findAlbumByMediaPublicId,

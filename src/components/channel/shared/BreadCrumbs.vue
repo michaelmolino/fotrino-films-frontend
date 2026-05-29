@@ -37,9 +37,11 @@ const props = defineProps({
   channel: { type: Object, required: true },
   album: { type: Object, default: null },
   media: { type: Object, default: null },
-  private: { type: Boolean, default: false },
-  privateScope: { type: String, default: 'media' }
+  routeContext: { type: Object, default: null }
 })
+
+const isPrivate = computed(() => Boolean(props.routeContext?.isPrivate))
+const privateScope = computed(() => props.routeContext?.privateScope || 'media')
 
 const isShortLandscape = computed(
   () => $q.platform.is.mobile && $q.screen.landscape && $q.screen.height <= 460
@@ -118,8 +120,8 @@ const buildPublicBreadcrumbs = () => {
 }
 
 const breadcrumbs = computed(() => {
-  if (props.private) {
-    if (props.privateScope === 'album') {
+  if (isPrivate.value) {
+    if (privateScope.value === 'album') {
       return buildPrivateAlbumBreadcrumbs()
     }
 

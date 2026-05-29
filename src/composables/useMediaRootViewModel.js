@@ -1,13 +1,10 @@
 import { computed } from 'vue'
-import { buildMediaPath, buildPrivateAlbumMediaPath } from '@utils/channel-route.js'
+import { buildMediaPathForRouteContext } from '@utils/channel-route.js'
 
-export function useMediaRootViewModel({ loading, channel, album, media, route }) {
-  const privateMode = computed(() => !!route.params.privateMediaId)
-  const privateScope = computed(() => (route.params.privateAlbumId ? 'album' : 'media'))
-
+export function useMediaRootViewModel({ loading, channel, album, media, routeContext }) {
   const contentState = computed(() => {
     if (loading.value) return 'loading'
-    const hasTargetMedia = !!(route.params.privateMediaId || route.params.mediaPublicId)
+    const hasTargetMedia = routeContext.value.hasMediaTarget
     return channel.value && album.value && media.value && hasTargetMedia ? 'ready' : 'not-found'
   })
 
@@ -20,20 +17,17 @@ export function useMediaRootViewModel({ loading, channel, album, media, route })
   })
 
   const showRelatedContent = computed(() => {
-    const isPublicMedia = !!route.params.mediaPublicId
-    const isPrivateAlbumMedia = !!route.params.privateAlbumId && !!route.params.privateMediaId
+    const isPublicMedia = routeContext.value.type === 'media'
+    const isPrivateAlbumMedia = routeContext.value.type === 'privateAlbumMedia'
     return (isPublicMedia || isPrivateAlbumMedia) && relatedMedia.value.length > 0
   })
 
   function getRelatedPath(related) {
-    if (route.params.privateAlbumId) {
-      return buildPrivateAlbumMediaPath({
-        privateAlbumId: route.params.privateAlbumId,
-        privateMediaId: related.privateId,
-        mediaSlug: related.slug
-      })
-    }
-    return buildMediaPath({ publicId: related.publicId, slug: related.slug })
+    return buildMediaPathForRouteContext({
+      context: routeContext.value,
+      album: album.value,
+      media: related
+    })
   }
 
   const relatedCards = computed(() => {
@@ -46,8 +40,6 @@ export function useMediaRootViewModel({ loading, channel, album, media, route })
   })
 
   return {
-    privateMode,
-    privateScope,
     contentState,
     albumPoster,
     albumPosterColor,

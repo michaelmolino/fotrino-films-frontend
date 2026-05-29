@@ -26,23 +26,6 @@ export const useChannelStore = defineStore('channel', () => {
     channels.value = value
   }
 
-  const channelQueryOptions = createApiGetQueryOptionsFactory({
-    key: (channelPublicId, pending = false) => [
-      'channel',
-      channelPublicId,
-      pending ? 'pending' : 'current'
-    ],
-    staleTime: API_CACHE_MEDIUM_MS,
-    url: (channelPublicId, pending = false) =>
-      `/channels/${channelPublicId}${pending ? '?pending=true' : ''}`,
-    config: {
-      __policy: {
-        notFound: 'route404'
-      },
-      __responseGuard: assertChannelViewResponse
-    }
-  })
-
   const channelsQueryOptions = createApiGetQueryOptionsFactory({
     key: ['channels', 'flat'],
     staleTime: API_CACHE_MEDIUM_MS,
@@ -53,55 +36,27 @@ export const useChannelStore = defineStore('channel', () => {
     transform: data => toArray(data?.data)
   })
 
-  const channelByAlbumQueryOptions = createApiGetQueryOptionsFactory({
-    key: albumPublicId => ['channel', 'album', albumPublicId],
-    staleTime: API_CACHE_MEDIUM_MS,
-    url: albumPublicId => `/channels/album/${albumPublicId}`,
-    config: {
-      __policy: {
-        notFound: 'route404'
-      },
-      __responseGuard: assertChannelViewResponse
-    }
-  })
-
-  const channelByMediaQueryOptions = createApiGetQueryOptionsFactory({
-    key: mediaPublicId => ['channel', 'media', mediaPublicId],
-    staleTime: API_CACHE_MEDIUM_MS,
-    url: mediaPublicId => `/channels/media/${mediaPublicId}`,
-    config: {
-      __policy: {
-        notFound: 'route404'
-      },
-      __responseGuard: assertChannelViewResponse
-    }
-  })
-
-  const privateMediaQueryOptions = createApiGetQueryOptionsFactory({
-    key: privateMediaId => ['channel', 'private-media', privateMediaId],
-    staleTime: API_CACHE_MEDIUM_MS,
-    url: privateMediaId => `/channels/media/private/${privateMediaId}`,
-    config: {
-      __policy: {
-        notFound: 'route404'
-      },
-      __responseGuard: assertChannelViewResponse
-    }
-  })
-
-  const privateAlbumQueryOptions = createApiGetQueryOptionsFactory({
-    key: (privateAlbumId, privateMediaId = null) => [
+  const unifiedRouteQueryOptions = createApiGetQueryOptionsFactory({
+    key: (resourceType, resourceId, focusedMediaPrivateId = null, pending = false) => [
       'channel',
-      'private-album',
-      privateAlbumId,
-      privateMediaId || 'root'
+      'resolve',
+      resourceType,
+      resourceId,
+      focusedMediaPrivateId || 'root',
+      pending ? 'pending' : 'current'
     ],
     staleTime: API_CACHE_MEDIUM_MS,
-    url: (privateAlbumId, privateMediaId = null) => {
-      const mediaQuery = privateMediaId
-        ? `?mediaPrivateId=${encodeURIComponent(privateMediaId)}`
-        : ''
-      return `/channels/album/private/${privateAlbumId}${mediaQuery}`
+    url: (resourceType, resourceId, focusedMediaPrivateId = null, pending = false) => {
+      const params = new URLSearchParams()
+      if (resourceType === 'privateAlbumMedia' && focusedMediaPrivateId) {
+        params.set('mediaPrivateId', focusedMediaPrivateId)
+      }
+      if (resourceType === 'channel' && pending) {
+        params.set('pending', 'true')
+      }
+      const query = params.toString()
+      const suffix = query ? `?${query}` : ''
+      return `/channels/resolve/${resourceType}/${resourceId}${suffix}`
     },
     config: {
       __policy: {
@@ -110,6 +65,39 @@ export const useChannelStore = defineStore('channel', () => {
       __responseGuard: assertChannelViewResponse
     }
   })
+
+  const channelQueryOptions = (channelPublicId, pending = false) =>
+    unifiedRouteQueryOptions('channel', channelPublicId, null, pending)
+
+  const routeTargetQueryOptions = target => {
+    if (!target?.type) return null
+
+    if (target.type === 'channel') {
+      return unifiedRouteQueryOptions('channel', target.publicId)
+    }
+
+    if (target.type === 'album') {
+      return unifiedRouteQueryOptions('album', target.publicId)
+    }
+
+    if (target.type === 'media') {
+      return unifiedRouteQueryOptions('media', target.publicId)
+    }
+
+    if (target.type === 'privateAlbum') {
+      return unifiedRouteQueryOptions('privateAlbum', target.privateAlbumId)
+    }
+
+    if (target.type === 'privateAlbumMedia') {
+      return unifiedRouteQueryOptions('privateAlbumMedia', target.privateAlbumId, target.privateMediaId)
+    }
+
+    if (target.type === 'privateMedia') {
+      return unifiedRouteQueryOptions('privateMedia', target.privateMediaId)
+    }
+
+    return null
+  }
 
   const invalidateChannelsCache = () => {
     invalidateQueriesSafely(queryCache, {
@@ -121,14 +109,18 @@ export const useChannelStore = defineStore('channel', () => {
   const invalidateChannelCacheById = channelPublicId => {
     if (!channelPublicId) return
     invalidateQueriesSafely(queryCache, {
-      predicate: query => query.key?.[0] === 'channel' && query.key?.[1] === channelPublicId
+      predicate: query =>
+        query.key?.[0] === 'channel' &&
+        query.key?.[1] === 'resolve' &&
+        query.key?.[2] === 'channel' &&
+        query.key?.[3] === channelPublicId
     })
   }
 
   const invalidateChannelCacheByAlbum = albumPublicId => {
     if (!albumPublicId) return
     invalidateQueriesSafely(queryCache, {
-      key: channelByAlbumQueryOptions(albumPublicId).key,
+      key: unifiedRouteQueryOptions('album', albumPublicId).key,
       exact: true
     })
   }
@@ -136,26 +128,8 @@ export const useChannelStore = defineStore('channel', () => {
   const invalidateChannelCacheByMedia = mediaPublicId => {
     if (!mediaPublicId) return
     invalidateQueriesSafely(queryCache, {
-      key: channelByMediaQueryOptions(mediaPublicId).key,
+      key: unifiedRouteQueryOptions('media', mediaPublicId).key,
       exact: true
-    })
-  }
-
-  const invalidatePrivateMediaCache = privateMediaId => {
-    if (!privateMediaId) return
-    invalidateQueriesSafely(queryCache, {
-      key: privateMediaQueryOptions(privateMediaId).key,
-      exact: true
-    })
-  }
-
-  const invalidatePrivateAlbumCache = privateAlbumId => {
-    if (!privateAlbumId) return
-    invalidateQueriesSafely(queryCache, {
-      predicate: query =>
-        query.key?.[0] === 'channel' &&
-        query.key?.[1] === 'private-album' &&
-        query.key?.[2] === privateAlbumId
     })
   }
 
@@ -205,12 +179,13 @@ export const useChannelStore = defineStore('channel', () => {
   }
 
   const fetchChannel = async ({ channelPublicId, pending = false, cache = true }) => {
+    const options = channelQueryOptions(channelPublicId, pending)
+
     if (!cache) {
-      const { data } = await api.get(`/channels/${channelPublicId}${pending ? '?pending=true' : ''}`)
+      const { data } = await api.get(options.url, options.config)
       return data?.data ?? null
     }
 
-    const options = channelQueryOptions(channelPublicId, pending)
     const entry = queryCache.ensure(options)
     const state = await queryCache.fetch(entry, options)
     if (state?.status === 'error') {
@@ -350,7 +325,12 @@ export const useChannelStore = defineStore('channel', () => {
           reason: reason?.trim() || null
         })
     })
-    invalidatePrivateMediaCache(privateId)
+    if (privateId) {
+      invalidateQueriesSafely(queryCache, {
+        key: unifiedRouteQueryOptions('privateMedia', privateId).key,
+        exact: true
+      })
+    }
     return mutationResult({ ok: true, data: res.data })
   }
 
@@ -374,17 +354,10 @@ export const useChannelStore = defineStore('channel', () => {
     updateAlbum,
     updateChannel,
     reportMedia,
-    channelsQueryOptions,
-    channelByAlbumQueryOptions,
-    channelByMediaQueryOptions,
-    privateMediaQueryOptions,
-    privateAlbumQueryOptions,
+    routeTargetQueryOptions,
     invalidateChannelsCache,
     invalidateChannelCacheById,
     invalidateChannelCacheByAlbum,
-    invalidateChannelCacheByMedia,
-    invalidatePrivateMediaCache,
-    invalidatePrivateAlbumCache,
-    channelQueryOptions
+    invalidateChannelCacheByMedia
   }
 })

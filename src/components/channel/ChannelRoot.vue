@@ -14,7 +14,7 @@
       <div :key="channel?.publicId || route.fullPath">
         <div ref="headerRowRef" class="row items-center q-mb-sm channel-header">
           <div ref="breadcrumbsRef" class="channel-header-breadcrumbs">
-            <BreadCrumbs :channel="channel" :album="null" :media="null" />
+            <BreadCrumbs :channel="channel" :album="null" :media="null" :route-context="routeContext" />
           </div>
           <q-space />
           <div
@@ -57,7 +57,7 @@
           </div>
         </template>
 
-        <ShareActions :channel="channel" />
+        <ShareActions :channel="channel" :route-context="routeContext" />
       </div>
     </div>
 
@@ -68,11 +68,13 @@
 </template>
 
 <script setup>
-import { ref, defineAsyncComponent, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, computed, defineAsyncComponent, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { getViewPreference, setViewPreference } from '@utils/view-preference.js'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
 import { useChannelRootViewModel } from '@composables/useChannelRootViewModel.js'
+import { useChannelRootRouteOrchestrator } from '@composables/useChannelRouteOrchestrator.js'
+import { resolveChannelRouteContext } from '@utils/channel-route.js'
 
 import BreadCrumbs from '@components/channel/shared/BreadCrumbs.vue'
 import ShareActions from '@components/channel/shared/ShareActions.vue'
@@ -91,6 +93,7 @@ const viewToggleRef = ref(null)
 const isViewToggleWrapped = ref(false)
 let headerResizeObserver = null
 const { channel, sortedAllMedia, loading } = useChannelLoader()
+const routeContext = computed(() => resolveChannelRouteContext(route))
 const {
   contentState,
   showAlbumsView,
@@ -102,7 +105,7 @@ const {
 } = useChannelRootViewModel({
   loading,
   channel,
-  route,
+  routeContext,
   selectedView,
   sortedAllMedia
 })
@@ -133,6 +136,14 @@ watch(selectedView, val => {
   setViewPreference(normalized)
 })
 
+useChannelRootRouteOrchestrator({
+  channel,
+  loading,
+  routeContext,
+  route,
+  redirect
+})
+
 onMounted(() => {
   nextTick(updateViewToggleWrapState)
 
@@ -156,17 +167,6 @@ onBeforeUnmount(() => {
   }
   window.removeEventListener('resize', updateViewToggleWrapState)
 })
-
-watch(
-  [channel, loading],
-  ([currentChannel, isLoading]) => {
-    if (isLoading || !currentChannel || !route.params.channelPublicId) return
-    const preferredContentPath = currentChannel?.uiHints?.preferredContentPath
-    if (!preferredContentPath || preferredContentPath === route.path) return
-    redirect(preferredContentPath)
-  },
-  { immediate: true }
-)
 
 watch([loading, channel, selectedView, albumCount, allCount], () => {
   nextTick(updateViewToggleWrapState)
