@@ -1,6 +1,13 @@
 <template>
   <div class="admin-dashboard-page q-pa-md" data-cy="admin-dashboard">
-    <template v-if="contentState === 'admin'">
+    <template v-if="contentState === 'loading'">
+      <q-skeleton type="text" width="260px" class="q-mb-md" animation="pulse" />
+      <q-skeleton type="text" width="180px" class="q-mb-lg" animation="pulse" />
+      <q-skeleton type="rect" class="q-mb-md admin-skeleton-row" animation="pulse" />
+      <q-skeleton type="rect" class="q-mb-md admin-skeleton-row" animation="pulse" />
+      <q-skeleton type="rect" class="admin-skeleton-row" animation="pulse" />
+    </template>
+    <template v-else-if="contentState === 'admin'">
       <div class="text-h6 text-weight-bold" data-cy="admin-all-users-title">Admin: All Users</div>
       <div class="text-caption text-grey-7 q-mb-md">All registered users.</div>
       <AdminUserList class="q-mb-xl" />
@@ -25,6 +32,19 @@ const accountStore = useAccountStore()
 const profile = computed(() => accountStore.profile)
 const isAuthenticated = computed(() => !!profile.value)
 const isAdmin = computed(() => profile.value?.isAdmin === true)
-const contentState = computed(() => (isAdmin.value ? 'admin' : 'auth-required'))
+const isProfileResolved = computed(() => accountStore.profileResolved)
+const contentState = computed(() => {
+  if (!isProfileResolved.value) {
+    return 'loading'
+  }
+  return isAdmin.value ? 'admin' : 'auth-required'
+})
 const authRequiredType = computed(() => (isAuthenticated.value ? 'admin' : 'login'))
 </script>
+
+<style scoped>
+.admin-skeleton-row {
+  min-height: 46px;
+  border-radius: 8px;
+}
+</style>

@@ -1,5 +1,11 @@
 <template>
-  <div v-if="contentState !== 'auth-required'" class="q-pa-md" data-cy="upload-page-composer">
+  <div class="q-pa-md">
+    <template v-if="contentState === 'loading'">
+      <q-skeleton type="text" width="220px" class="q-mb-lg" animation="pulse" />
+      <q-skeleton type="rect" class="q-mb-md upload-composer-skeleton-card" animation="pulse" />
+      <q-skeleton type="rect" class="upload-composer-skeleton-card" animation="pulse" />
+    </template>
+    <div v-else-if="contentState !== 'auth-required'" data-cy="upload-page-composer">
     <q-item class="q-pb-md">
       <q-item-section>
         <q-item-label class="text-h5">Upload Video</q-item-label>
@@ -168,13 +174,15 @@
         @cancel-upload="cancelUpload"
         @start-upload-journey="startUploadJourney" />
     </template>
+    </div>
+    <AuthRequired v-else type="login" message="Please log in to upload videos." />
   </div>
-  <AuthRequired v-else type="login" message="Please log in to upload videos." />
 </template>
 
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useQuasar } from 'quasar'
+import { useAccountStore } from 'src/stores/account-store.js'
 import AuthRequired from '@components/shared/AuthRequired.vue'
 import Summary from '@components/account/UploadMediaComposer/Summary.vue'
 import VideoExpansionItem from '@components/account/UploadMediaComposer/VideoExpansionItem.vue'
@@ -186,6 +194,7 @@ import { daysSince } from '@utils/date.js'
 import { sanitizeHtml, sanitizeText } from '@utils/text.js'
 
 const $q = useQuasar()
+const accountStore = useAccountStore()
 const activeSection = ref(null)
 const mediaUserModified = ref(false)
 const videoWasReady = ref(false)
@@ -339,6 +348,9 @@ const albumSummaryPosterColor = computed(() => {
 })
 
 const contentState = computed(() => {
+  if (!accountStore.profileResolved) {
+    return 'loading'
+  }
   if (!profile.value) {
     return 'auth-required'
   }
@@ -799,6 +811,12 @@ function onMediaFileRejected(rejectedEntries) {
 
 .composer-actions-card {
   grid-area: actions;
+}
+
+.upload-composer-skeleton-card {
+  width: 100%;
+  min-height: 180px;
+  border-radius: 12px;
 }
 
 @media (max-width: 959px) {
