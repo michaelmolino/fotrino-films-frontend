@@ -37,22 +37,38 @@ export const useChannelStore = defineStore('channel', () => {
   })
 
   const unifiedRouteQueryOptions = createApiGetQueryOptionsFactory({
-    key: (resourceType, resourceId, focusedMediaPrivateId = null, pending = false) => [
-      'channel',
-      'resolve',
+    key: (
       resourceType,
       resourceId,
-      focusedMediaPrivateId || 'root',
-      pending ? 'pending' : 'current'
-    ],
+      focusedMediaPrivateId = null,
+      withPending = false,
+      withSoftDeleted = false
+    ) => [
+        'channel',
+        'resolve',
+        resourceType,
+        resourceId,
+        focusedMediaPrivateId || 'root',
+        withPending ? 'pending' : 'current',
+        withSoftDeleted ? 'with-deleted' : 'without-deleted'
+      ],
     staleTime: API_CACHE_MEDIUM_MS,
-    url: (resourceType, resourceId, focusedMediaPrivateId = null, pending = false) => {
+    url: (
+      resourceType,
+      resourceId,
+      focusedMediaPrivateId = null,
+      withPending = false,
+      withSoftDeleted = false
+    ) => {
       const params = new URLSearchParams()
       if (resourceType === 'privateAlbumMedia' && focusedMediaPrivateId) {
         params.set('mediaPrivateId', focusedMediaPrivateId)
       }
-      if (resourceType === 'channel' && pending) {
-        params.set('pending', 'true')
+      if (resourceType === 'channel' && withPending) {
+        params.set('withPending', 'true')
+      }
+      if (resourceType === 'channel' && withSoftDeleted) {
+        params.set('withSoftDeleted', 'true')
       }
       const query = params.toString()
       const suffix = query ? `?${query}` : ''
@@ -66,8 +82,10 @@ export const useChannelStore = defineStore('channel', () => {
     }
   })
 
-  const channelQueryOptions = (channelPublicId, pending = false) =>
-    unifiedRouteQueryOptions('channel', channelPublicId, null, pending)
+  const channelQueryOptions = (
+    channelPublicId,
+    { withPending = false, withSoftDeleted = false } = {}
+  ) => unifiedRouteQueryOptions('channel', channelPublicId, null, withPending, withSoftDeleted)
 
   const routeTargetQueryOptions = target => {
     if (!target?.type) return null
@@ -186,8 +204,13 @@ export const useChannelStore = defineStore('channel', () => {
     }
   }
 
-  const fetchChannel = async ({ channelPublicId, pending = false, cache = true }) => {
-    const options = channelQueryOptions(channelPublicId, pending)
+  const fetchChannel = async ({
+    channelPublicId,
+    withPending = false,
+    withSoftDeleted = false,
+    cache = true
+  }) => {
+    const options = channelQueryOptions(channelPublicId, { withPending, withSoftDeleted })
 
     if (!cache) {
       const { data } = await api.get(options.url, options.config)
@@ -349,9 +372,9 @@ export const useChannelStore = defineStore('channel', () => {
     return mutationResult({ ok: true, data: res.data })
   }
 
-  const useChannelQuery = (channelPublicId, enabled = true) => {
+  const useChannelQuery = (channelPublicId, enabled = true, options = {}) => {
     return useQuery(() => ({
-      ...channelQueryOptions(toValue(channelPublicId)),
+      ...channelQueryOptions(toValue(channelPublicId), options),
       enabled: toValue(enabled)
     }))
   }

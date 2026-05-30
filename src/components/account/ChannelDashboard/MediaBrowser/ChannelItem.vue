@@ -92,7 +92,11 @@ const channelStore = useChannelStore()
 const hasBeenExpanded = ref(false)
 const channelQuery = channelStore.useChannelQuery(
   computed(() => props.channel.publicId),
-  hasBeenExpanded
+  hasBeenExpanded,
+  {
+    withPending: true,
+    withSoftDeleted: true
+  }
 )
 
 const deepChannel = computed(() => channelQuery.data.value?.data ?? null)

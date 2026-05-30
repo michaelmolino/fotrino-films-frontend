@@ -649,19 +649,10 @@ export function useUploadMediaForm() {
 
       let chan = await channelStore.fetchChannel({
         channelPublicId: publicId,
-        pending: true,
+        withPending: true,
         cache: true
       })
-      let albumList = Array.isArray(chan?.albums) ? chan.albums : []
-
-      if (albumList.length === 0) {
-        chan = await channelStore.fetchChannel({
-          channelPublicId: publicId,
-          pending: false,
-          cache: true
-        })
-        albumList = Array.isArray(chan?.albums) ? chan.albums : []
-      }
+      const albumList = Array.isArray(chan?.albums) ? chan.albums : []
 
       if (requestToken !== albumsLoadToken.value) return
       albums.value = excludeDeletedAlbums(albumList)
