@@ -11,6 +11,35 @@ import istanbul from 'vite-plugin-istanbul'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+const configureForwardedHeaders = proxy => {
+  proxy.on('proxyReq', (proxyReq, req) => {
+    proxyReq.setHeader(
+      'X-Forwarded-Host',
+      req.headers.host || req.headers['x-forwarded-host'] || req.headers[':authority'] || ''
+    )
+    proxyReq.setHeader(
+      'X-Forwarded-Proto',
+      req.headers['x-forwarded-proto'] || (req.socket.encrypted ? 'https' : 'http')
+    )
+  })
+}
+
+const apiProxyPrefixes = [
+  '^/account/(auth|login)/[^/]+$',
+  '/account/logout',
+  '/account/mock-login',
+  '/account/profile',
+  '/account/providers',
+  '/account/contracts/read-models',
+  '^/admin/(contracts/read-models|jobs(?:/.*)?|media(?:/.*)?|users(?:/.*)?)$',
+  '/channels',
+  '/contracts',
+  '/health',
+  '/test/workers',
+  '/uploads',
+  '/uppy'
+]
+
 export default defineConfig(() => ({
   supportTS: false,
   boot: ['install-colada', 'install-axios'],
@@ -21,7 +50,7 @@ export default defineConfig(() => ({
     vueRouterMode: 'history',
     publicPath: '/',
     env: {
-      API: process.env.NODE_ENV === 'production' ? 'https://films.fotrino.com/api' : '/api',
+      API: process.env.NODE_ENV === 'production' ? 'https://api.fotrino.com' : '',
       SAMPLE_CHANNEL_ID: process.env.SAMPLE_CHANNEL_ID || '',
       SAMPLE_CHANNEL_SLUG: process.env.SAMPLE_CHANNEL_SLUG || 'Sample-Channel'
     },
@@ -75,25 +104,17 @@ export default defineConfig(() => ({
     host: 'fotrino.example.com',
     port: 8080,
     open: process.env.COVERAGE !== 'true',
-    proxy: {
-      '/api': {
-        target: 'https://fotrino.example.com:65443/',
-        changeOrigin: true,
-        secure: false,
-        configure: proxy => {
-          proxy.on('proxyReq', (proxyReq, req) => {
-            proxyReq.setHeader(
-              'X-Forwarded-Host',
-              req.headers.host || req.headers['x-forwarded-host'] || req.headers[':authority'] || ''
-            )
-            proxyReq.setHeader(
-              'X-Forwarded-Proto',
-              req.headers['x-forwarded-proto'] || (req.socket.encrypted ? 'https' : 'http')
-            )
-          })
+    proxy: Object.fromEntries(
+      apiProxyPrefixes.map(prefix => [
+        prefix,
+        {
+          target: 'https://fotrino.example.com:65443/',
+          changeOrigin: true,
+          secure: false,
+          configure: configureForwardedHeaders
         }
-      }
-    }
+      ])
+    )
   },
 
   framework: {

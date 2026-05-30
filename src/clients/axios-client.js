@@ -28,7 +28,10 @@ const retryDelay = (retryCount, error) => {
   return axiosRetry.exponentialDelay(retryCount, error)
 }
 
-const api = axios.create({ baseURL: process.env.API })
+const api = axios.create({
+  baseURL: process.env.API,
+  withCredentials: true
+})
 
 axiosRetry(api, {
   retries: 6,
