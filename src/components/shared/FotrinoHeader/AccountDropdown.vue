@@ -7,6 +7,7 @@
     flat
     no-caps
     size="md">
+    <q-tooltip v-if="showTooltip">Account</q-tooltip>
     <div v-for="item in menuItems" :key="item.key" class="menu-row row">
       <q-btn
         align="left"
@@ -42,6 +43,7 @@ const props = defineProps({
 })
 
 const buttonLabel = computed(() => ($q.screen.gt.sm ? 'Account' : ''))
+const showTooltip = computed(() => !$q.screen.gt.sm)
 
 const menuItems = computed(() => {
   const items = []

@@ -5,13 +5,10 @@
     :class="{ 'app-footer--compact': isShortLandscape }"
     data-cy="app-footer">
     <div class="row no-wrap">
-      <q-btn
-        flat
-        icon="info"
-        :label="copyrightLabel"
-        :ripple="false"
-        class="no-pointer-events"
-        aria-label="Copyright information" />
+      <div class="footer-static-info" aria-label="Copyright information">
+        <q-icon name="info" size="18px" class="q-mr-xs" aria-hidden="true" />
+        <span>{{ copyrightLabel }}</span>
+      </div>
       <q-space />
       <q-btn
         flat
@@ -69,8 +66,16 @@ const showGithubText = computed(() => $q.screen.gt.xs && !isShortLandscape.value
 }
 
 .app-footer--compact :deep(.q-btn) {
-  min-height: 30px;
+  min-height: 40px;
   padding: 2px 6px;
+}
+
+.footer-static-info {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
 }
 
 :deep(.github-icon--white) {

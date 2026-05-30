@@ -2,13 +2,13 @@
   <q-page class="q-pa-md flex flex-center" data-cy="home-page">
     <section class="text-right q-pa-lg rounded-borders" data-cy="home-hero">
       <div>
-        <transition appear enter-active-class="animated zoomInDown slower">
+        <transition appear :enter-active-class="primaryTitleTransitionClass">
           <h1 class="text-h4 q-my-none" data-cy="home-title-primary">
             <span :class="textToneClass">{{ content.titlePrimaryLeft }}</span>
             <span class="text-accent">{{ content.titlePrimaryRight }}</span>
           </h1>
         </transition>
-        <transition appear enter-active-class="animated zoomInDown slower delay-1s">
+        <transition appear :enter-active-class="secondaryTitleTransitionClass">
           <h2 class="text-h4 q-my-none" data-cy="home-title-secondary">
             <span :class="textToneClass">{{ content.titleSecondaryLeft }} </span>
             <span class="text-accent">Transparent </span>
@@ -40,12 +40,27 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useQuasar } from 'quasar'
 import { buildChannelPath } from '@utils/channel-route.js'
 
 defineOptions({ name: 'Home-Page' })
 const $q = useQuasar()
+const prefersReducedMotion = ref(false)
+
+onMounted(() => {
+  const browserWindow = globalThis.window
+  if (typeof browserWindow?.matchMedia === 'function') {
+    prefersReducedMotion.value = browserWindow.matchMedia('(prefers-reduced-motion: reduce)').matches
+  }
+})
+
+const primaryTitleTransitionClass = computed(() =>
+  prefersReducedMotion.value ? '' : 'animated zoomInDown slower'
+)
+const secondaryTitleTransitionClass = computed(() =>
+  prefersReducedMotion.value ? '' : 'animated zoomInDown slower delay-1s'
+)
 const sampleChannelPath = buildChannelPath({
   publicId: process.env.SAMPLE_CHANNEL_ID,
   slug: process.env.SAMPLE_CHANNEL_SLUG

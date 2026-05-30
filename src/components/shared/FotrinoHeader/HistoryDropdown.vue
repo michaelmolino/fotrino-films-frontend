@@ -8,6 +8,7 @@
     no-caps
     size="md"
     content-class="my-history-dropdown-menu">
+    <q-tooltip v-if="showTooltip">History</q-tooltip>
     <div v-for="entry in historyEntries" :key="entry.key" class="row">
       <q-btn
         :icon="entry.icon"
@@ -45,6 +46,7 @@ const $q = useQuasar()
 
 const hasHistory = computed(() => (historyChannels?.value || []).length > 0)
 const dropdownLabel = computed(() => ($q.screen.gt.sm ? 'History' : ''))
+const showTooltip = computed(() => !$q.screen.gt.sm)
 
 const historyEntries = computed(() => {
   return (historyChannels?.value || []).map(channel => ({

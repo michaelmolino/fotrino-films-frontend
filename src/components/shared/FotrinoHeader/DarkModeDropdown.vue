@@ -6,6 +6,7 @@
     size="md"
     flat
     no-caps>
+    <q-tooltip v-if="showTooltip">Theme</q-tooltip>
     <div v-for="option in themeOptions" :key="option.mode" class="theme-row row">
       <q-btn
         flat
@@ -30,6 +31,7 @@ const $q = useQuasar()
 const { darkModePref } = useDarkMode($q)
 const darkModeIcon = computed(() => darkModeIcons[darkModePref.value])
 const buttonLabel = computed(() => ($q.screen.gt.sm ? 'Theme' : ''))
+const showTooltip = computed(() => !$q.screen.gt.sm)
 const themeOptions = computed(() => [
   {
     mode: 'light',

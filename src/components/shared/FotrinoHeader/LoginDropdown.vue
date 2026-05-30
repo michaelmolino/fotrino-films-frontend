@@ -6,6 +6,7 @@
     flat
     no-caps
     size="md">
+    <q-tooltip v-if="showTooltip">Sign In</q-tooltip>
     <div v-if="accountStore.providersLoadFailed" class="text-caption text-warning q-px-md q-py-sm">
       Login providers are temporarily unavailable. Please refresh and try again in a moment.
     </div>
@@ -45,6 +46,7 @@ const route = useRoute()
 accountStore.useProvidersQuery()
 
 const buttonLabel = computed(() => ($q.screen.gt.sm ? 'Sign Up/Login' : ''))
+const showTooltip = computed(() => !$q.screen.gt.sm)
 const oauthIconClass = computed(() => ($q.dark.isActive ? 'oauth-icon--white q-mr-md' : 'q-mr-md'))
 
 const providerMap = {

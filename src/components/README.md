@@ -23,7 +23,7 @@ The main goal is to make component intent obvious:
 1. Move display derivations to view-model composables
 
 - Put computed card/list shapes in composables like `useChannelRootViewModel`, `useAlbumRootViewModel`, `useMediaRootViewModel`.
-- Keep route/store derivation logic in one place.
+- Keep route entity resolution and route guard orchestration in dedicated route composables.
 
 1. Use stable view model objects for repeated UI blocks
 
@@ -37,7 +37,7 @@ The main goal is to make component intent obvious:
 
 1. Separate routing guards from rendering logic
 
-- Keep redirect and not-found guard logic in watchers/functions in script.
+- Keep redirect and not-found guard logic in `use*RouteOrchestrator` (or named script helpers for simple cases).
 - Keep template focused on rendering by state.
 
 ## Standard Structure
@@ -45,11 +45,23 @@ The main goal is to make component intent obvious:
 For root-level components, follow this layout:
 
 1. Imports
-2. Route/store/composable setup
-3. Derived view model (`contentState`, `displayState`, `*Cards`, counts)
-4. Named behavior helpers (`redirect`, `findByParams`, etc.)
-5. Watchers/guards
-6. Thin template using state and cards
+2. Route/store/composable setup (loader + `routeContext`)
+3. Route entity derivation (`use*RouteEntities`)
+4. Derived view model (`contentState`, `displayState`, `*Cards`, counts)
+5. Named behavior helpers (`redirect`, etc.)
+6. Route guard orchestration (`use*RouteOrchestrator`) + local UI-only watchers
+7. Thin template using state and cards
+
+## Route Composition Split
+
+For route-driven roots, keep responsibilities explicit:
+
+- `useChannelLoader`: load channel-level data and finder helpers.
+- `use*RouteEntities`: resolve route targets (album/media) from `routeContext` and loaded data.
+- `use*RootViewModel`: compute render-ready state and card arrays.
+- `use*RouteOrchestrator`: enforce redirects/not-found behavior and navigation flow.
+
+This split keeps rendering concerns independent from navigation policy.
 
 ## Recommended Naming
 
@@ -77,18 +89,27 @@ Avoid:
 ```js
 // useExampleRootViewModel.js
 import { computed } from 'vue'
+import { buildMediaPathForRouteContext } from '@utils/channel-route.js'
 
-export function useExampleRootViewModel({ loading, entity, route, items }) {
+export function useExampleRootViewModel({ loading, entity, routeContext, items }) {
   const contentState = computed(() => {
     if (loading.value) return 'loading'
-    return entity.value?.publicId === route.params.id ? 'ready' : 'not-found'
+    return entity.value && routeContext.value.hasTarget ? 'ready' : 'not-found'
+  })
+
+  function getItemPath(item) {
+    return buildMediaPathForRouteContext({
+      context: routeContext.value,
+      album: entity.value,
+      media: item
+    })
   })
 
   const itemCards = computed(() => {
     return items.value.map((item, index) => ({
       id: item.id,
       item,
-      to: `/m/${item.publicId}/${item.slug}`,
+      to: getItemPath(item),
       priority: index === 0 ? 'high' : 'auto'
     }))
   })
@@ -128,12 +149,14 @@ When refactoring an existing component:
 
 1. Identify all UI states currently expressed with scattered conditions.
 2. Introduce `contentState` (and `displayState` if needed).
-3. Move list/item derivations into computed card arrays.
-4. Replace inline route/path assembly with helper functions in script/composable.
-5. Replace inline template behavior with named handlers.
-6. Keep or add stable `data-cy` selectors.
-7. Verify imports for all composition API utilities used (`computed`, `ref`, etc.).
-8. Re-run related Cypress specs after refactor.
+3. Extract route context + route entity selection into `use*RouteEntities` where applicable.
+4. Move list/item derivations into computed card arrays.
+5. Replace inline route/path assembly with helper functions in script/composable.
+6. Move redirect/not-found policy into `use*RouteOrchestrator` where applicable.
+7. Replace inline template behavior with named handlers.
+8. Keep or add stable `data-cy` selectors.
+9. Verify imports for all composition API utilities used (`computed`, `ref`, etc.).
+10. Re-run related Cypress specs after refactor.
 
 ## Notes For This Repository
 
@@ -142,5 +165,7 @@ These patterns are already used in channel roots and related composables:
 - `ChannelRoot` + `useChannelRootViewModel`
 - `AlbumRoot` + `useAlbumRootViewModel`
 - `MediaRoot` + `useMediaRootViewModel`
+- `useAlbumRouteEntities` and `useMediaRouteEntities`
+- `useChannelRootRouteOrchestrator`, `useAlbumRootRouteOrchestrator`, `useMediaRootRouteOrchestrator`
 
 Use those files as canonical examples when adding or refactoring components in this folder.

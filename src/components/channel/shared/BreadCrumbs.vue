@@ -1,37 +1,26 @@
 <template>
-  <nav class="breadcrumb-nav" :class="{ 'breadcrumb-nav--compact': isShortLandscape }" data-cy="breadcrumbs">
-    <div class="row items-start q-pa-md" :class="rowGutterClass">
-      <q-avatar class="self-start" :size="avatarSize">
-        <img
-          :src="channel.cover"
-          :alt="channel.title || media?.title || 'Video cover'"
-          loading="lazy"
-          decoding="async" />
-      </q-avatar>
-      <div class="col">
-        <q-breadcrumbs class="breadcrumbs-list" active-color="primary" data-cy="breadcrumbs-list">
-          <template #separator>
-            <q-icon size="1.5em" name="chevron_right" color="primary" />
-          </template>
-          <q-breadcrumbs-el
-            v-for="location in breadcrumbs"
-            :class="crumbTextClass"
-            :key="location.id"
-            :label="location.label"
-            :to="location.to" />
-        </q-breadcrumbs>
-        <div class="text-caption">By {{ channel.ownerName }}</div>
-      </div>
+  <nav class="breadcrumb-nav" data-cy="breadcrumbs">
+    <div class="q-pa-md">
+      <q-breadcrumbs class="breadcrumbs-list" active-color="primary" data-cy="breadcrumbs-list">
+        <template #separator>
+          <q-icon size="1.5em" name="chevron_right" color="primary" />
+        </template>
+        <q-breadcrumbs-el
+          v-for="location in breadcrumbs"
+          class="text-subtitle1"
+          :key="location.id"
+          :icon="location.icon"
+          :label="location.label"
+          :to="location.to" />
+      </q-breadcrumbs>
+      <div class="text-caption">By {{ channel.ownerName }}</div>
     </div>
   </nav>
 </template>
 
 <script setup>
 import { computed } from 'vue'
-import { useQuasar } from 'quasar'
 import { buildAlbumPath, buildChannelPath, buildPrivateAlbumPath } from '@utils/channel-route.js'
-
-const $q = useQuasar()
 
 const props = defineProps({
   channel: { type: Object, required: true },
@@ -42,22 +31,6 @@ const props = defineProps({
 
 const isPrivate = computed(() => Boolean(props.routeContext?.isPrivate))
 const privateScope = computed(() => props.routeContext?.privateScope || 'media')
-
-const isShortLandscape = computed(
-  () => $q.platform.is.mobile && $q.screen.landscape && $q.screen.height <= 460
-)
-const rowGutterClass = computed(() => {
-  if (isShortLandscape.value) return 'q-gutter-xs'
-  return $q.screen.lt.sm ? 'q-gutter-sm' : 'q-gutter-md'
-})
-const avatarSize = computed(() => {
-  if (isShortLandscape.value) return '28px'
-  return $q.screen.lt.sm ? '32px' : '40px'
-})
-const crumbTextClass = computed(() => {
-  if (isShortLandscape.value) return 'text-subtitle2'
-  return $q.screen.gt.xs ? 'text-h5' : 'text-subtitle1'
-})
 
 function withLastCrumbCurrent(items) {
   if (items.length > 0) {
@@ -93,6 +66,7 @@ const buildPublicBreadcrumbs = () => {
   if (!props.channel) return arr
   arr.push({
     id: 0,
+    icon: `img:${props.channel.cover}`,
     label: props.channel.title,
     to:
       props.album?.publicId || props.media?.publicId
@@ -139,39 +113,19 @@ const breadcrumbs = computed(() => {
 </script>
 
 <style scoped>
-.breadcrumb-nav .row {
-  flex-wrap: nowrap;
-}
-
-.col {
-  min-width: 0;
-}
-
 .breadcrumbs-list {
   overflow-x: auto;
   overflow-y: hidden;
   white-space: nowrap;
-  scrollbar-width: none;
+  padding-bottom: 2px;
 }
 
 .breadcrumbs-list::-webkit-scrollbar {
-  display: none;
+  height: 6px;
 }
 
-.breadcrumbs-list :deep(.q-breadcrumbs__el),
-.breadcrumbs-list :deep(.q-breadcrumbs__el .ellipsis) {
-  white-space: nowrap;
-}
-
-.breadcrumb-nav--compact :deep(.q-breadcrumbs__el) {
-  line-height: 1.15;
-}
-
-.breadcrumb-nav--compact :deep(.q-breadcrumbs__el .ellipsis) {
-  font-size: 1rem;
-}
-
-.breadcrumb-nav--compact :deep(.text-caption) {
-  line-height: 1.15;
+.breadcrumbs-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 999px;
 }
 </style>
