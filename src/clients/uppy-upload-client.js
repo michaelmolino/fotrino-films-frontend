@@ -32,7 +32,7 @@ export function createPresignedUppyClient({
   id = 'presigned-uploader',
   instructions = [],
   maxFileSize = null,
-  uploadEndpoint = '/api/upload',
+  uploadEndpoint = '/api/uppy',
   headers = {},
   onTotalProgress,
   onProgress,

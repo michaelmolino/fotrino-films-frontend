@@ -39,7 +39,7 @@ export function useUppyPresignedUpload() {
     const createdClient = createPresignedUppyClient({
       id: 'presigned-uploader',
       instructions,
-      uploadEndpoint: '/api/upload',
+      uploadEndpoint: '/api/uppy',
       headers: accountStore?.profile?.csrfToken
         ? { 'X-CSRFToken': accountStore.profile.csrfToken }
         : {},
