@@ -9,7 +9,7 @@ import {
   toArray
 } from 'src/stores/utils/query-helpers.js'
 import { api } from 'src/clients/axios-client.js'
-import { assertDataEnvelopeArrayResponse } from 'src/utils/response-guards.js'
+import { assertDataEnvelopeArrayResponse, assertDataEnvelopeResponse } from 'src/utils/response-guards.js'
 
 export const useAdminStore = defineStore('admin', () => {
   const users = ref([])
@@ -170,7 +170,46 @@ export const useAdminStore = defineStore('admin', () => {
       invalidateQueriesSafely(queryCache, { key: ['admin', 'jobs'] })
       return mutationResult({ ok: true, data: 'replayed' })
     }
+    if (job.status === 'doing') {
+      await runMutation({
+        request: () => api.post(`/admin/jobs/doing/${job.id}/requeue`)
+      })
+      invalidateQueriesSafely(queryCache, { key: ['admin', 'jobs'] })
+      return mutationResult({ ok: true, data: 'requeued' })
+    }
     throw new Error(`No admin action available for status: ${job.status}`)
+  }
+
+  const cleanupPendingUploads = async ({
+    dryRun = true,
+    olderThanHours = 24,
+    limit = 200
+  } = {}) => {
+    const parsedOlderThanHours = Number.parseInt(String(olderThanHours), 10)
+    const parsedLimit = Number.parseInt(String(limit), 10)
+    if (!Number.isInteger(parsedOlderThanHours) || parsedOlderThanHours < 1) {
+      throw new Error('Older Than Hours must be an integer greater than 0.')
+    }
+    if (!Number.isInteger(parsedLimit) || parsedLimit < 1) {
+      throw new Error('Limit must be an integer greater than 0.')
+    }
+
+    const response = await runMutation({
+      request: () =>
+        api.post('/admin/maintenance/pending-uploads/cleanup', null, {
+          params: {
+            dryRun: dryRun ? 'true' : 'false',
+            olderThanHours: parsedOlderThanHours,
+            limit: parsedLimit
+          },
+          __policy: {
+            notify: 'local'
+          },
+          __responseGuard: data => assertDataEnvelopeResponse(data, 'Pending upload cleanup')
+        })
+    })
+
+    return mutationResult({ ok: true, data: response?.data?.data || null })
   }
 
   const deleteUser = async userEmail => {
@@ -244,6 +283,7 @@ export const useAdminStore = defineStore('admin', () => {
     jobsQueryOptions,
     reportedMediaQueryOptions,
     runJobAction,
+    cleanupPendingUploads,
     deleteUser,
     approveUser,
     deleteMedia

@@ -5,6 +5,7 @@
       <div class="text-caption text-grey-7 q-mb-md">All registered users.</div>
       <AdminUserList class="q-mb-xl" />
       <AdminJobs class="q-mb-xl" />
+      <AdminMaintenance class="q-mb-xl" />
       <AdminReportedMedia />
     </template>
     <AuthRequired v-else :type="authRequiredType" />
@@ -16,6 +17,7 @@ import { computed } from 'vue'
 import { useAccountStore } from 'src/stores/account-store.js'
 import AdminUserList from './AdminDashboard/AdminUserList.vue'
 import AdminJobs from './AdminDashboard/AdminJobs.vue'
+import AdminMaintenance from './AdminDashboard/AdminMaintenance.vue'
 import AdminReportedMedia from './AdminDashboard/AdminReportedMedia.vue'
 import AuthRequired from '@components/shared/AuthRequired.vue'
 

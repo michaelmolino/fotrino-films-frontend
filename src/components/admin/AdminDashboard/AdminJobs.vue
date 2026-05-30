@@ -69,6 +69,16 @@
             @click="runAction(props.row)">
             <q-tooltip>Requeue</q-tooltip>
           </q-btn>
+          <q-btn
+            v-else-if="props.row.status === 'doing'"
+            dense
+            size="sm"
+            flat
+            color="warning"
+            icon="restart_alt"
+            @click="runAction(props.row)">
+            <q-tooltip>Requeue Running Job</q-tooltip>
+          </q-btn>
           <span v-else class="text-grey-6">-</span>
         </q-td>
       </template>
@@ -191,14 +201,23 @@ function pretty(obj) {
   }
 }
 
+function getActionSuccessMessage(action) {
+  if (action === 'started') {
+    return 'Pending job set to run now.'
+  }
+  if (action === 'replayed') {
+    return 'Failed job replay requested.'
+  }
+  return 'Running job requeue requested.'
+}
+
 async function runAction(job) {
   try {
     const result = await adminStore.runJobAction(job)
     const action = result?.data
     Notify.create({
       type: 'positive',
-      message:
-        action === 'started' ? 'Pending job set to run now.' : 'Failed job replay requested.',
+      message: getActionSuccessMessage(action),
       icon: 'check',
       timeout: 2000
     })
