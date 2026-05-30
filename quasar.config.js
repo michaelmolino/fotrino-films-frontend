@@ -53,7 +53,7 @@ export default defineConfig(() => ({
       API:
         process.env.NODE_ENV === 'production'
           ? 'https://api.fotrino.com'
-          : 'https://fotrino.example.com:65443',
+          : 'https://fotrino.example.com:8080',
       SAMPLE_CHANNEL_ID: process.env.SAMPLE_CHANNEL_ID || '',
       SAMPLE_CHANNEL_SLUG: process.env.SAMPLE_CHANNEL_SLUG || 'Sample-Channel'
     },
