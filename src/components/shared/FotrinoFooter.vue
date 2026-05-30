@@ -49,7 +49,9 @@ const isShortLandscape = computed(
   () => $q.platform.is.mobile && $q.screen.landscape && $q.screen.height <= 460
 )
 const copyrightLabel = computed(() => ($q.screen.gt.sm ? `${year} Michael Molino` : String(year)))
-const termsLabel = computed(() => ($q.screen.gt.xs && !isShortLandscape.value ? 'Terms/Privacy' : ''))
+const termsLabel = computed(() =>
+  $q.screen.gt.xs && !isShortLandscape.value ? 'Terms/Privacy' : ''
+)
 const helpLabel = computed(() => ($q.screen.gt.xs && !isShortLandscape.value ? 'Help' : ''))
 const showGithubText = computed(() => $q.screen.gt.xs && !isShortLandscape.value)
 </script>

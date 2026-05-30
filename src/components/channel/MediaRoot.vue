@@ -7,11 +7,7 @@
     </div>
 
     <div v-else-if="contentState === 'ready'">
-      <BreadCrumbs
-        :channel="channel"
-        :album="album"
-        :media="media"
-        :route-context="routeContext" />
+      <BreadCrumbs :channel="channel" :album="album" :media="media" :route-context="routeContext" />
 
       <PlyrPlayer :media="media" :artist="channel?.ownerName" class="q-py-md plyrplayer" />
       <div class="plyrplayer" data-cy="media-description-container">
@@ -91,19 +87,14 @@ const { album, media } = useMediaRouteEntities({
   findAlbumByMediaPublicId,
   findMediaByPublicId
 })
-const {
-  contentState,
-  albumPoster,
-  albumPosterColor,
-  showRelatedContent,
-  relatedCards
-} = useMediaRootViewModel({
-  loading,
-  channel,
-  album,
-  media,
-  routeContext
-})
+const { contentState, albumPoster, albumPosterColor, showRelatedContent, relatedCards } =
+  useMediaRootViewModel({
+    loading,
+    channel,
+    album,
+    media,
+    routeContext
+  })
 
 useMediaRootRouteOrchestrator({
   channel,

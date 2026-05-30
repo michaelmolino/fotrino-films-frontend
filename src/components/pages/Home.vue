@@ -51,7 +51,9 @@ const prefersReducedMotion = ref(false)
 onMounted(() => {
   const browserWindow = globalThis.window
   if (typeof browserWindow?.matchMedia === 'function') {
-    prefersReducedMotion.value = browserWindow.matchMedia('(prefers-reduced-motion: reduce)').matches
+    prefersReducedMotion.value = browserWindow.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches
   }
 })
 

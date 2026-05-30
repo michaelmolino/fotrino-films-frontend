@@ -30,7 +30,7 @@ async function setupHlsJsPlayback({ videoEl, sourceUrl, exposeHlsGlobally }) {
 
   if (!Hls.isSupported()) {
     console.error('HLS is not supported in this browser.')
-    return { hlsInstance: null, cleanup: () => { } }
+    return { hlsInstance: null, cleanup: () => {} }
   }
 
   const hlsInstance = new Hls({
@@ -100,13 +100,13 @@ function setupNativeHlsPlayback({ videoEl, sourceUrl }) {
 
   return {
     hlsInstance: null,
-    cleanup: () => { }
+    cleanup: () => {}
   }
 }
 
 export async function setupVideoPlayback({ videoEl, sourceUrl, exposeHlsGlobally = false }) {
   if (!videoEl || !sourceUrl) {
-    return { hlsInstance: null, cleanup: () => { } }
+    return { hlsInstance: null, cleanup: () => {} }
   }
 
   if (supportsNativeHls(videoEl)) {

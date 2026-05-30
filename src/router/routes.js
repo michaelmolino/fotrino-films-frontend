@@ -6,8 +6,7 @@ const withMainLayout = (path, children) => ({
   children
 })
 
-const withMainLayoutRoot = (path, component) =>
-  withMainLayout(path, [{ path: '', component }])
+const withMainLayoutRoot = (path, component) => withMainLayout(path, [{ path: '', component }])
 
 const routes = [
   withMainLayout('', [

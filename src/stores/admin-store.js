@@ -35,9 +35,9 @@ export const useAdminStore = defineStore('admin', () => {
   const jobsQueryOptions = (statuses = []) => {
     const normalizedStatuses = Array.isArray(statuses)
       ? [...statuses]
-        .filter(Boolean)
-        .map(String)
-        .sort((a, b) => a.localeCompare(b))
+          .filter(Boolean)
+          .map(String)
+          .sort((a, b) => a.localeCompare(b))
       : []
 
     return createApiGetQueryOptionsFactory({

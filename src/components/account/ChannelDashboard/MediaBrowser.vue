@@ -102,8 +102,7 @@ function resolveResourcePath(resource) {
 function getMediaLink(type, resourceOrId) {
   if (!type || resourceOrId == null) return null
 
-  const resource =
-    typeof resourceOrId === 'object' && resourceOrId !== null ? resourceOrId : null
+  const resource = typeof resourceOrId === 'object' && resourceOrId !== null ? resourceOrId : null
   const resourcePath = resolveResourcePath(resource)
   if (resourcePath) return resourcePath
 
@@ -151,7 +150,11 @@ async function undeleteAlbum({ privateId, publicId }) {
 
 async function undeleteChannel(channelPublicId) {
   try {
-    await channelStore.undeleteResource({ type: 'channel', channelPublicId, publicId: channelPublicId })
+    await channelStore.undeleteResource({
+      type: 'channel',
+      channelPublicId,
+      publicId: channelPublicId
+    })
     notifySuccess('Channel restored.')
   } catch (error) {
     notifyError(getComponentApiErrorMessage(error, 'Unable to undelete this channel.'), {

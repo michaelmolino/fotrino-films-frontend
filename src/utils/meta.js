@@ -113,13 +113,13 @@ export function getMetaData(route, channel) {
   const link =
     type === 'video' && image
       ? {
-        preloadPoster: {
-          rel: 'preload',
-          as: 'image',
-          href: image,
-          fetchpriority: 'high'
+          preloadPoster: {
+            rel: 'preload',
+            as: 'image',
+            href: image,
+            fetchpriority: 'high'
+          }
         }
-      }
       : {}
 
   // Compose meta tags

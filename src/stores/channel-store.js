@@ -89,7 +89,11 @@ export const useChannelStore = defineStore('channel', () => {
     }
 
     if (target.type === 'privateAlbumMedia') {
-      return unifiedRouteQueryOptions('privateAlbumMedia', target.privateAlbumId, target.privateMediaId)
+      return unifiedRouteQueryOptions(
+        'privateAlbumMedia',
+        target.privateAlbumId,
+        target.privateMediaId
+      )
     }
 
     if (target.type === 'privateMedia') {
@@ -165,12 +169,16 @@ export const useChannelStore = defineStore('channel', () => {
       return { items: [], deletedItems: [] }
     }
 
-    const { data } = await api.post('/channels/history', { items }, {
-      __policy: {
-        loading: 'none'
-      },
-      __responseGuard: assertHistoryResolveResponse
-    })
+    const { data } = await api.post(
+      '/channels/history',
+      { items },
+      {
+        __policy: {
+          loading: 'none'
+        },
+        __responseGuard: assertHistoryResolveResponse
+      }
+    )
 
     return {
       items: Array.isArray(data?.data?.items) ? data.data.items : [],
@@ -269,7 +277,14 @@ export const useChannelStore = defineStore('channel', () => {
     return mutationResult({ ok: true })
   }
 
-  const updateMedia = async ({ mediaPrivateId, mediaPublicId = null, title, description = null, resourceDate = null, main }) => {
+  const updateMedia = async ({
+    mediaPrivateId,
+    mediaPublicId = null,
+    title,
+    description = null,
+    resourceDate = null,
+    main
+  }) => {
     const res = await runMutation({
       request: () =>
         api.put(`/channels/media/${mediaPrivateId}`, {

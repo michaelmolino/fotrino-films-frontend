@@ -112,9 +112,7 @@ export async function resolveHistoryFromBackend(channelStore, { force = false } 
     try {
       const response = await channelStore.resolveHistoryChannels(entries)
       const items = Array.isArray(response?.items) ? response.items : []
-      const deletedItems = Array.isArray(response?.deletedItems)
-        ? response.deletedItems
-        : []
+      const deletedItems = Array.isArray(response?.deletedItems) ? response.deletedItems : []
 
       if (deletedItems.length > 0) {
         const deletedSet = new Set(
@@ -122,7 +120,9 @@ export async function resolveHistoryFromBackend(channelStore, { force = false } 
             .filter(item => item?.type && item?.resourceId)
             .map(item => buildHistoryKey(item.type, item.resourceId))
         )
-        const remaining = entries.filter(e => !deletedSet.has(buildHistoryKey(e.type, e.resourceId)))
+        const remaining = entries.filter(
+          e => !deletedSet.has(buildHistoryKey(e.type, e.resourceId))
+        )
         if (remaining.length !== entries.length) {
           persistHistory(remaining)
         }

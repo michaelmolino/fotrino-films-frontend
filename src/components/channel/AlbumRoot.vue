@@ -7,11 +7,7 @@
     </div>
 
     <div v-else-if="contentState === 'ready'">
-      <BreadCrumbs
-        :channel="channel"
-        :album="album"
-        :media="null"
-        :route-context="routeContext" />
+      <BreadCrumbs :channel="channel" :album="album" :media="null" :route-context="routeContext" />
 
       <template v-if="displayState === 'empty'">
         <NothingText text="No content available." />
@@ -79,10 +75,7 @@
         </template>
       </template>
 
-      <ShareActions
-        :channel="channel"
-        :album="album"
-        :route-context="routeContext" />
+      <ShareActions :channel="channel" :album="album" :route-context="routeContext" />
     </div>
 
     <template v-else>

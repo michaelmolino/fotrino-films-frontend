@@ -136,8 +136,8 @@ const mediaPrivateAlbumPath = computed(() =>
 const isPrivateAlbumContext = computed(() => {
   return Boolean(
     props.routeContext?.type === 'privateAlbum' ||
-      props.routeContext?.type === 'privateAlbumMedia' ||
-      (!albumPublicPath.value && albumPrivatePath.value)
+    props.routeContext?.type === 'privateAlbumMedia' ||
+    (!albumPublicPath.value && albumPrivatePath.value)
   )
 })
 

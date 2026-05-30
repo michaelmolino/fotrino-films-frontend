@@ -45,10 +45,9 @@ const buildPrivateAlbumBreadcrumbs = () => {
     arr.push({
       id: 'private-album',
       label: props.album?.title || 'Private Album',
-      to:
-        props.media?.privateId
-          ? buildPrivateAlbumPath({ privateId: props.album.privateId, slug: props.album.slug })
-          : null
+      to: props.media?.privateId
+        ? buildPrivateAlbumPath({ privateId: props.album.privateId, slug: props.album.slug })
+        : null
     })
   }
   if (props.media?.privateId && props.album?.privateId) {
@@ -77,10 +76,9 @@ const buildPublicBreadcrumbs = () => {
     arr.push({
       id: 1,
       label: props.album.title,
-      to:
-        props.media?.publicId
-          ? buildAlbumPath({ publicId: props.album.publicId, slug: props.album.slug })
-          : null
+      to: props.media?.publicId
+        ? buildAlbumPath({ publicId: props.album.publicId, slug: props.album.slug })
+        : null
     })
   }
   if (props.album?.publicId && props.media?.publicId) {

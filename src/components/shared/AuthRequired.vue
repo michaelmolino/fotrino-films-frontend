@@ -107,7 +107,9 @@ const isDark = computed(() => $q.dark.isActive)
 const providerButtonColor = computed(() => (isDark.value ? 'secondary' : 'primary'))
 const providerButtonTextColor = computed(() => (isDark.value ? 'white' : 'primary'))
 const authProviderIconClass = computed(() =>
-  isDark.value ? 'q-mr-sm auth-provider-icon auth-provider-icon--dark' : 'q-mr-sm auth-provider-icon'
+  isDark.value
+    ? 'q-mr-sm auth-provider-icon auth-provider-icon--dark'
+    : 'q-mr-sm auth-provider-icon'
 )
 
 const providerMap = {

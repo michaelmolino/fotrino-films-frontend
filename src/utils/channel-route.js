@@ -243,10 +243,7 @@ const isPrivateAlbumPath = path => {
 const isPrivateAlbumMediaPath = path => {
   const segments = getPathSegments(path)
   return (
-    segments.length === 6 &&
-    segments[0] === 'private' &&
-    segments[1] === 'a' &&
-    segments[3] === 'm'
+    segments.length === 6 && segments[0] === 'private' && segments[1] === 'a' && segments[3] === 'm'
   )
 }
 

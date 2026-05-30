@@ -25,7 +25,9 @@ const channelsQuery = channelStore.useChannelsQuery(isAuthenticated)
 
 const profile = computed(() => accountStore.profile)
 const contentState = computed(() => (profile.value ? 'ready' : 'auth-required'))
-const channels = computed(() => (Array.isArray(channelsQuery.data.value) ? channelsQuery.data.value : []))
+const channels = computed(() =>
+  Array.isArray(channelsQuery.data.value) ? channelsQuery.data.value : []
+)
 const hasChannels = computed(() => channels.value.length > 0)
 </script>
 

@@ -4,7 +4,13 @@ import {
   buildMediaPathForRouteContext
 } from '@utils/channel-route.js'
 
-export function useChannelRootRouteOrchestrator({ channel, loading, routeContext, route, redirect }) {
+export function useChannelRootRouteOrchestrator({
+  channel,
+  loading,
+  routeContext,
+  route,
+  redirect
+}) {
   watch(
     [channel, loading, routeContext],
     ([currentChannel, isLoading, context]) => {
@@ -52,7 +58,8 @@ export function useAlbumRootRouteOrchestrator({
   watch(
     [featuredMediaCount, album, loading, channel, routeContext],
     ([count, currentAlbum, isLoading, currentChannel, context]) => {
-      if (!currentChannel || !currentAlbum || isLoading || count !== 1 || !context.hasAlbumTarget) return
+      if (!currentChannel || !currentAlbum || isLoading || count !== 1 || !context.hasAlbumTarget)
+        return
 
       const featured = featuredMedia.value[0]
       if (!featured) return

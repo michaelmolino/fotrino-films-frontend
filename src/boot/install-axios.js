@@ -11,10 +11,7 @@ import {
   REQUEST_POLICY_NOT_FOUND,
   resolveRequestPolicy
 } from 'src/utils/request-policy.js'
-import {
-  getGlobalApiErrorMessage,
-  normalizeApiError
-} from 'src/utils/api-error-service.js'
+import { getGlobalApiErrorMessage, normalizeApiError } from 'src/utils/api-error-service.js'
 import { getComponentApiErrorPayload } from 'src/utils/api-error-payloads.js'
 import CloudflareGatewayErrorDialog from '@components/errors/CloudflareGatewayErrorDialog.vue'
 
@@ -71,13 +68,19 @@ export default boot(({ app, router }) => {
         error.__globalErrorHandled = true
       }
 
-      if (normalizedError.isNotFound && requestPolicy.notFound === REQUEST_POLICY_NOT_FOUND.ROUTE_404) {
+      if (
+        normalizedError.isNotFound &&
+        requestPolicy.notFound === REQUEST_POLICY_NOT_FOUND.ROUTE_404
+      ) {
         error.__globalErrorHandled = true
         router.replace('/404')
         return
       }
 
-      if (normalizedError.isUnauthorized && requestPolicy.authRedirect === REQUEST_POLICY_AUTH_REDIRECT.GLOBAL) {
+      if (
+        normalizedError.isUnauthorized &&
+        requestPolicy.authRedirect === REQUEST_POLICY_AUTH_REDIRECT.GLOBAL
+      ) {
         error.__globalErrorHandled = true
         router.replace('/')
         return

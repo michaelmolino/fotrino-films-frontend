@@ -14,7 +14,11 @@
       <div :key="channel?.publicId || route.fullPath">
         <div ref="headerRowRef" class="row items-center q-mb-sm channel-header">
           <div ref="breadcrumbsRef" class="channel-header-breadcrumbs">
-            <BreadCrumbs :channel="channel" :album="null" :media="null" :route-context="routeContext" />
+            <BreadCrumbs
+              :channel="channel"
+              :album="null"
+              :media="null"
+              :route-context="routeContext" />
           </div>
           <q-space />
           <div
@@ -68,7 +72,15 @@
 </template>
 
 <script setup>
-import { ref, computed, defineAsyncComponent, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import {
+  ref,
+  computed,
+  defineAsyncComponent,
+  watch,
+  onMounted,
+  onBeforeUnmount,
+  nextTick
+} from 'vue'
 import { getViewPreference, setViewPreference } from '@utils/view-preference.js'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
