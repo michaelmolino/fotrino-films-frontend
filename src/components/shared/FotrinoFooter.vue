@@ -6,7 +6,7 @@
     data-cy="app-footer">
     <div class="row no-wrap">
       <div class="footer-static-info" aria-label="Copyright information">
-        <q-icon name="info" size="18px" class="q-mr-xs" aria-hidden="true" />
+        <q-icon name="copyright" size="18px" class="q-mr-xs" aria-hidden="true" />
         <span>{{ copyrightLabel }}</span>
       </div>
       <q-space />
@@ -76,6 +76,7 @@ const showGithubText = computed(() => $q.screen.gt.xs && !isShortLandscape.value
   min-height: 40px;
   display: inline-flex;
   align-items: center;
+  padding-left: 12px;
   color: rgba(255, 255, 255, 0.9);
   font-size: 0.95rem;
 }
