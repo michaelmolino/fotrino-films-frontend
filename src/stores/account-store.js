@@ -1,4 +1,4 @@
-import { ref, watch } from 'vue'
+import { ref, toValue, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { useQuery, useQueryCache } from '@pinia/colada'
 import { API_CACHE_LONG_MS, API_CACHE_SHORT_MS } from 'src/stores/utils/cache-timeouts.js'
@@ -16,6 +16,7 @@ import { mutationResult, runMutation } from 'src/utils/store-mutations.js'
 
 export const useAccountStore = defineStore('account', () => {
   const profile = ref(null)
+  const profileResolved = ref(false)
   const providers = ref([])
   const providersLoadFailed = ref(false)
   const queryCache = useQueryCache()
@@ -69,6 +70,9 @@ export const useAccountStore = defineStore('account', () => {
     watch(
       () => query.data.value,
       value => {
+        if (value !== undefined) {
+          profileResolved.value = true
+        }
         setProfile(value ?? null)
       },
       { immediate: true }
@@ -78,6 +82,7 @@ export const useAccountStore = defineStore('account', () => {
       () => query.error.value,
       error => {
         if (error) {
+          profileResolved.value = true
           setProfile(null)
         }
       },
@@ -87,8 +92,11 @@ export const useAccountStore = defineStore('account', () => {
     return query
   }
 
-  const useProvidersQuery = (staleTime = API_CACHE_LONG_MS) => {
-    const query = useQuery(() => accountProvidersQueryOptions(staleTime))
+  const useProvidersQuery = (enabled = true, staleTime = API_CACHE_LONG_MS) => {
+    const query = useQuery(() => ({
+      ...accountProvidersQueryOptions(staleTime),
+      enabled: toValue(enabled)
+    }))
 
     watch(
       () => query.data.value,
@@ -104,7 +112,9 @@ export const useAccountStore = defineStore('account', () => {
       error => {
         if (error) {
           providersLoadFailed.value = true
-          setProviders([])
+          if (providers.value.length === 0) {
+            setProviders([])
+          }
         }
       },
       { immediate: true }
@@ -118,6 +128,7 @@ export const useAccountStore = defineStore('account', () => {
       request: () => api.post('/account/logout'),
       onSuccess: () => {
         clearProfileCache()
+        profileResolved.value = true
         setProfile(null)
       }
     })
@@ -126,6 +137,7 @@ export const useAccountStore = defineStore('account', () => {
 
   return {
     profile,
+    profileResolved,
     providers,
     providersLoadFailed,
     setProfile,
