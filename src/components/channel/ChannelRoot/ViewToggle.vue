@@ -34,7 +34,7 @@
 import { computed } from 'vue'
 
 const props = defineProps({
-  modelValue: { type: String, default: 'all' },
+  modelValue: { type: String, default: 'albums' },
   albumCount: Number,
   allCount: Number
 })
