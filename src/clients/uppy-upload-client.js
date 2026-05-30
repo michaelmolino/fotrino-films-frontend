@@ -32,7 +32,6 @@ export function createPresignedUppyClient({
   id = 'presigned-uploader',
   instructions = [],
   maxFileSize = null,
-  uploadEndpoint = '/uppy',
   headers = {},
   onTotalProgress,
   onProgress,
@@ -40,6 +39,8 @@ export function createPresignedUppyClient({
   onUploadError
 }) {
   const instructionByType = buildInstructionMap(instructions)
+  const apiBase = typeof process.env.API === 'string' ? process.env.API.trim().replace(/\/$/, '') : ''
+  const companionBase = apiBase ? `${apiBase}/uppy` : '/uppy'
 
   const restrictions = {}
   if (Number.isFinite(maxFileSize) && maxFileSize > 0) {
@@ -56,11 +57,11 @@ export function createPresignedUppyClient({
   // AwsS3 plugin handles the `upload` resource type (video files).
   // For files >= MULTIPART_THRESHOLD it uses multipart; below that it uses
   // getUploadParameters for a standard presigned PUT.
-  const companionBase = uploadEndpoint.replace(/\/$/, '')
 
   uppy.use(AwsS3, {
-    endpoint: uploadEndpoint,
+    endpoint: companionBase,
     headers,
+    cookiesRule: 'include',
     retryDelays: MULTIPART_RETRY_DELAYS_MS,
     shouldUseMultipart: file =>
       file.meta?.resourceType === 'upload' && file.size >= MULTIPART_THRESHOLD,
