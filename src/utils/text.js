@@ -13,3 +13,12 @@ export function sanitizeText(unsafe) {
   const cleaned = unsafe.replaceAll(/<br[^>]*>/gi, '\n').replaceAll(/<\/?p[^>]*>/gi, '\n')
   return DOMPurify.sanitize(cleaned, { ALLOWED_TAGS: [] })
 }
+
+export function formatTitleWithSubtitle(title, subtitle, separator = ' - ') {
+  const main = typeof title === 'string' ? title.trim() : ''
+  const sub = typeof subtitle === 'string' ? subtitle.trim() : ''
+
+  if (!sub) return main
+
+  return `${main}${separator}${sub}`
+}

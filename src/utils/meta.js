@@ -1,4 +1,4 @@
-import { sanitizeText } from '@utils/text.js'
+import { formatTitleWithSubtitle, sanitizeText } from '@utils/text.js'
 
 function findAlbum(channel, albumPublicId) {
   if (!channel || !albumPublicId) {
@@ -33,7 +33,7 @@ function getChannelMeta(route, channel) {
 function getAlbumMeta(channel, albumPublicId) {
   const album = findAlbum(channel, albumPublicId)
   return {
-    title: album?.title || null,
+    title: formatTitleWithSubtitle(album?.title, album?.subtitle) || null,
     description: sanitizeText(album?.subtitle || ''),
     image: album?.poster || null,
     type: 'website'
@@ -65,7 +65,7 @@ function getPrivateMediaMeta(route, channel) {
 function getPrivateAlbumMeta(channel) {
   const album = channel?.album || null
   return {
-    title: album?.title || null,
+    title: formatTitleWithSubtitle(album?.title, album?.subtitle) || null,
     description: sanitizeText(album?.subtitle || ''),
     image: album?.poster || null,
     type: 'website'
