@@ -41,8 +41,14 @@ const compilerOptions = {
 }
 
 async function generateContracts() {
+  const childEnv = {
+    ...process.env,
+    // Ensure local schema generation does not require production secrets.
+    FLASK_ENV: process.env.FLASK_ENV || 'development'
+  }
   const { stdout } = await execFile(pythonExecutable, ['-m', 'contracts.export_contract_schemas'], {
     cwd: backendSrc,
+    env: childEnv,
     maxBuffer: 10 * 1024 * 1024
   })
   const schemaBundle = JSON.parse(stdout)
