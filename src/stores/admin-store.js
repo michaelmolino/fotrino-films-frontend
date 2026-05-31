@@ -1,7 +1,7 @@
 import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { useQuery, useQueryCache } from '@pinia/colada'
-import { isGlobalApiError } from 'src/utils/api-error-service.js'
+import { getGlobalApiErrorPayload } from 'src/utils/api-error-service.js'
 import { mutationResult, runMutation } from 'src/utils/store-mutations.js'
 import {
   createApiGetQueryOptionsFactory,
@@ -94,7 +94,7 @@ export const useAdminStore = defineStore('admin', () => {
     watch(
       () => query.error.value,
       error => {
-        if (error && isGlobalApiError(error, 'forbidden')) {
+        if (getGlobalApiErrorPayload(error)?.error === 'forbidden') {
           setUsers([])
         }
       },
@@ -118,7 +118,7 @@ export const useAdminStore = defineStore('admin', () => {
     watch(
       () => query.error.value,
       error => {
-        if (error && isGlobalApiError(error, 'forbidden')) {
+        if (getGlobalApiErrorPayload(error)?.error === 'forbidden') {
           setJobs([])
         }
       },
@@ -142,7 +142,7 @@ export const useAdminStore = defineStore('admin', () => {
     watch(
       () => query.error.value,
       error => {
-        if (error && isGlobalApiError(error, 'forbidden')) {
+        if (getGlobalApiErrorPayload(error)?.error === 'forbidden') {
           setReportedMedia([])
         }
       },

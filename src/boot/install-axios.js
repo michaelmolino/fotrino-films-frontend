@@ -4,8 +4,12 @@ import { useAccountStore } from 'src/stores/account-store'
 import { api, installApiClientInterceptors } from 'src/clients/axios-client.js'
 import { useRequestLoading } from 'src/composables/useRequestLoading'
 import { confirmDestructiveAction, notifyError } from 'src/utils/notify.js'
-import { getGlobalApiErrorMessage, normalizeApiError } from 'src/utils/api-error-service.js'
-import { getComponentApiErrorPayload } from 'src/utils/api-error-payloads.js'
+import {
+  getCloudflareGatewayErrorPayload,
+  getComponentApiErrorPayload,
+  getGlobalApiErrorPayload,
+  getGlobalApiErrorMessage,
+} from 'src/utils/api-error-service.js'
 import CloudflareGatewayErrorDialog from '@components/errors/CloudflareGatewayErrorDialog.vue'
 
 const DEFAULT_REQUEST_POLICY = Object.freeze({
@@ -60,23 +64,30 @@ export default boot(({ app, router }) => {
       hideLoader()
     },
     onApiError: ({ error, status, requestCanceled, requestPolicy }) => {
-      const normalizedError = normalizeApiError(error, { status, requestCanceled })
+      const globalPayload = getGlobalApiErrorPayload(error)
+      const cloudflarePayload = getCloudflareGatewayErrorPayload(error)
+      const resolvedStatus = globalPayload?.status ?? error?.response?.status ?? status
+      const code = globalPayload?.error
+      const isRequestCanceled =
+        requestCanceled === true ||
+        error?.__userCancelled === true ||
+        error?.code === 'ERR_CANCELED' ||
+        error?.name === 'CanceledError'
+      const isUnauthorized =
+        code === 'unauthorized' || code === 'forbidden' || resolvedStatus === 401 || resolvedStatus === 403
+      const isNotFound = code === 'not_found' || resolvedStatus === 404
       const componentErrorPayload = getComponentApiErrorPayload(error)
-      const skipNotify =
-        requestPolicy.errorHandling !== 'global' ||
-        normalizedError.requestCanceled ||
-        componentErrorPayload != null
-      const resolvedStatus = normalizedError.status
+      const skipNotify = requestPolicy.errorHandling !== 'global' || componentErrorPayload != null
 
-      if (normalizedError.requestCanceled) {
+      if (isRequestCanceled) {
         return
       }
 
-      if (normalizedError.isCloudflareGateway) {
+      if (cloudflarePayload) {
         Dialog.create({
           component: CloudflareGatewayErrorDialog,
           componentProps: {
-            payload: normalizedError.cloudflarePayload,
+            payload: cloudflarePayload,
             requestMethod: error?.config?.method,
             requestUrl: error?.config?.url,
             requestStatus: resolvedStatus ?? error?.response?.status
@@ -86,26 +97,21 @@ export default boot(({ app, router }) => {
         error.__globalErrorHandled = true
       }
 
-      if (normalizedError.isUnauthorized) {
+      if (isUnauthorized) {
         error.__globalErrorHandled = true
         router.replace('/')
         return
       }
 
-      if (normalizedError.isNotFound && requestPolicy.notFoundHandling !== 'none') {
+      if (isNotFound && requestPolicy.notFoundHandling !== 'none') {
         error.__globalErrorHandled = true
         router.replace('/404')
         return
       }
 
-      let msg = getGlobalApiErrorMessage(error)
-      const timeout = 0
-
-      if (!skipNotify && !normalizedError.isCloudflareGateway) {
+      if (!skipNotify && !cloudflarePayload) {
         error.__globalErrorHandled = true
-        notifyError(msg, {
-          timeout
-        })
+        notifyError(getGlobalApiErrorMessage(error), { timeout: 0 })
       }
     }
   })

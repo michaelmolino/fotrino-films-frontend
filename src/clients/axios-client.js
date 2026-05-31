@@ -1,6 +1,6 @@
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
-import { parseRetryAfterSeconds } from 'src/utils/api-error-rate-limit.js'
+import { parseRetryAfterSeconds } from 'src/utils/api-error-service.js'
 
 const RETRYABLE_STATUS_CODES = new Set([408, 429, 500, 502, 503, 504])
 

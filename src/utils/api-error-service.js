@@ -1,14 +1,3 @@
-const GLOBAL_API_ERROR_CODES = new Set([
-  'bad_request',
-  'unauthorized',
-  'forbidden',
-  'not_found',
-  'conflict',
-  'unprocessable_entity',
-  'internal_server_error',
-  'rate_limited'
-])
-
 const DEFAULT_GLOBAL_API_ERROR_MESSAGES = {
   bad_request: 'Bad request.',
   unauthorized: 'Unauthorised. Please login.',
@@ -19,133 +8,127 @@ const DEFAULT_GLOBAL_API_ERROR_MESSAGES = {
   internal_server_error: 'Internal server error.'
 }
 
-import {
-  getCloudflareGatewayErrorPayload,
-  getComponentApiErrorPayload,
-  getGlobalApiErrorPayload
-} from 'src/utils/api-error-payloads.js'
-import {
-  getRateLimitMessage,
-  getRateLimitRetryAfterSeconds
-} from 'src/utils/api-error-rate-limit.js'
+function getErrorData(error) {
+  const data = error?.response?.data
+  return data && typeof data === 'object' && !Array.isArray(data) ? data : null
+}
 
-/**
- * @typedef {import('src/types/api-contract').ApiContracts['BadRequestErrorResponse'] |
- * import('src/types/api-contract').ApiContracts['UnauthorizedErrorResponse'] |
- * import('src/types/api-contract').ApiContracts['ForbiddenErrorResponse'] |
- * import('src/types/api-contract').ApiContracts['NotFoundErrorResponse'] |
- * import('src/types/api-contract').ApiContracts['ConflictErrorResponse'] |
- * import('src/types/api-contract').ApiContracts['UnprocessableEntityErrorResponse'] |
- * import('src/types/api-contract').ApiContracts['InternalServerErrorResponse']} GlobalApiErrorResponse
- */
-
-/** @typedef {GlobalApiErrorResponse['error']} GlobalApiErrorCode */
+function isRateLimitedError(error, globalPayload) {
+  const status = globalPayload?.status ?? error?.response?.status
+  return globalPayload?.error === 'rate_limited' || status === 429
+}
 
 function getUploadValidationMessage(payload) {
-  const [firstDetail] = payload.detail || []
-  if (typeof firstDetail?.msg === 'string' && firstDetail.msg) {
-    return firstDetail.msg
-  }
-
-  return 'Invalid upload request.'
+  return payload?.detail?.[0]?.msg || 'Invalid upload request.'
 }
 
-export function normalizeApiError(error, options = {}) {
-  const fallbackStatus = typeof options.status === 'number' ? options.status : null
-  const fallbackRequestCanceled = options.requestCanceled === true
-  const cloudflarePayload = getCloudflareGatewayErrorPayload(error)
+function getGlobalPayloadMessage(payload, fallback) {
+  return (
+    (typeof payload?.message === 'string' && payload.message) ||
+    DEFAULT_GLOBAL_API_ERROR_MESSAGES[payload?.error] ||
+    fallback
+  )
+}
+
+export function getCloudflareGatewayErrorPayload(error) {
+  const data = getErrorData(error)
+  return data?.cloudflare_error === true && data?.status >= 500 && typeof data?.error_name === 'string'
+    ? data
+    : null
+}
+
+export function getGlobalApiErrorPayload(error) {
+  const data = getErrorData(error)
+  return typeof data?.status === 'number' && typeof data?.error === 'string' ? data : null
+}
+
+export function getComponentApiErrorPayload(error) {
+  const data = getErrorData(error)
+  if (typeof data?.error !== 'string') {
+    return null
+  }
+
+  if (Array.isArray(data.detail) && data.error === 'Invalid upload request') {
+    return data
+  }
+
+  if (typeof data.detail === 'string' && data.error === 'Upload not complete') {
+    return data
+  }
+
+  return data.detail == null && data.status == null ? data : null
+}
+
+export function parseRetryAfterSeconds(retryAfterHeader) {
+  const retryAfterText = String(retryAfterHeader ?? '').trim()
+  if (!retryAfterText) {
+    return null
+  }
+
+  const numericSeconds = Number(retryAfterText)
+  if (Number.isFinite(numericSeconds) && numericSeconds > 0) {
+    return Math.ceil(numericSeconds)
+  }
+
+  const retryAt = Date.parse(retryAfterText)
+  if (!Number.isFinite(retryAt)) {
+    return null
+  }
+
+  const secondsUntilRetry = Math.ceil((retryAt - Date.now()) / 1000)
+  return secondsUntilRetry > 0 ? secondsUntilRetry : null
+}
+
+export function getRateLimitRetryAfterSeconds(error) {
+  return parseRetryAfterSeconds(error?.response?.headers?.['retry-after'])
+}
+
+export function getRateLimitMessage(error) {
+  const retryAfterSeconds = getRateLimitRetryAfterSeconds(error)
+  if (retryAfterSeconds === null) {
+    return 'You are sending requests too quickly. Please wait a moment and try again.'
+  }
+
+  return `You are sending requests too quickly. Please wait ${retryAfterSeconds}s and try again.`
+}
+
+export function getGlobalApiErrorMessage(error, fallback = 'Something went wrong!') {
   const globalPayload = getGlobalApiErrorPayload(error)
-  const status = globalPayload?.status ?? error?.response?.status ?? fallbackStatus
-  const code = globalPayload?.error
-  const requestCanceled =
-    fallbackRequestCanceled ||
-    error?.__userCancelled === true ||
-    error?.code === 'ERR_CANCELED' ||
-    error?.name === 'CanceledError'
-  const retryAfterSeconds = status === 429 ? getRateLimitRetryAfterSeconds(error) : null
-  const knownCode = typeof code === 'string' && GLOBAL_API_ERROR_CODES.has(code)
-  const isUnauthorized =
-    code === 'unauthorized' || code === 'forbidden' || status === 401 || status === 403
-  const isNotFound = code === 'not_found' || status === 404
-  const isRateLimited = code === 'rate_limited' || status === 429
-  const isCloudflareGateway = cloudflarePayload != null
-  const isGloballyHandled =
+  return isRateLimitedError(error, globalPayload)
+    ? getRateLimitMessage(error)
+    : getGlobalPayloadMessage(globalPayload, fallback)
+}
+
+export function getComponentApiErrorMessage(error, fallback = 'Something went wrong!') {
+  if (
     error?.__globalErrorHandled === true ||
     error?.__cloudflareDialogShown === true ||
-    isCloudflareGateway
-  const message =
-    typeof globalPayload?.message === 'string' && globalPayload.message.trim()
-      ? globalPayload.message
-      : null
-
-  return {
-    status,
-    code,
-    message,
-    detail: globalPayload?.detail,
-    globalPayload,
-    requestCanceled,
-    retryAfterSeconds,
-    isKnownGlobalCode: knownCode,
-    isUnauthorized,
-    isNotFound,
-    isRateLimited,
-    isCloudflareGateway,
-    cloudflarePayload,
-    isGloballyHandled
-  }
-}
-
-// Check whether an error matches a specific global API error code.
-export function isGlobalApiError(error, code) {
-  return getGlobalApiErrorPayload(error)?.error === code
-}
-
-// Prefer backend/global message mapping and fall back to a safe generic message.
-export function getGlobalApiErrorMessage(error, fallback = 'Something went wrong!') {
-  const context = normalizeApiError(error)
-
-  if (context.isRateLimited) {
-    return getRateLimitMessage(error)
-  }
-
-  const payload = context.globalPayload
-  if (!payload) {
-    return fallback
-  }
-
-  return payload.message || DEFAULT_GLOBAL_API_ERROR_MESSAGES[payload.error] || fallback
-}
-
-// Build component-level errors, suppressing messages already handled globally.
-export function getComponentApiErrorMessage(error, fallback = 'Something went wrong!') {
-  const context = normalizeApiError(error)
-
-  if (context.isGloballyHandled) {
+    getCloudflareGatewayErrorPayload(error)
+  ) {
     return ''
   }
 
-  if (context.isRateLimited) {
+  const globalPayload = getGlobalApiErrorPayload(error)
+  if (isRateLimitedError(error, globalPayload)) {
     return getRateLimitMessage(error)
   }
 
-  const globalPayload = context.globalPayload
   if (globalPayload) {
-    return getGlobalApiErrorMessage(error, fallback)
+    return getGlobalPayloadMessage(globalPayload, fallback)
   }
 
-  const payload = getComponentApiErrorPayload(error)
-  if (!payload) {
+  const componentPayload = getComponentApiErrorPayload(error)
+  if (!componentPayload) {
     return fallback
   }
 
-  if (Array.isArray(payload.detail)) {
-    return getUploadValidationMessage(payload)
+  if (Array.isArray(componentPayload.detail)) {
+    return getUploadValidationMessage(componentPayload)
   }
 
-  if (typeof payload.detail === 'string' && payload.detail) {
-    return payload.detail
+  if (typeof componentPayload.detail === 'string' && componentPayload.detail) {
+    return componentPayload.detail
   }
 
-  return payload.error || fallback
+  return componentPayload.error || fallback
 }
