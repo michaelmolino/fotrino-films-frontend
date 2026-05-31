@@ -45,11 +45,6 @@ export function useAlbumRootRouteOrchestrator({
         if (canonicalPath) {
           redirect(canonicalPath)
         }
-        return
-      }
-
-      if (!currentAlbum && context.hasAlbumTarget) {
-        redirect('/404')
       }
     },
     { immediate: true }
@@ -88,22 +83,16 @@ export function useMediaRootRouteOrchestrator({
 }) {
   watch(
     [album, channel, loading, routeContext],
-    ([currentAlbum, currentChannel, isLoading, context]) => {
+    ([, currentChannel, isLoading]) => {
       if (!currentChannel || isLoading) return
-      if (!currentAlbum && context.hasMediaTarget) {
-        redirect('/404')
-      }
     },
     { immediate: true }
   )
 
   watch(
     [media, album, channel, loading],
-    ([currentMedia, currentAlbum, currentChannel, isLoading]) => {
-      if (!currentChannel || !currentAlbum || isLoading) return
-      if ((currentAlbum.media?.length || 0) > 0 && !currentMedia) {
-        redirect('/404')
-      }
+    ([, , currentChannel, isLoading]) => {
+      if (!currentChannel || isLoading) return
     },
     { immediate: true }
   )

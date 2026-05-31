@@ -25,7 +25,7 @@ export const useAdminStore = defineStore('admin', () => {
     url: '/admin/users',
     config: {
       __policy: {
-        notify: 'local'
+        errorHandling: 'none'
       },
       __responseGuard: data => assertDataEnvelopeArrayResponse(data, 'Admin users')
     },
@@ -35,9 +35,9 @@ export const useAdminStore = defineStore('admin', () => {
   const jobsQueryOptions = (statuses = []) => {
     const normalizedStatuses = Array.isArray(statuses)
       ? [...statuses]
-          .filter(Boolean)
-          .map(String)
-          .sort((a, b) => a.localeCompare(b))
+        .filter(Boolean)
+        .map(String)
+        .sort((a, b) => a.localeCompare(b))
       : []
 
     return createApiGetQueryOptionsFactory({
@@ -47,7 +47,7 @@ export const useAdminStore = defineStore('admin', () => {
       config: {
         params: normalizedStatuses.length > 0 ? { status: normalizedStatuses } : undefined,
         __policy: {
-          notify: 'local'
+          errorHandling: 'none'
         },
         __responseGuard: data => assertDataEnvelopeArrayResponse(data, 'Admin jobs')
       },
@@ -61,7 +61,7 @@ export const useAdminStore = defineStore('admin', () => {
     url: '/admin/media/reported',
     config: {
       __policy: {
-        notify: 'local'
+        errorHandling: 'none'
       },
       __responseGuard: data => assertDataEnvelopeArrayResponse(data, 'Admin reported media')
     },
@@ -203,7 +203,7 @@ export const useAdminStore = defineStore('admin', () => {
             limit: parsedLimit
           },
           __policy: {
-            notify: 'local'
+            errorHandling: 'none'
           },
           __responseGuard: data => assertDataEnvelopeResponse(data, 'Pending upload cleanup')
         })

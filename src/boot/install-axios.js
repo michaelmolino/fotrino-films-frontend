@@ -4,48 +4,66 @@ import { useAccountStore } from 'src/stores/account-store'
 import { api, installApiClientInterceptors } from 'src/clients/axios-client.js'
 import { useRequestLoading } from 'src/composables/useRequestLoading'
 import { confirmDestructiveAction, notifyError } from 'src/utils/notify.js'
-import {
-  REQUEST_POLICY_AUTH_REDIRECT,
-  REQUEST_POLICY_LOADING,
-  REQUEST_POLICY_NOTIFY,
-  REQUEST_POLICY_NOT_FOUND,
-  resolveRequestPolicy
-} from 'src/utils/request-policy.js'
 import { getGlobalApiErrorMessage, normalizeApiError } from 'src/utils/api-error-service.js'
 import { getComponentApiErrorPayload } from 'src/utils/api-error-payloads.js'
 import CloudflareGatewayErrorDialog from '@components/errors/CloudflareGatewayErrorDialog.vue'
+
+const DEFAULT_REQUEST_POLICY = Object.freeze({
+  csrfHandling: 'global',
+  deleteHandling: 'global',
+  notFoundHandling: 'none',
+  errorHandling: 'global',
+  loadHandling: 'global'
+})
+
+function resolveRequestPolicy(config) {
+  const policy = config?.__policy && typeof config.__policy === 'object' ? config.__policy : null
+  return {
+    csrfHandling: policy?.csrfHandling ?? DEFAULT_REQUEST_POLICY.csrfHandling,
+    deleteHandling: policy?.deleteHandling ?? DEFAULT_REQUEST_POLICY.deleteHandling,
+    notFoundHandling: policy?.notFoundHandling ?? DEFAULT_REQUEST_POLICY.notFoundHandling,
+    loadHandling: policy?.loadHandling ?? DEFAULT_REQUEST_POLICY.loadHandling,
+    errorHandling: policy?.errorHandling ?? DEFAULT_REQUEST_POLICY.errorHandling
+  }
+}
 
 export default boot(({ app, router }) => {
   const { increment: showLoader, decrement: hideLoader } = useRequestLoading()
 
   installApiClientInterceptors({
-    getCsrfToken: () => useAccountStore()?.profile?.csrfToken,
-    onBeforeDelete: () => {
-      return confirmDestructiveAction({
+    resolveRequestPolicy,
+    getCsrfToken: (req, requestPolicy) => {
+      if (requestPolicy.csrfHandling !== 'global') {
+        return null
+      }
+      return useAccountStore()?.profile?.csrfToken ?? null
+    },
+    onBeforeDelete: async (req, requestPolicy) => {
+      if (requestPolicy.deleteHandling !== 'global') {
+        return true
+      }
+      return await confirmDestructiveAction({
         confirmAction: { 'data-cy': 'confirm-delete' },
         cancelAction: { 'data-cy': 'cancel-delete' }
       })
     },
-    onRequestStart: req => {
-      const requestPolicy = resolveRequestPolicy(req)
-      if (requestPolicy.loading !== REQUEST_POLICY_LOADING.GLOBAL) {
+    onRequestStart: (req, requestPolicy) => {
+      if (requestPolicy.loadHandling !== 'global') {
         return
       }
       showLoader()
     },
-    onRequestEnd: req => {
-      const requestPolicy = resolveRequestPolicy(req)
-      if (requestPolicy.loading !== REQUEST_POLICY_LOADING.GLOBAL) {
+    onRequestEnd: (req, requestPolicy) => {
+      if (requestPolicy.loadHandling !== 'global') {
         return
       }
       hideLoader()
     },
-    onApiError: ({ error, status, requestCanceled }) => {
-      const requestPolicy = resolveRequestPolicy(error?.config)
+    onApiError: ({ error, status, requestCanceled, requestPolicy }) => {
       const normalizedError = normalizeApiError(error, { status, requestCanceled })
       const componentErrorPayload = getComponentApiErrorPayload(error)
       const skipNotify =
-        requestPolicy.notify !== REQUEST_POLICY_NOTIFY.GLOBAL ||
+        requestPolicy.errorHandling !== 'global' ||
         normalizedError.requestCanceled ||
         componentErrorPayload != null
       const resolvedStatus = normalizedError.status
@@ -68,21 +86,15 @@ export default boot(({ app, router }) => {
         error.__globalErrorHandled = true
       }
 
-      if (
-        normalizedError.isNotFound &&
-        requestPolicy.notFound === REQUEST_POLICY_NOT_FOUND.ROUTE_404
-      ) {
+      if (normalizedError.isUnauthorized) {
         error.__globalErrorHandled = true
-        router.replace('/404')
+        router.replace('/')
         return
       }
 
-      if (
-        normalizedError.isUnauthorized &&
-        requestPolicy.authRedirect === REQUEST_POLICY_AUTH_REDIRECT.GLOBAL
-      ) {
+      if (normalizedError.isNotFound && requestPolicy.notFoundHandling !== 'none') {
         error.__globalErrorHandled = true
-        router.replace('/')
+        router.replace('/404')
         return
       }
 

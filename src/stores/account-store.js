@@ -27,8 +27,8 @@ export const useAccountStore = defineStore('account', () => {
     url: '/account/profile',
     config: {
       __policy: {
-        loading: 'none',
-        notify: 'local'
+        loadHandling: 'none',
+        errorHandling: 'none'
       },
       __responseGuard: assertAccountProfileResponse
     },
@@ -41,8 +41,8 @@ export const useAccountStore = defineStore('account', () => {
     url: '/account/providers',
     config: {
       __policy: {
-        loading: 'none',
-        notify: 'local'
+        loadHandling: 'none',
+        errorHandling: 'none'
       },
       __responseGuard: assertAccountProvidersResponse
     },

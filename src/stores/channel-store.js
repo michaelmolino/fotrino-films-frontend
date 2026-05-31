@@ -76,7 +76,7 @@ export const useChannelStore = defineStore('channel', () => {
     },
     config: {
       __policy: {
-        notFound: 'route404'
+        notFoundHandling: 'global'
       },
       __responseGuard: assertChannelViewResponse
     }
@@ -192,7 +192,8 @@ export const useChannelStore = defineStore('channel', () => {
       { items },
       {
         __policy: {
-          loading: 'none'
+          loadHandling: 'none',
+          csrfHandling: 'none'
         },
         __responseGuard: assertHistoryResolveResponse
       }
@@ -226,7 +227,11 @@ export const useChannelStore = defineStore('channel', () => {
   }
 
   const createMediaSession = async ({ privateId }) => {
-    const res = await api.post(`/channels/media/session/${privateId}`)
+    const res = await api.post(`/channels/media/session/${privateId}`, null, {
+      __policy: {
+        csrfHandling: 'none'
+      }
+    })
     return mutationResult({ ok: true, data: res.data?.data ?? null })
   }
 
@@ -359,9 +364,17 @@ export const useChannelStore = defineStore('channel', () => {
   const reportMedia = async ({ privateId, reason }) => {
     const res = await runMutation({
       request: () =>
-        api.post(`/channels/media/private/${privateId}/report`, {
-          reason: reason?.trim() || null
-        })
+        api.post(
+          `/channels/media/private/${privateId}/report`,
+          {
+            reason: reason?.trim() || null
+          },
+          {
+            __policy: {
+              csrfHandling: 'none'
+            }
+          }
+        )
     })
     if (privateId) {
       invalidateQueriesSafely(queryCache, {

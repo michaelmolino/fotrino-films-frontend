@@ -16,7 +16,7 @@ export const useUploadStore = defineStore('upload', () => {
   }
 
   const invalidateQueries = options => {
-    queryCache.invalidateQueries(options).catch(() => {})
+    queryCache.invalidateQueries(options).catch(() => { })
   }
 
   const invalidateChannelsCache = () => {
@@ -74,7 +74,7 @@ export const useUploadStore = defineStore('upload', () => {
       request: () =>
         api.post('/uploads/media/drafts/validate', draftRequest, {
           __policy: {
-            loading: 'none'
+            loadHandling: 'none'
           },
           __responseGuard: assertUploadDraftValidationResponse,
           headers: {
