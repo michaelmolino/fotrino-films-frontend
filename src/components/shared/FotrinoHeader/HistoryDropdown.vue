@@ -37,12 +37,19 @@
 <script setup>
 import { computed, onMounted } from 'vue'
 import { Notify, useQuasar } from 'quasar'
+import { useRoute } from 'vue-router'
 import { useChannelStore } from 'src/stores/channel-store.js'
-import { historyChannels, removeHistory, resolveHistoryFromBackend } from '@utils/history.js'
-import { buildHistoryTargetPath } from '@utils/channel-route.js'
+import {
+  buildCurrentHistoryEntryFromContext,
+  historyChannels,
+  removeHistory,
+  resolveHistoryFromBackend
+} from '@utils/history.js'
+import { buildHistoryTargetPath, resolveChannelRouteContext } from '@utils/channel-route.js'
 
 const channelStore = useChannelStore()
 const $q = useQuasar()
+const route = useRoute()
 
 const hasHistory = computed(() => (historyChannels?.value || []).length > 0)
 const dropdownLabel = computed(() => ($q.screen.gt.sm ? 'History' : ''))
@@ -73,7 +80,9 @@ function getRemovedHistoryMessage(removedCount) {
 }
 
 onMounted(async () => {
-  const result = await resolveHistoryFromBackend(channelStore)
+  const context = resolveChannelRouteContext(route)
+  const currentEntry = buildCurrentHistoryEntryFromContext(context)
+  const result = await resolveHistoryFromBackend(channelStore, { currentEntry })
   const removedCount = result?.deletedItems?.length || 0
 
   if (removedCount > 0) {

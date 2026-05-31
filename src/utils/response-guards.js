@@ -41,6 +41,9 @@ export function assertHistoryResolveResponse(data) {
   if (data.data?.deletedItems != null && !Array.isArray(data.data.deletedItems)) {
     throw new TypeError('History resolve response deletedItems must be an array')
   }
+  if (data.data?.persistedItems != null && !Array.isArray(data.data.persistedItems)) {
+    throw new TypeError('History resolve response persistedItems must be an array')
+  }
 }
 
 export function assertChannelViewResponse(data) {

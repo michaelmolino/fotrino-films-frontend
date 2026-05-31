@@ -1,32 +1,44 @@
 import { ref } from 'vue'
-let hasResolvedHistory = false
-let resolveHistoryPromise = null
-import { parseStoredHistory, writeHistory, HISTORY_KEY } from './history-storage.js'
+import { LocalStorage } from 'quasar'
 
 /** @typedef {{ resourceId: string, type: 'channel' | 'privateMedia' | 'privateAlbum' }} HistoryEntry */
 
-import { LocalStorage } from 'quasar'
+const HISTORY_KEY = 'fotrino-films-history'
+
+function parseStoredHistory(value) {
+  if (!Array.isArray(value)) {
+    return []
+  }
+
+  const entries = []
+  const seen = new Set()
+
+  for (const item of value) {
+    if (!item || typeof item !== 'object') continue
+    if (typeof item.resourceId !== 'string') continue
+    if (item.type !== 'channel' && item.type !== 'privateMedia' && item.type !== 'privateAlbum') {
+      continue
+    }
+
+    const entry = { resourceId: item.resourceId, type: item.type }
+    const key = `${entry.type}:${entry.resourceId}`
+    if (seen.has(key)) continue
+    seen.add(key)
+    entries.push(entry)
+  }
+
+  return entries
+}
+
 const storedHistory = LocalStorage.getItem(HISTORY_KEY)
 const parsedHistory = parseStoredHistory(storedHistory)
 export const history = ref(parsedHistory)
 export const historyChannels = ref([])
 
-function getChannelHistoryId(channel) {
-  return channel?.publicId || null
-}
+let hasResolvedHistory = false
 
 function buildHistoryKey(type, resourceId) {
   return `${type}:${resourceId}`
-}
-
-function buildHistoryItem(type, resourceId, details = {}) {
-  return {
-    resourceId,
-    type,
-    title: details?.title || '',
-    slug: details?.slug || null,
-    cover: details?.cover || null
-  }
 }
 
 function excludeHistoryEntries(entries, resourceId, type = null) {
@@ -37,17 +49,17 @@ function excludeHistoryEntries(entries, resourceId, type = null) {
   })
 }
 
-function persistHistory(entries) {
+function commitHistory(entries) {
   history.value = entries
-  writeHistory(entries)
+  LocalStorage.set(HISTORY_KEY, entries)
 }
 
 if (JSON.stringify(storedHistory) !== JSON.stringify(parsedHistory)) {
-  writeHistory(parsedHistory)
+  LocalStorage.set(HISTORY_KEY, parsedHistory)
 }
 
 export function addHistory(channel) {
-  const historyId = getChannelHistoryId(channel)
+  const historyId = channel?.publicId || null
   if (!historyId) return
   addToHistory({ type: 'channel', resourceId: historyId, details: channel })
 }
@@ -62,114 +74,109 @@ export function addPrivateAlbumHistory(privateId, details = {}) {
   addToHistory({ type: 'privateAlbum', resourceId: privateId, details })
 }
 
+export function syncChannelRouteHistory({ context, channel }) {
+  if (!context.isPrivate && channel) {
+    addHistory(channel)
+  }
+
+  if (context.type === 'privateMedia' && context.privateMediaId && channel) {
+    const media =
+      (channel?.album?.media || []).find(item => item?.privateId === context.privateMediaId) ||
+      null
+
+    addPrivateHistory(context.privateMediaId, {
+      title: media?.title || channel?.title || '',
+      cover: media?.preview || channel?.cover || null,
+      slug: media?.slug || context.mediaSlug || null
+    })
+  }
+
+  if (context.privateAlbumId && channel?.album) {
+    const album = channel.album
+    addPrivateAlbumHistory(context.privateAlbumId, {
+      title: album?.title || channel?.title || '',
+      cover: album?.poster || channel?.cover || null,
+      slug: album?.slug || context.albumSlug || null
+    })
+  }
+}
+
+export function buildCurrentHistoryEntryFromContext(context) {
+  if (!context) return null
+
+  if (context.privateAlbumId) {
+    return { type: 'privateAlbum', resourceId: context.privateAlbumId }
+  }
+
+  if (context.type === 'privateMedia' && context.privateMediaId) {
+    return { type: 'privateMedia', resourceId: context.privateMediaId }
+  }
+
+  if (!context.isPrivate && context.channelPublicId) {
+    return { type: 'channel', resourceId: context.channelPublicId }
+  }
+
+  return null
+}
+
 export function addToHistory({ type, resourceId, details = {} }) {
   if (!type || !resourceId) return
 
   const entry = { type, resourceId }
-  const current = [...history.value]
-  const key = buildHistoryKey(entry.type, entry.resourceId)
-  const existingKeys = new Set(current.map(item => buildHistoryKey(item.type, item.resourceId)))
-  const isDupe = existingKeys.has(key)
-  if (isDupe) return
+  if (history.value.some(item => buildHistoryKey(item.type, item.resourceId) === buildHistoryKey(type, resourceId))) return
 
-  const updated = [...current, entry]
-  persistHistory(updated)
+  const updated = [...history.value, entry]
+  commitHistory(updated)
 
-  // Optimistically append when resolve has completed or is in-flight —
-  // we already have all display data so there is no need to wait.
-  if (hasResolvedHistory || resolveHistoryPromise !== null) {
+  // After initial resolve, we already have display data for new entries.
+  if (hasResolvedHistory) {
     historyChannels.value = [
       ...historyChannels.value,
-      buildHistoryItem(entry.type, entry.resourceId, details)
+      {
+        resourceId: entry.resourceId,
+        type: entry.type,
+        title: details?.title || '',
+        slug: details?.slug || null,
+        cover: details?.cover || null
+      }
     ]
   }
 }
 
 export function removeHistory(resourceId, type = null) {
   const updated = excludeHistoryEntries(history.value, resourceId, type)
-  persistHistory(updated)
+  commitHistory(updated)
   historyChannels.value = excludeHistoryEntries(historyChannels.value, resourceId, type)
 }
 
-export async function resolveHistoryFromBackend(channelStore, { force = false } = {}) {
+export async function resolveHistoryFromBackend(channelStore, { force = false, currentEntry = null } = {}) {
   if (hasResolvedHistory && !force) {
     return { channels: historyChannels.value, deletedItems: [] }
   }
+  const entries = [...history.value]
+  const hasCurrentEntry = Boolean(currentEntry?.type && currentEntry?.resourceId)
 
-  if (resolveHistoryPromise) {
-    return resolveHistoryPromise
+  if (entries.length === 0 && !hasCurrentEntry) {
+    historyChannels.value = []
+    hasResolvedHistory = true
+    return { channels: [], deletedItems: [] }
   }
 
-  resolveHistoryPromise = (async () => {
-    const entries = [...history.value]
-
-    if (entries.length === 0) {
-      historyChannels.value = []
-      hasResolvedHistory = true
-      return { channels: [], deletedItems: [] }
-    }
-
-    try {
-      const response = await channelStore.resolveHistoryChannels(entries)
-      const items = Array.isArray(response?.items) ? response.items : []
-      const deletedItems = Array.isArray(response?.deletedItems) ? response.deletedItems : []
-
-      if (deletedItems.length > 0) {
-        const deletedSet = new Set(
-          deletedItems
-            .filter(item => item?.type && item?.resourceId)
-            .map(item => buildHistoryKey(item.type, item.resourceId))
-        )
-        const remaining = entries.filter(
-          e => !deletedSet.has(buildHistoryKey(e.type, e.resourceId))
-        )
-        if (remaining.length !== entries.length) {
-          persistHistory(remaining)
-        }
-      }
-
-      const uniqueActiveEntries = []
-      const seenEntryKeys = new Set()
-      for (const entry of history.value) {
-        const entryKey = buildHistoryKey(entry.type, entry.resourceId)
-        if (seenEntryKeys.has(entryKey)) continue
-        seenEntryKeys.add(entryKey)
-        uniqueActiveEntries.push(entry)
-      }
-
-      if (uniqueActiveEntries.length !== history.value.length) {
-        persistHistory(uniqueActiveEntries)
-      }
-
-      const itemsByKey = new Map(
-        items
-          .filter(item => item?.resourceId)
-          .map(item => [buildHistoryKey(item.type, item.resourceId), item])
-      )
-
-      // Entries added during the in-flight request are already in historyChannels
-      // (optimistically appended by _addEntry). Preserve them for any key the
-      // backend didn't return so they aren't lost when we rebuild the list.
-      const optimisticByKey = new Map(
-        historyChannels.value.map(h => [buildHistoryKey(h.type, h.resourceId), h])
-      )
-      historyChannels.value = uniqueActiveEntries
-        .map(e => {
-          const key = buildHistoryKey(e.type, e.resourceId)
-          return itemsByKey.get(key) || optimisticByKey.get(key) || null
-        })
-        .filter(Boolean)
-
-      hasResolvedHistory = true
-      return { channels: historyChannels.value, deletedItems }
-    } catch {
-      return { channels: historyChannels.value, deletedItems: [] }
-    }
-  })()
-
   try {
-    return await resolveHistoryPromise
-  } finally {
-    resolveHistoryPromise = null
+    const response = await channelStore.resolveHistoryChannels({
+      items: entries,
+      current: hasCurrentEntry ? currentEntry : null
+    })
+    const items = Array.isArray(response?.items) ? response.items : []
+    const deletedItems = Array.isArray(response?.deletedItems) ? response.deletedItems : []
+    const persistedItems = parseStoredHistory(response?.persistedItems)
+
+    commitHistory(persistedItems)
+    historyChannels.value = items
+
+    hasResolvedHistory = true
+    return { channels: historyChannels.value, deletedItems }
+  } catch {
+    return { channels: historyChannels.value, deletedItems: [] }
   }
 }

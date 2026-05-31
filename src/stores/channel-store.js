@@ -182,14 +182,14 @@ export const useChannelStore = defineStore('channel', () => {
     return query
   }
 
-  const resolveHistoryChannels = async items => {
-    if (!Array.isArray(items) || items.length === 0) {
+  const resolveHistoryChannels = async ({ items = [], current = null } = {}) => {
+    if ((!Array.isArray(items) || items.length === 0) && !current) {
       return { items: [], deletedItems: [] }
     }
 
     const { data } = await api.post(
       '/channels/history',
-      { items },
+      { items, current },
       {
         __policy: {
           loadHandling: 'none',
@@ -201,7 +201,8 @@ export const useChannelStore = defineStore('channel', () => {
 
     return {
       items: Array.isArray(data?.data?.items) ? data.data.items : [],
-      deletedItems: Array.isArray(data?.data?.deletedItems) ? data.data.deletedItems : []
+      deletedItems: Array.isArray(data?.data?.deletedItems) ? data.data.deletedItems : [],
+      persistedItems: Array.isArray(data?.data?.persistedItems) ? data.data.persistedItems : []
     }
   }
 
