@@ -2,6 +2,12 @@ import { Notify } from 'quasar'
 
 // Action button configs for reuse
 const DISMISS_ACTION = Object.freeze([{ label: 'Dismiss', color: 'white' }])
+const DEFAULT_TIMEOUTS = Object.freeze({
+  positive: 2000,
+  info: 2000,
+  warning: 2200,
+  negative: 3000
+})
 const createAction = (label, action = {}) => ({
   label,
   color: 'white',
@@ -11,6 +17,16 @@ const createAction = (label, action = {}) => ({
 
 const CONFIRM_ACTION = (label = 'Confirm delete', action = {}) => createAction(label, action)
 const CANCEL_ACTION = (label = 'Go Back', action = {}) => createAction(label, action)
+
+function notifyWithDefaults(type, icon, message, options = {}) {
+  return Notify.create({
+    type,
+    icon,
+    timeout: DEFAULT_TIMEOUTS[type],
+    message,
+    ...options
+  })
+}
 
 // Add persistent dismiss button if timeout is 0 and no actions
 function withPersistentDismiss(options) {
@@ -26,13 +42,15 @@ function withPersistentDismiss(options) {
 
 // Notify success
 export function notifySuccess(message, options = {}) {
-  return Notify.create({
-    type: 'positive',
-    icon: 'check',
-    timeout: 2000,
-    message,
-    ...options
-  })
+  return notifyWithDefaults('positive', 'check', message, options)
+}
+
+export function notifyInfo(message, options = {}) {
+  return notifyWithDefaults('info', 'info', message, options)
+}
+
+export function notifyWarning(message, options = {}) {
+  return notifyWithDefaults('warning', 'warning', message, options)
 }
 
 // Notify error with persistent dismiss
@@ -44,7 +62,7 @@ export function notifyError(message, options = {}) {
   const payload = withPersistentDismiss({
     type: 'negative',
     icon: 'warning',
-    timeout: 3000,
+    timeout: DEFAULT_TIMEOUTS.negative,
     message,
     ...options
   })

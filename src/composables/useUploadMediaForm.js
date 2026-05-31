@@ -1,6 +1,5 @@
 import { ref, reactive, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { onBeforeRouteLeave, useRoute } from 'vue-router'
-import { Notify } from 'quasar'
 import { useAccountStore } from 'src/stores/account-store.js'
 import { useChannelStore } from 'src/stores/channel-store.js'
 import { useUploadStore } from 'src/stores/upload-store.js'
@@ -11,7 +10,7 @@ import { useUploadFlow } from '@composables/useUploadFlow.js'
 import { extractExifDate } from '@composables/useMediaMetadata.js'
 import { createRandomId } from 'src/utils/random.js'
 import { useDebounceFn } from '@vueuse/core'
-import { notifyError } from 'src/utils/notify.js'
+import { notifyError, notifyWarning } from 'src/utils/notify.js'
 
 const IMAGE_RESOURCE_TYPES = new Set(['cover', 'poster', 'preview'])
 const VALIDATION_DEBOUNCE_MS = 300
@@ -374,7 +373,7 @@ export function useUploadMediaForm() {
     } catch (err) {
       console.error(err)
       payload.album.media.previewType = 'new'
-      notifyError('Error extracting frames from video.', {
+      notifyError('Could not extract frames from the video.', {
         timeout: 0
       })
     } finally {
@@ -563,10 +562,7 @@ export function useUploadMediaForm() {
 
     await refreshValidation()
     if (!isReadyToUpload.value) {
-      Notify.create({
-        type: 'warning',
-        message: 'Please complete all required upload details before uploading.'
-      })
+      notifyWarning('Complete all required upload details before uploading.')
       return
     }
 

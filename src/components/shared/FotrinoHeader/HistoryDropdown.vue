@@ -36,7 +36,7 @@
 
 <script setup>
 import { computed, onMounted } from 'vue'
-import { Notify, useQuasar } from 'quasar'
+import { useQuasar } from 'quasar'
 import { useRoute } from 'vue-router'
 import { useChannelStore } from 'src/stores/channel-store.js'
 import {
@@ -46,6 +46,7 @@ import {
   resolveHistoryFromBackend
 } from '@utils/history.js'
 import { buildHistoryTargetPath, resolveChannelRouteContext } from '@utils/channel-route.js'
+import { notifyWarning } from 'src/utils/notify.js'
 
 const channelStore = useChannelStore()
 const $q = useQuasar()
@@ -86,12 +87,7 @@ onMounted(async () => {
   const removedCount = result?.deletedItems?.length || 0
 
   if (removedCount > 0) {
-    Notify.create({
-      type: 'warning',
-      timeout: 2200,
-      icon: 'info',
-      message: getRemovedHistoryMessage(removedCount)
-    })
+    notifyWarning(getRemovedHistoryMessage(removedCount), { icon: 'info' })
   }
 })
 </script>

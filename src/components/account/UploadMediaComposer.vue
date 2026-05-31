@@ -192,6 +192,7 @@ import ProgressView from '@components/account/UploadMediaComposer/ProgressView.v
 import { useUploadMediaForm } from '@composables/useUploadMediaForm.js'
 import { daysSince } from '@utils/date.js'
 import { sanitizeHtml, sanitizeText } from '@utils/text.js'
+import { notifyWarning } from 'src/utils/notify.js'
 
 const $q = useQuasar()
 const accountStore = useAccountStore()
@@ -774,19 +775,11 @@ function onMediaFileRejected(rejectedEntries) {
   const failedProp = first?.failedPropValidation || first?.failedProp
 
   if (failedProp === 'accept') {
-    $q.notify({
-      color: 'negative',
-      icon: 'warning',
-      message: 'Unsupported file type. Please choose a video file.'
-    })
+    notifyWarning('Unsupported file type. Please choose a video file.')
     return
   }
 
-  $q.notify({
-    color: 'negative',
-    icon: 'warning',
-    message: 'Selected file could not be added. Please try a different file.'
-  })
+  notifyWarning('Could not add the selected file. Please try a different file.')
 }
 </script>
 

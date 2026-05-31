@@ -62,10 +62,9 @@
 
 <script setup>
 import { ref } from 'vue'
-import { Notify } from 'quasar'
 import { useAdminStore } from 'src/stores/admin-store.js'
 import { getComponentApiErrorMessage } from 'src/utils/api-error-service.js'
-import { notifyError } from 'src/utils/notify.js'
+import { notifyError, notifySuccess } from 'src/utils/notify.js'
 
 const adminStore = useAdminStore()
 const olderThanHours = ref(24)
@@ -83,12 +82,9 @@ async function runCleanup() {
       limit: limit.value
     })
     result.value = response?.data || null
-    Notify.create({
-      type: 'positive',
-      message: dryRun.value ? 'Pending upload scan completed.' : 'Pending upload cleanup completed.',
-      icon: 'check',
-      timeout: 2200
-    })
+    notifySuccess(
+      dryRun.value ? 'Pending upload scan completed.' : 'Pending upload cleanup completed.'
+    )
   } catch (error) {
     console.error('Failed to run pending upload maintenance:', error)
     notifyError(getComponentApiErrorMessage(error, 'Failed to run pending upload maintenance.'), {

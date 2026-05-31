@@ -50,12 +50,11 @@
 
 <script setup>
 import { computed, watch } from 'vue'
-import { Notify } from 'quasar'
 import { useAdminStore } from 'src/stores/admin-store.js'
 import { daysSince } from '@utils/date.js'
 import { getComponentApiErrorMessage } from 'src/utils/api-error-service.js'
 import { buildPrivateMediaPath } from '@utils/channel-route.js'
-import { notifyError } from 'src/utils/notify.js'
+import { notifyError, notifySuccess } from 'src/utils/notify.js'
 
 const adminStore = useAdminStore()
 const reportedMediaQuery = adminStore.useReportedMediaQuery()
@@ -104,12 +103,7 @@ async function deleteMedia(privateId) {
   try {
     const result = await adminStore.deleteMedia(privateId)
     if (result?.cancelled || result?.ok === false) return
-    Notify.create({
-      type: 'positive',
-      message: 'Reported video deleted.',
-      icon: 'check',
-      timeout: 2000
-    })
+    notifySuccess('Reported video deleted.')
   } catch (err) {
     console.error('Failed to delete reported media:', err)
     notifyError(getComponentApiErrorMessage(err, 'Failed to delete reported videos.'), {

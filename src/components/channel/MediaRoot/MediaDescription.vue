@@ -111,12 +111,12 @@
 
 <script setup>
 import { computed, ref } from 'vue'
-import { Notify, useQuasar } from 'quasar'
+import { useQuasar } from 'quasar'
 import { sanitizeHtml } from '@utils/text.js'
 import { daysSince } from '@utils/date.js'
 import { useChannelStore } from 'src/stores/channel-store.js'
 import { getComponentApiErrorMessage } from 'src/utils/api-error-service.js'
-import { notifyError } from 'src/utils/notify.js'
+import { notifyError, notifyInfo, notifySuccess } from 'src/utils/notify.js'
 
 const props = defineProps({
   media: Object,
@@ -181,15 +181,10 @@ async function submitReport() {
     const res = result?.data || {}
     const reported = !!res?.reported
     if (reported) {
-      Notify.create({
-        message: 'Thanks for your report. Our team will review it.',
-        color: 'positive',
-        icon: 'check',
-        timeout: 2000
-      })
+      notifySuccess('Report submitted. Our team will review it.')
     } else {
-      const msg = res?.message || 'This video has already been reported by you.'
-      Notify.create({ message: msg, color: 'info', icon: 'info', timeout: 2000 })
+      const msg = res?.message || 'You have already reported this video.'
+      notifyInfo(msg)
     }
     reportDialog.value = false
     reason.value = ''

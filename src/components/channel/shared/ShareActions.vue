@@ -79,7 +79,8 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { Notify, copyToClipboard } from 'quasar'
+import { copyToClipboard } from 'quasar'
+import { notifyInfo } from 'src/utils/notify.js'
 
 const props = defineProps({
   channel: { type: Object, required: true },
@@ -295,8 +296,7 @@ onBeforeUnmount(() => {
 function copyLink(path) {
   if (!path) return
   copyToClipboard(`${globalThis.location.origin}${path}`).then(() => {
-    Notify.create({
-      message: 'URL copied to clipboard',
+    notifyInfo('Link copied to clipboard.', {
       color: 'accent',
       icon: 'content_paste',
       timeout: 1000

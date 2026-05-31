@@ -88,11 +88,10 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { Notify } from 'quasar'
 import { useAdminStore } from 'src/stores/admin-store.js'
 import { daysSince } from '@utils/date.js'
 import { getComponentApiErrorMessage } from 'src/utils/api-error-service.js'
-import { notifyError } from 'src/utils/notify.js'
+import { notifyError, notifySuccess } from 'src/utils/notify.js'
 
 const adminStore = useAdminStore()
 const JOB_FILTER_KEY = 'admin.jobs.filterMode'
@@ -215,12 +214,7 @@ async function runAction(job) {
   try {
     const result = await adminStore.runJobAction(job)
     const action = result?.data
-    Notify.create({
-      type: 'positive',
-      message: getActionSuccessMessage(action),
-      icon: 'check',
-      timeout: 2000
-    })
+    notifySuccess(getActionSuccessMessage(action))
   } catch (err) {
     console.error('Failed to run admin job action:', err)
     notifyError(getComponentApiErrorMessage(err, 'Failed to run admin job action.'), {
