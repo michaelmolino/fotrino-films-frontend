@@ -8,10 +8,6 @@ import {
   toArray
 } from 'src/stores/utils/query-helpers.js'
 import { api } from 'src/clients/axios-client.js'
-import {
-  assertAccountProfileResponse,
-  assertAccountProvidersResponse
-} from 'src/utils/response-guards.js'
 import { mutationResult, runMutation } from 'src/utils/store-mutations.js'
 
 export const useAccountStore = defineStore('account', () => {
@@ -29,8 +25,7 @@ export const useAccountStore = defineStore('account', () => {
       __policy: {
         loadHandling: 'none',
         errorHandling: 'none'
-      },
-      __responseGuard: assertAccountProfileResponse
+      }
     },
     transform: data => data?.data ?? null
   })
@@ -43,8 +38,7 @@ export const useAccountStore = defineStore('account', () => {
       __policy: {
         loadHandling: 'none',
         errorHandling: 'none'
-      },
-      __responseGuard: assertAccountProvidersResponse
+      }
     },
     transform: data => data?.data
   })

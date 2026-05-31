@@ -90,34 +90,8 @@ const installApiClientInterceptors = ({
 
   api.interceptors.response.use(
     response => {
-      try {
-        const responseGuard = response?.config?.__responseGuard
-        if (typeof responseGuard === 'function') {
-          responseGuard(response.data)
-        }
-        return response
-      } catch (error) {
-        const validationError = new Error(
-          error?.message || 'Invalid API response received from server.'
-        )
-        validationError.code = 'ERR_INVALID_RESPONSE'
-        validationError.__invalidApiResponse = true
-        validationError.__cause = error
-        validationError.config = response?.config
-        validationError.response = response
-
-        onApiError({
-          error: validationError,
-          status: response?.status,
-          requestCanceled: false,
-          requestPolicy: getRequestPolicyFromConfig(response?.config)
-        })
-        validationError.__apiErrorHandled = true
-
-        return Promise.reject(validationError)
-      } finally {
-        onRequestEnd(response?.config, getRequestPolicyFromConfig(response?.config))
-      }
+      onRequestEnd(response?.config, getRequestPolicyFromConfig(response?.config))
+      return response
     },
     error => {
       onRequestEnd(error?.config, getRequestPolicyFromConfig(error?.config))

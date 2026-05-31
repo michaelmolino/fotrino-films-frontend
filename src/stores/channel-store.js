@@ -9,11 +9,6 @@ import {
   toArray
 } from 'src/stores/utils/query-helpers.js'
 import { api } from 'src/clients/axios-client.js'
-import {
-  assertDataEnvelopeArrayResponse,
-  assertChannelViewResponse,
-  assertHistoryResolveResponse
-} from 'src/utils/response-guards.js'
 
 export const useChannelStore = defineStore('channel', () => {
   const channels = ref([])
@@ -30,9 +25,7 @@ export const useChannelStore = defineStore('channel', () => {
     key: ['channels', 'flat'],
     staleTime: API_CACHE_MEDIUM_MS,
     url: '/channels',
-    config: {
-      __responseGuard: data => assertDataEnvelopeArrayResponse(data, 'Channels list')
-    },
+    config: {},
     transform: data => toArray(data?.data)
   })
 
@@ -77,8 +70,7 @@ export const useChannelStore = defineStore('channel', () => {
     config: {
       __policy: {
         notFoundHandling: 'global'
-      },
-      __responseGuard: assertChannelViewResponse
+      }
     }
   })
 
@@ -194,8 +186,7 @@ export const useChannelStore = defineStore('channel', () => {
         __policy: {
           loadHandling: 'none',
           csrfHandling: 'none'
-        },
-        __responseGuard: assertHistoryResolveResponse
+        }
       }
     )
 

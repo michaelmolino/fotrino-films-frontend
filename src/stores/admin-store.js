@@ -9,7 +9,6 @@ import {
   toArray
 } from 'src/stores/utils/query-helpers.js'
 import { api } from 'src/clients/axios-client.js'
-import { assertDataEnvelopeArrayResponse, assertDataEnvelopeResponse } from 'src/utils/response-guards.js'
 
 export const useAdminStore = defineStore('admin', () => {
   const users = ref([])
@@ -26,8 +25,7 @@ export const useAdminStore = defineStore('admin', () => {
     config: {
       __policy: {
         errorHandling: 'none'
-      },
-      __responseGuard: data => assertDataEnvelopeArrayResponse(data, 'Admin users')
+      }
     },
     transform: data => toArray(data?.data)
   })
@@ -48,8 +46,7 @@ export const useAdminStore = defineStore('admin', () => {
         params: normalizedStatuses.length > 0 ? { status: normalizedStatuses } : undefined,
         __policy: {
           errorHandling: 'none'
-        },
-        __responseGuard: data => assertDataEnvelopeArrayResponse(data, 'Admin jobs')
+        }
       },
       transform: data => toArray(data?.data)
     })()
@@ -62,8 +59,7 @@ export const useAdminStore = defineStore('admin', () => {
     config: {
       __policy: {
         errorHandling: 'none'
-      },
-      __responseGuard: data => assertDataEnvelopeArrayResponse(data, 'Admin reported media')
+      }
     },
     transform: data => toArray(data?.data)
   })
@@ -204,8 +200,7 @@ export const useAdminStore = defineStore('admin', () => {
           },
           __policy: {
             errorHandling: 'none'
-          },
-          __responseGuard: data => assertDataEnvelopeResponse(data, 'Pending upload cleanup')
+          }
         })
     })
 
