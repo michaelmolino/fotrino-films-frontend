@@ -85,26 +85,22 @@
 </template>
 
 <script setup>
-import { computed, defineAsyncComponent, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { defineAsyncComponent, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
 import { useAlbumRootViewModel } from '@composables/useAlbumRootViewModel.js'
 import { useAlbumRouteEntities } from '@composables/useChannelRouteEntities.js'
 import { useAlbumRootRouteOrchestrator } from '@composables/useChannelRouteOrchestrator.js'
-import { resolveChannelRouteContext } from '@utils/channel-route.js'
 
 import BreadCrumbs from '@components/channel/shared/BreadCrumbs.vue'
 import ShareActions from '@components/channel/shared/ShareActions.vue'
 import MediaPreview from '@components/channel/shared/MediaPreview.vue'
 const NothingText = defineAsyncComponent(() => import('@components/shared/NothingText.vue'))
 
-const route = useRoute()
 const router = useRouter()
 const redirecting = ref(false)
 
-const { channel, loading, findAlbumByPublicId } = useChannelLoader()
-
-const routeContext = computed(() => resolveChannelRouteContext(route))
+const { channel, loading, findAlbumByPublicId, routeContext } = useChannelLoader()
 
 function redirect(pathOrObj) {
   if (redirecting.value) return

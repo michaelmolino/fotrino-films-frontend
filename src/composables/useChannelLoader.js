@@ -4,7 +4,7 @@ import { useChannelStore } from 'src/stores/channel-store.js'
 import { useRoute, useRouter } from 'vue-router'
 import { useMeta } from 'quasar'
 import { getMetaData } from '@utils/meta.js'
-import { syncChannelRouteHistory } from '@utils/history.js'
+import { syncHistoryFromRouteContext } from '@utils/history.js'
 import {
   isChannelRouteTargetLoaded,
   resolveCanonicalPathForRoute,
@@ -176,7 +176,7 @@ export function useChannelLoader({ manageMeta = false } = {}) {
       channel.value = loaded.data
       const loadedChannel = loaded.data
 
-      syncChannelRouteHistory({ context, channel: loadedChannel })
+      syncHistoryFromRouteContext({ context, channel: loadedChannel })
       syncCanonicalSlugs({ route, context })
 
       metaData.value = getMetaData(route, loadedChannel)

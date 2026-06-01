@@ -1,5 +1,10 @@
 import { ref } from 'vue'
 import { LocalStorage } from 'quasar'
+import {
+  buildChannelPath,
+  buildPrivateAlbumPath,
+  buildPrivateMediaPath
+} from '@utils/channel-route.js'
 
 /** @typedef {{ resourceId: string, type: 'channel' | 'privateMedia' | 'privateAlbum' }} HistoryEntry */
 
@@ -54,6 +59,12 @@ function commitHistory(entries) {
   LocalStorage.set(HISTORY_KEY, entries)
 }
 
+const HISTORY_PATH_BUILDERS = {
+  privateAlbum: entry => buildPrivateAlbumPath({ privateId: entry.resourceId, slug: entry.slug }),
+  privateMedia: entry => buildPrivateMediaPath({ privateId: entry.resourceId, slug: entry.slug }),
+  default: entry => buildChannelPath({ publicId: entry.resourceId, slug: entry.slug })
+}
+
 if (JSON.stringify(storedHistory) !== JSON.stringify(parsedHistory)) {
   LocalStorage.set(HISTORY_KEY, parsedHistory)
 }
@@ -74,7 +85,7 @@ export function addPrivateAlbumHistory(privateId, details = {}) {
   addToHistory({ type: 'privateAlbum', resourceId: privateId, details })
 }
 
-export function syncChannelRouteHistory({ context, channel }) {
+export function syncHistoryFromRouteContext({ context, channel }) {
   if (!context.isPrivate && channel) {
     addHistory(channel)
   }
@@ -117,6 +128,13 @@ export function buildCurrentHistoryEntryFromContext(context) {
   }
 
   return null
+}
+
+export function buildHistoryTargetPath(entry) {
+  if (!entry?.resourceId || !entry?.slug) return null
+
+  const buildPath = HISTORY_PATH_BUILDERS[entry.type] || HISTORY_PATH_BUILDERS.default
+  return buildPath(entry)
 }
 
 export function addToHistory({ type, resourceId, details = {} }) {

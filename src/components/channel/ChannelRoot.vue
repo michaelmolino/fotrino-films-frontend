@@ -74,7 +74,6 @@
 <script setup>
 import {
   ref,
-  computed,
   defineAsyncComponent,
   watch,
   onMounted,
@@ -86,7 +85,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
 import { useChannelRootViewModel } from '@composables/useChannelRootViewModel.js'
 import { useChannelRootRouteOrchestrator } from '@composables/useChannelRouteOrchestrator.js'
-import { resolveChannelRouteContext } from '@utils/channel-route.js'
 
 import BreadCrumbs from '@components/channel/shared/BreadCrumbs.vue'
 import ShareActions from '@components/channel/shared/ShareActions.vue'
@@ -104,8 +102,7 @@ const breadcrumbsRef = ref(null)
 const viewToggleRef = ref(null)
 const isViewToggleWrapped = ref(false)
 let headerResizeObserver = null
-const { channel, sortedAllMedia, loading } = useChannelLoader()
-const routeContext = computed(() => resolveChannelRouteContext(route))
+const { channel, sortedAllMedia, loading, routeContext } = useChannelLoader()
 const {
   contentState,
   showAlbumsView,

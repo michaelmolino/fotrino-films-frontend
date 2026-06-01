@@ -14,19 +14,17 @@
 </template>
 
 <script setup>
-import { computed, ref, watch, defineAsyncComponent, onMounted } from 'vue'
+import { ref, watch, defineAsyncComponent, onMounted } from 'vue'
 import { useAccountStore } from 'src/stores/account-store.js'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
-import { resolveChannelRouteContext } from '@utils/channel-route.js'
 
 const Terms = defineAsyncComponent(() => import('@components/pages/Terms.vue'))
 
 const accountStore = useAccountStore()
 const route = useRoute()
 const router = useRouter()
-const { loadChannel } = useChannelLoader({ manageMeta: true })
-const routeContext = computed(() => resolveChannelRouteContext(route))
+const { loadChannel, routeContext } = useChannelLoader({ manageMeta: true })
 accountStore.useProfileQuery()
 
 const showTerms = ref(false)

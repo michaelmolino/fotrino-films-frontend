@@ -40,12 +40,13 @@ import { useQuasar } from 'quasar'
 import { useRoute } from 'vue-router'
 import { useChannelStore } from 'src/stores/channel-store.js'
 import {
+  buildHistoryTargetPath,
   buildCurrentHistoryEntryFromContext,
   historyChannels,
   removeHistory,
   resolveHistoryFromBackend
 } from '@utils/history.js'
-import { buildHistoryTargetPath, resolveChannelRouteContext } from '@utils/channel-route.js'
+import { resolveChannelRouteContext } from '@utils/channel-route.js'
 import { notifyWarning } from 'src/utils/notify.js'
 
 const channelStore = useChannelStore()
