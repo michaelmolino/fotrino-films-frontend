@@ -9,6 +9,33 @@ import {
   toArray
 } from 'src/stores/utils/query-helpers.js'
 import { api } from 'src/clients/axios-client.js'
+import {
+  ensureApiEnvelope,
+  ensureHistoryResponsePayload,
+  ensureMediaSessionPayload,
+  ensureReportMediaPayload
+} from 'src/stores/utils/api-contract-guards.js'
+
+/** @typedef {import('src/types/api.generated').ApiContracts} ApiContracts */
+
+function resolveUnifiedRouteContractName(resourceType) {
+  switch (resourceType) {
+    case 'channel':
+      return 'ChannelDetail'
+    case 'album':
+      return 'ChannelDetail'
+    case 'media':
+      return 'ChannelDetail'
+    case 'privateMedia':
+      return 'PrivateMediaChannel'
+    case 'privateAlbum':
+      return 'PrivateMediaChannel'
+    case 'privateAlbumMedia':
+      return 'PrivateMediaChannel'
+    default:
+      return null
+  }
+}
 
 export const useChannelStore = defineStore('channel', () => {
   const channels = ref([])
@@ -26,7 +53,9 @@ export const useChannelStore = defineStore('channel', () => {
     staleTime: API_CACHE_MEDIUM_MS,
     url: '/channels',
     config: {},
-    transform: data => toArray(data?.data)
+    enforceEnvelope: true,
+    contractName: 'ChannelSummary',
+    transform: data => toArray(data.data)
   })
 
   const unifiedRouteQueryOptions = createApiGetQueryOptionsFactory({
@@ -71,7 +100,9 @@ export const useChannelStore = defineStore('channel', () => {
       __policy: {
         notFoundHandling: 'global'
       }
-    }
+    },
+    enforceEnvelope: true,
+    contractName: resourceType => resolveUnifiedRouteContractName(resourceType)
   })
 
   const channelQueryOptions = (
@@ -181,10 +212,18 @@ export const useChannelStore = defineStore('channel', () => {
       }
     )
 
+    const envelope = ensureApiEnvelope(data, {
+      url: '/channels/history',
+      contractName: 'ChannelHistory'
+    })
+    const historyPayload = ensureHistoryResponsePayload(envelope.data, {
+      url: '/channels/history'
+    })
+
     return {
-      items: Array.isArray(data?.data?.items) ? data.data.items : [],
-      deletedItems: Array.isArray(data?.data?.deletedItems) ? data.data.deletedItems : [],
-      persistedItems: Array.isArray(data?.data?.persistedItems) ? data.data.persistedItems : []
+      items: Array.isArray(historyPayload.items) ? historyPayload.items : [],
+      deletedItems: Array.isArray(historyPayload.deletedItems) ? historyPayload.deletedItems : [],
+      persistedItems: Array.isArray(historyPayload.persistedItems) ? historyPayload.persistedItems : []
     }
   }
 
@@ -198,7 +237,11 @@ export const useChannelStore = defineStore('channel', () => {
 
     if (!cache) {
       const { data } = await api.get(options.url, options.config)
-      return data?.data ?? null
+      const envelope = ensureApiEnvelope(data, {
+        url: options.url,
+        contractName: 'ChannelDetail'
+      })
+      return envelope.data ?? null
     }
 
     const entry = queryCache.ensure(options)
@@ -210,12 +253,29 @@ export const useChannelStore = defineStore('channel', () => {
   }
 
   const createMediaSession = async ({ privateId }) => {
-    const res = await api.post(`/channels/media/session/${privateId}`, null, {
-      __policy: {
-        csrfHandling: 'none'
+    const res = await runMutation({
+      request: () =>
+        api.post(`/channels/media/session/${privateId}`, null, {
+          __policy: {
+            csrfHandling: 'none'
+          }
+        }),
+      validateResult: result => {
+        const envelope = ensureApiEnvelope(result?.data, {
+          url: `/channels/media/session/${privateId}`,
+          contractName: 'MediaSession'
+        })
+        ensureMediaSessionPayload(envelope.data, {
+          url: `/channels/media/session/${privateId}`
+        })
       }
     })
-    return mutationResult({ ok: true, data: res.data?.data ?? null })
+
+    const envelope = ensureApiEnvelope(res.data, {
+      url: `/channels/media/session/${privateId}`,
+      contractName: 'MediaSession'
+    })
+    return mutationResult({ ok: true, data: ensureMediaSessionPayload(envelope.data) })
   }
 
   const deleteResource = async resource => {
@@ -303,11 +363,17 @@ export const useChannelStore = defineStore('channel', () => {
           description: description?.trim() || null,
           resourceDate: resourceDate?.trim() || null,
           main
+        }),
+      validateResult: result => {
+        ensureApiEnvelope(result?.data, {
+          url: `/channels/media/${mediaPrivateId}`,
+          contractName: 'ChannelMedia'
         })
+      }
     })
     invalidateChannelsCache()
     if (mediaPublicId) invalidateChannelCacheByMedia(mediaPublicId)
-    return mutationResult({ ok: true, data: res.data?.data ?? null })
+    return mutationResult({ ok: true, data: ensureApiEnvelope(res.data).data ?? null })
   }
 
   const updateAlbum = async ({
@@ -325,11 +391,17 @@ export const useChannelStore = defineStore('channel', () => {
           subtitle: subtitle?.trim() || null,
           posterType,
           posterColor
+        }),
+      validateResult: result => {
+        ensureApiEnvelope(result?.data, {
+          url: `/channels/album/${albumPrivateId}`,
+          contractName: 'ChannelAlbum'
         })
+      }
     })
     invalidateChannelsCache()
     if (albumPublicId) invalidateChannelCacheByAlbum(albumPublicId)
-    return mutationResult({ ok: true, data: res.data?.data ?? null })
+    return mutationResult({ ok: true, data: ensureApiEnvelope(res.data).data ?? null })
   }
 
   const updateChannel = async ({ channelPublicId, title }) => {
@@ -337,11 +409,17 @@ export const useChannelStore = defineStore('channel', () => {
       request: () =>
         api.put(`/channels/${channelPublicId}`, {
           title: title?.trim()
+        }),
+      validateResult: result => {
+        ensureApiEnvelope(result?.data, {
+          url: `/channels/${channelPublicId}`,
+          contractName: 'ChannelSummary'
         })
+      }
     })
     invalidateChannelsCache()
     invalidateChannelCacheById(channelPublicId)
-    return mutationResult({ ok: true, data: res.data?.data ?? null })
+    return mutationResult({ ok: true, data: ensureApiEnvelope(res.data).data ?? null })
   }
 
   const reportMedia = async ({ privateId, reason }) => {
@@ -357,7 +435,12 @@ export const useChannelStore = defineStore('channel', () => {
               csrfHandling: 'none'
             }
           }
-        )
+        ),
+      validateResult: result => {
+        ensureReportMediaPayload(result?.data, {
+          url: `/channels/media/private/${privateId}/report`
+        })
+      }
     })
     if (privateId) {
       invalidateQueriesSafely(queryCache, {
@@ -365,7 +448,7 @@ export const useChannelStore = defineStore('channel', () => {
         exact: true
       })
     }
-    return mutationResult({ ok: true, data: res.data })
+    return mutationResult({ ok: true, data: ensureReportMediaPayload(res.data) })
   }
 
   const useChannelQuery = (channelPublicId, enabled = true, options = {}) => {

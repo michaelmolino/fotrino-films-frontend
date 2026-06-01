@@ -1,4 +1,5 @@
 import { api } from 'src/clients/axios-client.js'
+import { ensureApiEnvelope } from 'src/stores/utils/api-contract-guards.js'
 
 const identity = value => value
 
@@ -11,7 +12,9 @@ export function createApiGetQueryOptionsFactory({
   staleTime,
   url,
   config,
-  transform = identity
+  transform = identity,
+  enforceEnvelope = false,
+  contractName = null
 }) {
   return (...args) => ({
     key: typeof key === 'function' ? key(...args) : key,
@@ -19,8 +22,18 @@ export function createApiGetQueryOptionsFactory({
     query: async () => {
       const resolvedUrl = typeof url === 'function' ? url(...args) : url
       const resolvedConfig = typeof config === 'function' ? config(...args) : config
+      const resolvedContractName =
+        typeof contractName === 'function' ? contractName(...args) : contractName
       const { data } = await api.get(resolvedUrl, resolvedConfig)
-      return transform(data, ...args)
+      const guardedData =
+        enforceEnvelope || resolvedContractName
+          ? ensureApiEnvelope(data, {
+              url: resolvedUrl,
+              contractName: resolvedContractName
+            })
+          : data
+
+      return transform(guardedData, ...args)
     }
   })
 }

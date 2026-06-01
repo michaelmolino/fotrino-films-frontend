@@ -12,6 +12,13 @@ import { createRandomId } from 'src/utils/random.js'
 import { useDebounceFn } from '@vueuse/core'
 import { notifyError, notifyWarning } from 'src/utils/notify.js'
 
+/** @typedef {import('src/types/api.generated').ApiContracts} ApiContracts */
+/** @typedef {ApiContracts['UploadMediaRequest']} UploadMediaRequest */
+/** @typedef {ApiContracts['UploadValidationResponse']} UploadValidationResponse */
+/** @typedef {ApiContracts['UploadDraftFiles']} UploadDraftFiles */
+/** @typedef {ApiContracts['Channel']} ChannelSelection */
+/** @typedef {ApiContracts['Album']} AlbumSelection */
+
 const IMAGE_RESOURCE_TYPES = new Set(['cover', 'poster', 'preview'])
 const VALIDATION_DEBOUNCE_MS = 300
 
@@ -88,6 +95,7 @@ export function useUploadMediaForm() {
   const frameExtractionToken = ref(0)
   const uploadTriggered = ref(false)
   const channelsHydrated = ref(false)
+  /** @type {import('vue').Ref<UploadValidationResponse>} */
   const validation = ref({ canSubmit: false, blockers: [] })
   let validationInFlightPromise = null
   let dismissUploadErrorNotify = null
@@ -101,6 +109,7 @@ export function useUploadMediaForm() {
   const { compressImageFile } = useImageFileProcessor()
   const { getRandomFrameFromFile, disposeFrameSession } = useVideoThumbnailProcessor()
 
+  /** @returns {ChannelSelection} */
   function buildChannelSelection() {
     if (payload.channelMode === 'create') {
       const coverMode = payload.coverType === 'new' ? 'upload' : 'profile'
@@ -126,6 +135,7 @@ export function useUploadMediaForm() {
     }
   }
 
+  /** @returns {AlbumSelection} */
   function buildAlbumSelection() {
     if (payload.album.projectMode === 'create') {
       const posterMode = payload.album.posterType === 'new' ? 'upload' : 'color'
@@ -161,6 +171,7 @@ export function useUploadMediaForm() {
     }
   }
 
+  /** @returns {UploadDraftFiles} */
   function buildDraftFiles() {
     return {
       upload: !!mediaFile.value,
@@ -173,6 +184,7 @@ export function useUploadMediaForm() {
     }
   }
 
+  /** @returns {UploadMediaRequest} */
   function buildDraftRequest() {
     const channel = buildChannelSelection()
     const album = buildAlbumSelection()
@@ -402,6 +414,7 @@ export function useUploadMediaForm() {
     validationInFlightPromise = (async () => {
       try {
         const result = await uploadStore.validateUploadDraft(buildDraftRequest())
+        /** @type {UploadValidationResponse} */
         validation.value = result?.data || { canSubmit: false, blockers: [] }
       } catch {
         validation.value = { canSubmit: false, blockers: ['validation.unavailable'] }

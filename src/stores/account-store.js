@@ -27,7 +27,9 @@ export const useAccountStore = defineStore('account', () => {
         errorHandling: 'none'
       }
     },
-    transform: data => data?.data ?? null
+    enforceEnvelope: true,
+    contractName: 'AccountProfile',
+    transform: data => data.data ?? null
   })
 
   const accountProvidersQueryOptions = createApiGetQueryOptionsFactory({
@@ -40,7 +42,9 @@ export const useAccountStore = defineStore('account', () => {
         errorHandling: 'none'
       }
     },
-    transform: data => data?.data
+    enforceEnvelope: true,
+    contractName: 'AccountProvidersResponse',
+    transform: data => data.data
   })
 
   const setProfile = value => {

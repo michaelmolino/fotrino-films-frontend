@@ -27,7 +27,9 @@ export const useAdminStore = defineStore('admin', () => {
         errorHandling: 'none'
       }
     },
-    transform: data => toArray(data?.data)
+    enforceEnvelope: true,
+    contractName: 'AdminUsersResponse',
+    transform: data => toArray(data.data)
   })
 
   const jobsQueryOptions = (statuses = []) => {
@@ -48,7 +50,8 @@ export const useAdminStore = defineStore('admin', () => {
           errorHandling: 'none'
         }
       },
-      transform: data => toArray(data?.data)
+      enforceEnvelope: true,
+      transform: data => toArray(data.data)
     })()
   }
 
@@ -61,7 +64,9 @@ export const useAdminStore = defineStore('admin', () => {
         errorHandling: 'none'
       }
     },
-    transform: data => toArray(data?.data)
+    enforceEnvelope: true,
+    contractName: 'ReportedMediaItem',
+    transform: data => toArray(data.data)
   })
 
   const setUsers = value => {

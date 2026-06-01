@@ -7,6 +7,8 @@
   "type": "module",
   "scripts": {
     "generate:api-contracts": "node scripts/generate-api-contracts.mjs",
+    "validate:api-contracts": "node scripts/validate-api-contracts.mjs",
+    "check:api-contracts": "yarn generate:api-contracts && yarn validate:api-contracts",
     "format": "yarn prettier --write . && yarn eslint --fix 'src/**/*.{js,vue}'",
     "lint": "eslint --ext .js,.vue ./",
     "test": "echo \"No test specified\" && exit 0",

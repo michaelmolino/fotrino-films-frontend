@@ -4,6 +4,14 @@ import { api } from 'src/clients/axios-client.js'
 import { useQueryCache } from '@pinia/colada'
 import { invalidateQueriesSafely } from 'src/stores/utils/query-helpers.js'
 import { mutationResult, runMutation } from 'src/stores/utils/store-mutations.js'
+import {
+  ensureUploadDraftPayload,
+  ensureUploadValidationPayload
+} from 'src/stores/utils/api-contract-guards.js'
+
+/** @typedef {import('src/types/api.generated').ApiContracts} ApiContracts */
+/** @typedef {ApiContracts['UploadMediaRequest']} UploadMediaRequest */
+/** @typedef {ApiContracts['UploadValidationResponse']} UploadValidationResponse */
 
 export const useUploadStore = defineStore('upload', () => {
   const upload = ref(null)
@@ -55,6 +63,7 @@ export const useUploadStore = defineStore('upload', () => {
     return mutationResult({ ok: true, data: res.data })
   }
 
+  /** @param {UploadMediaRequest} draftRequest */
   const postUploadDraft = async draftRequest => {
     const response = await runMutation({
       request: () =>
@@ -64,12 +73,15 @@ export const useUploadStore = defineStore('upload', () => {
             Accept: 'application/json'
           }
         }),
+      validateResult: result => {
+        ensureUploadDraftPayload(result?.data, { url: '/uploads/media/drafts' })
+      },
       onError: () => {
         setUpload(null)
       }
     })
 
-    const data = response?.data || {}
+    const data = ensureUploadDraftPayload(response?.data, { url: '/uploads/media/drafts' })
     const normalizedData = {
       mediaPrivateId: data?.mediaPrivateId ?? null,
       instructions: data.instructions
@@ -79,6 +91,7 @@ export const useUploadStore = defineStore('upload', () => {
     return mutationResult({ ok: true, data: normalizedData })
   }
 
+  /** @param {UploadMediaRequest} draftRequest */
   const validateUploadDraft = async draftRequest => {
     const response = await runMutation({
       request: () =>
@@ -90,10 +103,18 @@ export const useUploadStore = defineStore('upload', () => {
             'Content-Type': 'application/json',
             Accept: 'application/json'
           }
-        })
+        }),
+      validateResult: result => {
+        ensureUploadValidationPayload(result?.data, { url: '/uploads/media/drafts/validate' })
+      }
     })
 
-    return mutationResult({ ok: true, data: response?.data || { canSubmit: false, blockers: [] } })
+    /** @type {UploadValidationResponse} */
+    const validated = ensureUploadValidationPayload(response?.data, {
+      url: '/uploads/media/drafts/validate'
+    })
+
+    return mutationResult({ ok: true, data: validated })
   }
 
   const confirmUpload = async mediaPrivateId => {
