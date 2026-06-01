@@ -8,7 +8,7 @@ import {
   getCloudflareGatewayErrorPayload,
   getComponentApiErrorPayload,
   getGlobalApiErrorPayload,
-  getGlobalApiErrorMessage,
+  getGlobalApiErrorMessage
 } from 'src/utils/api-error-service.js'
 import CloudflareGatewayErrorDialog from '@components/errors/CloudflareGatewayErrorDialog.vue'
 
@@ -74,7 +74,10 @@ export default boot(({ app, router }) => {
         error?.code === 'ERR_CANCELED' ||
         error?.name === 'CanceledError'
       const isUnauthorized =
-        code === 'unauthorized' || code === 'forbidden' || resolvedStatus === 401 || resolvedStatus === 403
+        code === 'unauthorized' ||
+        code === 'forbidden' ||
+        resolvedStatus === 401 ||
+        resolvedStatus === 403
       const isNotFound = code === 'not_found' || resolvedStatus === 404
       const componentErrorPayload = getComponentApiErrorPayload(error)
       const skipNotify = requestPolicy.errorHandling !== 'global' || componentErrorPayload != null

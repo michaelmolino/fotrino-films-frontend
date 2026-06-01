@@ -53,7 +53,9 @@
           expand-separator
           class="q-mt-md"
           :label="`Matched Media IDs (${result.mediaIds.length})`">
-          <pre class="maintenance-result-pre q-mt-sm">{{ JSON.stringify(result.mediaIds, null, 2) }}</pre>
+          <pre class="maintenance-result-pre q-mt-sm">{{
+            JSON.stringify(result.mediaIds, null, 2)
+          }}</pre>
         </q-expansion-item>
       </q-card-section>
     </q-card>

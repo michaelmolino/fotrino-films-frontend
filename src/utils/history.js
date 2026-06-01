@@ -92,8 +92,7 @@ export function syncHistoryFromRouteContext({ context, channel }) {
 
   if (context.type === 'privateMedia' && context.privateMediaId && channel) {
     const media =
-      (channel?.album?.media || []).find(item => item?.privateId === context.privateMediaId) ||
-      null
+      (channel?.album?.media || []).find(item => item?.privateId === context.privateMediaId) || null
 
     addPrivateHistory(context.privateMediaId, {
       title: media?.title || channel?.title || '',
@@ -141,7 +140,12 @@ export function addToHistory({ type, resourceId, details = {} }) {
   if (!type || !resourceId) return
 
   const entry = { type, resourceId }
-  if (history.value.some(item => buildHistoryKey(item.type, item.resourceId) === buildHistoryKey(type, resourceId))) return
+  if (
+    history.value.some(
+      item => buildHistoryKey(item.type, item.resourceId) === buildHistoryKey(type, resourceId)
+    )
+  )
+    return
 
   const updated = [...history.value, entry]
   commitHistory(updated)
@@ -167,7 +171,10 @@ export function removeHistory(resourceId, type = null) {
   historyChannels.value = excludeHistoryEntries(historyChannels.value, resourceId, type)
 }
 
-export async function resolveHistoryFromBackend(channelStore, { force = false, currentEntry = null } = {}) {
+export async function resolveHistoryFromBackend(
+  channelStore,
+  { force = false, currentEntry = null } = {}
+) {
   if (hasResolvedHistory && !force) {
     return { channels: historyChannels.value, deletedItems: [] }
   }

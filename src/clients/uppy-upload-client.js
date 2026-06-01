@@ -39,7 +39,8 @@ export function createPresignedUppyClient({
   onUploadError
 }) {
   const instructionByType = buildInstructionMap(instructions)
-  const apiBase = typeof process.env.API === 'string' ? process.env.API.trim().replace(/\/$/, '') : ''
+  const apiBase =
+    typeof process.env.API === 'string' ? process.env.API.trim().replace(/\/$/, '') : ''
   const companionBase = apiBase ? `${apiBase}/uppy` : '/uppy'
 
   const restrictions = {}

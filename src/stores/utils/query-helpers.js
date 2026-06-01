@@ -3,7 +3,7 @@ import { api } from 'src/clients/axios-client.js'
 const identity = value => value
 
 export function invalidateQueriesSafely(queryCache, options) {
-  queryCache.invalidateQueries(options).catch(() => { })
+  queryCache.invalidateQueries(options).catch(() => {})
 }
 
 export function createApiGetQueryOptionsFactory({

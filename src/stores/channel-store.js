@@ -37,14 +37,14 @@ export const useChannelStore = defineStore('channel', () => {
       withPending = false,
       withSoftDeleted = false
     ) => [
-        'channel',
-        'resolve',
-        resourceType,
-        resourceId,
-        focusedMediaPrivateId || 'root',
-        withPending ? 'pending' : 'current',
-        withSoftDeleted ? 'with-deleted' : 'without-deleted'
-      ],
+      'channel',
+      'resolve',
+      resourceType,
+      resourceId,
+      focusedMediaPrivateId || 'root',
+      withPending ? 'pending' : 'current',
+      withSoftDeleted ? 'with-deleted' : 'without-deleted'
+    ],
     staleTime: API_CACHE_MEDIUM_MS,
     url: (
       resourceType,

@@ -32,7 +32,9 @@ function getGlobalPayloadMessage(payload, fallback) {
 
 export function getCloudflareGatewayErrorPayload(error) {
   const data = getErrorData(error)
-  return data?.cloudflare_error === true && data?.status >= 500 && typeof data?.error_name === 'string'
+  return data?.cloudflare_error === true &&
+    data?.status >= 500 &&
+    typeof data?.error_name === 'string'
     ? data
     : null
 }
