@@ -78,6 +78,20 @@ const normalizeCanonicalPath = canonicalPath => {
   return canonicalPath && typeof canonicalPath === 'object' ? canonicalPath : null
 }
 
+const getPathSegments = path => path.split('/').filter(Boolean)
+
+const isPrivateAlbumPath = path => {
+  const segments = getPathSegments(path)
+  return segments.length === 4 && segments[0] === 'private' && segments[1] === 'a'
+}
+
+const isPrivateAlbumMediaPath = path => {
+  const segments = getPathSegments(path)
+  return (
+    segments.length === 6 && segments[0] === 'private' && segments[1] === 'a' && segments[3] === 'm'
+  )
+}
+
 const ROUTE_TARGET_PRIORITY = [
   'privateAlbumMedia',
   'privateAlbum',
@@ -376,20 +390,6 @@ export const toChannelRouteTargetFromContext = context => {
   if (!context || context.type === 'unknown') return null
 
   return getRouteTypeDefinition(context.type)?.getTargetFromContext(context) || null
-}
-
-const getPathSegments = path => path.split('/').filter(Boolean)
-
-const isPrivateAlbumPath = path => {
-  const segments = getPathSegments(path)
-  return segments.length === 4 && segments[0] === 'private' && segments[1] === 'a'
-}
-
-const isPrivateAlbumMediaPath = path => {
-  const segments = getPathSegments(path)
-  return (
-    segments.length === 6 && segments[0] === 'private' && segments[1] === 'a' && segments[3] === 'm'
-  )
 }
 
 export const isCanonicalPathCompatibleWithRouteTarget = (canonicalPath, target) => {
