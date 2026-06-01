@@ -51,7 +51,6 @@ yarn quasar dev
 - `yarn format` - run Prettier and auto-fix lint issues in `src/**/*.{js,vue}`
 - `yarn build:analyze` - build SPA bundle with analyzer enabled
 - `yarn coverage` - start dev server with coverage instrumentation
-- `yarn generate:api-contracts` - generate API contract types from backend OpenAPI schema
 
 ## License
 
