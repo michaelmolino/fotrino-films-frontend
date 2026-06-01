@@ -98,6 +98,9 @@ export type Slug5 = string | null
 export type Title5 = string
 export type Type2 = 'channel' | 'privateMedia' | 'privateAlbum'
 export type Items = HistoryItemResponse[]
+export type HistoryResourceID2 = string
+export type Type3 = 'channel' | 'privateMedia' | 'privateAlbum'
+export type Persisteditems = HistoryItemRequest[]
 export type Created7 = string
 export type Deleted6 = boolean
 export type Descriptionunsafe1 = string | null
@@ -111,7 +114,7 @@ export type Resourcedate3 = string
 export type Slug6 = string
 export type Src1 = string | null
 export type Title6 = string
-export type Type3 = string | null
+export type Type4 = string | null
 export type Updatedat3 = string
 export type Cover3 = string
 export type Created8 = string
@@ -164,7 +167,7 @@ export type Resourcedate6 = string | null
 export type Slug8 = string
 export type Src2 = string | null
 export type Title10 = string
-export type Type4 = string | null
+export type Type5 = string | null
 export type Updatedat4 = string | null
 export type Media2 = PrivateMediaItemResponse[]
 export type Poster2 = string | null
@@ -393,6 +396,7 @@ export interface ChannelCanonicalPathResponse {
 export interface HistoryResponse {
   deletedItems?: Deleteditems
   items: Items
+  persistedItems?: Persisteditems
 }
 export interface HistoryDeletedItemResponse {
   resourceId: HistoryResourceID
@@ -404,6 +408,10 @@ export interface HistoryItemResponse {
   slug?: Slug5
   title: Title5
   type: Type2
+}
+export interface HistoryItemRequest {
+  resourceId: HistoryResourceID2
+  type: Type3
 }
 export interface MediaResponse1 {
   canonicalPath?: MediaCanonicalPathResponse | null
@@ -420,7 +428,7 @@ export interface MediaResponse1 {
   slug: Slug6
   src: Src1
   title: Title6
-  type: Type3
+  type: Type4
   updatedAt: Updatedat3
   [k: string]: unknown
 }
@@ -509,7 +517,7 @@ export interface PrivateMediaItemResponse {
   slug: Slug8
   src?: Src2
   title: Title10
-  type?: Type4
+  type?: Type5
   updatedAt?: Updatedat4
 }
 export interface PrivateMediaChannelResponse {
