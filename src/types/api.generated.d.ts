@@ -136,6 +136,10 @@ export type Message3 = string | null
 export type Status = string
 export type Error7 = 'internal_server_error'
 export type Message4 = string | null
+export type Expiresat = number
+export type Issuedat = number
+export type Playbackurl = string
+export type Ttlseconds = number
 export type Description = string | null
 export type Main2 = boolean
 export type Resourcedate4 = string
@@ -250,6 +254,7 @@ export interface ApiContracts {
   GlobalHttpErrorResponse: GlobalHttpErrorResponse
   HealthResponse: HealthResponse
   InternalServerErrorResponse: InternalServerErrorResponse
+  MediaSession: MediaSessionEnvelopeResponse
   MediaUpdateRequest: MediaUpdateRequest
   MediaUploadPayload: MediaUploadPayload
   NotFoundErrorResponse: NotFoundErrorResponse
@@ -478,6 +483,15 @@ export interface InternalServerErrorResponse {
   detail?: unknown
   error: Error7
   message?: Message4
+}
+export interface MediaSessionEnvelopeResponse {
+  data: MediaSessionResponse
+}
+export interface MediaSessionResponse {
+  expiresAt: Expiresat
+  issuedAt: Issuedat
+  playbackUrl: Playbackurl
+  ttlSeconds: Ttlseconds
 }
 export interface MediaUpdateRequest {
   description?: Description
