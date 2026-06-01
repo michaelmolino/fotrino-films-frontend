@@ -8,7 +8,7 @@ import {
   toArray
 } from 'src/stores/utils/query-helpers.js'
 import { api } from 'src/clients/axios-client.js'
-import { mutationResult, runMutation } from 'src/utils/store-mutations.js'
+import { mutationResult, runMutation } from 'src/stores/utils/store-mutations.js'
 
 export const useAccountStore = defineStore('account', () => {
   const profile = ref(null)

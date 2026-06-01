@@ -2,7 +2,8 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { api } from 'src/clients/axios-client.js'
 import { useQueryCache } from '@pinia/colada'
-import { mutationResult, runMutation } from 'src/utils/store-mutations.js'
+import { invalidateQueriesSafely } from 'src/stores/utils/query-helpers.js'
+import { mutationResult, runMutation } from 'src/stores/utils/store-mutations.js'
 
 export const useUploadStore = defineStore('upload', () => {
   const upload = ref(null)
@@ -14,29 +15,39 @@ export const useUploadStore = defineStore('upload', () => {
     upload.value = value
   }
 
-  const invalidateQueries = options => {
-    queryCache.invalidateQueries(options).catch(() => { })
+  const channelResolveKey = (resourceType, resourceId) => {
+    return ['channel', 'resolve', resourceType, resourceId, 'root', 'current', 'without-deleted']
   }
 
   const invalidateChannelsCache = () => {
-    invalidateQueries({ key: ['channels', 'flat'], exact: true })
+    invalidateQueriesSafely(queryCache, { key: ['channels', 'flat'], exact: true })
   }
 
   const invalidateChannelCacheById = channelPublicId => {
     if (!channelPublicId) return
-    invalidateQueries({
-      predicate: query => query.key?.[0] === 'channel' && query.key?.[1] === channelPublicId
+    invalidateQueriesSafely(queryCache, {
+      predicate: query =>
+        query.key?.[0] === 'channel' &&
+        query.key?.[1] === 'resolve' &&
+        query.key?.[2] === 'channel' &&
+        query.key?.[3] === channelPublicId
     })
   }
 
-  const invalidateChannelCacheByAlbum = albumRecordId => {
-    if (!albumRecordId) return
-    invalidateQueries({ key: ['channel', 'album', albumRecordId], exact: true })
+  const invalidateChannelCacheByAlbum = albumPublicId => {
+    if (!albumPublicId) return
+    invalidateQueriesSafely(queryCache, {
+      key: channelResolveKey('album', albumPublicId),
+      exact: true
+    })
   }
 
-  const invalidateChannelCacheByMedia = mediaRecordId => {
-    if (!mediaRecordId) return
-    invalidateQueries({ key: ['channel', 'media', mediaRecordId], exact: true })
+  const invalidateChannelCacheByMedia = mediaPublicId => {
+    if (!mediaPublicId) return
+    invalidateQueriesSafely(queryCache, {
+      key: channelResolveKey('media', mediaPublicId),
+      exact: true
+    })
   }
 
   const requestUploadInstruction = async url => {
@@ -90,7 +101,6 @@ export const useUploadStore = defineStore('upload', () => {
       request: () => api.put(`/uploads/media/confirm/${mediaPrivateId}`)
     })
     invalidateChannelsCache()
-    invalidateChannelCacheByMedia(mediaPrivateId)
     return mutationResult({ ok: true })
   }
 

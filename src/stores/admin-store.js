@@ -2,7 +2,7 @@ import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { useQuery, useQueryCache } from '@pinia/colada'
 import { getGlobalApiErrorPayload } from 'src/utils/api-error-service.js'
-import { mutationResult, runMutation } from 'src/utils/store-mutations.js'
+import { mutationResult, runMutation } from 'src/stores/utils/store-mutations.js'
 import {
   createApiGetQueryOptionsFactory,
   invalidateQueriesSafely,

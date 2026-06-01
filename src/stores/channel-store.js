@@ -2,7 +2,7 @@ import { ref, watch, toValue } from 'vue'
 import { defineStore } from 'pinia'
 import { useQuery, useQueryCache } from '@pinia/colada'
 import { API_CACHE_MEDIUM_MS } from 'src/stores/utils/cache-timeouts.js'
-import { mutationResult, runMutation } from 'src/utils/store-mutations.js'
+import { mutationResult, runMutation } from 'src/stores/utils/store-mutations.js'
 import {
   createApiGetQueryOptionsFactory,
   invalidateQueriesSafely,
@@ -82,35 +82,26 @@ export const useChannelStore = defineStore('channel', () => {
   const routeTargetQueryOptions = target => {
     if (!target?.type) return null
 
-    if (target.type === 'channel') {
-      return unifiedRouteQueryOptions('channel', target.publicId)
+    switch (target.type) {
+      case 'channel':
+        return unifiedRouteQueryOptions('channel', target.publicId)
+      case 'album':
+        return unifiedRouteQueryOptions('album', target.publicId)
+      case 'media':
+        return unifiedRouteQueryOptions('media', target.publicId)
+      case 'privateAlbum':
+        return unifiedRouteQueryOptions('privateAlbum', target.privateAlbumId)
+      case 'privateAlbumMedia':
+        return unifiedRouteQueryOptions(
+          'privateAlbumMedia',
+          target.privateAlbumId,
+          target.privateMediaId
+        )
+      case 'privateMedia':
+        return unifiedRouteQueryOptions('privateMedia', target.privateMediaId)
+      default:
+        return null
     }
-
-    if (target.type === 'album') {
-      return unifiedRouteQueryOptions('album', target.publicId)
-    }
-
-    if (target.type === 'media') {
-      return unifiedRouteQueryOptions('media', target.publicId)
-    }
-
-    if (target.type === 'privateAlbum') {
-      return unifiedRouteQueryOptions('privateAlbum', target.privateAlbumId)
-    }
-
-    if (target.type === 'privateAlbumMedia') {
-      return unifiedRouteQueryOptions(
-        'privateAlbumMedia',
-        target.privateAlbumId,
-        target.privateMediaId
-      )
-    }
-
-    if (target.type === 'privateMedia') {
-      return unifiedRouteQueryOptions('privateMedia', target.privateMediaId)
-    }
-
-    return null
   }
 
   const invalidateChannelsCache = () => {
