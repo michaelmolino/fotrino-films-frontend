@@ -1,8 +1,7 @@
 import { boot } from 'quasar/wrappers'
-import { Dialog } from 'quasar'
+import { Dialog, Loading } from 'quasar'
 import { useAccountStore } from 'src/stores/account-store'
-import { api, installApiClientInterceptors } from 'src/clients/axios-client.js'
-import { useRequestLoading } from 'src/composables/useRequestLoading'
+import { api } from 'src/clients/axios-client.js'
 import { confirmDestructiveAction, notifyError } from 'src/utils/notify.js'
 import {
   getCloudflareGatewayErrorPayload,
@@ -20,6 +19,10 @@ const DEFAULT_REQUEST_POLICY = Object.freeze({
   loadHandling: 'global'
 })
 
+const RESOLVED_REQUEST_POLICY_KEY = '__resolvedRequestPolicy'
+
+let interceptorsInstalled = false
+
 function resolveRequestPolicy(config) {
   const policy = config?.__policy && typeof config.__policy === 'object' ? config.__policy : null
   return {
@@ -32,92 +35,173 @@ function resolveRequestPolicy(config) {
 }
 
 export default boot(({ app, router }) => {
-  const { increment: showLoader, decrement: hideLoader } = useRequestLoading()
+  if (interceptorsInstalled) {
+    app.config.globalProperties.$api = api
+    return
+  }
+  interceptorsInstalled = true
 
-  installApiClientInterceptors({
-    resolveRequestPolicy,
-    getCsrfToken: (req, requestPolicy) => {
-      if (requestPolicy.csrfHandling !== 'global') {
-        return null
-      }
-      return useAccountStore()?.profile?.csrfToken ?? null
-    },
-    onBeforeDelete: async (req, requestPolicy) => {
-      if (requestPolicy.deleteHandling !== 'global') {
-        return true
-      }
-      return await confirmDestructiveAction({
-        confirmAction: { 'data-cy': 'confirm-delete' },
-        cancelAction: { 'data-cy': 'cancel-delete' }
-      })
-    },
-    onRequestStart: (req, requestPolicy) => {
-      if (requestPolicy.loadHandling !== 'global') {
-        return
-      }
-      showLoader()
-    },
-    onRequestEnd: (req, requestPolicy) => {
-      if (requestPolicy.loadHandling !== 'global') {
-        return
-      }
-      hideLoader()
-    },
-    onApiError: ({ error, status, requestCanceled, requestPolicy }) => {
-      const globalPayload = getGlobalApiErrorPayload(error)
-      const cloudflarePayload = getCloudflareGatewayErrorPayload(error)
-      const resolvedStatus = globalPayload?.status ?? error?.response?.status ?? status
-      const code = globalPayload?.error
-      const isRequestCanceled =
-        requestCanceled === true ||
-        error?.__userCancelled === true ||
-        error?.code === 'ERR_CANCELED' ||
-        error?.name === 'CanceledError'
-      const isUnauthorized =
-        code === 'unauthorized' ||
-        code === 'forbidden' ||
-        resolvedStatus === 401 ||
-        resolvedStatus === 403
-      const isNotFound = code === 'not_found' || resolvedStatus === 404
-      const componentErrorPayload = getComponentApiErrorPayload(error)
-      const skipNotify = requestPolicy.errorHandling !== 'global' || componentErrorPayload != null
+  let loadingRequestCount = 0
 
-      if (isRequestCanceled) {
-        return
-      }
-
-      if (cloudflarePayload) {
-        Dialog.create({
-          component: CloudflareGatewayErrorDialog,
-          componentProps: {
-            payload: cloudflarePayload,
-            requestMethod: error?.config?.method,
-            requestUrl: error?.config?.url,
-            requestStatus: resolvedStatus ?? error?.response?.status
-          }
-        })
-        error.__cloudflareDialogShown = true
-        error.__globalErrorHandled = true
-      }
-
-      if (isUnauthorized) {
-        error.__globalErrorHandled = true
-        router.replace('/')
-        return
-      }
-
-      if (isNotFound && requestPolicy.notFoundHandling !== 'none') {
-        error.__globalErrorHandled = true
-        router.replace('/404')
-        return
-      }
-
-      if (!skipNotify && !cloudflarePayload) {
-        error.__globalErrorHandled = true
-        notifyError(getGlobalApiErrorMessage(error), { timeout: 0 })
-      }
+  const showLoader = () => {
+    if (loadingRequestCount === 0) {
+      Loading.show()
     }
-  })
+    loadingRequestCount++
+  }
+
+  const hideLoader = () => {
+    loadingRequestCount = Math.max(0, loadingRequestCount - 1)
+    if (loadingRequestCount === 0) {
+      Loading.hide()
+    }
+  }
+
+  const attachCsrfToken = req => {
+    const method = (req.method || '').toLowerCase()
+    const requestPolicy = req?.[RESOLVED_REQUEST_POLICY_KEY]
+
+    if (!['post', 'put', 'delete'].includes(method)) {
+      return
+    }
+
+    if (requestPolicy.csrfHandling !== 'global') {
+      return
+    }
+
+    const csrfToken = useAccountStore()?.profile?.csrfToken ?? null
+    if (csrfToken == null) {
+      return
+    }
+
+    req.headers = req.headers || {}
+    req.headers['X-CSRFToken'] = csrfToken
+  }
+
+  const confirmDeleteRequest = async req => {
+    const method = (req.method || '').toLowerCase()
+    const requestPolicy = req?.[RESOLVED_REQUEST_POLICY_KEY]
+
+    if (method !== 'delete' || requestPolicy.deleteHandling !== 'global') {
+      return true
+    }
+
+    return await confirmDestructiveAction({
+      confirmAction: { 'data-cy': 'confirm-delete' },
+      cancelAction: { 'data-cy': 'cancel-delete' }
+    })
+  }
+
+  const handleApiError = ({ error, status, requestCanceled, requestPolicy }) => {
+    const globalPayload = getGlobalApiErrorPayload(error)
+    const cloudflarePayload = getCloudflareGatewayErrorPayload(error)
+    const resolvedStatus = globalPayload?.status ?? error?.response?.status ?? status
+    const code = globalPayload?.error
+    const isRequestCanceled =
+      requestCanceled === true ||
+      error?.__userCancelled === true ||
+      error?.code === 'ERR_CANCELED' ||
+      error?.name === 'CanceledError'
+    const isUnauthorized =
+      code === 'unauthorized' ||
+      code === 'forbidden' ||
+      resolvedStatus === 401 ||
+      resolvedStatus === 403
+    const isNotFound = code === 'not_found' || resolvedStatus === 404
+    const componentErrorPayload = getComponentApiErrorPayload(error)
+    const skipNotify = requestPolicy?.errorHandling !== 'global' || componentErrorPayload != null
+
+    if (isRequestCanceled) {
+      return
+    }
+
+    if (cloudflarePayload) {
+      Dialog.create({
+        component: CloudflareGatewayErrorDialog,
+        componentProps: {
+          payload: cloudflarePayload,
+          requestMethod: error?.config?.method,
+          requestUrl: error?.config?.url,
+          requestStatus: resolvedStatus ?? error?.response?.status
+        }
+      })
+      error.__cloudflareDialogShown = true
+      error.__globalErrorHandled = true
+    }
+
+    if (isUnauthorized) {
+      error.__globalErrorHandled = true
+      router.replace('/')
+      return
+    }
+
+    if (isNotFound && requestPolicy?.notFoundHandling !== 'none') {
+      error.__globalErrorHandled = true
+      router.replace('/404')
+      return
+    }
+
+    if (!skipNotify && !cloudflarePayload) {
+      error.__globalErrorHandled = true
+      notifyError(getGlobalApiErrorMessage(error), { timeout: 0 })
+    }
+  }
+
+  const onRequest = async req => {
+    const requestPolicy = (req[RESOLVED_REQUEST_POLICY_KEY] = resolveRequestPolicy(req))
+
+    attachCsrfToken(req)
+
+    const confirmed = await confirmDeleteRequest(req)
+    if (!confirmed) {
+      const err = new Error('User cancelled delete')
+      err.__userCancelled = true
+      err.code = 'ERR_CANCELED'
+      throw err
+    }
+
+    if (requestPolicy.loadHandling === 'global') {
+      showLoader()
+    }
+
+    return req
+  }
+
+  const onResponseSuccess = response => {
+    const requestPolicy = response?.config?.[RESOLVED_REQUEST_POLICY_KEY]
+    if (requestPolicy?.loadHandling === 'global') {
+      hideLoader()
+    }
+    return response
+  }
+
+  const onResponseError = error => {
+    const requestPolicy = error?.config?.[RESOLVED_REQUEST_POLICY_KEY]
+    if (requestPolicy?.loadHandling === 'global') {
+      hideLoader()
+    }
+
+    const status = error?.response?.status
+    const requestCanceled =
+      error?.__userCancelled === true ||
+      error?.code === 'ERR_CANCELED' ||
+      error?.name === 'CanceledError'
+
+    if (error?.__apiErrorHandled !== true) {
+      handleApiError({
+        error,
+        status,
+        requestCanceled,
+        requestPolicy
+      })
+    }
+
+    return Promise.reject(error)
+  }
+
+  api.interceptors.request.use(onRequest)
+
+  api.interceptors.response.use(onResponseSuccess, onResponseError)
 
   app.config.globalProperties.$api = api
 })
