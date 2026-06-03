@@ -8,12 +8,12 @@
         aria-hidden="true"></div>
       <div :class="['video-frame', { 'video-frame-portrait': isPortraitVideo }]">
         <video
-          id="video-player"
+          ref="mediaEl"
           controls
           x-webkit-airplay="allow"
-          :key="media.privateId"
+          :key="mediaElementKey"
           :aria-label="`Video player for ${media.title}`"
-          :poster="isPortraitVideo ? undefined : videoPosterUrl || undefined"
+          :poster="!isPortraitVideo ? mediaPreviewUrl : null"
           preload="none"
           data-cy="video-player"
           class="videoEl"></video>
@@ -22,16 +22,15 @@
     <div v-else class="audio-container">
       <picture v-if="media.preview" class="audio-preview">
         <img
-          :src="audioPreviewUrl"
+          :src="mediaPreviewUrl"
           :alt="`${media.title} cover art`"
           fetchpriority="high"
-          @error="onAudioPreviewError"
           class="audio-img" />
       </picture>
       <audio
-        id="audio-player"
+        ref="mediaEl"
         controls
-        :key="media.privateId"
+        :key="mediaElementKey"
         :aria-label="`Audio player for ${media.title}`"
         data-cy="audio-player"
         class="audioEl"></audio>
@@ -40,192 +39,36 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onBeforeUnmount, watch, ref, nextTick } from 'vue'
-import { useChannelStore } from 'src/stores/channel-store.js'
+import { computed, ref } from 'vue'
 import 'plyr/dist/plyr.css'
 import '@css/plyr.sass'
-import { setupVideoPlayback } from '@utils/video-playback'
-import { useWebP } from '@composables/useWebP'
+import { usePlyrMediaLifecycle } from '@composables/usePlyrMediaLifecycle'
+import { useMediaSessionMetadata } from '@composables/useMediaSessionMetadata'
 
 const props = defineProps({
-  media: Object,
-  artist: String
+  media: {
+    type: Object,
+    required: true
+  },
+  artist: {
+    type: String,
+    required: true
+  }
 })
 
-const channelStore = useChannelStore()
-const player = ref(null)
-const teardownPlayback = ref(null)
-let rebuildRunId = 0
-let PlyrCtor = null
-const { resolvePreviewSource } = useWebP()
-const audioPreviewSource = ref({ strategy: 'original-only', primaryUrl: null, fallbackUrl: null })
-const audioPreviewUrl = ref(null)
-const playbackUrl = ref(null)
-const view = computed(() => (props.media?.type?.startsWith('audio/') ? 'audio' : 'video'))
+const mediaEl = ref(null)
+const view = computed(() => (props.media.type.startsWith('audio/') ? 'audio' : 'video'))
 const isVideoView = computed(() => view.value === 'video')
-const mediaElementId = computed(() => (isVideoView.value ? 'video-player' : 'audio-player'))
-const videoPosterUrl = computed(() => props.media?.preview || null)
-const isPortraitVideo = computed(
-  () => view.value === 'video' && props.media?.orientation === 'portrait'
-)
+const mediaElementKey = computed(() => `${view.value}:${props.media.privateId}`)
+const mediaPreviewUrl = computed(() => props.media.preview)
+const isPortraitVideo = computed(() => view.value === 'video' && props.media.orientation === 'portrait')
 const portraitBackdropStyle = computed(() => {
-  if (!videoPosterUrl.value) return {}
-  return { backgroundImage: `url("${videoPosterUrl.value}")` }
+  if (!mediaPreviewUrl.value) return {}
+  return { backgroundImage: `url("${mediaPreviewUrl.value}")` }
 })
 
-function onAudioPreviewError() {
-  if (
-    audioPreviewSource.value.fallbackUrl &&
-    audioPreviewUrl.value !== audioPreviewSource.value.fallbackUrl
-  ) {
-    audioPreviewUrl.value = audioPreviewSource.value.fallbackUrl
-  }
-}
-
-async function refreshAudioPreviewSource() {
-  audioPreviewSource.value = { strategy: 'original-only', primaryUrl: null, fallbackUrl: null }
-  audioPreviewUrl.value = null
-  if (!props.media?.preview) return
-  const source = await resolvePreviewSource(props.media.preview)
-  audioPreviewSource.value = source
-  audioPreviewUrl.value = source.primaryUrl || props.media.preview
-}
-
-function destroyPlayers() {
-  if (teardownPlayback.value) {
-    try {
-      teardownPlayback.value()
-    } catch (e) {
-      console.debug(e)
-    }
-    teardownPlayback.value = null
-  }
-  if (player.value) {
-    try {
-      player.value.destroy()
-    } catch (e) {
-      console.debug(e)
-    }
-    player.value = null
-  }
-}
-
-async function refreshPlaybackUrl() {
-  if (!props.media?.privateId) {
-    playbackUrl.value = props.media?.src || null
-    return
-  }
-
-  try {
-    const result = await channelStore.createMediaSession({ privateId: props.media.privateId })
-    const session = result?.data
-    playbackUrl.value = session?.playbackUrl || props.media?.src || null
-  } catch (error) {
-    console.debug('Failed to initialize playback URL:', error)
-    playbackUrl.value = props.media?.src || null
-  }
-}
-
-async function setupPlayer() {
-  const el = document.getElementById(mediaElementId.value)
-  if (!el || !props.media) return
-  const sourceUrl = playbackUrl.value || props.media.src
-  const controls = isPortraitVideo.value
-    ? ['play-large', 'play', 'progress', 'mute', 'fullscreen', 'airplay']
-    : [
-        'play-large',
-        'restart',
-        'rewind',
-        'play',
-        'fast-forward',
-        'progress',
-        'current-time',
-        'duration',
-        'mute',
-        'volume',
-        'fullscreen',
-        'airplay'
-      ]
-
-  if (!PlyrCtor) {
-    const mod = await import('plyr')
-    PlyrCtor = mod.default
-  }
-  player.value = new PlyrCtor(el, {
-    iconUrl: `${import.meta.env.BASE_URL}icons/plyr.svg`,
-    loadSprite: true,
-    blankVideo: `${import.meta.env.BASE_URL}media/blank.mp4`,
-    settings: [],
-    fullscreen: { iosNative: true },
-    keyboard: { focused: true, global: true },
-    controls
-  })
-
-  // Auto-fullscreen for all videos on play
-  if (view.value === 'video') {
-    let hasAutoFullscreened = false
-    player.value.on('play', () => {
-      if (!hasAutoFullscreened) {
-        hasAutoFullscreened = true
-        player.value.fullscreen.enter()
-      }
-    })
-  }
-
-  if (isVideoView.value) {
-    const { cleanup } = await setupVideoPlayback({
-      videoEl: el,
-      sourceUrl,
-      exposeHlsGlobally: import.meta.env.DEV
-    })
-    teardownPlayback.value = cleanup
-  } else {
-    el.src = sourceUrl
-  }
-}
-
-function attachMediaSessionHandler() {
-  const el = document.getElementById(mediaElementId.value)
-  if (!('mediaSession' in navigator) || !el || !props.media) return
-  const artwork = isVideoView.value ? [] : [{ src: audioPreviewUrl.value || '', type: 'image/jpeg' }]
-  navigator.mediaSession.metadata = new MediaMetadata({
-    title: props.media.title,
-    artist: props.artist,
-    artwork
-  })
-}
-
-async function rebuild() {
-  const runId = ++rebuildRunId
-  await refreshPlaybackUrl()
-  destroyPlayers()
-  await nextTick()
-  if (runId !== rebuildRunId) return
-  await setupPlayer()
-  if (runId !== rebuildRunId) {
-    destroyPlayers()
-    return
-  }
-  attachMediaSessionHandler()
-}
-
-onMounted(async () => {
-  await refreshAudioPreviewSource()
-  await rebuild()
-})
-
-onBeforeUnmount(() => {
-  rebuildRunId += 1
-  destroyPlayers()
-})
-
-watch(
-  () => props.media?.privateId,
-  async () => {
-    await refreshAudioPreviewSource()
-    await rebuild()
-  }
-)
+usePlyrMediaLifecycle(props, mediaEl)
+useMediaSessionMetadata(props)
 </script>
 
 <style lang="sass" scoped>

@@ -58,6 +58,7 @@ const sharedHydratedAlbumsByPublicId = computed(() => {
 })
 
 const EMPTY_CHANNEL_VIEW_RESPONSE = { data: null }
+const ALWAYS_FETCH_ROUTE_TYPES = new Set(['media', 'privateMedia', 'privateAlbumMedia'])
 // Shared route loader for channel/album/media data. Can optionally own meta updates.
 export function useChannelLoader({ manageMeta = false } = {}) {
   const channelStore = useChannelStore()
@@ -115,7 +116,10 @@ export function useChannelLoader({ manageMeta = false } = {}) {
       return Promise.resolve(EMPTY_CHANNEL_VIEW_RESPONSE)
     }
 
+    const shouldAlwaysFetch = ALWAYS_FETCH_ROUTE_TYPES.has(target.type)
+
     if (
+      !shouldAlwaysFetch &&
       isChannelRouteTargetLoaded({
         target,
         channel: channel.value,
