@@ -13,8 +13,7 @@
           x-webkit-airplay="allow"
           :key="media.privateId"
           :aria-label="`Video player for ${media.title}`"
-          :poster="videoPosterUrl || undefined"
-          :data-poster="videoPosterUrl || undefined"
+          :poster="isPortraitVideo ? undefined : videoPosterUrl || undefined"
           preload="none"
           data-cy="video-player"
           class="videoEl"></video>
@@ -188,10 +187,11 @@ async function setupPlayer() {
 function attachMediaSessionHandler() {
   const el = document.getElementById(mediaElementId.value)
   if (!('mediaSession' in navigator) || !el || !props.media) return
+  const artwork = isVideoView.value ? [] : [{ src: audioPreviewUrl.value || '', type: 'image/jpeg' }]
   navigator.mediaSession.metadata = new MediaMetadata({
     title: props.media.title,
     artist: props.artist,
-    artwork: [{ src: audioPreviewUrl.value || '', type: 'image/jpeg' }]
+    artwork
   })
 }
 
