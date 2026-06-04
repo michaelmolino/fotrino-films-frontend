@@ -29,12 +29,19 @@ accountStore.useProfileQuery()
 
 const showTerms = ref(false)
 
-onMounted(async () => {
+onMounted(() => {
   if (process.env.NODE_ENV === 'development') {
     console.warn('WARNING: This is a development server and should not be exposed to the internet.')
   }
-  showTerms.value = route.query?.showTerms?.toLowerCase() === 'true'
 })
+
+watch(
+  () => route.query?.showTerms,
+  showTermsQueryValue => {
+    showTerms.value = showTermsQueryValue?.toLowerCase() === 'true'
+  },
+  { immediate: true }
+)
 
 watch(
   [
