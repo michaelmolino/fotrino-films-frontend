@@ -118,6 +118,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 import MediaPreview from '@components/channel/shared/MediaPreview.vue'
 
 const props = defineProps({
@@ -150,7 +151,7 @@ const videoSummaryLabel = computed(() => {
   const title = props.media?.title
   return typeof title === 'string' && title.trim().length > 0 ? title.trim() : 'Video'
 })
-const videoSummaryPreviewSrc = computed(() => props.media?.preview || null)
+const videoSummaryPreviewSrc = computed(() => resolveImagePrimaryUrl(props.media?.previewAsset) || null)
 const showAlbumSubtitle = computed(() => !!props.albumSummarySubtitle)
 const albumSummaryAvatarClass = computed(() => ({
   'summary-step-swatch': !props.albumSummaryPosterSrc

@@ -2,7 +2,7 @@
   <div class="media-row">
     <ResourceActions
       :title="media.title"
-      :image="media.preview"
+      :image="media.previewAsset"
       :pending="media.pending"
       :abortable="media.pending"
       :deleted="media.deleted"
@@ -86,6 +86,7 @@ import { daysSince } from '@utils/date.js'
 import MediaMetadataFields from '@components/account/shared/MediaMetadataFields.vue'
 import MediaPreviewSelectorFields from '@components/account/shared/MediaPreviewSelectorFields.vue'
 import { useImageSelectionProcessing } from '@composables/useImageFileProcessor.js'
+import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 
 const props = defineProps({
   media: Object,
@@ -127,7 +128,7 @@ function emitAbortMedia() {
 }
 
 function setLocalPreviewImage(url) {
-  editPreviewImage.value = url || props.media?.preview || null
+  editPreviewImage.value = url || resolveImagePrimaryUrl(props.media?.previewAsset) || null
 }
 
 function normalizeResourceDate(raw) {
@@ -147,7 +148,7 @@ function openEditDialog() {
   }
   resetPreviewFile()
   editPreviewFile.value = null
-  editPreviewImage.value = props.media?.preview || null
+  editPreviewImage.value = resolveImagePrimaryUrl(props.media?.previewAsset) || null
   editDialog.value = true
 }
 
@@ -184,7 +185,7 @@ async function onUpdatePreviewFile(fileOrFiles) {
   if (!file) {
     resetPreviewFile()
     editPreviewFile.value = null
-    editPreviewImage.value = props.media?.preview || null
+    editPreviewImage.value = resolveImagePrimaryUrl(props.media?.previewAsset) || null
     return
   }
 

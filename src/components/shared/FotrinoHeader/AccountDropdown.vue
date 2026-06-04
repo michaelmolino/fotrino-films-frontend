@@ -1,6 +1,6 @@
 <template>
   <q-btn-dropdown
-    :icon="'img:' + profile.avatar"
+    :icon="accountIcon"
     :label="buttonLabel"
     :aria-label="'Account menu for ' + (profile.name || 'user')"
     data-cy="account-menu"
@@ -30,6 +30,7 @@ import { computed } from 'vue'
 import { useAccountStore } from 'src/stores/account-store.js'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
+import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 
 const $q = useQuasar()
 const accountStore = useAccountStore()
@@ -44,6 +45,10 @@ const props = defineProps({
 
 const buttonLabel = computed(() => ($q.screen.gt.sm ? 'Account' : ''))
 const showTooltip = computed(() => !$q.screen.gt.sm)
+const accountIcon = computed(() => {
+  const avatar = resolveImagePrimaryUrl(props.profile?.avatarAsset)
+  return avatar ? `img:${avatar}` : 'account_circle'
+})
 
 const menuItems = computed(() => {
   const items = []

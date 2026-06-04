@@ -3,8 +3,8 @@
     <q-item-section avatar>
       <div class="relative-position resource-actions-row">
         <q-avatar :square="square" :size="avatarSize">
-          <template v-if="image">
-            <q-img :src="image" class="cover" />
+          <template v-if="imageSrc">
+            <q-img :src="imageSrc" class="cover" />
           </template>
           <template v-else>
             <div class="cover avatar-fill" :style="{ backgroundColor: color || '#000000' }" />
@@ -118,10 +118,14 @@
 
 <script setup>
 import { computed } from 'vue'
+import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 
 const props = defineProps({
   title: String,
-  image: String,
+  image: {
+    type: [String, Object],
+    default: null
+  },
   color: String,
   pending: Boolean,
   abortable: {
@@ -158,6 +162,7 @@ const props = defineProps({
 })
 
 defineEmits(['delete', 'edit', 'abort', 'undelete'])
+const imageSrc = computed(() => resolveImagePrimaryUrl(props.image))
 const canDelete = computed(() => !props.pending && !props.hasPendingChildren)
 const showVisitAction = computed(() => !props.pending && !props.deleted && !!props.link)
 const showUndeleteAction = computed(() => !props.pending && props.deleted && props.undeletable)

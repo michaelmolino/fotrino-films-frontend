@@ -5,6 +5,7 @@ import {
   buildPrivateAlbumPath,
   buildPrivateMediaPath
 } from '@utils/channel-route.js'
+import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 
 /** @typedef {{ resourceId: string, type: 'channel' | 'privateMedia' | 'privateAlbum' }} HistoryEntry */
 
@@ -96,7 +97,7 @@ export function syncHistoryFromRouteContext({ context, channel }) {
 
     addPrivateHistory(context.privateMediaId, {
       title: media?.title || channel?.title || '',
-      cover: media?.preview || channel?.cover || null,
+      cover: resolveImagePrimaryUrl(media?.previewAsset) || resolveImagePrimaryUrl(channel?.coverAsset) || null,
       slug: media?.slug || context.mediaSlug || null
     })
   }
@@ -105,7 +106,7 @@ export function syncHistoryFromRouteContext({ context, channel }) {
     const album = channel.album
     addPrivateAlbumHistory(context.privateAlbumId, {
       title: album?.title || channel?.title || '',
-      cover: album?.poster || channel?.cover || null,
+      cover: resolveImagePrimaryUrl(album?.posterAsset) || resolveImagePrimaryUrl(channel?.coverAsset) || null,
       slug: album?.slug || context.albumSlug || null
     })
   }

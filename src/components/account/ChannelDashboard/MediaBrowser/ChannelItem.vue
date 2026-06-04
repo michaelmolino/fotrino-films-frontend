@@ -10,7 +10,7 @@
     <template #header>
       <ResourceActions
         :title="channel.title"
-        :image="channel.cover"
+        :image="channel.coverAsset"
         :pending="channel.pending"
         :deleted="channel.deleted"
         :undeletable="channel.deleted"
@@ -51,7 +51,7 @@
         <q-card-section>
           <EditableChannelFields
             :title="editForm.title"
-            :cover-preview="editCoverPreview || channel.cover"
+            :cover-preview="editCoverPreview || persistedCoverUrl"
             :cover-file="editCoverFile"
             :cover-processing="editCoverProcessing"
             @update:title="editForm.title = $event"
@@ -82,6 +82,7 @@ import EditableChannelFields from '@components/account/shared/EditableChannelFie
 import { daysSince } from '@utils/date.js'
 import { useImageSelectionProcessing } from '@composables/useImageFileProcessor.js'
 import { useChannelStore } from 'src/stores/channel-store.js'
+import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 
 const props = defineProps({
   channel: Object,
@@ -135,6 +136,9 @@ const hasPendingChildren = computed(() => {
 })
 const channelSubtitle = computed(() =>
   props.channel.created ? `Created: ${daysSince(props.channel.created, true)}` : ''
+)
+const persistedCoverUrl = computed(() =>
+  resolveImagePrimaryUrl(props.channel?.coverAsset)
 )
 
 const albumItemListeners = {

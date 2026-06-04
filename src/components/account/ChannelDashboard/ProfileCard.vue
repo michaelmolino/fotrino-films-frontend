@@ -32,6 +32,7 @@
 import { computed } from 'vue'
 import { daysSince } from '@utils/date.js'
 import { getCountry } from '@utils/countries.js'
+import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 import googleIcon from '@assets/icons/google.svg'
 import microsoftIcon from '@assets/icons/microsoft.svg'
 import facebookIcon from '@assets/icons/facebook.svg'
@@ -52,7 +53,10 @@ const props = defineProps({
   profile: { type: Object, default: null }
 })
 
-const profilePic = computed(() => props.profile?.avatar || undefined)
+const profilePic = computed(() => {
+  const source = props.profile?.avatarAsset
+  return resolveImagePrimaryUrl(source) || undefined
+})
 const providerIcon = computed(() => {
   const p = (props.profile?.identityProvider?.provider || '').toLowerCase()
   return PROVIDER_ICON_MAP[p] || 'account_circle'

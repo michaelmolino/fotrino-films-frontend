@@ -211,7 +211,7 @@ const albumCards = computed(() => {
     item,
     subtitle: item.subtitle || 'Existing album',
     fallbackSwatchStyle: {
-      backgroundColor: item.posterColor || item.poster_color || '#000000'
+      backgroundColor: item.posterColor || '#000000'
     },
     className: {
       'is-selected':

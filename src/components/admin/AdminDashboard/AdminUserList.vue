@@ -25,7 +25,7 @@
             <div class="relative-position avatar-wrap q-mr-md">
               <q-avatar size="44px" :class="{ 'deleted-user': props.row.deleted }">
                 <img
-                  :src="props.row.avatar"
+                  :src="resolveUserAvatar(props.row)"
                   :alt="`${props.row.name}'s avatar`"
                   loading="lazy"
                   decoding="async" />
@@ -102,7 +102,7 @@
                 <div class="row items-center no-wrap">
                   <q-avatar size="28px" class="q-mr-sm">
                     <img
-                      :src="channel.cover || '/images/channel.png'"
+                      :src="resolveChannelCover(channel) || '/images/channel.png'"
                       :alt="`${channel.title} cover`"
                       loading="lazy"
                       decoding="async" />
@@ -170,6 +170,7 @@ import { useAdminStore } from 'src/stores/admin-store.js'
 import { daysSince } from '@utils/date.js'
 import { getCountry } from '@utils/countries.js'
 import { buildChannelPath } from '@utils/channel-route.js'
+import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 import { getComponentApiErrorMessage } from 'src/utils/api-error-service.js'
 import { notifyError, notifySuccess } from 'src/utils/notify.js'
 import googleIcon from '@assets/icons/google.svg'
@@ -231,6 +232,14 @@ function getChannelsLabel(user) {
 
 function getChannelPath(channel) {
   return buildChannelPath({ publicId: channel?.publicId, slug: channel?.slug })
+}
+
+function resolveUserAvatar(user) {
+  return resolveImagePrimaryUrl(user?.avatarAsset) || '/images/channel.png'
+}
+
+function resolveChannelCover(channel) {
+  return resolveImagePrimaryUrl(channel?.coverAsset)
 }
 
 watch(filterMode, value => {

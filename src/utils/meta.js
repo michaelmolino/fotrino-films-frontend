@@ -1,4 +1,5 @@
 import { formatTitleWithSubtitle, sanitizeText } from '@utils/text.js'
+import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 
 function findAlbum(channel, albumPublicId) {
   if (!channel || !albumPublicId) {
@@ -25,7 +26,7 @@ function getChannelMeta(route, channel) {
   return {
     title: channel?.title || null,
     description: channel?.title || '',
-    image: channel?.cover || null,
+    image: resolveImagePrimaryUrl(channel?.coverAsset) || null,
     type: 'website'
   }
 }
@@ -35,7 +36,7 @@ function getAlbumMeta(channel, albumPublicId) {
   return {
     title: formatTitleWithSubtitle(album?.title, album?.subtitle) || null,
     description: sanitizeText(album?.subtitle || ''),
-    image: album?.poster || null,
+    image: resolveImagePrimaryUrl(album?.posterAsset) || null,
     type: 'website'
   }
 }
@@ -45,7 +46,7 @@ function getMediaMeta(channel, mediaPublicId) {
   return {
     title: media?.title || null,
     description: sanitizeText(media?.descriptionUnsafe),
-    image: media?.preview || null,
+    image: resolveImagePrimaryUrl(media?.previewAsset) || null,
     type: 'video'
   }
 }
@@ -57,7 +58,7 @@ function getPrivateMediaMeta(route, channel) {
   return {
     title: media?.title || null,
     description: sanitizeText(media?.descriptionUnsafe),
-    image: media?.preview || null,
+    image: resolveImagePrimaryUrl(media?.previewAsset) || null,
     type: 'video'
   }
 }
@@ -67,7 +68,7 @@ function getPrivateAlbumMeta(channel) {
   return {
     title: formatTitleWithSubtitle(album?.title, album?.subtitle) || null,
     description: sanitizeText(album?.subtitle || ''),
-    image: album?.poster || null,
+    image: resolveImagePrimaryUrl(album?.posterAsset) || null,
     type: 'website'
   }
 }

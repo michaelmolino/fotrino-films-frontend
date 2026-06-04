@@ -12,8 +12,8 @@
       <span class="text-bold">{{ album.media.length }}</span>
     </q-badge>
     <q-img
-      v-if="album.poster"
-      :src="album.poster"
+      v-if="posterUrl"
+      :src="posterUrl"
       :ratio="2 / 3"
       fit="cover"
       loading="lazy"
@@ -35,7 +35,7 @@
       </template>
     </q-img>
     <div
-      v-if="!album.poster"
+      v-if="!posterUrl"
       class="poster-fallback"
       :style="{ backgroundColor: album.posterColor || '#000000' }">
       <!-- Centered overlay in the main body for color fallback -->
@@ -51,11 +51,14 @@
 
 <script setup>
 import { computed } from 'vue'
+import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 
 const props = defineProps({
   album: Object,
   to: [String, Object]
 })
+
+const posterUrl = computed(() => resolveImagePrimaryUrl(props.album?.posterAsset))
 
 function hexToRgb(hex) {
   let h = (hex || '').trim()

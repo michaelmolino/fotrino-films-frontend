@@ -1,5 +1,6 @@
 import { computed } from 'vue'
 import { buildMediaPathForRouteContext } from '@utils/channel-route.js'
+import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 
 export function useMediaRootViewModel({ loading, channel, album, media, routeContext }) {
   const contentState = computed(() => {
@@ -8,7 +9,7 @@ export function useMediaRootViewModel({ loading, channel, album, media, routeCon
     return channel.value && album.value && media.value && hasTargetMedia ? 'ready' : 'not-found'
   })
 
-  const albumPoster = computed(() => album.value?.poster || null)
+  const albumPoster = computed(() => resolveImagePrimaryUrl(album.value?.posterAsset) || null)
   const albumPosterColor = computed(() => album.value?.posterColor || null)
 
   const relatedMedia = computed(() => {

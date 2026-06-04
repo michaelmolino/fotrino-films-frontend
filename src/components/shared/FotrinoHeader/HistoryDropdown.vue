@@ -47,6 +47,7 @@ import {
   resolveHistoryFromBackend
 } from '@utils/history.js'
 import { resolveChannelRouteContext } from '@utils/channel-route.js'
+import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 import { notifyWarning } from 'src/utils/notify.js'
 
 const channelStore = useChannelStore()
@@ -63,12 +64,17 @@ const historyEntries = computed(() => {
     resourceId: channel.resourceId,
     type: channel.type,
     title: channel.title,
-    icon: channel.cover ? `img:${channel.cover}` : 'movie',
+    icon: resolveHistoryCoverIcon(channel),
     target: historyTarget(channel),
     visitLabel: `Visit ${channel.title}`,
     removeLabel: `Remove ${channel.title} from history`
   }))
 })
+
+function resolveHistoryCoverIcon(channel) {
+  const url = resolveImagePrimaryUrl(channel?.coverAsset)
+  return url ? `img:${url}` : 'movie'
+}
 
 function historyTarget(channel) {
   return buildHistoryTargetPath(channel)

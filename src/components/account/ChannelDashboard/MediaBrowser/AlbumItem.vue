@@ -12,7 +12,7 @@
       <template #header>
         <ResourceActions
           :title="album.title"
-          :image="album.poster"
+          :image="album.posterAsset"
           :color="album.posterColor || '#000000'"
           :pending="album.pending"
           :deleted="album.deleted"
@@ -101,6 +101,7 @@ import MediaItem from './MediaItem.vue'
 import { daysSince } from '@utils/date.js'
 import AlbumPosterFields from '@components/account/shared/AlbumPosterFields.vue'
 import { useImageSelectionProcessing } from '@composables/useImageFileProcessor.js'
+import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 
 const props = defineProps({
   album: Object,
@@ -171,12 +172,13 @@ const editAlbumPreview = computed(() => {
 })
 
 function openEditDialog() {
+  const persistedPoster = resolveImagePrimaryUrl(props.album?.posterAsset)
   editForm.value = {
     title: props.album?.title ?? '',
     subtitle: props.album?.subtitle ?? null,
-    posterType: props.album?.poster ? 'new' : 'default',
+    posterType: persistedPoster ? 'new' : 'default',
     posterColor: props.album?.posterColor || '#000000',
-    posterImage: props.album?.poster || null
+    posterImage: persistedPoster || null
   }
   resetPosterFile()
   editDialog.value = true
@@ -210,7 +212,7 @@ function onUpdatePosterType(value) {
   editForm.value = {
     ...editForm.value,
     posterType: 'new',
-    posterImage: editForm.value.posterImage || props.album?.poster || null
+    posterImage: editForm.value.posterImage || resolveImagePrimaryUrl(props.album?.posterAsset) || null
   }
 }
 
@@ -223,11 +225,12 @@ function onUpdatePosterColor(value) {
 
 async function onUpdatePosterFile(fileOrFiles) {
   const file = Array.isArray(fileOrFiles) ? fileOrFiles[0] : fileOrFiles
+  const persistedPoster = resolveImagePrimaryUrl(props.album?.posterAsset)
   if (!file) {
     resetPosterFile()
     editForm.value = {
       ...editForm.value,
-      posterImage: props.album?.poster || null
+      posterImage: persistedPoster || null
     }
     return
   }

@@ -63,7 +63,6 @@ const { resolvePreviewSource } = useWebP()
 const view = computed(() => (props.media.type.startsWith('audio/') ? 'audio' : 'video'))
 const isVideoView = computed(() => view.value === 'video')
 const mediaElementKey = computed(() => `${view.value}:${props.media.privateId}`)
-const mediaPreviewSource = ref({ strategy: 'original-only', primaryUrl: null, fallbackUrl: null })
 const mediaPreviewUrl = ref(null)
 const isPortraitVideo = computed(() => view.value === 'video' && props.media.orientation === 'portrait')
 const portraitBackdropStyle = computed(() => {
@@ -74,17 +73,14 @@ const portraitBackdropStyle = computed(() => {
 let previewRunId = 0
 
 function onMediaPreviewError() {
-  if (mediaPreviewSource.value.fallbackUrl && mediaPreviewUrl.value !== mediaPreviewSource.value.fallbackUrl) {
-    mediaPreviewUrl.value = mediaPreviewSource.value.fallbackUrl
-  }
+  mediaPreviewUrl.value = null
 }
 
 watch(
-  () => props.media.preview,
+  () => props.media.previewAsset,
   async preview => {
     const runId = ++previewRunId
 
-    mediaPreviewSource.value = { strategy: 'original-only', primaryUrl: null, fallbackUrl: null }
     mediaPreviewUrl.value = null
 
     if (!preview) return
@@ -92,8 +88,7 @@ watch(
     const resolvedSource = await resolvePreviewSource(preview)
     if (runId !== previewRunId) return
 
-    mediaPreviewSource.value = resolvedSource
-    mediaPreviewUrl.value = resolvedSource.primaryUrl || resolvedSource.fallbackUrl || preview
+    mediaPreviewUrl.value = resolvedSource.url
   },
   { immediate: true }
 )

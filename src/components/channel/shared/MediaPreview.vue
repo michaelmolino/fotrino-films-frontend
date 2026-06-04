@@ -95,14 +95,13 @@ const titleSecondary = computed(() => {
 })
 
 const { resolvePreviewSource } = useWebP()
-const previewSource = ref({ strategy: 'original-only', primaryUrl: null, fallbackUrl: null })
 const finalUrl = ref(null)
 const ready = ref(false)
 let previewResolveToken = 0
 
 // Watch media.preview to re-resolve whenever it changes (e.g., thumbnail refresh)
 watch(
-  () => media?.preview,
+  () => media?.previewAsset,
   async (newPreview, _oldPreview, onCleanup) => {
     const token = ++previewResolveToken
     let active = true
@@ -111,27 +110,22 @@ watch(
     })
 
     if (!newPreview) {
-      previewSource.value = { strategy: 'original-only', primaryUrl: null, fallbackUrl: null }
       finalUrl.value = null
       ready.value = false
       return
     }
     // Reset ready to show skeleton while resolving
     ready.value = false
-    // Resolve explicit source strategy: primary first, fallback on error.
     const resolved = await resolvePreviewSource(newPreview)
     if (!active || token !== previewResolveToken) return
-    previewSource.value = resolved
-    finalUrl.value = resolved.primaryUrl || newPreview
+    finalUrl.value = resolved.url
     ready.value = true
   },
   { immediate: true }
 )
 
 function onPreviewError() {
-  if (previewSource.value.fallbackUrl && finalUrl.value !== previewSource.value.fallbackUrl) {
-    finalUrl.value = previewSource.value.fallbackUrl
-  }
+  finalUrl.value = null
 }
 </script>
 

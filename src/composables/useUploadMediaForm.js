@@ -35,6 +35,14 @@ function createUploadIdempotencyKey() {
   return createRandomId('upload')
 }
 
+function buildPreviewAsset(url) {
+  if (typeof url !== 'string' || !url) {
+    return []
+  }
+
+  return [{ type: 'jpeg', key: url }]
+}
+
 function createInitialPayload() {
   return {
     channelMode: 'unselected',
@@ -261,19 +269,20 @@ export function useUploadMediaForm() {
 
   const media = computed(() => {
     const base = buildMediaBase()
+    let previewUrl = null
+
     if (mediaFile.value && payload.album.media.previewType === 'frame') {
-      return {
-        ...base,
-        preview: previewThumbRandom.value
-      }
+      previewUrl = previewThumbRandom.value
+    } else if (previewFile.value && payload.album.media.previewType === 'new') {
+      previewUrl = previewThumb.value
     }
-    if (previewFile.value && payload.album.media.previewType === 'new') {
-      return {
-        ...base,
-        preview: previewThumb.value
-      }
+
+    const previewAsset = buildPreviewAsset(previewUrl)
+    return {
+      ...base,
+      preview: previewUrl,
+      previewAsset
     }
-    return base
   })
 
   const isMediaReady = computed(

@@ -99,6 +99,7 @@
 import { computed } from 'vue'
 import MediaPreview from '@components/channel/shared/MediaPreview.vue'
 import MediaMetadataFields from '@components/account/shared/MediaMetadataFields.vue'
+import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 
 const emit = defineEmits([
   'section-toggle',
@@ -137,9 +138,13 @@ const mediaResourceDate = computed(() => props.payload.album?.media?.resourceDat
 const mediaIsMain = computed(() => !!props.payload.album?.media?.main)
 const previewType = computed(() => props.payload.album?.media?.previewType)
 const showPreviewUploadInput = computed(() => previewType.value === 'new')
+const previewAsset = computed(() =>
+  props.composerPreviewImage ? [{ type: 'jpeg', key: props.composerPreviewImage }] : []
+)
 const previewMedia = computed(() => ({
   title: 'Video preview',
-  preview: props.composerPreviewImage,
+  preview: resolveImagePrimaryUrl(previewAsset.value),
+  previewAsset: previewAsset.value,
   main: mediaIsMain.value
 }))
 const previewFrameClass = computed(() => ({ 'composer-preview-featured': mediaIsMain.value }))

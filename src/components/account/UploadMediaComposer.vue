@@ -196,6 +196,7 @@ import ProjectExpansionItem from '@components/account/UploadMediaComposer/Projec
 import ProgressView from '@components/account/UploadMediaComposer/ProgressView.vue'
 import { useUploadMediaForm } from '@composables/useUploadMediaForm.js'
 import { daysSince } from '@utils/date.js'
+import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 import { sanitizeHtml, sanitizeText } from '@utils/text.js'
 import { notifyWarning } from 'src/utils/notify.js'
 
@@ -290,7 +291,7 @@ const channelCoverByPublicId = computed(() => {
   const map = {}
   for (const channel of channels.value || []) {
     if (channel?.publicId) {
-      map[channel.publicId] = channel.cover || null
+      map[channel.publicId] = resolveImagePrimaryUrl(channel.coverAsset) || null
     }
   }
   return map
@@ -306,7 +307,9 @@ const channelSummaryAvatarSrc = computed(() => {
   }
 
   if (payload.channelMode === 'create') {
-    return payload.coverType === 'new' ? coverThumb.value : profile.value?.avatar || null
+    return payload.coverType === 'new'
+      ? coverThumb.value
+      : resolveImagePrimaryUrl(profile.value?.avatarAsset) || null
   }
 
   return channelCoverByPublicId.value[payload.publicId?.value] || null
@@ -338,7 +341,7 @@ const albumSummaryPosterSrc = computed(() => {
   if (!isAlbumSummaryReady.value) {
     return null
   }
-  return album.value?.poster || null
+  return resolveImagePrimaryUrl(album.value?.posterAsset) || null
 })
 
 const albumSummaryPosterColor = computed(() => {
@@ -350,7 +353,7 @@ const albumSummaryPosterColor = computed(() => {
     return payload.album?.posterColor || '#000000'
   }
 
-  return album.value?.posterColor || album.value?.poster_color || '#000000'
+  return album.value?.posterColor || '#000000'
 })
 
 const contentState = computed(() => {
@@ -460,16 +463,20 @@ const summaryDescriptionRaw = computed(() => media.value?.description || '')
 const summaryDescriptionHtml = computed(() => sanitizeHtml(summaryDescriptionRaw.value))
 const summaryDescriptionText = computed(() => sanitizeText(summaryDescriptionRaw.value).trim())
 const hasSummaryDescription = computed(() => summaryDescriptionText.value.length > 0)
-const composerPreviewImage = computed(() => media.value?.preview || null)
+const composerPreviewImage = computed(() => {
+  return resolveImagePrimaryUrl(media.value?.previewAsset) || null
+})
 
 const channelEditorCoverSrc = computed(() => {
   if (payload.channelMode === 'create' && payload.coverType === 'new') {
     return coverThumb.value || null
   }
-  return profile.value?.avatar || null
+  return resolveImagePrimaryUrl(profile.value?.avatarAsset) || null
 })
 
-const albumEditorPosterSrc = computed(() => album.value?.poster || null)
+const albumEditorPosterSrc = computed(() => {
+  return resolveImagePrimaryUrl(album.value?.posterAsset) || null
+})
 const albumEditorPosterColor = computed(() => payload.album?.posterColor || '#000000')
 const albumEditorPreview = computed(() => {
   const currentAlbum = album.value || {}
