@@ -30,19 +30,19 @@ export function isWebPSupported() {
     return supportsWebP
 }
 
-export function resolveImagePrimaryUrl(imageOrAsset) {
-    if (!Array.isArray(imageOrAsset)) return null
+export function resolveImagePrimaryUrl(imageAssets) {
+    if (!Array.isArray(imageAssets)) return null
 
     let webpUrl = null
     let jpegUrl = null
 
-    for (const entry of imageOrAsset) {
-        if (!entry || typeof entry.key !== 'string' || !entry.key) continue
-        const type = String(entry.type || '').toLowerCase()
-        if (type === 'webp' && !webpUrl) webpUrl = entry.key
-        if ((type === 'jpeg' || type === 'jpg') && !jpegUrl) jpegUrl = entry.key
+    for (const asset of imageAssets) {
+        const key = asset.key
+
+        const type = String(asset.type || '').toLowerCase()
+        if (!webpUrl && type === 'webp') webpUrl = key
+        if (!jpegUrl && (type === 'jpeg')) jpegUrl = key
     }
 
-    if (supportsWebP && webpUrl) return webpUrl
-    return jpegUrl
+    return (supportsWebP && webpUrl) || jpegUrl
 }

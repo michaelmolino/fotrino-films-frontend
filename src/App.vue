@@ -18,7 +18,6 @@ import { ref, watch, defineAsyncComponent, onMounted } from 'vue'
 import { useAccountStore } from 'src/stores/account-store.js'
 import { useRoute, useRouter } from 'vue-router'
 import { useChannelLoader } from '@composables/useChannelLoader.js'
-import { initializeImageAssetSupport } from '@utils/image-asset.js'
 
 const Terms = defineAsyncComponent(() => import('@components/pages/Terms.vue'))
 
@@ -27,7 +26,6 @@ const route = useRoute()
 const router = useRouter()
 const { loadChannel, routeContext } = useChannelLoader({ manageMeta: true })
 accountStore.useProfileQuery()
-initializeImageAssetSupport()
 
 const showTerms = ref(false)
 
