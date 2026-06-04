@@ -1,5 +1,5 @@
 <template>
-  <div data-cy="media-player" :class="['media-player-shell', { 'portrait-mode': isPortraitVideo }]">
+  <div data-cy="media-player" class="media-player-shell" :class="{ 'portrait-mode': isPortraitVideo }">
     <div v-if="isVideoView" class="video-shell">
       <div
         v-if="isPortraitVideo"
@@ -25,7 +25,8 @@
           :src="mediaPreviewUrl"
           :alt="`${media.title} cover art`"
           fetchpriority="high"
-          class="audio-img" />
+          class="audio-img"
+          @error="onMediaPreviewError" />
       </picture>
       <audio
         ref="mediaEl"
@@ -39,11 +40,12 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import 'plyr/dist/plyr.css'
 import '@css/plyr.sass'
 import { usePlyrMediaLifecycle } from '@composables/usePlyrMediaLifecycle'
 import { useMediaSessionMetadata } from '@composables/useMediaSessionMetadata'
+import { useWebP } from '@composables/useWebP'
 
 const props = defineProps({
   media: {
@@ -57,18 +59,48 @@ const props = defineProps({
 })
 
 const mediaEl = ref(null)
+const { resolvePreviewSource } = useWebP()
 const view = computed(() => (props.media.type.startsWith('audio/') ? 'audio' : 'video'))
 const isVideoView = computed(() => view.value === 'video')
 const mediaElementKey = computed(() => `${view.value}:${props.media.privateId}`)
-const mediaPreviewUrl = computed(() => props.media.preview)
+const mediaPreviewSource = ref({ strategy: 'original-only', primaryUrl: null, fallbackUrl: null })
+const mediaPreviewUrl = ref(null)
 const isPortraitVideo = computed(() => view.value === 'video' && props.media.orientation === 'portrait')
 const portraitBackdropStyle = computed(() => {
   if (!mediaPreviewUrl.value) return {}
   return { backgroundImage: `url("${mediaPreviewUrl.value}")` }
 })
 
-usePlyrMediaLifecycle(props, mediaEl)
-useMediaSessionMetadata(props)
+let previewRunId = 0
+
+function onMediaPreviewError() {
+  if (mediaPreviewSource.value.fallbackUrl && mediaPreviewUrl.value !== mediaPreviewSource.value.fallbackUrl) {
+    mediaPreviewUrl.value = mediaPreviewSource.value.fallbackUrl
+  }
+}
+
+watch(
+  () => props.media.preview,
+  async preview => {
+    const runId = ++previewRunId
+
+    mediaPreviewSource.value = { strategy: 'original-only', primaryUrl: null, fallbackUrl: null }
+    mediaPreviewUrl.value = null
+
+    if (!preview) return
+
+    const resolvedSource = await resolvePreviewSource(preview)
+    if (runId !== previewRunId) return
+
+    mediaPreviewSource.value = resolvedSource
+    mediaPreviewUrl.value = resolvedSource.primaryUrl || resolvedSource.fallbackUrl || preview
+  },
+  { immediate: true }
+)
+
+const { syncMediaSessionMetadata } = useMediaSessionMetadata(props, mediaEl, mediaPreviewUrl)
+
+usePlyrMediaLifecycle(props, mediaEl, { onPlaybackReady: syncMediaSessionMetadata })
 </script>
 
 <style lang="sass" scoped>

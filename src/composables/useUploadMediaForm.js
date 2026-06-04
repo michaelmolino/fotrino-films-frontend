@@ -394,6 +394,11 @@ export function useUploadMediaForm() {
       return
     }
 
+    if (isNewUserProfile.value) {
+      validation.value = { canSubmit: false, blockers: ['account.verificationPending'] }
+      return
+    }
+
     if (validationInFlightPromise) {
       await validationInFlightPromise
       return

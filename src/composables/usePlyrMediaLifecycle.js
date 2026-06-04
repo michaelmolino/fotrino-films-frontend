@@ -87,11 +87,12 @@ function createPlyrPlaybackController({ mediaEl }) {
     }
 }
 
-export function usePlyrMediaLifecycle(props, mediaEl) {
+export function usePlyrMediaLifecycle(props, mediaEl, options = {}) {
     const media = toRef(props, 'media')
     const channelStore = useChannelStore()
     let lifecycleRunId = 0
     const { destroyPlayers, setupPlayerForMedia } = createPlyrPlaybackController({ mediaEl })
+    const { onPlaybackReady = null } = options
 
     async function resolvePlaybackUrl(mediaSnapshot) {
         if (!mediaSnapshot.privateId) {
@@ -123,7 +124,10 @@ export function usePlyrMediaLifecycle(props, mediaEl) {
         await setupPlayerForMedia({ mediaSnapshot, sourceUrl })
         if (runId !== lifecycleRunId) {
             destroyPlayers()
+            return
         }
+
+        onPlaybackReady?.()
     }
 
     const playbackLifecycleKey = computed(
