@@ -82,7 +82,7 @@ const rootBindings = computed(() =>
 )
 
 const mediaAriaLabel = computed(() => `View ${media.title}`)
-const isAudio = computed(() => media.type.startsWith('audio/'))
+const isAudio = computed(() => media.type?.startsWith('audio/') ?? false)
 const showAudioBadge = computed(() => showBadges && isAudio.value)
 const showPortraitBadge = computed(
   () => showBadges && media.orientation === 'portrait' && !isAudio.value
