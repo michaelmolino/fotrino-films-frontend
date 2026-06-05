@@ -357,9 +357,6 @@ const albumSummaryPosterColor = computed(() => {
 })
 
 const contentState = computed(() => {
-  if (!accountStore.profileResolved) {
-    return 'loading'
-  }
   if (!profile.value) {
     return 'auth-required'
   }

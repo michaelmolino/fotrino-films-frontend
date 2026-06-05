@@ -43,7 +43,7 @@ import yahooIcon from '@assets/icons/yahoo.svg'
 const $q = useQuasar()
 const accountStore = useAccountStore()
 const route = useRoute()
-const shouldLoadProviders = computed(() => accountStore.profileResolved && !accountStore.profile)
+const shouldLoadProviders = computed(() => !accountStore.profile)
 accountStore.useProvidersQuery(shouldLoadProviders)
 
 const buttonLabel = computed(() => ($q.screen.gt.sm ? 'Sign Up/Login' : ''))

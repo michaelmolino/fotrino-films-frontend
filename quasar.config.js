@@ -42,7 +42,7 @@ const apiProxyPrefixes = [
 
 export default defineConfig(() => ({
   supportTS: false,
-  boot: ['install-colada', 'install-axios', 'image-asset-support'],
+  boot: ['install-colada', 'install-axios', 'bootstrap-profile', 'image-asset-support'],
   css: [],
   extras: ['material-icons'],
 

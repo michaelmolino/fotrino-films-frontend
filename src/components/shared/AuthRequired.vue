@@ -102,7 +102,7 @@ const props = defineProps({
 const route = useRoute()
 const $q = useQuasar()
 const accountStore = useAccountStore()
-const shouldLoadProviders = computed(() => accountStore.profileResolved && !accountStore.profile)
+const shouldLoadProviders = computed(() => !accountStore.profile)
 accountStore.useProvidersQuery(shouldLoadProviders)
 const isDark = computed(() => $q.dark.isActive)
 const providerButtonColor = computed(() => (isDark.value ? 'secondary' : 'primary'))

@@ -12,7 +12,6 @@ import { mutationResult, runMutation } from 'src/stores/utils/store-mutations.js
 
 export const useAccountStore = defineStore('account', () => {
   const profile = ref(null)
-  const profileResolved = ref(false)
   const providers = ref([])
   const providersLoadFailed = ref(false)
   const queryCache = useQueryCache()
@@ -58,32 +57,19 @@ export const useAccountStore = defineStore('account', () => {
     })
   }
 
-  const useProfileQuery = (staleTime = API_CACHE_SHORT_MS) => {
-    const query = useQuery(() => accountProfileQueryOptions(staleTime))
+  const fetchProfile = async (staleTime = API_CACHE_SHORT_MS) => {
+    const options = accountProfileQueryOptions(staleTime)
+    const entry = queryCache.ensure(options)
+    const state = await queryCache.fetch(entry, options)
 
-    watch(
-      () => query.data.value,
-      value => {
-        if (value !== undefined) {
-          profileResolved.value = true
-        }
-        setProfile(value ?? null)
-      },
-      { immediate: true }
-    )
+    if (state?.status === 'error') {
+      setProfile(null)
+      return null
+    }
 
-    watch(
-      () => query.error.value,
-      error => {
-        if (error) {
-          profileResolved.value = true
-          setProfile(null)
-        }
-      },
-      { immediate: true }
-    )
-
-    return query
+    const value = state?.data ?? null
+    setProfile(value)
+    return value
   }
 
   const useProvidersQuery = (enabled = true, staleTime = API_CACHE_LONG_MS) => {
@@ -122,7 +108,6 @@ export const useAccountStore = defineStore('account', () => {
       request: () => api.post('/account/logout'),
       onSuccess: () => {
         clearProfileCache()
-        profileResolved.value = true
         setProfile(null)
       }
     })
@@ -131,13 +116,12 @@ export const useAccountStore = defineStore('account', () => {
 
   return {
     profile,
-    profileResolved,
     providers,
     providersLoadFailed,
     setProfile,
     setProviders,
     clearProfileCache,
-    useProfileQuery,
+    fetchProfile,
     useProvidersQuery,
     accountProfileQueryOptions,
     accountProvidersQueryOptions,
