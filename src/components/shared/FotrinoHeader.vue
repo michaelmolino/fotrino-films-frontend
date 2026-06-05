@@ -23,7 +23,7 @@ import LoginDropdown from './FotrinoHeader/LoginDropdown.vue'
 import AccountDropdown from './FotrinoHeader/AccountDropdown.vue'
 
 const accountStore = useAccountStore()
-const profile = computed(() => accountStore.profile || null)
+const profile = computed(() => accountStore.profile)
 const isAuthenticated = computed(() => !!profile.value)
 const showLoginMenu = computed(() => !isAuthenticated.value)
 </script>

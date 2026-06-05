@@ -123,13 +123,13 @@ const providerMap = {
 }
 
 function getProviderLoginHref(providerKey) {
-  const returnTo = route.fullPath || '/'
+  const returnTo = route.fullPath
   return `${process.env.API}/account/login/${providerKey}?redirect_to=${encodeURIComponent(returnTo)}`
 }
 
 const oauthProviders = computed(() => {
   if (props.type !== 'login') return []
-  return (accountStore.providers || [])
+  return accountStore.providers
     .map(providerKey => {
       const base = providerMap[providerKey]
       if (!base) return null
@@ -182,7 +182,7 @@ const AUTH_REQUIRED_PRESETS = {
 }
 
 const resolved = computed(() => {
-  const preset = AUTH_REQUIRED_PRESETS[props.type] || AUTH_REQUIRED_PRESETS.login
+  const preset = AUTH_REQUIRED_PRESETS[props.type]
   return {
     title: props.title || preset.title,
     message: props.message || preset.message,

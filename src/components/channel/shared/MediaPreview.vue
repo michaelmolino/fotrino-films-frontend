@@ -82,7 +82,7 @@ const rootBindings = computed(() =>
 )
 
 const mediaAriaLabel = computed(() => `View ${media.title}`)
-const isAudio = computed(() => media.type?.startsWith('audio/'))
+const isAudio = computed(() => media.type.startsWith('audio/'))
 const showAudioBadge = computed(() => showBadges && isAudio.value)
 const showPortraitBadge = computed(
   () => showBadges && media.orientation === 'portrait' && !isAudio.value
@@ -91,10 +91,10 @@ const imageLoadingMode = computed(() => (priority === 'high' ? 'eager' : 'lazy')
 const titlePrimary = computed(() => media.title)
 const titleSecondary = computed(() => {
   if (!detail || media.title === album?.title) return null
-  return album?.title || null
+  return album.title
 })
 const hasPreviewAsset = computed(
-  () => Array.isArray(media?.previewAsset) && media.previewAsset.length > 0
+  () => Array.isArray(media.previewAsset) && media.previewAsset.length > 0
 )
 
 const { resolvePreviewSource } = useWebP()
@@ -104,7 +104,7 @@ let previewResolveToken = 0
 
 // Watch media.preview to re-resolve whenever it changes (e.g., thumbnail refresh)
 watch(
-  () => media?.previewAsset,
+  () => media.previewAsset,
   async (newPreview, _oldPreview, onCleanup) => {
     const token = ++previewResolveToken
     let active = true
@@ -121,7 +121,7 @@ watch(
     ready.value = false
     const resolved = await resolvePreviewSource(newPreview)
     if (!active || token !== previewResolveToken) return
-    finalUrl.value = resolved?.url || null
+    finalUrl.value = resolved?.url
     ready.value = true
   },
   { immediate: true }

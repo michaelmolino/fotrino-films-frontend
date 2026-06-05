@@ -47,19 +47,18 @@ import {
   resolveHistoryFromBackend
 } from '@utils/history.js'
 import { resolveChannelRouteContext } from '@utils/channel-route.js'
-import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 import { notifyWarning } from 'src/utils/notify.js'
 
 const channelStore = useChannelStore()
 const $q = useQuasar()
 const route = useRoute()
 
-const hasHistory = computed(() => (historyChannels?.value || []).length > 0)
+const hasHistory = computed(() => historyChannels.value.length > 0)
 const dropdownLabel = computed(() => ($q.screen.gt.sm ? 'History' : ''))
 const showTooltip = computed(() => !$q.screen.gt.sm)
 
 const historyEntries = computed(() => {
-  return (historyChannels?.value || []).map(channel => ({
+  return historyChannels.value.map(channel => ({
     key: `${channel.type}:${channel.resourceId}`,
     resourceId: channel.resourceId,
     type: channel.type,
@@ -72,7 +71,7 @@ const historyEntries = computed(() => {
 })
 
 function resolveHistoryCoverIcon(channel) {
-  const url = resolveImagePrimaryUrl(channel?.coverAsset)
+  const url = channel.cover
   return url ? `img:${url}` : 'movie'
 }
 
@@ -91,7 +90,7 @@ onMounted(async () => {
   const context = resolveChannelRouteContext(route)
   const currentEntry = buildCurrentHistoryEntryFromContext(context)
   const result = await resolveHistoryFromBackend(channelStore, { currentEntry })
-  const removedCount = result?.deletedItems?.length || 0
+  const removedCount = result.deletedItems.length
 
   if (removedCount > 0) {
     notifyWarning(getRemovedHistoryMessage(removedCount), { icon: 'info' })

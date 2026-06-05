@@ -93,7 +93,7 @@
             dense
             expand-separator
             :label="getChannelsLabel(props.row)"
-            :disable="(props.row.channels?.length || 0) === 0">
+            :disable="props.row.channels.length === 0">
             <div class="q-py-sm">
               <div
                 v-for="channel in props.row.channels"
@@ -102,7 +102,7 @@
                 <div class="row items-center no-wrap">
                   <q-avatar size="28px" class="q-mr-sm">
                     <img
-                      :src="resolveChannelCover(channel) || '/images/channel.png'"
+                      :src="resolveChannelCover(channel)"
                       :alt="`${channel.title} cover`"
                       loading="lazy"
                       decoding="async" />
@@ -183,7 +183,7 @@ import yahooIcon from '@assets/icons/yahoo.svg'
 const $q = useQuasar()
 const adminStore = useAdminStore()
 const usersQuery = adminStore.useUsersQuery()
-const loading = computed(() => usersQuery.isLoading.value && (adminStore.users || []).length === 0)
+const loading = computed(() => usersQuery.isLoading.value && adminStore.users.length === 0)
 const USER_FILTER_KEY = 'admin.users.filterMode'
 const USER_FILTER_VALUES = new Set(['all', 'new'])
 
@@ -200,7 +200,7 @@ const filterOptions = [
   { label: 'All Users', value: 'all' },
   { label: 'New Users', value: 'new' }
 ]
-const users = computed(() => adminStore.users || [])
+const users = computed(() => adminStore.users)
 const filteredUsers = computed(() => {
   if (filterMode.value === 'new') {
     return users.value.filter(user => user.newUser === true)
@@ -226,20 +226,20 @@ const providerIconClass = computed(() =>
 )
 
 function getChannelsLabel(user) {
-  const count = user.channels?.length || 0
+  const count = user.channels.length
   return count > 0 ? `Show Channels (${count})` : 'No Channels'
 }
 
 function getChannelPath(channel) {
-  return buildChannelPath({ publicId: channel?.publicId, slug: channel?.slug })
+  return buildChannelPath({ publicId: channel.publicId, slug: channel.slug })
 }
 
 function resolveUserAvatar(user) {
-  return resolveImagePrimaryUrl(user?.avatarAsset) || '/images/channel.png'
+  return resolveImagePrimaryUrl(user.avatarAsset)
 }
 
 function resolveChannelCover(channel) {
-  return resolveImagePrimaryUrl(channel?.coverAsset)
+  return resolveImagePrimaryUrl(channel.coverAsset)
 }
 
 watch(filterMode, value => {

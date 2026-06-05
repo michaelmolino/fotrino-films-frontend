@@ -30,7 +30,7 @@ const props = defineProps({
 })
 
 const isPrivate = computed(() => Boolean(props.routeContext?.isPrivate))
-const privateScope = computed(() => props.routeContext?.privateScope || 'media')
+const privateScope = computed(() => props.routeContext.privateScope)
 
 function withLastCrumbCurrent(items) {
   if (items.length > 0) {
@@ -41,19 +41,19 @@ function withLastCrumbCurrent(items) {
 
 const buildPrivateAlbumBreadcrumbs = () => {
   const arr = []
-  if (props.album?.privateId) {
+  if (props.album.privateId) {
     arr.push({
       id: 'private-album',
-      label: props.album?.title || 'Private Album',
-      to: props.media?.privateId
+      label: props.album.title,
+      to: props.media.privateId
         ? buildPrivateAlbumPath({ privateId: props.album.privateId, slug: props.album.slug })
         : null
     })
   }
-  if (props.media?.privateId && props.album?.privateId) {
+  if (props.media.privateId && props.album.privateId) {
     arr.push({
       id: 'private-album-media',
-      label: props.media?.title || 'Private Video',
+      label: props.media.title,
       to: null
     })
   }
@@ -62,7 +62,6 @@ const buildPrivateAlbumBreadcrumbs = () => {
 
 const buildPublicBreadcrumbs = () => {
   const arr = []
-  if (!props.channel) return arr
   arr.push({
     id: 0,
     icon: `img:${props.channel.cover}`,
@@ -100,7 +99,7 @@ const breadcrumbs = computed(() => {
     return [
       {
         id: 'private-media',
-        label: props.media?.title || 'Private Video',
+        label: props.media.title,
         to: null
       }
     ]

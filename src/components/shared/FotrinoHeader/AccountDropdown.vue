@@ -2,7 +2,7 @@
   <q-btn-dropdown
     :icon="accountIcon"
     :label="buttonLabel"
-    :aria-label="'Account menu for ' + (profile.name || 'user')"
+    :aria-label="'Account menu for ' + profile.name"
     data-cy="account-menu"
     flat
     no-caps
@@ -46,14 +46,14 @@ const props = defineProps({
 const buttonLabel = computed(() => ($q.screen.gt.sm ? 'Account' : ''))
 const showTooltip = computed(() => !$q.screen.gt.sm)
 const accountIcon = computed(() => {
-  const avatar = resolveImagePrimaryUrl(props.profile?.avatarAsset)
+  const avatar = resolveImagePrimaryUrl(props.profile.avatarAsset)
   return avatar ? `img:${avatar}` : 'account_circle'
 })
 
 const menuItems = computed(() => {
   const items = []
 
-  if (props.profile?.isAdmin) {
+  if (props.profile.isAdmin) {
     items.push({
       key: 'admin',
       to: '/admin',

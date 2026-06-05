@@ -11,7 +11,7 @@
     </div>
 
     <div v-else-if="contentState === 'ready'">
-      <div :key="channel?.publicId || route.fullPath">
+      <div :key="channel.publicId">
         <div ref="headerRowRef" class="row items-center q-mb-sm channel-header">
           <div ref="breadcrumbsRef" class="channel-header-breadcrumbs">
             <BreadCrumbs

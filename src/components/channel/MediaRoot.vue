@@ -9,7 +9,7 @@
     <div v-else-if="contentState === 'ready'">
       <BreadCrumbs :channel="channel" :album="album" :media="media" :route-context="routeContext" />
 
-      <PlyrPlayer :media="media" :artist="channel?.ownerName" class="q-py-md plyrplayer" />
+      <PlyrPlayer :media="media" :artist="channel.ownerName" class="q-py-md plyrplayer" />
       <div class="plyrplayer" data-cy="media-description-container">
         <MediaDescription :media="media" :poster="albumPoster" :poster-color="albumPosterColor" />
       </div>

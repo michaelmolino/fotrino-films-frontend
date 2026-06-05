@@ -271,8 +271,8 @@ const videoCompletionSource = computed(() => {
   }
 
   const fileNameBase = (mediaFile.value.name || '').replace(/\.[^/.]+$/, '')
-  const titleMatchesFile = payload.album?.media?.title === fileNameBase
-  const usesFramePreview = payload.album?.media?.previewType === 'frame'
+  const titleMatchesFile = payload.album.media.title === fileNameBase
+  const usesFramePreview = payload.album.media.previewType === 'frame'
 
   return titleMatchesFile && usesFramePreview ? 'auto' : 'user'
 })
@@ -289,8 +289,8 @@ const channelSummaryLabel = computed(() => {
 
 const channelCoverByPublicId = computed(() => {
   const map = {}
-  for (const channel of channels.value || []) {
-    if (channel?.publicId) {
+  for (const channel of channels.value) {
+    if (channel.publicId) {
       map[channel.publicId] = resolveImagePrimaryUrl(channel.coverAsset) || null
     }
   }
@@ -316,22 +316,22 @@ const channelSummaryAvatarSrc = computed(() => {
 })
 
 const albumSummaryLabel = computed(() => {
-  if (payload.album?.projectMode === 'unselected') {
+  if (payload.album.projectMode === 'unselected') {
     return 'Album'
   }
   if (payload.album.projectMode === 'create') {
-    return payload.album?.title || 'My Videos'
+    return payload.album.title || 'My Videos'
   }
-  return payload.album?.privateId?.label || 'Album'
+  return payload.album.privateId.label || 'Album'
 })
 
 const albumSummarySubtitle = computed(() => {
-  if (payload.album?.projectMode === 'unselected') {
+  if (payload.album.projectMode === 'unselected') {
     return ''
   }
 
   if (payload.album.projectMode === 'create') {
-    return payload.album?.subtitle || ''
+    return payload.album.subtitle || ''
   }
 
   return album.value?.subtitle || ''
@@ -349,8 +349,8 @@ const albumSummaryPosterColor = computed(() => {
     return '#000000'
   }
 
-  if (payload.album?.projectMode === 'create') {
-    return payload.album?.posterColor || '#000000'
+  if (payload.album.projectMode === 'create') {
+    return payload.album.posterColor || '#000000'
   }
 
   return album.value?.posterColor || '#000000'
@@ -370,7 +370,7 @@ const contentState = computed(() => {
 })
 
 const isChannelAutoDefault = computed(() => {
-  const channelList = channels.value || []
+  const channelList = channels.value
 
   if (payload.channelMode === 'create') {
     return (
@@ -408,14 +408,14 @@ const channelCompletionSource = computed(() => {
 })
 
 const isAlbumAutoDefault = computed(() => {
-  const albumList = albums.value || []
-  const normalizedPosterColor = (payload.album?.posterColor || '#000000').toLowerCase()
+  const albumList = albums.value
+  const normalizedPosterColor = payload.album.posterColor.toLowerCase()
 
-  if (payload.album?.projectMode === 'create') {
-    const subtitle = (payload.album?.subtitle || '').trim()
+  if (payload.album.projectMode === 'create') {
+    const subtitle = (payload.album.subtitle || '').trim()
     return (
-      (payload.album?.title || 'My Videos') === 'My Videos' &&
-      payload.album?.posterType === 'default' &&
+      (payload.album.title || 'My Videos') === 'My Videos' &&
+      payload.album.posterType === 'default' &&
       !posterFile.value &&
       subtitle.length === 0 &&
       normalizedPosterColor === '#000000'
@@ -424,8 +424,8 @@ const isAlbumAutoDefault = computed(() => {
 
   if (albumList.length === 0) {
     return (
-      (payload.album?.title || 'My Videos') === 'My Videos' &&
-      payload.album?.posterType === 'default' &&
+      (payload.album.title || 'My Videos') === 'My Videos' &&
+      payload.album.posterType === 'default' &&
       !posterFile.value &&
       normalizedPosterColor === '#000000'
     )
@@ -433,8 +433,8 @@ const isAlbumAutoDefault = computed(() => {
 
   if (albumList.length === 1) {
     return (
-      payload.album?.projectMode === 'existing' &&
-      payload.album?.privateId?.value === albumList[0].privateId
+      payload.album.projectMode === 'existing' &&
+      payload.album.privateId.value === albumList[0].privateId
     )
   }
 
@@ -474,14 +474,14 @@ const channelEditorCoverSrc = computed(() => {
 const albumEditorPosterSrc = computed(() => {
   return resolveImagePrimaryUrl(album.value?.posterAsset) || null
 })
-const albumEditorPosterColor = computed(() => payload.album?.posterColor || '#000000')
+const albumEditorPosterColor = computed(() => payload.album.posterColor || '#000000')
 const albumEditorPreview = computed(() => {
   const currentAlbum = album.value || {}
-  const isNew = payload.album?.projectMode === 'create'
+  const isNew = payload.album.projectMode === 'create'
   const baseMedia = Array.isArray(currentAlbum.media) ? currentAlbum.media : []
   return {
-    title: payload.album?.title || currentAlbum.title || 'My Videos',
-    subtitle: payload.album?.subtitle || currentAlbum.subtitle || '',
+    title: payload.album.title || currentAlbum.title || 'My Videos',
+    subtitle: payload.album.subtitle || currentAlbum.subtitle || '',
     poster: albumEditorPosterSrc.value,
     posterColor: albumEditorPosterColor.value,
     media: isNew ? [{}] : baseMedia
@@ -493,7 +493,7 @@ const capturedSinceLabel = computed(() => {
     return 'No capture date'
   }
 
-  const resourceDate = payload.album?.media?.resourceDate
+  const resourceDate = payload.album.media.resourceDate
   if (!resourceDate) {
     return 'No capture date'
   }
@@ -633,14 +633,14 @@ function onComposerSelectNewAlbum() {
       ...payload.album,
       projectMode: 'create',
       privateId: null,
-      title: payload.album?.title || 'My Videos',
-      posterType: payload.album?.posterType || 'default'
+      title: payload.album.title || 'My Videos',
+      posterType: payload.album.posterType || 'default'
     }
   })
 }
 
 function onComposerSelectNewAlbumCard() {
-  if (payload.album?.projectMode === 'create') {
+  if (payload.album.projectMode === 'create') {
     return
   }
   onComposerSelectNewAlbum()
@@ -658,8 +658,8 @@ function onComposerAlbumTitleUpdate(value) {
 
 function restoreDefaultAlbumTitle() {
   if (
-    payload.album?.projectMode === 'create' &&
-    (!payload.album?.title || payload.album.title.trim() === '')
+    payload.album.projectMode === 'create' &&
+    (!payload.album.title || payload.album.title.trim() === '')
   ) {
     onAlbumStepPayloadUpdate({
       ...payload,

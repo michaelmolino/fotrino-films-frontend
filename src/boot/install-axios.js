@@ -69,7 +69,7 @@ export default boot(({ app, router }) => {
       return
     }
 
-    const csrfToken = useAccountStore()?.profile?.csrfToken ?? null
+    const csrfToken = useAccountStore()?.profile?.csrfToken
     if (csrfToken == null) {
       return
     }
@@ -122,7 +122,7 @@ export default boot(({ app, router }) => {
           payload: cloudflarePayload,
           requestMethod: error?.config?.method,
           requestUrl: error?.config?.url,
-          requestStatus: resolvedStatus ?? error?.response?.status
+          requestStatus: resolvedStatus
         }
       })
       error.__cloudflareDialogShown = true

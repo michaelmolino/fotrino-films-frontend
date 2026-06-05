@@ -78,12 +78,12 @@ const providerMap = {
 }
 
 function getProviderLoginHref(providerKey) {
-  const returnTo = route.fullPath || '/'
+  const returnTo = route.fullPath
   return `${process.env.API}/account/login/${providerKey}?redirect_to=${encodeURIComponent(returnTo)}`
 }
 
 const oauthProviders = computed(() => {
-  return (accountStore.providers || [])
+  return accountStore.providers
     .map(providerKey => {
       const base = providerMap[providerKey]
       if (!base) return null

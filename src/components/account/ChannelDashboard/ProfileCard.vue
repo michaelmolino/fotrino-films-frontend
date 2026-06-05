@@ -19,7 +19,7 @@
           <div class="text-grey-6 text-caption ellipsis">{{ safeEmail }}</div>
           <div class="text-grey-6 text-caption q-mt-xs">Joined {{ joinedText }}</div>
           <div class="text-grey-6 text-caption q-mt-xs" data-cy="video-count">
-            {{ profile.mediaCount ?? 0 }} videos
+            {{ profile.mediaCount }} videos
           </div>
         </div>
       </div>
@@ -54,20 +54,20 @@ const props = defineProps({
 })
 
 const profilePic = computed(() => {
-  const source = props.profile?.avatarAsset
+  const source = props.profile.avatarAsset
   return resolveImagePrimaryUrl(source) || undefined
 })
 const providerIcon = computed(() => {
-  const p = (props.profile?.identityProvider?.provider || '').toLowerCase()
+  const p = (props.profile.identityProvider?.provider || '').toLowerCase()
   return PROVIDER_ICON_MAP[p] || 'account_circle'
 })
 const joinedText = computed(() => {
-  const created = props.profile?.created
+  const created = props.profile.created
   return created ? daysSince(created) : 'unknown'
 })
-const safeName = computed(() => props.profile?.name || '')
-const safeEmail = computed(() => props.profile?.email || '')
-const country = computed(() => getCountry(props.profile?.country))
+const safeName = computed(() => props.profile.name)
+const safeEmail = computed(() => props.profile.email)
+const country = computed(() => getCountry(props.profile.country))
 </script>
 
 <style scoped>

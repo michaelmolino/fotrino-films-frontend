@@ -13,7 +13,7 @@
               decoding="async" />
           </div>
           <div class="description-text-wrap">
-            <span class="text-h6 description-title">{{ media?.title || '' }}</span>
+            <span class="text-h6 description-title">{{ media.title }}</span>
             <div class="description-meta text-subtitle2">Captured {{ sinceCaptured }}</div>
             <div class="description-meta text-subtitle2">Published {{ sincePublished }}</div>
           </div>
@@ -132,12 +132,12 @@ const props = defineProps({
 
 const $q = useQuasar()
 const sinceCaptured = computed(() =>
-  props.media?.resourceDate ? daysSince(props.media.resourceDate, false) : ''
+  daysSince(props.media.resourceDate, false)
 )
-const sincePublished = computed(() => (props.media?.created ? daysSince(props.media.created) : ''))
-const descriptionSafe = computed(() => sanitizeHtml(props.media?.descriptionUnsafe || ''))
+const sincePublished = computed(() => daysSince(props.media.created))
+const descriptionSafe = computed(() => sanitizeHtml(props.media.descriptionUnsafe || ''))
 const showDescription = computed(() => !!descriptionSafe.value)
-const miniPosterSrc = computed(() => props.poster || null)
+const miniPosterSrc = computed(() => props.poster)
 const miniPosterStyle = computed(() => ({
   backgroundColor: props.posterColor || '#1f2933'
 }))
@@ -160,12 +160,11 @@ const keyboardShortcuts = [
 ]
 
 const reportPayload = computed(() => ({
-  privateId: props.media?.privateId,
+  privateId: props.media.privateId,
   reason: reason.value
 }))
 
 function openReportDialog() {
-  if (!props.media?.privateId) return
   reportDialog.value = true
 }
 
@@ -174,16 +173,15 @@ function openShortcutsDialog() {
 }
 
 async function submitReport() {
-  if (!reportPayload.value.privateId) return
   submitting.value = true
   try {
     const result = await channelStore.reportMedia(reportPayload.value)
-    const res = result?.data || {}
-    const reported = !!res?.reported
+    const res = result.data
+    const reported = !!res.reported
     if (reported) {
       notifySuccess('Report submitted. Our team will review it.')
     } else {
-      const msg = res?.message || 'You have already reported this video.'
+      const msg = res.message || 'You have already reported this video.'
       notifyInfo(msg)
     }
     reportDialog.value = false
