@@ -55,7 +55,7 @@ const props = defineProps({
 
 const profilePic = computed(() => {
   const source = props.profile.avatarAsset
-  return resolveImagePrimaryUrl(source) || undefined
+  return resolveImagePrimaryUrl(source)
 })
 const providerIcon = computed(() => {
   const p = (props.profile.identityProvider?.provider || '').toLowerCase()

@@ -57,7 +57,6 @@
                 :has-summary-description="hasSummaryDescription"
                 :summary-description-html="summaryDescriptionHtml"
                 :is-video-summary-ready="isVideoSummaryReady"
-                :video-check-color="videoCheckColor"
                 :icon-color-on-surface="iconColorOnSurface"
                 :video-completion-source="videoCompletionSource"
                 :is-channel-summary-ready="isChannelSummaryReady"
@@ -187,7 +186,6 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useQuasar } from 'quasar'
-import { useAccountStore } from 'src/stores/account-store.js'
 import AuthRequired from '@components/shared/AuthRequired.vue'
 import Summary from '@components/account/UploadMediaComposer/Summary.vue'
 import VideoExpansionItem from '@components/account/UploadMediaComposer/VideoExpansionItem.vue'
@@ -201,7 +199,6 @@ import { sanitizeHtml, sanitizeText } from '@utils/text.js'
 import { notifyWarning } from 'src/utils/notify.js'
 
 const $q = useQuasar()
-const accountStore = useAccountStore()
 const activeSection = ref(null)
 const mediaUserModified = ref(false)
 const videoWasReady = ref(false)
@@ -453,9 +450,6 @@ const albumCompletionSource = computed(() => {
   return 'user'
 })
 
-const videoCheckColor = computed(() =>
-  videoCompletionSource.value === 'user' ? 'info' : undefined
-)
 const summaryDescriptionRaw = computed(() => media.value?.description || '')
 const summaryDescriptionHtml = computed(() => sanitizeHtml(summaryDescriptionRaw.value))
 const summaryDescriptionText = computed(() => sanitizeText(summaryDescriptionRaw.value).trim())

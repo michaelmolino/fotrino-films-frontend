@@ -128,7 +128,6 @@ const props = defineProps({
   hasSummaryDescription: { type: Boolean, required: true },
   summaryDescriptionHtml: { type: String, required: true },
   isVideoSummaryReady: { type: Boolean, required: true },
-  videoCheckColor: { type: String, default: undefined },
   iconColorOnSurface: { type: String, required: true },
   videoCompletionSource: { type: String, default: null },
   isChannelSummaryReady: { type: Boolean, required: true },
