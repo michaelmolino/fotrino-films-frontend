@@ -21,6 +21,7 @@
 <script setup>
 import { computed } from 'vue'
 import { buildAlbumPath, buildChannelPath, buildPrivateAlbumPath } from '@utils/channel-route.js'
+import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 
 const props = defineProps({
   channel: { type: Object, required: true },
@@ -31,6 +32,7 @@ const props = defineProps({
 
 const isPrivate = computed(() => Boolean(props.routeContext?.isPrivate))
 const privateScope = computed(() => props.routeContext.privateScope)
+const channelCoverIcon = computed(() => `img:${resolveImagePrimaryUrl(props.channel.coverAsset)}`)
 
 function withLastCrumbCurrent(items) {
   if (items.length > 0) {
@@ -64,7 +66,7 @@ const buildPublicBreadcrumbs = () => {
   const arr = []
   arr.push({
     id: 0,
-    icon: `img:${props.channel.cover}`,
+    icon: channelCoverIcon.value,
     label: props.channel.title,
     to:
       props.album?.publicId || props.media?.publicId
