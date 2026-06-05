@@ -12,7 +12,7 @@
       <q-icon name="smartphone" size="16px" />
     </q-badge>
     <q-img
-      v-if="media.preview && ready"
+      v-if="hasPreviewAsset && ready && finalUrl"
       :src="finalUrl"
       :alt="media.title"
       :ratio="16 / 9"
@@ -42,11 +42,11 @@
       </template>
     </q-img>
     <q-skeleton
-      v-if="media.preview && !ready"
+      v-if="hasPreviewAsset && !ready"
       class="cursor-not-allowed preview-skeleton"
       animation="wave" />
     <q-skeleton
-      v-if="!media.preview"
+      v-if="!hasPreviewAsset || (hasPreviewAsset && ready && !finalUrl)"
       class="cursor-not-allowed preview-skeleton"
       animation="none" />
   </component>
@@ -93,6 +93,9 @@ const titleSecondary = computed(() => {
   if (!detail || media.title === album?.title) return null
   return album?.title || null
 })
+const hasPreviewAsset = computed(
+  () => Array.isArray(media?.previewAsset) && media.previewAsset.length > 0
+)
 
 const { resolvePreviewSource } = useWebP()
 const finalUrl = ref(null)
@@ -118,7 +121,7 @@ watch(
     ready.value = false
     const resolved = await resolvePreviewSource(newPreview)
     if (!active || token !== previewResolveToken) return
-    finalUrl.value = resolved.url
+    finalUrl.value = resolved?.url || null
     ready.value = true
   },
   { immediate: true }

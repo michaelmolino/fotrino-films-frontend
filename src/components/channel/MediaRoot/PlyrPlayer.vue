@@ -20,7 +20,7 @@
       </div>
     </div>
     <div v-else class="audio-container">
-      <picture v-if="media.preview" class="audio-preview">
+      <picture v-if="mediaPreviewUrl" class="audio-preview">
         <img
           :src="mediaPreviewUrl"
           :alt="`${media.title} cover art`"
@@ -88,7 +88,7 @@ watch(
     const resolvedSource = await resolvePreviewSource(preview)
     if (runId !== previewRunId) return
 
-    mediaPreviewUrl.value = resolvedSource.url
+    mediaPreviewUrl.value = resolvedSource?.url || null
   },
   { immediate: true }
 )
