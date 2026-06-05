@@ -66,18 +66,6 @@ const buildCanonicalPathIfSlugChanged = ({ currentSlug, routeSlug, buildPath }) 
   return buildPath()
 }
 
-const normalizeCanonicalPath = canonicalPath => {
-  if (typeof canonicalPath === 'string') {
-    return {
-      publicPath: canonicalPath,
-      privatePath: canonicalPath,
-      privateAlbumPath: canonicalPath
-    }
-  }
-
-  return canonicalPath && typeof canonicalPath === 'object' ? canonicalPath : null
-}
-
 const getPathSegments = path => path.split('/').filter(Boolean)
 
 const isPrivateAlbumPath = path => {
@@ -406,11 +394,7 @@ export const getCanonicalPathForRouteTarget = (canonicalPath, target) => {
   if (!canonicalPath || !target?.type) return null
 
   const definition = getRouteTypeDefinition(target.type)
-  const normalizedCanonicalPath = normalizeCanonicalPath(canonicalPath)
-
-  return definition && normalizedCanonicalPath
-    ? definition.getCanonicalPath(normalizedCanonicalPath)
-    : null
+  return definition ? definition.getCanonicalPath(canonicalPath) : null
 }
 
 export const resolveCanonicalPathForRoute = ({ route, context, canonicalPath, channelContext }) => {

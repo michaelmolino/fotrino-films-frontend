@@ -69,14 +69,10 @@ export const useUploadStore = defineStore('upload', () => {
       }
     })
 
-    const data = response?.data || {}
-    const normalizedData = {
-      mediaPrivateId: data?.mediaPrivateId ?? null,
-      instructions: data.instructions
-    }
+    const draftData = response.data
 
-    setUpload(normalizedData.instructions)
-    return mutationResult({ ok: true, data: normalizedData })
+    setUpload(draftData.instructions)
+    return mutationResult({ ok: true, data: draftData })
   }
 
   const validateUploadDraft = async draftRequest => {

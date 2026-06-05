@@ -130,12 +130,7 @@ function redirect(pathOrObj) {
 }
 
 watch(selectedView, val => {
-  const normalized = val === 'albums' || val === 'all' ? val : 'all'
-  if (normalized !== val) {
-    selectedView.value = normalized
-    return
-  }
-  setViewPreference(normalized)
+  setViewPreference(val)
 })
 
 useChannelRootRouteOrchestrator({

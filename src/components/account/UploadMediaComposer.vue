@@ -406,7 +406,7 @@ const channelCompletionSource = computed(() => {
 
 const isAlbumAutoDefault = computed(() => {
   const albumList = albums.value
-  const normalizedPosterColor = payload.album.posterColor.toLowerCase()
+  const posterColor = payload.album.posterColor
 
   if (payload.album.projectMode === 'create') {
     const subtitle = (payload.album.subtitle || '').trim()
@@ -415,7 +415,7 @@ const isAlbumAutoDefault = computed(() => {
       payload.album.posterType === 'default' &&
       !posterFile.value &&
       subtitle.length === 0 &&
-      normalizedPosterColor === '#000000'
+      posterColor === '#000000'
     )
   }
 
@@ -424,7 +424,7 @@ const isAlbumAutoDefault = computed(() => {
       (payload.album.title || 'My Videos') === 'My Videos' &&
       payload.album.posterType === 'default' &&
       !posterFile.value &&
-      normalizedPosterColor === '#000000'
+      posterColor === '#000000'
     )
   }
 
@@ -690,16 +690,11 @@ function onComposerAlbumPosterTypeUpdate(value) {
 }
 
 function onComposerAlbumPosterColorUpdate(value) {
-  let normalizedColor = '#000000'
-  if (typeof value === 'string') {
-    normalizedColor = value.startsWith('#') ? value : `#${value}`
-  }
-
   onAlbumStepPayloadUpdate({
     ...payload,
     album: {
       ...payload.album,
-      posterColor: normalizedColor
+      posterColor: value
     }
   })
 }
