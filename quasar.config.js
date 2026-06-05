@@ -31,7 +31,7 @@ const apiProxyPrefixes = [
   '/account/profile',
   '/account/providers',
   '/account/contracts/read-models',
-  '^/admin/(contracts/read-models|jobs(?:/.*)?|media(?:/.*)?|users(?:/.*)?)$',
+  '^/admin/(contracts/read-models|jobs(?:/.*)?|maintenance(?:/.*)?|media(?:/.*)?|users(?:/.*)?)$',
   '/channels',
   '/contracts',
   '/health',
