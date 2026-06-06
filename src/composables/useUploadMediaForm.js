@@ -138,14 +138,15 @@ export function useUploadMediaForm() {
     if (payload.album.projectMode === 'create') {
       const posterMode = payload.album.posterType === 'new' ? 'upload' : 'color'
       const posterColor = payload.album.posterColor || '#000000'
+      const poster = { mode: posterMode }
+      if (posterMode === 'color') {
+        poster.color = posterColor
+      }
       return {
         mode: 'create',
         title: payload.album.title,
         subtitle: payload.album.subtitle,
-        poster: {
-          mode: posterMode,
-          color: posterColor
-        }
+        poster
       }
     }
 
