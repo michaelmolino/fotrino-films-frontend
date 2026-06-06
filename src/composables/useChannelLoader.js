@@ -58,6 +58,7 @@ const sharedHydratedAlbumsByPublicId = computed(() => {
 })
 
 const EMPTY_CHANNEL_VIEW_RESPONSE = { data: null }
+const LOCAL_ROUTE_HIT_RESPONSE = data => ({ data, isLocalRouteHit: true })
 // Shared route loader for channel/album/media data. Can optionally own meta updates.
 export function useChannelLoader({ manageMeta = false } = {}) {
   const channelStore = useChannelStore()
@@ -123,9 +124,7 @@ export function useChannelLoader({ manageMeta = false } = {}) {
         findMediaByPublicId
       })
     ) {
-      return Promise.resolve({
-        data: channel.value
-      })
+      return Promise.resolve(LOCAL_ROUTE_HIT_RESPONSE(channel.value))
     }
 
     const options = channelStore.routeTargetQueryOptions(target)
@@ -170,7 +169,9 @@ export function useChannelLoader({ manageMeta = false } = {}) {
       const loadedChannel = loaded.data
 
       syncHistoryFromRouteContext({ context, channel: loadedChannel })
-      syncCanonicalSlugs({ route, context })
+      if (!loaded.isLocalRouteHit) {
+        syncCanonicalSlugs({ route, context })
+      }
 
       metaData.value = getMetaData(route, loadedChannel)
       loadStatus.value = 'success'
