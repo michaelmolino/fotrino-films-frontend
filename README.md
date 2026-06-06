@@ -13,44 +13,25 @@ This project is under active development and should be considered pre-production
 
 [![Live Demo](https://img.shields.io/badge/Visit-Live%20Demo-1f7a8c?style=for-the-badge)](https://films.fotrino.com/)
 
+The demo runs on a small, single-instance deployment for evaluation purposes. It is not representative of production scale or performance characteristics. The service may be intermittently unavailable due to maintenance, resets, or resource constraints.
+
 [![Chromium HSTS preload](https://img.shields.io/hsts/preload/films.fotrino.com?style=for-the-badge)](https://hstspreload.org/?domain=films.fotrino.com)
 [![SSL Labs SSL Server Test](https://img.shields.io/badge/SSL%20LABS-A%2B-brightgreen?style=for-the-badge)](https://www.ssllabs.com/ssltest/analyze.html?d=films.fotrino.com)
 [![Mozilla HTTP Observatory Grade](https://img.shields.io/mozilla-observatory/grade/films.fotrino.com?publish&style=for-the-badge)](https://observatory.mozilla.org/analyze/films.fotrino.com)
 
 ## Related Repositories
 
-- Backend API and workers: private repository (Flask, Postgres, Redis, Procrastinate, ffmpeg)
-- End-to-end tests: private repository (Cypress)
+The following components are maintained in private repositories.
 
-## Prerequisites
+- Backend: Python API built with Flask, using Postgres and Redis for persistence and caching.
+- Worker: Asynchronous job processing handled via Procrastinate, with ffmpeg used for media processing.
+- Tests: End-to-end test suite written in Cypress, covering key user flows and system behaviour.
 
-- [Node.js](https://nodejs.org/) >= 20
-- [Yarn Classic](https://classic.yarnpkg.com/) >= 1.21
+## OpenAPI Docs
 
-No global Quasar CLI installation is required for local development.
+[![OpenAPI Docs](https://img.shields.io/badge/Visit-OpenAPI%20Docs-1f7a8c?style=for-the-badge)](https://openapi.fotrino.com/)
 
-## Getting Started
-
-1. Install dependencies:
-
-```bash
-yarn install
-```
-
-1. Run the app in development mode:
-
-```bash
-yarn quasar dev
-```
-
-1. Configure API proxy/back-end target in `quasar.config.js` for your local environment.
-
-## Useful Scripts
-
-- `yarn lint` - run ESLint
-- `yarn format` - run Prettier and auto-fix lint issues in `src/**/*.{js,vue}`
-- `yarn build:analyze` - build SPA bundle with analyzer enabled
-- `yarn coverage` - start dev server with coverage instrumentation
+These docs are a work in progress. They may be incomplete or may not always reflect the latest implementation details. If something looks incorrect, the API behaviour should be considered the source of truth.
 
 ## License
 
