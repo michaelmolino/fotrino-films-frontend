@@ -183,8 +183,7 @@ export const useChannelStore = defineStore('channel', () => {
 
     return {
       items: Array.isArray(data?.data?.items) ? data.data.items : [],
-      deletedItems: Array.isArray(data?.data?.deletedItems) ? data.data.deletedItems : [],
-      persistedItems: Array.isArray(data?.data?.persistedItems) ? data.data.persistedItems : []
+      deletedItems: Array.isArray(data?.data?.deletedItems) ? data.data.deletedItems : []
     }
   }
 

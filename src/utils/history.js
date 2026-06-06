@@ -85,6 +85,13 @@ function commitHistory(entries) {
   LocalStorage.set(HISTORY_KEY, entries)
 }
 
+function buildStoredHistoryFromResolvedItems(items) {
+  return items.map(item => ({
+    type: item.type,
+    resourceId: item.resourceId
+  }))
+}
+
 export function syncHistoryFromRouteContext({ context, channel }) {
   if (!context.isPrivate && channel) {
     addToHistory({ type: 'channel', resourceId: channel.publicId, details: channel })
@@ -196,13 +203,12 @@ export async function resolveHistoryFromBackend(
     })
     const items = response.items
     const deletedItems = response.deletedItems
-    const persistedItems = response.persistedItems
 
-    if (!Array.isArray(items) || !Array.isArray(deletedItems) || !Array.isArray(persistedItems)) {
+    if (!Array.isArray(items) || !Array.isArray(deletedItems)) {
       throw new TypeError('Invalid history response')
     }
 
-    commitHistory(persistedItems)
+    commitHistory(buildStoredHistoryFromResolvedItems(items))
     historyChannels.value = items
 
     hasResolvedHistory = true
