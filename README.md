@@ -1,6 +1,6 @@
 # Fotrino Films Frontend
 
-![GitHub](https://img.shields.io/github/license/michaelmolino/fotrino-films-frontend?style=for-the-badge)
+[![License](https://img.shields.io/badge/License-GPL%203.0-EA7317?style=for-the-badge)](https://github.com/michaelmolino/fotrino-films-frontend?tab=GPL-3.0-1-ov-file)
 [![Sonar Violations](https://img.shields.io/sonar/violations/michaelmolino_fotrino-films-frontend?label=sonar%20violations&server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge)](https://sonarcloud.io/dashboard?id=michaelmolino_fotrino-films-frontend)
 
 Fotrino Films is a personal video hosting platform focused on private sharing with family and friends. This repository contains the frontend single-page application built with [Quasar](https://quasar.dev/) and [Vue 3](https://vuejs.org/).
@@ -29,7 +29,7 @@ The following components are maintained in private repositories.
 
 ## OpenAPI Docs
 
-[![OpenAPI Docs](https://img.shields.io/badge/Visit-OpenAPI%20Docs-1f7a8c?style=for-the-badge)](https://openapi.fotrino.com/)
+[![OpenAPI Docs](https://img.shields.io/badge/Visit-OpenAPI%20Docs-CAA8F5?style=for-the-badge)](https://openapi.fotrino.com/)
 
 These docs are a work in progress. They may be incomplete or may not always reflect the latest implementation details. If something looks incorrect, the API behaviour should be considered the source of truth.
 
