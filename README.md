@@ -31,7 +31,3 @@ The following components are maintained in private repositories.
 [![OpenAPI Docs](https://img.shields.io/badge/Visit-OpenAPI%20Docs-CAA8F5?style=for-the-badge)](https://openapi.fotrino.com/)
 
 These docs are a work in progress. They may be incomplete or may not always reflect the latest implementation details. If something looks incorrect, the API behaviour should be considered the source of truth.
-
-## License
-
-Licensed under the terms in [LICENSE.txt](LICENSE.txt).
