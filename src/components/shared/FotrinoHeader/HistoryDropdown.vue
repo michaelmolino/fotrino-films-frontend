@@ -40,7 +40,7 @@ import { useQuasar } from 'quasar'
 import { useRoute } from 'vue-router'
 import { useChannelStore } from 'src/stores/channel-store.js'
 import {
-  buildHistoryTargetPath,
+  resolveHistoryTargetPath,
   buildCurrentHistoryEntryFromContext,
   historyChannels,
   removeHistory,
@@ -76,7 +76,7 @@ function resolveHistoryCoverIcon(channel) {
 }
 
 function historyTarget(channel) {
-  return buildHistoryTargetPath(channel)
+  return resolveHistoryTargetPath(channel)
 }
 
 function getRemovedHistoryMessage(removedCount) {

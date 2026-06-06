@@ -1,10 +1,5 @@
 import { ref } from 'vue'
 import { LocalStorage } from 'quasar'
-import {
-  buildChannelPath,
-  buildPrivateAlbumPath,
-  buildPrivateMediaPath
-} from '@utils/channel-route.js'
 import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 
 /** @typedef {{ resourceId: string, type: 'channel' | 'privateMedia' | 'privateAlbum' }} HistoryEntry */
@@ -60,12 +55,6 @@ function commitHistory(entries) {
   LocalStorage.set(HISTORY_KEY, entries)
 }
 
-const HISTORY_PATH_BUILDERS = {
-  privateAlbum: entry => buildPrivateAlbumPath({ privateId: entry.resourceId, slug: entry.slug }),
-  privateMedia: entry => buildPrivateMediaPath({ privateId: entry.resourceId, slug: entry.slug }),
-  default: entry => buildChannelPath({ publicId: entry.resourceId, slug: entry.slug })
-}
-
 if (JSON.stringify(storedHistory) !== JSON.stringify(parsedHistory)) {
   LocalStorage.set(HISTORY_KEY, parsedHistory)
 }
@@ -98,7 +87,7 @@ export function syncHistoryFromRouteContext({ context, channel }) {
     addPrivateHistory(context.privateMediaId, {
       title: media?.title || channel?.title || '',
       cover: resolveImagePrimaryUrl(media?.previewAsset) || resolveImagePrimaryUrl(channel?.coverAsset) || null,
-      slug: media?.slug || context.mediaSlug || null
+      canonicalPath: media?.canonicalPath || null
     })
   }
 
@@ -107,7 +96,7 @@ export function syncHistoryFromRouteContext({ context, channel }) {
     addPrivateAlbumHistory(context.privateAlbumId, {
       title: album?.title || channel?.title || '',
       cover: resolveImagePrimaryUrl(album?.posterAsset) || resolveImagePrimaryUrl(channel?.coverAsset) || null,
-      slug: album?.slug || context.albumSlug || null
+      canonicalPath: album?.canonicalPath || null
     })
   }
 }
@@ -130,11 +119,13 @@ export function buildCurrentHistoryEntryFromContext(context) {
   return null
 }
 
-export function buildHistoryTargetPath(entry) {
-  if (!entry?.resourceId || !entry?.slug) return null
+export function resolveHistoryTargetPath(entry) {
+  const canonicalPath = entry?.canonicalPath
+  if (!canonicalPath || typeof canonicalPath !== 'object') {
+    return null
+  }
 
-  const buildPath = HISTORY_PATH_BUILDERS[entry.type] || HISTORY_PATH_BUILDERS.default
-  return buildPath(entry)
+  return canonicalPath.privateAlbumPath || canonicalPath.privatePath || canonicalPath.publicPath || null
 }
 
 export function addToHistory({ type, resourceId, details = {} }) {
@@ -159,8 +150,8 @@ export function addToHistory({ type, resourceId, details = {} }) {
         resourceId: entry.resourceId,
         type: entry.type,
         title: details?.title || '',
-        slug: details?.slug || null,
-        cover: details?.cover || null
+        cover: details?.cover || null,
+        canonicalPath: details?.canonicalPath || null
       }
     ]
   }

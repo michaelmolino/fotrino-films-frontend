@@ -20,7 +20,6 @@
 
 <script setup>
 import { computed } from 'vue'
-import { buildAlbumPath, buildChannelPath, buildPrivateAlbumPath } from '@utils/channel-route.js'
 import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 
 const props = defineProps({
@@ -47,9 +46,7 @@ const buildPrivateAlbumBreadcrumbs = () => {
     arr.push({
       id: 'private-album',
       label: props.album.title,
-      to: props.media.privateId
-        ? buildPrivateAlbumPath({ privateId: props.album.privateId, slug: props.album.slug })
-        : null
+      to: props.media.privateId ? props.album.canonicalPath?.privatePath || null : null
     })
   }
   if (props.media.privateId && props.album.privateId) {
@@ -70,16 +67,14 @@ const buildPublicBreadcrumbs = () => {
     label: props.channel.title,
     to:
       props.album?.publicId || props.media?.publicId
-        ? buildChannelPath({ publicId: props.channel.publicId, slug: props.channel.slug })
+        ? props.channel.canonicalPath?.publicPath || null
         : null
   })
   if (props.album?.publicId) {
     arr.push({
       id: 1,
       label: props.album.title,
-      to: props.media?.publicId
-        ? buildAlbumPath({ publicId: props.album.publicId, slug: props.album.slug })
-        : null
+      to: props.media?.publicId ? props.album.canonicalPath?.publicPath || null : null
     })
   }
   if (props.album?.publicId && props.media?.publicId) {

@@ -1,7 +1,7 @@
 import { watch } from 'vue'
 import {
-  buildAlbumPathForRouteContext,
-  buildMediaPathForRouteContext
+  resolveAlbumCanonicalPathForContext,
+  resolveMediaCanonicalPathForContext
 } from '@utils/channel-route.js'
 
 export function useChannelRootRouteOrchestrator({
@@ -38,9 +38,9 @@ export function useAlbumRootRouteOrchestrator({
       if (!currentChannel || isLoading) return
 
       if (currentAlbum && context.albumSlug && currentAlbum.slug !== context.albumSlug) {
-        const canonicalPath = buildAlbumPathForRouteContext({
+        const canonicalPath = resolveAlbumCanonicalPathForContext({
           context,
-          album: currentAlbum
+          canonicalPath: currentAlbum.canonicalPath
         })
         if (canonicalPath) {
           redirect(canonicalPath)
@@ -59,10 +59,9 @@ export function useAlbumRootRouteOrchestrator({
       const featured = featuredMedia.value[0]
       if (!featured) return
 
-      const featuredPath = buildMediaPathForRouteContext({
+      const featuredPath = resolveMediaCanonicalPathForContext({
         context,
-        album: currentAlbum,
-        media: featured
+        canonicalPath: featured.canonicalPath
       })
 
       if (featuredPath) {
@@ -99,14 +98,13 @@ export function useMediaRootRouteOrchestrator({
 
   watch(
     [media, loading, routeContext, album],
-    ([currentMedia, isLoading, context, currentAlbum]) => {
+    ([currentMedia, isLoading, context]) => {
       if (!currentMedia || isLoading || !context.mediaSlug) return
 
       if (currentMedia.slug !== context.mediaSlug) {
-        const canonicalPath = buildMediaPathForRouteContext({
+        const canonicalPath = resolveMediaCanonicalPathForContext({
           context,
-          album: currentAlbum,
-          media: currentMedia
+          canonicalPath: currentMedia.canonicalPath
         })
         if (canonicalPath) {
           redirect(canonicalPath)

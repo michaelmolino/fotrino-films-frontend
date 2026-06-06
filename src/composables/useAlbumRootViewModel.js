@@ -1,5 +1,5 @@
 import { computed } from 'vue'
-import { buildMediaPathForRouteContext } from '@utils/channel-route.js'
+import { resolveMediaCanonicalPathForContext } from '@utils/channel-route.js'
 
 export function useAlbumRootViewModel({ loading, channel, album, routeContext }) {
   const contentState = computed(() => {
@@ -9,10 +9,9 @@ export function useAlbumRootViewModel({ loading, channel, album, routeContext })
   })
 
   function getMediaPath(media) {
-    return buildMediaPathForRouteContext({
+      return resolveMediaCanonicalPathForContext({
       context: routeContext.value,
-      album: album.value,
-      media
+        canonicalPath: media?.canonicalPath
     })
   }
 

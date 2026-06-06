@@ -1,5 +1,5 @@
 import { computed } from 'vue'
-import { buildMediaPathForRouteContext } from '@utils/channel-route.js'
+import { resolveMediaCanonicalPathForContext } from '@utils/channel-route.js'
 import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 
 export function useMediaRootViewModel({ loading, channel, album, media, routeContext }) {
@@ -24,10 +24,9 @@ export function useMediaRootViewModel({ loading, channel, album, media, routeCon
   })
 
   function getRelatedPath(related) {
-    return buildMediaPathForRouteContext({
+      return resolveMediaCanonicalPathForContext({
       context: routeContext.value,
-      album: album.value,
-      media: related
+        canonicalPath: related?.canonicalPath
     })
   }
 

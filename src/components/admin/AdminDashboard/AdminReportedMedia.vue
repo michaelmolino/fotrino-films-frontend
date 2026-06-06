@@ -53,7 +53,6 @@ import { computed, watch } from 'vue'
 import { useAdminStore } from 'src/stores/admin-store.js'
 import { daysSince } from '@utils/date.js'
 import { getComponentApiErrorMessage } from 'src/utils/api-error-service.js'
-import { buildPrivateMediaPath } from '@utils/channel-route.js'
 import { notifyError, notifySuccess } from 'src/utils/notify.js'
 
 const adminStore = useAdminStore()
@@ -96,7 +95,7 @@ const flattenedReportedMediaRows = computed(() => {
 })
 
 function getReportedMediaPath(row) {
-  return buildPrivateMediaPath({ privateId: row.privateId, slug: row.slug })
+  return row?.canonicalPath?.privatePath || null
 }
 
 async function deleteMedia(privateId) {

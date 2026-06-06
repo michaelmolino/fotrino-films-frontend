@@ -89,7 +89,7 @@ Avoid:
 ```js
 // useExampleRootViewModel.js
 import { computed } from 'vue'
-import { buildMediaPathForRouteContext } from '@utils/channel-route.js'
+import { resolveMediaCanonicalPathForContext } from '@utils/channel-route.js'
 
 export function useExampleRootViewModel({ loading, entity, routeContext, items }) {
   const contentState = computed(() => {
@@ -98,10 +98,9 @@ export function useExampleRootViewModel({ loading, entity, routeContext, items }
   })
 
   function getItemPath(item) {
-    return buildMediaPathForRouteContext({
+    return resolveMediaCanonicalPathForContext({
       context: routeContext.value,
-      album: entity.value,
-      media: item
+      canonicalPath: item.canonicalPath
     })
   })
 

@@ -42,7 +42,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useQuasar } from 'quasar'
-import { buildChannelPath } from '@utils/channel-route.js'
 
 defineOptions({ name: 'Home-Page' })
 const $q = useQuasar()
@@ -63,10 +62,7 @@ const primaryTitleTransitionClass = computed(() =>
 const secondaryTitleTransitionClass = computed(() =>
   prefersReducedMotion.value ? '' : 'animated zoomInDown slower delay-1s'
 )
-const sampleChannelPath = buildChannelPath({
-  publicId: process.env.SAMPLE_CHANNEL_ID,
-  slug: process.env.SAMPLE_CHANNEL_SLUG
-})
+const sampleChannelPath = process.env.SAMPLE_CHANNEL_CANONICAL_PATH
 const textToneClass = computed(() => ($q.dark.isActive ? 'text-white' : 'text-primary'))
 const content = {
   titlePrimaryLeft: 'Fotrino ',

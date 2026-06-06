@@ -142,15 +142,8 @@ export function useChannelLoader({ manageMeta = false } = {}) {
 
   const syncCanonicalSlugs = ({ route, context }) => {
     const canonicalPath = resolveCanonicalPathForRoute({
-      route,
       context,
-      canonicalPath: channel.value?.canonicalPath,
-      channelContext: {
-        channel: channel.value,
-        findAlbumByPublicId,
-        findMediaByPublicId,
-        findAlbumByMediaPublicId
-      }
+      canonicalPath: channel.value?.canonicalPath
     })
 
     if (canonicalPath && canonicalPath !== route.path) {

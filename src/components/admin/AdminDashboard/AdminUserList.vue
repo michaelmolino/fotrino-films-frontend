@@ -169,7 +169,6 @@ import { useQuasar } from 'quasar'
 import { useAdminStore } from 'src/stores/admin-store.js'
 import { daysSince } from '@utils/date.js'
 import { getCountry } from '@utils/countries.js'
-import { buildChannelPath } from '@utils/channel-route.js'
 import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 import { getComponentApiErrorMessage } from 'src/utils/api-error-service.js'
 import { notifyError, notifySuccess } from 'src/utils/notify.js'
@@ -231,7 +230,7 @@ function getChannelsLabel(user) {
 }
 
 function getChannelPath(channel) {
-  return buildChannelPath({ publicId: channel.publicId, slug: channel.slug })
+  return channel?.canonicalPath?.publicPath || null
 }
 
 function resolveUserAvatar(user) {
