@@ -874,10 +874,10 @@
   resolved "https://registry.yarnpkg.com/@pkgr/core/-/core-0.3.6.tgz#3569708bd4be4d8870ba32bf1c456dac81600d97"
   integrity sha512-SEeaJLb3qBNF/OaXnaR1NmmBbFYk1zC0ZH/52fATcRPLFg/p791YrcyFFy44Bo9sLaGuSuLp5Q6axbb/O+v/RA==
 
-"@quasar/app-vite@^2.6.1":
-  version "2.6.1"
-  resolved "https://registry.yarnpkg.com/@quasar/app-vite/-/app-vite-2.6.1.tgz#7d4b8f50de2b4fd203af6a4b169e1c07373e1d8b"
-  integrity sha512-cBpPqUkHLxhQHeXoXEI+KGv7k5tx9gUk/F4+YnN6uRhfYJKfbAbTgq/rftA5rVcGJfM1lNxe6G4YOk+YwUfGlA==
+"@quasar/app-vite@^2.6.2":
+  version "2.6.2"
+  resolved "https://registry.yarnpkg.com/@quasar/app-vite/-/app-vite-2.6.2.tgz#962201a9bdf17767f694b7d326f2a7d18eac9e2d"
+  integrity sha512-t+z0jh5ogJ5/ClX/rlyD5bfVKaP9Yi8WC5+7NZoiLRnBtD36cX5Z7aWV1wHqD3qfElYHSF0P6dH7A883E+tu/A==
   dependencies:
     "@quasar/render-ssr-error" "1.0.4"
     "@quasar/ssl-certificate" "2.0.0"
@@ -2231,10 +2231,10 @@ doctrine@^2.1.0:
   dependencies:
     esutils "^2.0.2"
 
-dompurify@^3.4.7:
-  version "3.4.7"
-  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.4.7.tgz#e2702ea4fd5d83467f1baef62309466ce7d44a82"
-  integrity sha512-2jBxDJY4RR06tQNy4w5FlFH7kfxsQZlufd0sbv+chfHCxeJwrFw2baUDsSwvBISD4K4RDbd0PTfy3uNXsR6siA==
+dompurify@^3.4.8:
+  version "3.4.8"
+  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.4.8.tgz#6c54f8c207160e7f83fcb7f4fd05a82ac36b1cdc"
+  integrity sha512-yb1cEmaOum7wFvOCSQxyfgVlv5D47Rc30iZWoMpbDIWTnJ6grDDQyu2KFJzB2k7u0pMuJcQ1zphH//fFnw2tjQ==
   optionalDependencies:
     "@types/trusted-types" "^2.0.7"
 
@@ -2575,10 +2575,10 @@ eslint-plugin-quasar@^1.0.0:
     requireindex "~1.2.0"
     semver-compare "^1.0.0"
 
-eslint-plugin-vue@^10.9.1:
-  version "10.9.1"
-  resolved "https://registry.npmjs.org/eslint-plugin-vue/-/eslint-plugin-vue-10.9.1.tgz"
-  integrity sha512-cHB0Tf4Duvzwecwd/AqWzZvF/QszE13BhjVUpVXWCy9AeMR5GjkAjP3i85vqgLgOuTmkHR1OJ5oMeqLHtuw8zg==
+eslint-plugin-vue@^10.9.2:
+  version "10.9.2"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-vue/-/eslint-plugin-vue-10.9.2.tgz#571a3e1d826628f078094a748c9d4df49ad18668"
+  integrity sha512-4g7ZP3pYcuqd7Zp0pzUKcos0W+RkjBz4EGdhJ92FcYk6v03Ti/GK5NwjgsjxHK+98eXDbHeK7VtX1az7/8doZA==
   dependencies:
     "@eslint-community/eslint-utils" "^4.4.0"
     natural-compare "^1.4.0"
