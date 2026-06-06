@@ -86,7 +86,7 @@ const props = defineProps({
   channel: { type: Object, required: true },
   album: { type: Object, default: null },
   media: { type: Object, default: null },
-  routeContext: { type: Object, default: null }
+  routeContext: { type: Object, required: true }
 })
 
 const showAdvanced = ref(false)
@@ -94,52 +94,51 @@ const menuOpen = ref(false)
 const containerRef = ref(null)
 
 const shareContext = computed(() => {
-  const routeType = props.routeContext?.type
+  const routeType = props.routeContext.type
   if (routeType === 'media' || routeType === 'privateMedia' || routeType === 'privateAlbumMedia') {
     return 'media'
   }
   if (routeType === 'album' || routeType === 'privateAlbum') {
     return 'album'
   }
-  if (routeType === 'channel') {
-    return 'channel'
-  }
-
-  if (props.media) return 'media'
-  if (props.album) return 'album'
   return 'channel'
 })
 
 const isPrivateAlbumContext = computed(() => {
   return Boolean(
-    props.routeContext?.type === 'privateAlbum' ||
-    props.routeContext?.type === 'privateAlbumMedia' ||
+    props.routeContext.type === 'privateAlbum' ||
+    props.routeContext.type === 'privateAlbumMedia' ||
     (shareContext.value !== 'channel' &&
-      !props.album?.canonicalPath?.publicPath &&
-      props.album?.canonicalPath?.privatePath)
+      !props.album.canonicalPath.publicPath &&
+      props.album.canonicalPath.privatePath)
   )
 })
 
-function buildChannelActions() {
-  const channelPublicPath = props.channel.canonicalPath.publicPath
-  if (!channelPublicPath) return []
+const channelPublicPath = computed(() => {
+  if (props.routeContext.type !== 'channel') {
+    return props.channel.canonicalPath.publicPath
+  }
+
+  return `/c/${props.routeContext.channelPublicId}/${props.routeContext.channelSlug}`
+})
+
+const channelMenuActions = computed(() => {
   return [
     {
       key: 'share-channel',
       label: 'Entire channel',
       description: 'Recipient can browse everything in this channel.',
       icon: 'apps',
-      path: channelPublicPath,
+      path: channelPublicPath.value,
       cy: 'share-channel'
     }
   ]
-}
+})
 
-function buildAlbumActions() {
+const albumMenuActions = computed(() => {
   const items = []
   const albumPublicPath = props.album.canonicalPath.publicPath
   const albumPrivatePath = props.album.canonicalPath.privatePath
-  const channelPublicPath = props.channel.canonicalPath.publicPath
 
   if (albumPrivatePath) {
     items.push({
@@ -150,7 +149,7 @@ function buildAlbumActions() {
       path: albumPrivatePath,
       cy: 'share-only-album'
     })
-  } else if (albumPublicPath) {
+  } else {
     items.push({
       key: 'share-album-public',
       label: 'This album',
@@ -165,37 +164,32 @@ function buildAlbumActions() {
     return items
   }
 
-  if (channelPublicPath) {
-    items.push({
-      key: 'share-album-channel',
-      label: 'Entire channel',
-      description: 'Recipient can browse everything in this channel.',
-      icon: 'apps',
-      path: albumPublicPath || channelPublicPath,
-      cy: 'share-within-channel'
-    })
-  }
+  items.push({
+    key: 'share-album-channel',
+    label: 'Entire channel',
+    description: 'Recipient can browse everything in this channel.',
+    icon: 'apps',
+    path: albumPublicPath || channelPublicPath.value,
+    cy: 'share-within-channel'
+  })
 
   return items
-}
+})
 
-function buildMediaActions() {
+const mediaMenuActions = computed(() => {
   const items = []
   const mediaPublicPath = props.media.canonicalPath.publicPath
   const mediaPrivatePath = props.media.canonicalPath.privatePath
   const mediaPrivateAlbumPath = props.media.canonicalPath.privateAlbumPath
-  const channelPublicPath = props.channel.canonicalPath.publicPath
 
-  if (mediaPrivatePath || mediaPrivateAlbumPath || mediaPublicPath) {
-    items.push({
-      key: 'share-media-only',
-      label: 'Only this video',
-      description: 'Recipient can watch this video only.',
-      icon: 'movie',
-      path: mediaPrivatePath || mediaPrivateAlbumPath || mediaPublicPath,
-      cy: 'share-only-video'
-    })
-  }
+  items.push({
+    key: 'share-media-only',
+    label: 'Only this video',
+    description: 'Recipient can watch this video only.',
+    icon: 'movie',
+    path: mediaPrivatePath || mediaPrivateAlbumPath || mediaPublicPath,
+    cy: 'share-only-video'
+  })
 
   if (mediaPrivateAlbumPath) {
     items.push({
@@ -208,23 +202,24 @@ function buildMediaActions() {
     })
   }
 
-  if (channelPublicPath && !isPrivateAlbumContext.value) {
+  if (!isPrivateAlbumContext.value) {
     items.push({
       key: 'share-media-channel',
       label: 'Entire channel',
       description: 'Recipient can browse everything in this channel.',
       icon: 'apps',
-      path: mediaPublicPath || channelPublicPath,
+      path: mediaPublicPath || channelPublicPath.value,
       cy: 'share-within-channel'
     })
   }
+
   return items
-}
+})
 
 const menuActions = computed(() => {
-  if (shareContext.value === 'media') return buildMediaActions()
-  if (shareContext.value === 'album') return buildAlbumActions()
-  return buildChannelActions()
+  if (shareContext.value === 'channel') return channelMenuActions.value
+  if (shareContext.value === 'album') return albumMenuActions.value
+  return mediaMenuActions.value
 })
 
 const primaryAction = computed(() => {
@@ -280,7 +275,6 @@ onBeforeUnmount(() => {
 })
 
 function copyLink(path) {
-  if (!path) return
   copyToClipboard(`${globalThis.location.origin}${path}`).then(() => {
     notifyInfo('Link copied to clipboard.', {
       color: 'accent',
