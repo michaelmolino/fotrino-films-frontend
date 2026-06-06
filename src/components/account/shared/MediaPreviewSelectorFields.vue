@@ -49,7 +49,7 @@
           <MediaPreview
             v-if="previewImage"
             class="full-fit"
-            :media="{ title: 'Video preview', preview: previewImage, main: showFeaturedBorder }"
+            :media="previewMedia"
             :interactive="false"
             :show-badges="false"
             :show-title-overlay="false" />
@@ -140,6 +140,11 @@ const props = defineProps({
 const emit = defineEmits(['update:previewType', 'update:previewFile', 'refresh:frame'])
 
 const showRefreshButton = computed(() => props.allowFrameMode && props.previewType === 'frame')
+const previewMedia = computed(() => ({
+  title: 'Video preview',
+  main: props.showFeaturedBorder,
+  previewAsset: props.previewImage ? [{ type: 'jpeg', key: props.previewImage }] : []
+}))
 
 function onUpdatePreviewType(value) {
   emit('update:previewType', value)
