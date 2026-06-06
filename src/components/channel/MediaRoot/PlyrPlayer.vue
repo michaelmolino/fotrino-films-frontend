@@ -16,7 +16,7 @@
           x-webkit-airplay="allow"
           :key="mediaElementKey"
           :aria-label="`Video player for ${media.title}`"
-          :poster="!isPortraitVideo ? mediaPreviewUrl : null"
+          :poster="mediaPreviewUrl"
           preload="none"
           data-cy="video-player"
           class="videoEl"></video>
@@ -93,7 +93,7 @@ watch(
     const resolvedSource = await resolvePreviewSource(preview)
     if (runId !== previewRunId) return
 
-    mediaPreviewUrl.value = resolvedSource?.url || null
+    mediaPreviewUrl.value = resolvedSource?.url
   },
   { immediate: true }
 )

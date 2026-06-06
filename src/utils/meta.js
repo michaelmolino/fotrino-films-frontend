@@ -24,7 +24,7 @@ function findMedia(channel, mediaPublicId) {
 }
 
 // Helpers for each route type
-function getChannelMeta(route, channel) {
+function getChannelMeta(channel) {
   return {
     title: channel.title,
     description: channel.title,
@@ -79,7 +79,7 @@ export function getMetaData(route, channel) {
 
   // Route type detection
   if (route?.params.channelPublicId) {
-    meta = getChannelMeta(route, channel)
+    meta = getChannelMeta(channel)
   }
   if (route?.params.albumPublicId) {
     meta = getAlbumMeta(channel, route.params.albumPublicId)
@@ -112,22 +112,20 @@ export function getMetaData(route, channel) {
   // Open Graph URL
   const routePath = route ? route.fullPath.split('?')[0] : '/'
   const ogUrl = `${SITE_BASE_URL}${routePath}`
-  const link =
-    type === 'video' && image
+
+  const preloadPosterLink =
+    type === 'video' && typeof image === 'string' && image.length > 0
       ? {
-          preloadPoster: {
-            rel: 'preload',
-            as: 'image',
-            href: image,
-            fetchpriority: 'high'
-          }
+          rel: 'preload',
+          as: 'image',
+          href: image,
+          fetchpriority: 'high'
         }
-      : {}
+      : null
 
   // Compose meta tags
-  return {
+  const metaData = {
     title,
-    link,
     meta: {
       description: { name: 'description', content: description },
       // Open Graph
@@ -153,4 +151,12 @@ export function getMetaData(route, channel) {
       })
     }
   }
+
+  if (preloadPosterLink) {
+    metaData.link = {
+      preloadPoster: preloadPosterLink
+    }
+  }
+
+  return metaData
 }
