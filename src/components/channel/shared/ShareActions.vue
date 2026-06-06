@@ -94,6 +94,17 @@ const menuOpen = ref(false)
 const containerRef = ref(null)
 
 const shareContext = computed(() => {
+  const routeType = props.routeContext?.type
+  if (routeType === 'media' || routeType === 'privateMedia' || routeType === 'privateAlbumMedia') {
+    return 'media'
+  }
+  if (routeType === 'album' || routeType === 'privateAlbum') {
+    return 'album'
+  }
+  if (routeType === 'channel') {
+    return 'channel'
+  }
+
   if (props.media) return 'media'
   if (props.album) return 'album'
   return 'channel'
@@ -104,8 +115,8 @@ const isPrivateAlbumContext = computed(() => {
     props.routeContext?.type === 'privateAlbum' ||
     props.routeContext?.type === 'privateAlbumMedia' ||
     (shareContext.value !== 'channel' &&
-      !props.album.canonicalPath.publicPath &&
-      props.album.canonicalPath.privatePath)
+      !props.album?.canonicalPath?.publicPath &&
+      props.album?.canonicalPath?.privatePath)
   )
 })
 
