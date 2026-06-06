@@ -28,8 +28,6 @@ export function useAlbumRootRouteOrchestrator({
   album,
   loading,
   routeContext,
-  featuredMedia,
-  featuredMediaCount,
   redirect
 }) {
   watch(
@@ -51,12 +49,12 @@ export function useAlbumRootRouteOrchestrator({
   )
 
   watch(
-    [featuredMediaCount, album, loading, channel, routeContext],
-    ([count, currentAlbum, isLoading, currentChannel, context]) => {
-      if (!currentChannel || !currentAlbum || isLoading || count !== 1 || !context.hasAlbumTarget)
-        return
+    [album, loading, channel, routeContext],
+    ([currentAlbum, isLoading, currentChannel, context]) => {
+      if (!currentChannel || !currentAlbum || isLoading || !context.hasAlbumTarget) return
+      if (!currentAlbum.uiHints?.preferredContentPath) return
 
-      const featured = featuredMedia.value[0]
+      const featured = (currentAlbum.media || []).find(m => m.main === true)
       if (!featured) return
 
       const featuredPath = resolveMediaCanonicalPathForContext({

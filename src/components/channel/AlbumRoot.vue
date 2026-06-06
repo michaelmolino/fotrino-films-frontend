@@ -115,8 +115,6 @@ const { album } = useAlbumRouteEntities({
 })
 const {
   contentState,
-  featuredMedia,
-  featuredMediaCount,
   displayState,
   allMediaCards,
   featuredMediaCards,
@@ -135,8 +133,6 @@ useAlbumRootRouteOrchestrator({
   album,
   loading,
   routeContext,
-  featuredMedia,
-  featuredMediaCount,
   redirect
 })
 </script>
