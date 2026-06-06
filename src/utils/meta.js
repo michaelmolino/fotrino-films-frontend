@@ -1,6 +1,8 @@
 import { formatTitleWithSubtitle, sanitizeText } from '@utils/text.js'
 import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 
+const SITE_BASE_URL = process.env.SITE_BASE_URL
+
 function findAlbum(channel, albumPublicId) {
   if (!channel || !albumPublicId) {
     return null
@@ -108,7 +110,8 @@ export function getMetaData(route, channel) {
   }
 
   // Open Graph URL
-  const ogUrl = `https://films.fotrino.com${route.href.split('?')[0]}`
+  const routePath = route ? route.fullPath.split('?')[0] : '/'
+  const ogUrl = `${SITE_BASE_URL}${routePath}`
   const link =
     type === 'video' && image
       ? {

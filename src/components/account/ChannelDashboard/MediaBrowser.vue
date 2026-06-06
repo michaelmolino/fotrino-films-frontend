@@ -45,63 +45,31 @@ const channelItemListeners = {
   editChannel: saveChannelEdit
 }
 
-function buildEmptyLinks() {
-  return {
-    channel: {},
-    album: {},
-    media: {}
-  }
-}
-
-function addChannelLink(links, channel) {
-  if (channel.publicId && !channel.pending) {
-    links.channel[channel.publicId] = channel.canonicalPath.publicPath
-  }
-}
-
-function addAlbumAndMediaLinks(links, album) {
-  if (album.privateId && !album.pending) {
-    links.album[album.privateId] = album.canonicalPath.publicPath
-  }
-
-  for (const media of album.media) {
-    if (media.privateId && !media.pending) {
-      links.media[media.privateId] = media.canonicalPath.publicPath
-    }
-  }
-}
-
-const resourceLinks = computed(() => {
-  const links = buildEmptyLinks()
+const channelLinks = computed(() => {
+  const links = {}
 
   for (const channel of props.channels) {
-    addChannelLink(links, channel)
-
-    for (const album of channel.albums) {
-      addAlbumAndMediaLinks(links, album)
+    if (channel.publicId && !channel.pending) {
+      links[channel.publicId] = channel.canonicalPath.publicPath
     }
   }
 
   return links
 })
 
-function resolveResourcePath(resource) {
-  if (resource.pending) return null
-  return resource.canonicalPath.publicPath
-}
-
 function getMediaLink(type, resourceOrId) {
   if (!type || resourceOrId == null) return null
 
   const resource = typeof resourceOrId === 'object' && resourceOrId !== null ? resourceOrId : null
-  const resourcePath = resource ? resolveResourcePath(resource) : null
+  const resourcePath =
+    resource && !resource.pending && resource.canonicalPath
+      ? resource.canonicalPath.publicPath
+      : null
   if (resourcePath) return resourcePath
 
   const id = resource?.privateId || resource?.publicId || resourceOrId
   if (id == null) return null
-  if (type === 'channel') return resourceLinks.value.channel[id]
-  if (type === 'album') return resourceLinks.value.album[id]
-  if (type === 'media') return resourceLinks.value.media[id]
+  if (type === 'channel') return channelLinks.value[id]
   return null
 }
 

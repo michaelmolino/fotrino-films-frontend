@@ -5,12 +5,69 @@ import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 /** @typedef {{ resourceId: string, type: 'channel' | 'privateMedia' | 'privateAlbum' }} HistoryEntry */
 
 const HISTORY_KEY = 'fotrino-films-history'
-const storedHistory = LocalStorage.getItem(HISTORY_KEY)
-if (storedHistory !== null && !Array.isArray(storedHistory)) {
-  throw new Error('Invalid stored history')
+const HISTORY_TYPES = new Set(['channel', 'privateMedia', 'privateAlbum'])
+
+function isValidHistoryEntry(entry) {
+  return (
+    entry &&
+    typeof entry === 'object' &&
+    HISTORY_TYPES.has(entry.type) &&
+    typeof entry.resourceId === 'string' &&
+    entry.resourceId.length > 0
+  )
 }
 
-export const history = ref(storedHistory ?? [])
+function loadStoredHistory() {
+  const stored = LocalStorage.getItem(HISTORY_KEY)
+
+  if (stored == null) {
+    return []
+  }
+
+  let entries
+  if (Array.isArray(stored)) {
+    entries = stored
+  } else if (typeof stored === 'string') {
+    try {
+      const parsed = JSON.parse(stored)
+      if (!Array.isArray(parsed)) {
+        LocalStorage.remove(HISTORY_KEY)
+        return []
+      }
+      entries = parsed
+    } catch {
+      LocalStorage.remove(HISTORY_KEY)
+      return []
+    }
+  } else {
+    LocalStorage.remove(HISTORY_KEY)
+    return []
+  }
+
+  const seen = new Set()
+  const validEntries = []
+  for (const entry of entries) {
+    if (!isValidHistoryEntry(entry)) {
+      continue
+    }
+
+    const key = `${entry.type}:${entry.resourceId}`
+    if (seen.has(key)) {
+      continue
+    }
+
+    seen.add(key)
+    validEntries.push(entry)
+  }
+
+  if (validEntries.length !== entries.length || !entries.every(isValidHistoryEntry)) {
+    LocalStorage.set(HISTORY_KEY, validEntries)
+  }
+
+  return validEntries
+}
+
+export const history = ref(loadStoredHistory())
 export const historyChannels = ref([])
 
 let hasResolvedHistory = false

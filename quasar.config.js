@@ -54,7 +54,11 @@ export default defineConfig(() => ({
         process.env.NODE_ENV === 'production'
           ? 'https://api.fotrino.com'
           : 'https://fotrino.example.com:8080',
-      SAMPLE_CHANNEL_CANONICAL_PATH: process.env.SAMPLE_CHANNEL_CANONICAL_PATH || ''
+      SITE_BASE_URL:
+        process.env.NODE_ENV === 'production'
+          ? 'https://films.fotrino.com'
+          : 'https://fotrino.example.com:8080',
+      SAMPLE_CHANNEL_CANONICAL_PATH: process.env.SAMPLE_CHANNEL_CANONICAL_PATH
     },
     sourcemap: process.env.NODE_ENV !== 'production',
     extendViteConf(viteConf) {

@@ -33,58 +33,28 @@ const isPrivate = computed(() => Boolean(props.routeContext?.isPrivate))
 const privateScope = computed(() => props.routeContext.privateScope)
 const channelCoverIcon = computed(() => `img:${resolveImagePrimaryUrl(props.channel.coverAsset)}`)
 
-const buildPrivateAlbumBreadcrumbs = () => {
-  const arr = []
-  if (props.album.privateId) {
-    arr.push({
-      id: 'private-album',
-      label: props.album.title,
-      to: props.routeContext.privateScope === 'media' ? props.album.canonicalPath.privatePath : null
-    })
-  }
-  if (props.routeContext.privateScope === 'media') {
-    arr.push({
-      id: 'private-album-media',
-      label: props.media.title,
-      to: null
-    })
-  }
-  if (arr.length > 0) {
-    arr[arr.length - 1].to = null
-  }
-  return arr
-}
-
-const buildPublicBreadcrumbs = () => {
-  const arr = []
-  arr.push({
-    id: 0,
-    icon: channelCoverIcon.value,
-    label: props.channel.title,
-    to:
-      props.album?.publicId || props.media?.publicId ? props.channel.canonicalPath.publicPath : null
-  })
-  if (props.album?.publicId) {
-    arr.push({
-      id: 1,
-      label: props.album.title,
-      to: props.media?.publicId ? props.album.canonicalPath.publicPath : null
-    })
-  }
-  if (props.album?.publicId && props.media?.publicId) {
-    arr.push({
-      id: 2,
-      label: props.media.title,
-      to: null
-    })
-  }
-  return arr
-}
-
 const breadcrumbs = computed(() => {
   if (isPrivate.value) {
     if (privateScope.value === 'album') {
-      return buildPrivateAlbumBreadcrumbs()
+      const isPrivateAlbumMediaRoute = props.routeContext.type === 'privateAlbumMedia'
+      const privateAlbumBreadcrumbs = [
+        {
+          id: 'private-album',
+          label: props.album.title,
+          to: isPrivateAlbumMediaRoute ? props.album.canonicalPath.privatePath : null
+        }
+      ]
+
+      if (isPrivateAlbumMediaRoute) {
+        privateAlbumBreadcrumbs.push({
+          id: 'private-album-media',
+          label: props.media.title,
+          to: null
+        })
+      }
+
+      privateAlbumBreadcrumbs[privateAlbumBreadcrumbs.length - 1].to = null
+      return privateAlbumBreadcrumbs
     }
 
     return [
@@ -96,7 +66,35 @@ const breadcrumbs = computed(() => {
     ]
   }
 
-  return buildPublicBreadcrumbs()
+  const publicBreadcrumbs = [
+    {
+      id: 0,
+      icon: channelCoverIcon.value,
+      label: props.channel.title,
+      to:
+        props.album?.publicId || props.media?.publicId
+          ? `/c/${props.channel.publicId}/${props.channel.slug}`
+          : null
+    }
+  ]
+
+  if (props.album?.publicId) {
+    publicBreadcrumbs.push({
+      id: 1,
+      label: props.album.title,
+      to: props.media?.publicId ? props.album.canonicalPath.publicPath : null
+    })
+  }
+
+  if (props.album?.publicId && props.media?.publicId) {
+    publicBreadcrumbs.push({
+      id: 2,
+      label: props.media.title,
+      to: null
+    })
+  }
+
+  return publicBreadcrumbs
 })
 </script>
 
