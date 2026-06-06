@@ -16,9 +16,9 @@ const getRouteBaseContext = route => {
     mediaPublicId: null,
     privateAlbumId: null,
     privateMediaId: null,
-    channelSlug: params.channelSlug || null,
-    albumSlug: params.albumSlug || null,
-    mediaSlug: params.mediaSlug || null,
+    channelSlug: params.channelSlug,
+    albumSlug: params.albumSlug,
+    mediaSlug: params.mediaSlug,
     hasAlbumTarget: false,
     hasMediaTarget: false
   }
@@ -88,7 +88,7 @@ const ROUTE_TYPE_DEFINITIONS = {
       return getAlbumMediaItems(album).some(item => item?.privateId === target.privateMediaId)
     },
     isCanonicalPathCompatible: isPrivateAlbumMediaPath,
-    getCanonicalPath: canonicalPath => canonicalPath.privateAlbumPath || canonicalPath.privatePath || null
+    getCanonicalPath: canonicalPath => canonicalPath.privateAlbumPath || canonicalPath.privatePath
   },
   privateAlbum: {
     getTargetFromParams: params => {
@@ -109,7 +109,7 @@ const ROUTE_TYPE_DEFINITIONS = {
     },
     isLoaded: ({ target, channel }) => channel?.album?.privateId === target.privateAlbumId,
     isCanonicalPathCompatible: isPrivateAlbumPath,
-    getCanonicalPath: canonicalPath => canonicalPath.privatePath || null
+    getCanonicalPath: canonicalPath => canonicalPath.privatePath
   },
   channel: {
     getTargetFromParams: params => {
@@ -129,7 +129,7 @@ const ROUTE_TYPE_DEFINITIONS = {
     },
     isLoaded: ({ target, channel }) => channel?.publicId === target.publicId,
     isCanonicalPathCompatible: canonicalPath => canonicalPath.startsWith('/c/'),
-    getCanonicalPath: canonicalPath => canonicalPath.publicPath || null
+    getCanonicalPath: canonicalPath => canonicalPath.publicPath
   },
   album: {
     getTargetFromParams: params => {
@@ -150,7 +150,7 @@ const ROUTE_TYPE_DEFINITIONS = {
     },
     isLoaded: ({ target, findAlbumByPublicId }) => !!findAlbumByPublicId(target.publicId),
     isCanonicalPathCompatible: canonicalPath => canonicalPath.startsWith('/a/'),
-    getCanonicalPath: canonicalPath => canonicalPath.publicPath || null
+    getCanonicalPath: canonicalPath => canonicalPath.publicPath
   },
   media: {
     getTargetFromParams: params => {
@@ -171,7 +171,7 @@ const ROUTE_TYPE_DEFINITIONS = {
     },
     isLoaded: ({ target, findMediaByPublicId }) => !!findMediaByPublicId(target.publicId),
     isCanonicalPathCompatible: canonicalPath => canonicalPath.startsWith('/m/'),
-    getCanonicalPath: canonicalPath => canonicalPath.publicPath || null
+    getCanonicalPath: canonicalPath => canonicalPath.publicPath
   },
   privateMedia: {
     getTargetFromParams: params => {
@@ -193,11 +193,11 @@ const ROUTE_TYPE_DEFINITIONS = {
     isLoaded: ({ target, channel }) =>
       getAlbumMediaItems(channel?.album).some(item => item?.privateId === target.privateMediaId),
     isCanonicalPathCompatible: canonicalPath => canonicalPath.startsWith('/private/m/'),
-    getCanonicalPath: canonicalPath => canonicalPath.privatePath || null
+    getCanonicalPath: canonicalPath => canonicalPath.privatePath
   }
 }
 
-const getRouteTypeDefinition = type => ROUTE_TYPE_DEFINITIONS[type] || null
+const getRouteTypeDefinition = type => ROUTE_TYPE_DEFINITIONS[type]
 
 export const getChannelRouteTarget = route => {
   const params = getRouteParams(route)
@@ -259,7 +259,7 @@ export const isChannelRouteTargetLoaded = ({
 export const toChannelRouteTargetFromContext = context => {
   if (!context || context.type === 'unknown') return null
 
-  return getRouteTypeDefinition(context.type)?.getTargetFromContext(context) || null
+  return getRouteTypeDefinition(context.type)?.getTargetFromContext(context)
 }
 
 export const isCanonicalPathCompatibleWithRouteTarget = (canonicalPath, target) => {
@@ -289,22 +289,22 @@ export const resolveMediaCanonicalPathForContext = ({ context, canonicalPath }) 
   if (!context || !canonicalPath) return null
 
   if (context.type === 'privateAlbum' || context.type === 'privateAlbumMedia') {
-    return canonicalPath.privateAlbumPath || null
+    return canonicalPath.privateAlbumPath
   }
 
   if (context.type === 'privateMedia') {
-    return canonicalPath.privatePath || null
+    return canonicalPath.privatePath
   }
 
-  return canonicalPath.publicPath || null
+  return canonicalPath.publicPath
 }
 
 export const resolveAlbumCanonicalPathForContext = ({ context, canonicalPath }) => {
   if (!context || !canonicalPath) return null
 
   if (context.type === 'privateAlbum' || context.type === 'privateAlbumMedia') {
-    return canonicalPath.privatePath || null
+    return canonicalPath.privatePath
   }
 
-  return canonicalPath.publicPath || null
+  return canonicalPath.publicPath
 }

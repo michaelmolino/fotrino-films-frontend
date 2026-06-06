@@ -64,7 +64,7 @@ const historyEntries = computed(() => {
     type: channel.type,
     title: channel.title,
     icon: resolveHistoryCoverIcon(channel),
-    target: historyTarget(channel),
+    target: resolveHistoryTargetPath(channel),
     visitLabel: `Visit ${channel.title}`,
     removeLabel: `Remove ${channel.title} from history`
   }))
@@ -73,10 +73,6 @@ const historyEntries = computed(() => {
 function resolveHistoryCoverIcon(channel) {
   const url = channel.cover
   return url ? `img:${url}` : 'movie'
-}
-
-function historyTarget(channel) {
-  return resolveHistoryTargetPath(channel)
 }
 
 function getRemovedHistoryMessage(removedCount) {

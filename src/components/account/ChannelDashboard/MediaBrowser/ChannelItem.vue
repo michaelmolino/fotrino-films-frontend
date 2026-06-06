@@ -137,9 +137,7 @@ const hasPendingChildren = computed(() => {
 const channelSubtitle = computed(() =>
   props.channel.created ? `Created: ${daysSince(props.channel.created, true)}` : ''
 )
-const persistedCoverUrl = computed(() =>
-  resolveImagePrimaryUrl(props.channel?.coverAsset)
-)
+const persistedCoverUrl = computed(() => resolveImagePrimaryUrl(props.channel?.coverAsset))
 
 const albumItemListeners = {
   deleteAlbum: value => emit('deleteAlbum', value),

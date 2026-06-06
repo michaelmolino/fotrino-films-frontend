@@ -23,18 +23,14 @@ export function useMediaRootViewModel({ loading, channel, album, media, routeCon
     return (isPublicMedia || isPrivateAlbumMedia) && relatedMedia.value.length > 0
   })
 
-  function getRelatedPath(related) {
-      return resolveMediaCanonicalPathForContext({
-      context: routeContext.value,
-        canonicalPath: related?.canonicalPath
-    })
-  }
-
   const relatedCards = computed(() => {
     return relatedMedia.value.map((related, index) => ({
       id: related.privateId,
       media: related,
-      to: getRelatedPath(related),
+      to: resolveMediaCanonicalPathForContext({
+        context: routeContext.value,
+        canonicalPath: related.canonicalPath
+      }),
       priority: index === 0 ? 'high' : 'auto'
     }))
   })
@@ -45,7 +41,6 @@ export function useMediaRootViewModel({ loading, channel, album, media, routeCon
     albumPosterColor,
     relatedMedia,
     showRelatedContent,
-    relatedCards,
-    getRelatedPath
+    relatedCards
   }
 }

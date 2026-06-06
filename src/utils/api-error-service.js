@@ -22,14 +22,6 @@ function getUploadValidationMessage(payload) {
   return payload?.detail?.[0]?.msg || 'Invalid upload request.'
 }
 
-function getGlobalPayloadMessage(payload, fallback) {
-  return (
-    (typeof payload?.message === 'string' && payload.message) ||
-    DEFAULT_GLOBAL_API_ERROR_MESSAGES[payload?.error] ||
-    fallback
-  )
-}
-
 export function getCloudflareGatewayErrorPayload(error) {
   const data = getErrorData(error)
   return data?.cloudflare_error === true &&
@@ -98,7 +90,9 @@ export function getGlobalApiErrorMessage(error, fallback = 'Something went wrong
   const globalPayload = getGlobalApiErrorPayload(error)
   return isRateLimitedError(error, globalPayload)
     ? getRateLimitMessage(error)
-    : getGlobalPayloadMessage(globalPayload, fallback)
+    : (typeof globalPayload.message === 'string' && globalPayload.message) ||
+        DEFAULT_GLOBAL_API_ERROR_MESSAGES[globalPayload.error] ||
+        fallback
 }
 
 export function getComponentApiErrorMessage(error, fallback = 'Something went wrong!') {
@@ -116,7 +110,11 @@ export function getComponentApiErrorMessage(error, fallback = 'Something went wr
   }
 
   if (globalPayload) {
-    return getGlobalPayloadMessage(globalPayload, fallback)
+    return (
+      (typeof globalPayload.message === 'string' && globalPayload.message) ||
+      DEFAULT_GLOBAL_API_ERROR_MESSAGES[globalPayload.error] ||
+      fallback
+    )
   }
 
   const componentPayload = getComponentApiErrorPayload(error)

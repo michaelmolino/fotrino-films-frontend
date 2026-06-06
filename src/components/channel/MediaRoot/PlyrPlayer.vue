@@ -1,5 +1,8 @@
 <template>
-  <div data-cy="media-player" class="media-player-shell" :class="{ 'portrait-mode': isPortraitVideo }">
+  <div
+    data-cy="media-player"
+    class="media-player-shell"
+    :class="{ 'portrait-mode': isPortraitVideo }">
     <div v-if="isVideoView" class="video-shell">
       <div
         v-if="isPortraitVideo"
@@ -64,7 +67,9 @@ const view = computed(() => (props.media.type.startsWith('audio/') ? 'audio' : '
 const isVideoView = computed(() => view.value === 'video')
 const mediaElementKey = computed(() => `${view.value}:${props.media.privateId}`)
 const mediaPreviewUrl = ref(null)
-const isPortraitVideo = computed(() => view.value === 'video' && props.media.orientation === 'portrait')
+const isPortraitVideo = computed(
+  () => view.value === 'video' && props.media.orientation === 'portrait'
+)
 const portraitBackdropStyle = computed(() => {
   if (!mediaPreviewUrl.value) return {}
   return { backgroundImage: `url("${mediaPreviewUrl.value}")` }

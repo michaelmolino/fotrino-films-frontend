@@ -8,13 +8,6 @@ export function useAlbumRootViewModel({ loading, channel, album, routeContext })
     return channel.value && album.value && hasAlbumTarget ? 'ready' : 'not-found'
   })
 
-  function getMediaPath(media) {
-      return resolveMediaCanonicalPathForContext({
-      context: routeContext.value,
-        canonicalPath: media?.canonicalPath
-    })
-  }
-
   const allMedia = computed(() => {
     return album.value?.media || []
   })
@@ -47,7 +40,10 @@ export function useAlbumRootViewModel({ loading, channel, album, routeContext })
       .map((media, index) => ({
         id: media.privateId,
         media,
-        to: getMediaPath(media),
+        to: resolveMediaCanonicalPathForContext({
+          context: routeContext.value,
+          canonicalPath: media.canonicalPath
+        }),
         priority: index === 0 ? 'high' : 'auto'
       }))
   })
@@ -58,7 +54,10 @@ export function useAlbumRootViewModel({ loading, channel, album, routeContext })
       .map((media, index) => ({
         id: media.privateId,
         media,
-        to: getMediaPath(media),
+        to: resolveMediaCanonicalPathForContext({
+          context: routeContext.value,
+          canonicalPath: media.canonicalPath
+        }),
         priority: index === 0 ? 'high' : 'auto'
       }))
   })
@@ -69,7 +68,10 @@ export function useAlbumRootViewModel({ loading, channel, album, routeContext })
       .map((media, index) => ({
         id: media.privateId,
         media,
-        to: getMediaPath(media),
+        to: resolveMediaCanonicalPathForContext({
+          context: routeContext.value,
+          canonicalPath: media.canonicalPath
+        }),
         priority: index === 0 ? 'high' : 'auto'
       }))
   })
@@ -79,7 +81,6 @@ export function useAlbumRootViewModel({ loading, channel, album, routeContext })
 
   return {
     contentState,
-    getMediaPath,
     allMedia,
     featuredMedia,
     featuredMediaCount,

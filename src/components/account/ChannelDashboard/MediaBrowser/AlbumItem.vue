@@ -212,7 +212,8 @@ function onUpdatePosterType(value) {
   editForm.value = {
     ...editForm.value,
     posterType: 'new',
-    posterImage: editForm.value.posterImage || resolveImagePrimaryUrl(props.album?.posterAsset) || null
+    posterImage:
+      editForm.value.posterImage || resolveImagePrimaryUrl(props.album?.posterAsset) || null
   }
 }
 

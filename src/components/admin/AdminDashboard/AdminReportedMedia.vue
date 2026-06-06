@@ -20,7 +20,7 @@
         <q-td :props="props">
           <q-btn
             :label="props.row.title"
-            :to="getReportedMediaPath(props.row)"
+            :to="props.row.canonicalPath.privatePath"
             icon="link"
             flat
             dense
@@ -82,6 +82,7 @@ const flattenedReportedMediaRows = computed(() => {
         rowKey: `${media.privateId}-${idx}`,
         privateId: media.privateId,
         slug: media.slug,
+        canonicalPath: media.canonicalPath,
         title: media.title,
         reporter: report.reporter,
         reason: report.reason,
@@ -93,10 +94,6 @@ const flattenedReportedMediaRows = computed(() => {
   }
   return rows
 })
-
-function getReportedMediaPath(row) {
-  return row?.canonicalPath?.privatePath || null
-}
 
 async function deleteMedia(privateId) {
   try {

@@ -150,7 +150,9 @@ const videoSummaryLabel = computed(() => {
   const title = props.media?.title
   return typeof title === 'string' && title.trim().length > 0 ? title.trim() : 'Video'
 })
-const videoSummaryPreviewSrc = computed(() => resolveImagePrimaryUrl(props.media?.previewAsset) || null)
+const videoSummaryPreviewSrc = computed(
+  () => resolveImagePrimaryUrl(props.media?.previewAsset) || null
+)
 const showAlbumSubtitle = computed(() => !!props.albumSummarySubtitle)
 const albumSummaryAvatarClass = computed(() => ({
   'summary-step-swatch': !props.albumSummaryPosterSrc

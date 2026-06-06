@@ -131,9 +131,7 @@ const props = defineProps({
 })
 
 const $q = useQuasar()
-const sinceCaptured = computed(() =>
-  daysSince(props.media.resourceDate, false)
-)
+const sinceCaptured = computed(() => daysSince(props.media.resourceDate, false))
 const sincePublished = computed(() => daysSince(props.media.created))
 const descriptionSafe = computed(() => sanitizeHtml(props.media.descriptionUnsafe || ''))
 const showDescription = computed(() => !!descriptionSafe.value)

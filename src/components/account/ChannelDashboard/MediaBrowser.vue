@@ -29,7 +29,7 @@ const props = defineProps({
   channels: { type: Array, default: () => [] }
 })
 
-const showEmptyState = computed(() => (props.channels || []).length === 0)
+const showEmptyState = computed(() => props.channels.length === 0)
 
 const channelItemListeners = {
   deleteChannel: channelPublicId =>
@@ -53,29 +53,20 @@ function buildEmptyLinks() {
   }
 }
 
-function getPublicPath(canonicalPath) {
-  if (!canonicalPath) return null
-  if (typeof canonicalPath === 'string') return canonicalPath
-  if (typeof canonicalPath === 'object') {
-    return canonicalPath.publicPath || null
-  }
-  return null
-}
-
 function addChannelLink(links, channel) {
-  if (channel?.publicId && !channel?.pending) {
-    links.channel[channel.publicId] = getPublicPath(channel.canonicalPath)
+  if (channel.publicId && !channel.pending) {
+    links.channel[channel.publicId] = channel.canonicalPath.publicPath
   }
 }
 
 function addAlbumAndMediaLinks(links, album) {
-  if (album?.privateId && !album?.pending) {
-    links.album[album.privateId] = getPublicPath(album.canonicalPath)
+  if (album.privateId && !album.pending) {
+    links.album[album.privateId] = album.canonicalPath.publicPath
   }
 
-  for (const media of album?.media || []) {
-    if (media?.privateId && !media?.pending) {
-      links.media[media.privateId] = getPublicPath(media.canonicalPath)
+  for (const media of album.media) {
+    if (media.privateId && !media.pending) {
+      links.media[media.privateId] = media.canonicalPath.publicPath
     }
   }
 }
@@ -83,10 +74,10 @@ function addAlbumAndMediaLinks(links, album) {
 const resourceLinks = computed(() => {
   const links = buildEmptyLinks()
 
-  for (const channel of props.channels || []) {
+  for (const channel of props.channels) {
     addChannelLink(links, channel)
 
-    for (const album of channel?.albums || []) {
+    for (const album of channel.albums) {
       addAlbumAndMediaLinks(links, album)
     }
   }
@@ -95,22 +86,22 @@ const resourceLinks = computed(() => {
 })
 
 function resolveResourcePath(resource) {
-  if (!resource || resource.pending) return null
-  return getPublicPath(resource.canonicalPath)
+  if (resource.pending) return null
+  return resource.canonicalPath.publicPath
 }
 
 function getMediaLink(type, resourceOrId) {
   if (!type || resourceOrId == null) return null
 
   const resource = typeof resourceOrId === 'object' && resourceOrId !== null ? resourceOrId : null
-  const resourcePath = resolveResourcePath(resource)
+  const resourcePath = resource ? resolveResourcePath(resource) : null
   if (resourcePath) return resourcePath
 
   const id = resource?.privateId || resource?.publicId || resourceOrId
   if (id == null) return null
-  if (type === 'channel') return resourceLinks.value.channel[id] || null
-  if (type === 'album') return resourceLinks.value.album[id] || null
-  if (type === 'media') return resourceLinks.value.media[id] || null
+  if (type === 'channel') return resourceLinks.value.channel[id]
+  if (type === 'album') return resourceLinks.value.album[id]
+  if (type === 'media') return resourceLinks.value.media[id]
   return null
 }
 

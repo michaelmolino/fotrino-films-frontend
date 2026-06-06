@@ -5,15 +5,15 @@ function findAlbum(channel, albumPublicId) {
   if (!channel || !albumPublicId) {
     return null
   }
-  return (channel.albums || []).find(item => item?.publicId === albumPublicId) || null
+  return channel.albums.find(item => item.publicId === albumPublicId)
 }
 
 function findMedia(channel, mediaPublicId) {
   if (!channel || !mediaPublicId) {
     return null
   }
-  for (const album of channel.albums || []) {
-    const found = (album.media || []).find(item => item?.publicId === mediaPublicId)
+  for (const album of channel.albums) {
+    const found = album.media.find(item => item.publicId === mediaPublicId)
     if (found) {
       return found
     }
@@ -24,9 +24,9 @@ function findMedia(channel, mediaPublicId) {
 // Helpers for each route type
 function getChannelMeta(route, channel) {
   return {
-    title: channel?.title || null,
-    description: channel?.title || '',
-    image: resolveImagePrimaryUrl(channel?.coverAsset) || null,
+    title: channel.title,
+    description: channel.title,
+    image: resolveImagePrimaryUrl(channel.coverAsset),
     type: 'website'
   }
 }
@@ -34,9 +34,9 @@ function getChannelMeta(route, channel) {
 function getAlbumMeta(channel, albumPublicId) {
   const album = findAlbum(channel, albumPublicId)
   return {
-    title: formatTitleWithSubtitle(album?.title, album?.subtitle) || null,
-    description: sanitizeText(album?.subtitle || ''),
-    image: resolveImagePrimaryUrl(album?.posterAsset) || null,
+    title: formatTitleWithSubtitle(album.title, album.subtitle),
+    description: sanitizeText(album.subtitle),
+    image: resolveImagePrimaryUrl(album.posterAsset),
     type: 'website'
   }
 }
@@ -44,31 +44,29 @@ function getAlbumMeta(channel, albumPublicId) {
 function getMediaMeta(channel, mediaPublicId) {
   const media = findMedia(channel, mediaPublicId)
   return {
-    title: media?.title || null,
+    title: media.title,
     description: sanitizeText(media?.descriptionUnsafe),
-    image: resolveImagePrimaryUrl(media?.previewAsset) || null,
+    image: resolveImagePrimaryUrl(media.previewAsset),
     type: 'video'
   }
 }
 
 function getPrivateMediaMeta(route, channel) {
-  const media =
-    (channel?.album?.media || []).find(item => item?.privateId === route?.params?.privateMediaId) ||
-    null
+  const media = channel.album.media.find(item => item.privateId === route.params.privateMediaId)
   return {
-    title: media?.title || null,
-    description: sanitizeText(media?.descriptionUnsafe),
-    image: resolveImagePrimaryUrl(media?.previewAsset) || null,
+    title: media.title,
+    description: sanitizeText(media.descriptionUnsafe),
+    image: resolveImagePrimaryUrl(media.previewAsset),
     type: 'video'
   }
 }
 
 function getPrivateAlbumMeta(channel) {
-  const album = channel?.album || null
+  const album = channel.album
   return {
-    title: formatTitleWithSubtitle(album?.title, album?.subtitle) || null,
-    description: sanitizeText(album?.subtitle || ''),
-    image: resolveImagePrimaryUrl(album?.posterAsset) || null,
+    title: formatTitleWithSubtitle(album.title, album.subtitle),
+    description: sanitizeText(album.subtitle),
+    image: resolveImagePrimaryUrl(album.posterAsset),
     type: 'website'
   }
 }
@@ -110,7 +108,7 @@ export function getMetaData(route, channel) {
   }
 
   // Open Graph URL
-  const ogUrl = 'https://films.fotrino.com' + (route?.href?.split('?')[0] || '')
+  const ogUrl = `https://films.fotrino.com${route.href.split('?')[0]}`
   const link =
     type === 'video' && image
       ? {

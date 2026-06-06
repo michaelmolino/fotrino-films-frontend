@@ -25,7 +25,7 @@ export function useChannelRootViewModel({
       .map(album => ({
         id: album.privateId,
         album,
-        to: album.canonicalPath?.publicPath || null
+        to: album.canonicalPath.publicPath
       }))
   })
 
@@ -36,7 +36,7 @@ export function useChannelRootViewModel({
         id: item.media.privateId,
         album: item.album,
         media: item.media,
-        to: item.media.canonicalPath?.publicPath || null,
+        to: item.media.canonicalPath.publicPath,
         priority: index === 0 ? 'high' : 'auto'
       }))
   })

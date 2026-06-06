@@ -114,7 +114,7 @@
                     </div>
                   </div>
                   <q-btn
-                    :to="getChannelPath(channel)"
+                    :to="channel.canonicalPath.publicPath"
                     icon="link"
                     flat
                     dense
@@ -227,10 +227,6 @@ const providerIconClass = computed(() =>
 function getChannelsLabel(user) {
   const count = user.channels.length
   return count > 0 ? `Show Channels (${count})` : 'No Channels'
-}
-
-function getChannelPath(channel) {
-  return channel?.canonicalPath?.publicPath || null
 }
 
 function resolveUserAvatar(user) {
