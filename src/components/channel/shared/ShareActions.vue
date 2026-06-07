@@ -93,133 +93,116 @@ const showAdvanced = ref(false)
 const menuOpen = ref(false)
 const containerRef = ref(null)
 
-const shareContext = computed(() => {
-  const routeType = props.routeContext.type
-  if (routeType === 'media' || routeType === 'privateMedia' || routeType === 'privateAlbumMedia') {
-    return 'media'
-  }
-  if (routeType === 'album' || routeType === 'privateAlbum') {
-    return 'album'
-  }
-  return 'channel'
-})
+const routeType = computed(() => props.routeContext.type)
 
-const isPrivateAlbumContext = computed(() => {
-  return Boolean(
-    props.routeContext.type === 'privateAlbum' ||
-    props.routeContext.type === 'privateAlbumMedia' ||
-    (shareContext.value !== 'channel' &&
-      !props.album.canonicalPath.publicPath &&
-      props.album.canonicalPath.privatePath)
-  )
-})
-
-const channelPublicPath = computed(() => {
-  if (props.routeContext.type !== 'channel') {
-    return props.channel.canonicalPath.publicPath
-  }
-
-  return `/c/${props.routeContext.channelPublicId}/${props.routeContext.channelSlug}`
-})
-
-const channelMenuActions = computed(() => {
-  return [
-    {
-      key: 'share-channel',
-      label: 'Entire channel',
-      description: 'Recipient can browse everything in this channel.',
-      icon: 'apps',
-      path: channelPublicPath.value,
-      cy: 'share-channel'
-    }
-  ]
-})
-
-const albumMenuActions = computed(() => {
-  const items = []
-  const albumPublicPath = props.album.canonicalPath.publicPath
-  const albumPrivatePath = props.album.canonicalPath.privatePath
-
-  if (albumPrivatePath) {
-    items.push({
-      key: 'share-album-private',
-      label: 'This album',
-      description: 'Recipient can browse videos from this album only.',
-      icon: 'folder',
-      path: albumPrivatePath,
-      cy: 'share-only-album'
-    })
-  } else {
-    items.push({
-      key: 'share-album-public',
-      label: 'This album',
-      description: 'Recipient can only browse videos from this album.',
-      icon: 'folder',
-      path: albumPublicPath,
-      cy: 'share-only-album'
-    })
-  }
-
-  if (isPrivateAlbumContext.value) {
-    return items
-  }
-
-  items.push({
+const shareActionTemplates = {
+  channel: {
+    key: 'share-channel',
+    label: 'Entire channel',
+    description: 'Recipient can browse everything in this channel.',
+    icon: 'apps',
+    cy: 'share-channel'
+  },
+  albumOnly: {
+    key: 'share-album-private',
+    label: 'This album',
+    description: 'Recipient can browse videos from this album only.',
+    icon: 'folder',
+    cy: 'share-only-album'
+  },
+  albumWithinChannel: {
     key: 'share-album-channel',
     label: 'Entire channel',
     description: 'Recipient can browse everything in this channel.',
     icon: 'apps',
-    path: albumPublicPath || channelPublicPath.value,
     cy: 'share-within-channel'
-  })
-
-  return items
-})
-
-const mediaMenuActions = computed(() => {
-  const items = []
-  const mediaPublicPath = props.media.canonicalPath.publicPath
-  const mediaPrivatePath = props.media.canonicalPath.privatePath
-  const mediaPrivateAlbumPath = props.media.canonicalPath.privateAlbumPath
-
-  items.push({
+  },
+  mediaOnly: {
     key: 'share-media-only',
     label: 'Only this video',
     description: 'Recipient can watch this video only.',
     icon: 'movie',
-    path: mediaPrivatePath || mediaPrivateAlbumPath || mediaPublicPath,
     cy: 'share-only-video'
-  })
+  },
+  mediaWithinAlbum: {
+    key: 'share-media-album',
+    label: 'This album',
+    description: 'Recipient can browse related videos in this album.',
+    icon: 'folder',
+    cy: 'share-within-album'
+  },
+  mediaWithinChannel: {
+    key: 'share-media-channel',
+    label: 'Entire channel',
+    description: 'Recipient can browse everything in this channel.',
+    icon: 'apps',
+    cy: 'share-within-channel'
+  }
+}
 
-  if (mediaPrivateAlbumPath) {
-    items.push({
-      key: 'share-media-album',
-      label: 'This album',
-      description: 'Recipient can browse related videos in this album.',
-      icon: 'folder',
-      path: mediaPrivateAlbumPath,
-      cy: 'share-within-album'
-    })
+const channelMenuActions = computed(() => {
+  return [{ ...shareActionTemplates.channel, path: props.channel.canonicalPath.publicPath }]
+})
+
+const albumMenuActions = computed(() => {
+  const albumPublicPath = props.album.canonicalPath.publicPath
+  const albumPrivatePath = props.album.canonicalPath.privatePath
+
+  if (routeType.value === 'privateAlbum') {
+    return [{ ...shareActionTemplates.albumOnly, path: albumPrivatePath }]
   }
 
-  if (!isPrivateAlbumContext.value) {
-    items.push({
-      key: 'share-media-channel',
-      label: 'Entire channel',
-      description: 'Recipient can browse everything in this channel.',
-      icon: 'apps',
-      path: mediaPublicPath || channelPublicPath.value,
-      cy: 'share-within-channel'
-    })
+  if (routeType.value === 'album') {
+    return [
+      { ...shareActionTemplates.albumOnly, path: albumPrivatePath },
+      { ...shareActionTemplates.albumWithinChannel, path: albumPublicPath }
+    ]
   }
 
-  return items
+  return []
+})
+
+const mediaMenuActions = computed(() => {
+  const mediaPublicPath = props.media.canonicalPath.publicPath
+  const mediaPrivatePath = props.media.canonicalPath.privatePath
+  const mediaPrivateAlbumPath = props.media.canonicalPath.privateAlbumPath
+
+  if (routeType.value === 'privateMedia') {
+    return [{ ...shareActionTemplates.mediaOnly, path: mediaPrivatePath }]
+  }
+
+  if (routeType.value === 'privateAlbumMedia') {
+    return [
+      { ...shareActionTemplates.mediaOnly, path: mediaPrivatePath },
+      { ...shareActionTemplates.mediaWithinAlbum, path: mediaPrivateAlbumPath }
+    ]
+  }
+
+  if (routeType.value === 'media') {
+    return [
+      { ...shareActionTemplates.mediaOnly, path: mediaPrivatePath },
+      { ...shareActionTemplates.mediaWithinAlbum, path: mediaPrivateAlbumPath },
+      { ...shareActionTemplates.mediaWithinChannel, path: mediaPublicPath }
+    ]
+  }
+  return []
 })
 
 const menuActions = computed(() => {
-  if (shareContext.value === 'channel') return channelMenuActions.value
-  if (shareContext.value === 'album') return albumMenuActions.value
-  return mediaMenuActions.value
+  if (routeType.value === 'channel') {
+    return channelMenuActions.value
+  }
+  if (routeType.value === 'album' || routeType.value === 'privateAlbum') {
+    return albumMenuActions.value
+  }
+  if (
+    routeType.value === 'media' ||
+    routeType.value === 'privateAlbumMedia' ||
+    routeType.value === 'privateMedia'
+  ) {
+    return mediaMenuActions.value
+  }
+  throw new Error(`Unsupported route context type for share actions: ${routeType.value}`)
 })
 
 const primaryAction = computed(() => {
