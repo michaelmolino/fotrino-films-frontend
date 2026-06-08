@@ -7,7 +7,7 @@
     no-caps
     size="md">
     <q-tooltip v-if="showTooltip">Sign In</q-tooltip>
-    <div v-if="accountStore.providersLoadFailed" class="text-caption text-warning q-px-md q-py-sm">
+    <div v-if="providersLoadFailed" class="text-caption text-warning q-px-md q-py-sm">
       Login providers are temporarily unavailable. Please refresh and try again in a moment.
     </div>
     <template v-for="provider in oauthProviders" :key="provider.name">
@@ -44,7 +44,9 @@ const $q = useQuasar()
 const accountStore = useAccountStore()
 const route = useRoute()
 const shouldLoadProviders = computed(() => !accountStore.profile)
-accountStore.useProvidersQuery(shouldLoadProviders)
+const providersQuery = accountStore.useProvidersQuery(shouldLoadProviders)
+const providers = computed(() => providersQuery.data.value || [])
+const providersLoadFailed = computed(() => !!providersQuery.error.value)
 
 const buttonLabel = computed(() => ($q.screen.gt.sm ? 'Sign Up/Login' : ''))
 const showTooltip = computed(() => !$q.screen.gt.sm)
@@ -83,7 +85,7 @@ function getProviderLoginHref(providerKey) {
 }
 
 const oauthProviders = computed(() => {
-  return accountStore.providers
+  return providers.value
     .map(providerKey => {
       const base = providerMap[providerKey]
       if (!base) return null

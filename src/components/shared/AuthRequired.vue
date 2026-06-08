@@ -9,7 +9,7 @@
     </div>
     <div class="text-body2 text-grey-7" data-cy="auth-required-message">{{ resolved.message }}</div>
     <div v-if="showLoginProviders" class="auth-provider-list q-mt-md full-width">
-      <div v-if="accountStore.providersLoadFailed" class="text-caption text-warning q-mb-sm">
+      <div v-if="providersLoadFailed" class="text-caption text-warning q-mb-sm">
         Login providers are temporarily unavailable. Please refresh and try again in a moment.
       </div>
       <q-btn
@@ -103,7 +103,9 @@ const route = useRoute()
 const $q = useQuasar()
 const accountStore = useAccountStore()
 const shouldLoadProviders = computed(() => !accountStore.profile)
-accountStore.useProvidersQuery(shouldLoadProviders)
+const providersQuery = accountStore.useProvidersQuery(shouldLoadProviders)
+const providers = computed(() => providersQuery.data.value || [])
+const providersLoadFailed = computed(() => !!providersQuery.error.value)
 const isDark = computed(() => $q.dark.isActive)
 const providerButtonColor = computed(() => (isDark.value ? 'secondary' : 'primary'))
 const providerButtonTextColor = computed(() => (isDark.value ? 'white' : 'primary'))
@@ -129,7 +131,7 @@ function getProviderLoginHref(providerKey) {
 
 const oauthProviders = computed(() => {
   if (props.type !== 'login') return []
-  return accountStore.providers
+  return providers.value
     .map(providerKey => {
       const base = providerMap[providerKey]
       if (!base) return null

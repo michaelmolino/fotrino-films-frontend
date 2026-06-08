@@ -1,4 +1,4 @@
-import { ref, watch, toValue } from 'vue'
+import { toValue } from 'vue'
 import { defineStore } from 'pinia'
 import { useQuery, useQueryCache } from '@pinia/colada'
 import { API_CACHE_MEDIUM_MS } from 'src/stores/utils/cache-timeouts.js'
@@ -11,15 +11,9 @@ import {
 import { api } from 'src/clients/axios-client.js'
 
 export const useChannelStore = defineStore('channel', () => {
-  const channels = ref([])
-
   const queryCache = useQueryCache()
 
   const CANCELLED = Symbol('cancelled')
-
-  const setChannels = value => {
-    channels.value = value
-  }
 
   const channelsQueryOptions = createApiGetQueryOptionsFactory({
     key: ['channels', 'flat'],
@@ -139,30 +133,10 @@ export const useChannelStore = defineStore('channel', () => {
   }
 
   const useChannelsQuery = (enabled = true) => {
-    const query = useQuery(() => ({
+    return useQuery(() => ({
       ...channelsQueryOptions(),
       enabled: toValue(enabled)
     }))
-
-    watch(
-      () => query.data.value,
-      value => {
-        setChannels(toArray(value))
-      },
-      { immediate: true }
-    )
-
-    watch(
-      () => query.error.value,
-      error => {
-        if (error) {
-          setChannels([])
-        }
-      },
-      { immediate: true }
-    )
-
-    return query
   }
 
   const resolveHistoryChannels = async ({ items = [], current = null } = {}) => {
@@ -206,15 +180,6 @@ export const useChannelStore = defineStore('channel', () => {
       throw state.error || new Error('Channel query failed')
     }
     return state?.data?.data ?? null
-  }
-
-  const createMediaSession = async ({ privateId }) => {
-    const res = await api.post(`/channels/media/session/${privateId}`, null, {
-      __policy: {
-        csrfHandling: 'none'
-      }
-    })
-    return mutationResult({ ok: true, data: res.data?.data ?? null })
   }
 
   const deleteResource = async resource => {
@@ -375,12 +340,10 @@ export const useChannelStore = defineStore('channel', () => {
   }
 
   return {
-    channels,
     useChannelsQuery,
     useChannelQuery,
     resolveHistoryChannels,
     fetchChannel,
-    createMediaSession,
     deleteResource,
     undeleteResource,
     updateMedia,

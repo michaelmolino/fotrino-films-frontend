@@ -1,19 +1,16 @@
-import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { useQuery, useQueryCache } from '@pinia/colada'
-import { getGlobalApiErrorPayload } from 'src/utils/api-error-service.js'
 import { mutationResult, runMutation } from 'src/stores/utils/store-mutations.js'
+import { computed } from 'vue'
 import {
   createApiGetQueryOptionsFactory,
   invalidateQueriesSafely,
   toArray
 } from 'src/stores/utils/query-helpers.js'
 import { api } from 'src/clients/axios-client.js'
+import { getGlobalApiErrorPayload } from 'src/utils/api-error-service.js'
 
 export const useAdminStore = defineStore('admin', () => {
-  const users = ref([])
-  const jobs = ref([])
-  const reportedMedia = ref([])
   const queryCache = useQueryCache()
 
   const CANCELLED = Symbol('cancelled')
@@ -59,88 +56,43 @@ export const useAdminStore = defineStore('admin', () => {
     transform: data => toArray(data?.data)
   })
 
-  const setUsers = value => {
-    users.value = value
-  }
-
-  const setJobs = value => {
-    jobs.value = toArray(value)
-  }
-
-  const setReportedMedia = value => {
-    reportedMedia.value = toArray(value)
-  }
-
   const useUsersQuery = () => {
     const query = useQuery(usersQueryOptions)
-
-    watch(
-      () => query.data.value,
-      value => {
-        setUsers(toArray(value))
-      },
-      { immediate: true }
-    )
-
-    watch(
-      () => query.error.value,
-      error => {
-        if (getGlobalApiErrorPayload(error)?.error === 'forbidden') {
-          setUsers([])
+    return {
+      ...query,
+      data: computed(() => {
+        if (getGlobalApiErrorPayload(query.error.value)?.error === 'forbidden') {
+          return []
         }
-      },
-      { immediate: true }
-    )
-
-    return query
+        return toArray(query.data.value)
+      })
+    }
   }
 
   const useJobsQuery = (statuses = []) => {
     const query = useQuery(() => jobsQueryOptions(statuses))
-
-    watch(
-      () => query.data.value,
-      value => {
-        setJobs(toArray(value))
-      },
-      { immediate: true }
-    )
-
-    watch(
-      () => query.error.value,
-      error => {
-        if (getGlobalApiErrorPayload(error)?.error === 'forbidden') {
-          setJobs([])
+    return {
+      ...query,
+      data: computed(() => {
+        if (getGlobalApiErrorPayload(query.error.value)?.error === 'forbidden') {
+          return []
         }
-      },
-      { immediate: true }
-    )
-
-    return query
+        return toArray(query.data.value)
+      })
+    }
   }
 
   const useReportedMediaQuery = () => {
     const query = useQuery(reportedMediaQueryOptions)
-
-    watch(
-      () => query.data.value,
-      value => {
-        setReportedMedia(toArray(value))
-      },
-      { immediate: true }
-    )
-
-    watch(
-      () => query.error.value,
-      error => {
-        if (getGlobalApiErrorPayload(error)?.error === 'forbidden') {
-          setReportedMedia([])
+    return {
+      ...query,
+      data: computed(() => {
+        if (getGlobalApiErrorPayload(query.error.value)?.error === 'forbidden') {
+          return []
         }
-      },
-      { immediate: true }
-    )
-
-    return query
+        return toArray(query.data.value)
+      })
+    }
   }
 
   const runJobAction = async job => {
@@ -263,9 +215,6 @@ export const useAdminStore = defineStore('admin', () => {
   }
 
   return {
-    users,
-    jobs,
-    reportedMedia,
     useUsersQuery,
     useJobsQuery,
     useReportedMediaQuery,

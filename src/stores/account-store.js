@@ -1,19 +1,15 @@
-import { ref, toValue, watch } from 'vue'
+import { computed, toValue } from 'vue'
 import { defineStore } from 'pinia'
 import { useQuery, useQueryCache } from '@pinia/colada'
 import { API_CACHE_LONG_MS, API_CACHE_SHORT_MS } from 'src/stores/utils/cache-timeouts.js'
 import {
   createApiGetQueryOptionsFactory,
-  invalidateQueriesSafely,
-  toArray
+  invalidateQueriesSafely
 } from 'src/stores/utils/query-helpers.js'
 import { api } from 'src/clients/axios-client.js'
 import { mutationResult, runMutation } from 'src/stores/utils/store-mutations.js'
 
 export const useAccountStore = defineStore('account', () => {
-  const profile = ref(null)
-  const providers = ref([])
-  const providersLoadFailed = ref(false)
   const queryCache = useQueryCache()
 
   const accountProfileQueryOptions = createApiGetQueryOptionsFactory({
@@ -42,12 +38,15 @@ export const useAccountStore = defineStore('account', () => {
     transform: data => data?.data
   })
 
-  const setProfile = value => {
-    profile.value = value
-  }
+  const profileQuery = useQuery(() => ({
+    ...accountProfileQueryOptions(),
+    enabled: false
+  }))
 
-  const setProviders = value => {
-    providers.value = toArray(value)
+  const profile = computed(() => profileQuery.data.value ?? null)
+
+  const setProfile = value => {
+    queryCache.setQueryData(accountProfileQueryOptions().key, value)
   }
 
   const clearProfileCache = () => {
@@ -57,50 +56,22 @@ export const useAccountStore = defineStore('account', () => {
     })
   }
 
-  const fetchProfile = async (staleTime = API_CACHE_SHORT_MS) => {
-    const options = accountProfileQueryOptions(staleTime)
-    const entry = queryCache.ensure(options)
-    const state = await queryCache.fetch(entry, options)
+  const fetchProfile = async () => {
+    const state = await profileQuery.refresh()
 
     if (state?.status === 'error') {
       setProfile(null)
       return null
     }
 
-    const value = state?.data ?? null
-    setProfile(value)
-    return value
+    return profile.value
   }
 
   const useProvidersQuery = (enabled = true, staleTime = API_CACHE_LONG_MS) => {
-    const query = useQuery(() => ({
+    return useQuery(() => ({
       ...accountProvidersQueryOptions(staleTime),
       enabled: toValue(enabled)
     }))
-
-    watch(
-      () => query.data.value,
-      value => {
-        providersLoadFailed.value = false
-        setProviders(value)
-      },
-      { immediate: true }
-    )
-
-    watch(
-      () => query.error.value,
-      error => {
-        if (error) {
-          providersLoadFailed.value = true
-          if (providers.value.length === 0) {
-            setProviders([])
-          }
-        }
-      },
-      { immediate: true }
-    )
-
-    return query
   }
 
   const logout = async () => {
@@ -116,10 +87,7 @@ export const useAccountStore = defineStore('account', () => {
 
   return {
     profile,
-    providers,
-    providersLoadFailed,
     setProfile,
-    setProviders,
     clearProfileCache,
     fetchProfile,
     useProvidersQuery,

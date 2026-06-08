@@ -107,7 +107,7 @@ function getInitialJobFilterMode() {
 
 const filterMode = ref(getInitialJobFilterMode())
 const jobsQuery = adminStore.useJobsQuery()
-const jobs = computed(() => adminStore.jobs || [])
+const jobs = computed(() => jobsQuery.data.value || [])
 const loading = computed(() => jobsQuery.isLoading.value && jobs.value.length === 0)
 const loadingRows = [1, 2, 3]
 const tablePagination = { rowsPerPage: 0 }

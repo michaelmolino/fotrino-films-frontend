@@ -79,6 +79,7 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import { copyToClipboard } from 'quasar'
 import { notifyInfo } from 'src/utils/notify.js'
 
@@ -92,6 +93,7 @@ const props = defineProps({
 const showAdvanced = ref(false)
 const menuOpen = ref(false)
 const containerRef = ref(null)
+const route = useRoute()
 
 const routeType = computed(() => props.routeContext.type)
 
@@ -141,7 +143,7 @@ const shareActionTemplates = {
 }
 
 const channelMenuActions = computed(() => {
-  return [{ ...shareActionTemplates.channel, path: props.channel.canonicalPath.publicPath }]
+  return [{ ...shareActionTemplates.channel, path: route.path }]
 })
 
 const albumMenuActions = computed(() => {

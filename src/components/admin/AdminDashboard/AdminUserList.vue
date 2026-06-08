@@ -182,7 +182,8 @@ import yahooIcon from '@assets/icons/yahoo.svg'
 const $q = useQuasar()
 const adminStore = useAdminStore()
 const usersQuery = adminStore.useUsersQuery()
-const loading = computed(() => usersQuery.isLoading.value && adminStore.users.length === 0)
+const users = computed(() => usersQuery.data.value || [])
+const loading = computed(() => usersQuery.isLoading.value && users.value.length === 0)
 const USER_FILTER_KEY = 'admin.users.filterMode'
 const USER_FILTER_VALUES = new Set(['all', 'new'])
 
@@ -199,7 +200,6 @@ const filterOptions = [
   { label: 'All Users', value: 'all' },
   { label: 'New Users', value: 'new' }
 ]
-const users = computed(() => adminStore.users)
 const filteredUsers = computed(() => {
   if (filterMode.value === 'new') {
     return users.value.filter(user => user.newUser === true)

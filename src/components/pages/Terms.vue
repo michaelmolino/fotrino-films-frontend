@@ -194,9 +194,9 @@ import { computed } from 'vue'
 import { useAccountStore } from 'src/stores/account-store.js'
 
 const accountStore = useAccountStore()
-accountStore.useProvidersQuery()
+const providersQuery = accountStore.useProvidersQuery()
 
-const providers = computed(() => accountStore.providers)
+const providers = computed(() => providersQuery.data.value || [])
 </script>
 
 <style scoped>

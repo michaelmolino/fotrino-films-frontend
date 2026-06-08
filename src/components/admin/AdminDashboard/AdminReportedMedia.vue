@@ -58,9 +58,8 @@ import { notifyError, notifySuccess } from 'src/utils/notify.js'
 const adminStore = useAdminStore()
 const reportedMediaQuery = adminStore.useReportedMediaQuery()
 const loadingRows = [1, 2, 3]
-const loading = computed(
-  () => reportedMediaQuery.isLoading.value && (adminStore.reportedMedia || []).length === 0
-)
+const reportedMedia = computed(() => reportedMediaQuery.data.value || [])
+const loading = computed(() => reportedMediaQuery.isLoading.value && reportedMedia.value.length === 0)
 const reportedMediaColumns = [
   { name: 'createdAt', label: 'Reported', field: 'createdAt', align: 'left' },
   { name: 'title', label: 'Video', field: 'title', align: 'left' },
@@ -70,7 +69,7 @@ const reportedMediaColumns = [
 ]
 const flattenedReportedMediaRows = computed(() => {
   const rows = []
-  const reported = adminStore.reportedMedia || []
+  const reported = reportedMedia.value
   for (const media of reported) {
     if (!media?.privateId) {
       continue

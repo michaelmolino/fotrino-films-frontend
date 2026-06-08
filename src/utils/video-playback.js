@@ -25,6 +25,28 @@ function supportsNativeHls(videoEl) {
   return isIosFamily || hasAirPlayApi
 }
 
+function preservePlaybackState(videoEl, applySource) {
+  const wasPlaying = !videoEl.paused
+  const resumeTime = Number.isFinite(videoEl.currentTime) ? videoEl.currentTime : 0
+
+  const restorePlaybackState = () => {
+    if (resumeTime > 0) {
+      try {
+        videoEl.currentTime = resumeTime
+      } catch {
+        // Some browsers reject seeks until metadata is fully ready.
+      }
+    }
+
+    if (wasPlaying) {
+      videoEl.play().catch(() => {})
+    }
+  }
+
+  videoEl.addEventListener('loadedmetadata', restorePlaybackState, { once: true })
+  applySource()
+}
+
 async function setupHlsJsPlayback({ videoEl, sourceUrl, exposeHlsGlobally }) {
   const Hls = await getHlsCtor()
 
@@ -75,8 +97,15 @@ async function setupHlsJsPlayback({ videoEl, sourceUrl, exposeHlsGlobally }) {
   }
 
   hlsInstance.on(Hls.Events.ERROR, onHlsError)
-  hlsInstance.loadSource(sourceUrl)
   hlsInstance.attachMedia(videoEl)
+
+  const refreshSource = nextSourceUrl => {
+    preservePlaybackState(videoEl, () => {
+      hlsInstance.loadSource(nextSourceUrl)
+    })
+  }
+
+  refreshSource(sourceUrl)
 
   if (exposeHlsGlobally) {
     globalThis.hls = hlsInstance
@@ -84,6 +113,7 @@ async function setupHlsJsPlayback({ videoEl, sourceUrl, exposeHlsGlobally }) {
 
   return {
     hlsInstance,
+    refreshSource,
     cleanup: () => {
       hlsInstance.off(Hls.Events.ERROR, onHlsError)
       hlsInstance.destroy()
@@ -95,11 +125,18 @@ async function setupHlsJsPlayback({ videoEl, sourceUrl, exposeHlsGlobally }) {
 }
 
 function setupNativeHlsPlayback({ videoEl, sourceUrl }) {
-  videoEl.src = sourceUrl
-  videoEl.load()
+  const refreshSource = nextSourceUrl => {
+    preservePlaybackState(videoEl, () => {
+      videoEl.src = nextSourceUrl
+      videoEl.load()
+    })
+  }
+
+  refreshSource(sourceUrl)
 
   return {
     hlsInstance: null,
+    refreshSource,
     cleanup: () => {}
   }
 }

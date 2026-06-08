@@ -1,10 +1,15 @@
 import { nextTick, onBeforeUnmount, ref, watch, computed, toRef } from 'vue'
-import { useChannelStore } from 'src/stores/channel-store.js'
+import { useQuery } from '@pinia/colada'
+import { useEventListener } from '@vueuse/core'
+import { api } from 'src/clients/axios-client.js'
 import { setupVideoPlayback } from '@utils/video-playback'
+
+const MEDIA_SESSION_REFRESH_HEADROOM_MS = 60_000
 
 function createPlyrPlaybackController({ mediaEl }) {
   const player = ref(null)
   const teardownPlayback = ref(null)
+  const playbackSession = ref(null)
   let PlyrCtor = null
 
   function destroyPlayers() {
@@ -17,6 +22,8 @@ function createPlyrPlaybackController({ mediaEl }) {
       player.value.destroy()
       player.value = null
     }
+
+    playbackSession.value = null
   }
 
   async function setupPlayerForMedia({ mediaSnapshot, sourceUrl }) {
@@ -70,37 +77,97 @@ function createPlyrPlaybackController({ mediaEl }) {
     }
 
     if (isVideo) {
-      const { cleanup } = await setupVideoPlayback({
+      const session = await setupVideoPlayback({
         videoEl: el,
         sourceUrl,
         exposeHlsGlobally: import.meta.env.DEV
       })
-      teardownPlayback.value = cleanup
+      teardownPlayback.value = session.cleanup
+      playbackSession.value = session
     } else {
       el.src = sourceUrl
     }
   }
 
+  async function refreshPlaybackSource(sourceUrl) {
+    if (!playbackSession.value?.refreshSource) {
+      throw new Error('Playback session is not initialized.')
+    }
+
+    playbackSession.value.refreshSource(sourceUrl)
+  }
+
   return {
     destroyPlayers,
-    setupPlayerForMedia
+    setupPlayerForMedia,
+    refreshPlaybackSource
   }
 }
 
 export function usePlyrMediaLifecycle(props, mediaEl, options = {}) {
   const media = toRef(props, 'media')
-  const channelStore = useChannelStore()
   let lifecycleRunId = 0
-  const { destroyPlayers, setupPlayerForMedia } = createPlyrPlaybackController({ mediaEl })
+  const mediaSessionRefreshTimer = ref(null)
+  const { destroyPlayers, setupPlayerForMedia, refreshPlaybackSource } =
+    createPlyrPlaybackController({ mediaEl })
   const { onPlaybackReady = null } = options
+
+  const mediaSessionQuery = useQuery(() => {
+    const privateId = media.value.privateId
+
+    return {
+      key: ['channel', 'media-session', privateId],
+      enabled: false,
+      staleTime: 0,
+      query: async () => {
+        const { data } = await api.post(`/channels/media/session/${privateId}`, null, {
+          __policy: {
+            csrfHandling: 'none'
+          }
+        })
+        return data?.data ?? null
+      }
+    }
+  })
+
+  const clearMediaSessionRefreshTimer = () => {
+    if (mediaSessionRefreshTimer.value !== null) {
+      clearTimeout(mediaSessionRefreshTimer.value)
+      mediaSessionRefreshTimer.value = null
+    }
+  }
+
+  const scheduleMediaSessionRefresh = session => {
+    clearMediaSessionRefreshTimer()
+
+    if (!session?.expiresAt) {
+      return
+    }
+
+    const delay = Math.max(
+      1000,
+      session.expiresAt * 1000 - Date.now() - MEDIA_SESSION_REFRESH_HEADROOM_MS
+    )
+    mediaSessionRefreshTimer.value = setTimeout(() => {
+      if (media.value.privateId) {
+        void syncPlaybackLifecycle({ rebuild: false })
+      }
+    }, delay)
+  }
+
+  watch(
+    () => mediaSessionQuery.data.value,
+    session => scheduleMediaSessionRefresh(session),
+    { immediate: true }
+  )
 
   async function resolvePlaybackUrl(mediaSnapshot) {
     if (!mediaSnapshot.privateId) {
       throw new Error('Media is missing privateId; cannot create playback session.')
     }
 
-    const result = await channelStore.createMediaSession({ privateId: mediaSnapshot.privateId })
-    const session = result?.data
+    await mediaSessionQuery.refresh()
+    const session = mediaSessionQuery.data.value
     if (!session?.playbackUrl) {
       throw new Error('Playback session response missing playbackUrl.')
     }
@@ -108,16 +175,39 @@ export function usePlyrMediaLifecycle(props, mediaEl, options = {}) {
     return session.playbackUrl
   }
 
-  async function syncPlaybackLifecycle() {
+  async function syncPlaybackLifecycle({ rebuild = false } = {}) {
     const mediaSnapshot = { ...media.value }
     const runId = ++lifecycleRunId
-
-    destroyPlayers()
+    clearMediaSessionRefreshTimer()
 
     const sourceUrl = await resolvePlaybackUrl(mediaSnapshot)
 
     if (runId !== lifecycleRunId) return
 
+    if (rebuild) {
+      destroyPlayers()
+      await nextTick()
+      if (runId !== lifecycleRunId) return
+
+      await setupPlayerForMedia({ mediaSnapshot, sourceUrl })
+      if (runId !== lifecycleRunId) {
+        destroyPlayers()
+        return
+      }
+
+      onPlaybackReady?.()
+      return
+    }
+
+    if (mediaSnapshot.privateId && mediaSessionQuery.data.value) {
+      await refreshPlaybackSource(sourceUrl)
+      if (runId !== lifecycleRunId) return
+
+      onPlaybackReady?.()
+      return
+    }
+
+    destroyPlayers()
     await nextTick()
     if (runId !== lifecycleRunId) return
 
@@ -130,6 +220,19 @@ export function usePlyrMediaLifecycle(props, mediaEl, options = {}) {
     onPlaybackReady?.()
   }
 
+  useEventListener(document, 'visibilitychange', () => {
+    if (document.visibilityState !== 'visible' || !media.value.privateId) {
+      return
+    }
+
+    const session = mediaSessionQuery.data.value
+    const expiresAtMs = session?.expiresAt ? session.expiresAt * 1000 : 0
+    const isStale = !expiresAtMs || expiresAtMs - Date.now() <= MEDIA_SESSION_REFRESH_HEADROOM_MS
+    if (isStale) {
+      void syncPlaybackLifecycle({ rebuild: false })
+    }
+  })
+
   const playbackLifecycleKey = computed(
     () => `${media.value.privateId}|${media.value.type}|${media.value.orientation}`
   )
@@ -137,13 +240,14 @@ export function usePlyrMediaLifecycle(props, mediaEl, options = {}) {
   watch(
     playbackLifecycleKey,
     async () => {
-      await syncPlaybackLifecycle()
+      await syncPlaybackLifecycle({ rebuild: true })
     },
     { immediate: true, flush: 'post' }
   )
 
   onBeforeUnmount(() => {
     lifecycleRunId += 1
+    clearMediaSessionRefreshTimer()
     destroyPlayers()
   })
 

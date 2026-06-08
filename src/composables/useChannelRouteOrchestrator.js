@@ -23,13 +23,7 @@ export function useChannelRootRouteOrchestrator({
   )
 }
 
-export function useAlbumRootRouteOrchestrator({
-  channel,
-  album,
-  loading,
-  routeContext,
-  redirect
-}) {
+export function useAlbumRootRouteOrchestrator({ channel, album, loading, routeContext, redirect }) {
   watch(
     [album, channel, loading, routeContext],
     ([currentAlbum, currentChannel, isLoading, context]) => {
