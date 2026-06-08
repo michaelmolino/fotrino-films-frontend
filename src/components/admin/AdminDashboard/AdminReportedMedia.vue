@@ -59,7 +59,9 @@ const adminStore = useAdminStore()
 const reportedMediaQuery = adminStore.useReportedMediaQuery()
 const loadingRows = [1, 2, 3]
 const reportedMedia = computed(() => reportedMediaQuery.data.value || [])
-const loading = computed(() => reportedMediaQuery.isLoading.value && reportedMedia.value.length === 0)
+const loading = computed(
+  () => reportedMediaQuery.isLoading.value && reportedMedia.value.length === 0
+)
 const reportedMediaColumns = [
   { name: 'createdAt', label: 'Reported', field: 'createdAt', align: 'left' },
   { name: 'title', label: 'Video', field: 'title', align: 'left' },

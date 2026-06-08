@@ -79,14 +79,19 @@
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn flat label="Cancel" color="accent" @click="editDialog = false" />
+          <q-btn
+            flat
+            label="Cancel"
+            color="accent"
+            :disable="savingEdit"
+            @click="editDialog = false" />
           <q-btn
             unelevated
             label="Save"
             color="accent"
             data-cy="edit-album-save"
-            :loading="editPosterProcessing"
-            :disable="editPosterProcessing"
+            :loading="savingEdit || editPosterProcessing"
+            :disable="savingEdit || editPosterProcessing"
             @click="saveEdit" />
         </q-card-actions>
       </q-card>
@@ -120,6 +125,7 @@ const emit = defineEmits([
 ])
 
 const editDialog = ref(false)
+const savingEdit = ref(false)
 const {
   selectedFile: editPosterFile,
   processing: editPosterProcessing,
@@ -154,11 +160,19 @@ const mediaItemListeners = {
 }
 
 function emitDeleteAlbum() {
-  emit('deleteAlbum', { privateId: props.album.privateId, publicId: props.album.publicId })
+  emit('deleteAlbum', {
+    channelPublicId: props.channel?.publicId,
+    privateId: props.album.privateId,
+    publicId: props.album.publicId
+  })
 }
 
 function emitUndeleteAlbum() {
-  emit('undeleteAlbum', { privateId: props.album.privateId, publicId: props.album.publicId })
+  emit('undeleteAlbum', {
+    channelPublicId: props.channel?.publicId,
+    privateId: props.album.privateId,
+    publicId: props.album.publicId
+  })
 }
 
 const editAlbumPreview = computed(() => {
@@ -245,17 +259,29 @@ async function onUpdatePosterFile(fileOrFiles) {
   editPosterFile.value = processedFile
 }
 
-function saveEdit() {
-  emit('editAlbum', {
-    privateId: props.album?.privateId,
-    publicId: props.album?.publicId,
-    title: editForm.value.title,
-    subtitle: editForm.value.subtitle,
-    posterType: editForm.value.posterType,
-    posterColor: editForm.value.posterColor,
-    posterFile: editPosterFile.value
-  })
-  editDialog.value = false
+async function saveEdit() {
+  savingEdit.value = true
+  try {
+    await new Promise((resolve, reject) => {
+      emit('editAlbum', {
+        channelPublicId: props.channel?.publicId,
+        privateId: props.album?.privateId,
+        publicId: props.album?.publicId,
+        title: editForm.value.title,
+        subtitle: editForm.value.subtitle,
+        posterType: editForm.value.posterType,
+        posterColor: editForm.value.posterColor,
+        posterFile: editPosterFile.value,
+        resolve,
+        reject
+      })
+    })
+    editDialog.value = false
+  } catch {
+    // error already shown by parent via notify
+  } finally {
+    savingEdit.value = false
+  }
 }
 </script>
 

@@ -64,13 +64,18 @@
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn flat label="Cancel" color="accent" @click="editDialog = false" />
+          <q-btn
+            flat
+            label="Cancel"
+            color="accent"
+            :disable="savingEdit"
+            @click="editDialog = false" />
           <q-btn
             unelevated
             label="Save"
             color="accent"
-            :loading="editPreviewProcessing"
-            :disable="editPreviewProcessing"
+            :loading="savingEdit || editPreviewProcessing"
+            :disable="savingEdit || editPreviewProcessing"
             data-cy="edit-media-save"
             @click="saveEdit" />
         </q-card-actions>
@@ -98,6 +103,7 @@ const props = defineProps({
 const emit = defineEmits(['deleteMedia', 'undeleteMedia', 'editMedia', 'abortMedia'])
 
 const editDialog = ref(false)
+const savingEdit = ref(false)
 const editForm = ref({
   title: '',
   description: null,
@@ -116,11 +122,19 @@ const mediaSubtitle = computed(() =>
 )
 
 function emitDeleteMedia() {
-  emit('deleteMedia', { privateId: props.media.privateId, publicId: props.media.publicId })
+  emit('deleteMedia', {
+    channelPublicId: props.channel?.publicId,
+    privateId: props.media.privateId,
+    publicId: props.media.publicId
+  })
 }
 
 function emitUndeleteMedia() {
-  emit('undeleteMedia', { privateId: props.media.privateId, publicId: props.media.publicId })
+  emit('undeleteMedia', {
+    channelPublicId: props.channel?.publicId,
+    privateId: props.media.privateId,
+    publicId: props.media.publicId
+  })
 }
 
 function emitAbortMedia() {
@@ -190,17 +204,29 @@ async function onUpdatePreviewFile(fileOrFiles) {
   setLocalPreviewImage(previewUrl)
 }
 
-function saveEdit() {
-  emit('editMedia', {
-    privateId: props.media?.privateId,
-    publicId: props.media?.publicId,
-    title: editForm.value.title,
-    description: editForm.value.description,
-    resourceDate: editForm.value.resourceDate,
-    main: !!editForm.value.main,
-    previewFile: editPreviewFile.value
-  })
-  editDialog.value = false
+async function saveEdit() {
+  savingEdit.value = true
+  try {
+    await new Promise((resolve, reject) => {
+      emit('editMedia', {
+        channelPublicId: props.channel?.publicId,
+        privateId: props.media?.privateId,
+        publicId: props.media?.publicId,
+        title: editForm.value.title,
+        description: editForm.value.description,
+        resourceDate: editForm.value.resourceDate,
+        main: !!editForm.value.main,
+        previewFile: editPreviewFile.value,
+        resolve,
+        reject
+      })
+    })
+    editDialog.value = false
+  } catch {
+    // error already shown by parent via notify
+  } finally {
+    savingEdit.value = false
+  }
 }
 </script>
 

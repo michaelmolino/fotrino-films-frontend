@@ -213,8 +213,10 @@ export const useChannelStore = defineStore('channel', () => {
       invalidateChannelCacheById(resource.publicId)
     } else if (resource.type === 'album') {
       invalidateChannelCacheByAlbum(resource.publicId)
+      invalidateChannelCacheById(resource.channelPublicId)
     } else if (resource.type === 'media') {
       invalidateChannelCacheByMedia(resource.publicId)
+      invalidateChannelCacheById(resource.channelPublicId)
     }
     return mutationResult({ ok: true })
   }
@@ -244,15 +246,18 @@ export const useChannelStore = defineStore('channel', () => {
     invalidateChannelsCache()
     if (resource.type === 'album') {
       invalidateChannelCacheByAlbum(resource.publicId)
+      invalidateChannelCacheById(resource.channelPublicId)
     } else if (resource.type === 'channel') {
       invalidateChannelCacheById(resource.publicId)
     } else {
       invalidateChannelCacheByMedia(resource.publicId)
+      invalidateChannelCacheById(resource.channelPublicId)
     }
     return mutationResult({ ok: true })
   }
 
   const updateMedia = async ({
+    channelPublicId = null,
     mediaPrivateId,
     mediaPublicId = null,
     title,
@@ -270,11 +275,13 @@ export const useChannelStore = defineStore('channel', () => {
         })
     })
     invalidateChannelsCache()
+    if (channelPublicId) invalidateChannelCacheById(channelPublicId)
     if (mediaPublicId) invalidateChannelCacheByMedia(mediaPublicId)
     return mutationResult({ ok: true, data: res.data?.data ?? null })
   }
 
   const updateAlbum = async ({
+    channelPublicId = null,
     albumPrivateId,
     albumPublicId = null,
     title,
@@ -292,6 +299,7 @@ export const useChannelStore = defineStore('channel', () => {
         })
     })
     invalidateChannelsCache()
+    if (channelPublicId) invalidateChannelCacheById(channelPublicId)
     if (albumPublicId) invalidateChannelCacheByAlbum(albumPublicId)
     return mutationResult({ ok: true, data: res.data?.data ?? null })
   }

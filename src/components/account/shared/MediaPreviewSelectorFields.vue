@@ -45,7 +45,7 @@
         <div
           class="preview-frame"
           :class="{ 'preview-frame-featured': showFeaturedBorder }"
-          :style="{ width: previewWidth, aspectRatio: previewAspectRatio }">
+          :style="{ width: previewWidth }">
           <MediaPreview
             v-if="previewImage"
             class="full-fit"
@@ -110,10 +110,6 @@ const props = defineProps({
   previewWidth: {
     type: String,
     default: '250px'
-  },
-  previewAspectRatio: {
-    type: String,
-    default: '16 / 9'
   },
   showFeaturedBorder: {
     type: Boolean,

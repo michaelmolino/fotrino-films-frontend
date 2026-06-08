@@ -85,9 +85,9 @@ async function deleteResource(type, resource) {
   }
 }
 
-async function undeleteMedia({ privateId, publicId }) {
+async function undeleteMedia({ channelPublicId, privateId, publicId }) {
   try {
-    await channelStore.undeleteResource({ type: 'media', privateId, publicId })
+    await channelStore.undeleteResource({ type: 'media', channelPublicId, privateId, publicId })
     notifySuccess('Video restored.')
   } catch (error) {
     notifyError(getComponentApiErrorMessage(error, 'Unable to undelete this video.'), {
@@ -96,9 +96,9 @@ async function undeleteMedia({ privateId, publicId }) {
   }
 }
 
-async function undeleteAlbum({ privateId, publicId }) {
+async function undeleteAlbum({ channelPublicId, privateId, publicId }) {
   try {
-    await channelStore.undeleteResource({ type: 'album', privateId, publicId })
+    await channelStore.undeleteResource({ type: 'album', channelPublicId, privateId, publicId })
     notifySuccess('Album restored.')
   } catch (error) {
     notifyError(getComponentApiErrorMessage(error, 'Unable to undelete this album.'), {
@@ -181,15 +181,18 @@ async function runEditJourney({
     }
 
     notifySuccess(successMessage)
+    return true
   } catch (error) {
     notifyError(getComponentApiErrorMessage(error, errorMessage), { timeout: 0 })
+    return false
   }
 }
 
 async function saveMediaEdit(payload) {
-  return runEditJourney({
+  const success = await runEditJourney({
     update: channelStore.updateMedia,
     updatePayload: {
+      channelPublicId: payload?.channelPublicId,
       mediaPrivateId: payload?.privateId,
       mediaPublicId: payload?.publicId,
       title: payload?.title,
@@ -213,12 +216,15 @@ async function saveMediaEdit(payload) {
     successMessage: 'Video updated.',
     errorMessage: 'Unable to update this video.'
   })
+  if (success) payload?.resolve?.()
+  else payload?.reject?.()
 }
 
 async function saveAlbumEdit(payload) {
-  return runEditJourney({
+  const success = await runEditJourney({
     update: channelStore.updateAlbum,
     updatePayload: {
+      channelPublicId: payload?.channelPublicId,
       albumPrivateId: payload?.privateId,
       albumPublicId: payload?.publicId,
       title: payload?.title,
@@ -242,10 +248,12 @@ async function saveAlbumEdit(payload) {
     successMessage: 'Album updated.',
     errorMessage: 'Unable to update this album.'
   })
+  if (success) payload?.resolve?.()
+  else payload?.reject?.()
 }
 
 async function saveChannelEdit(payload) {
-  return runEditJourney({
+  const success = await runEditJourney({
     update: channelStore.updateChannel,
     updatePayload: {
       channelPublicId: payload?.channelPublicId,
@@ -266,6 +274,8 @@ async function saveChannelEdit(payload) {
     successMessage: 'Channel updated.',
     errorMessage: 'Unable to update this channel.'
   })
+  if (success) payload?.resolve?.()
+  else payload?.reject?.()
 }
 </script>
 

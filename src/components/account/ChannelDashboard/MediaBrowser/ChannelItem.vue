@@ -28,7 +28,9 @@
         @undelete="emitUndeleteChannel" />
     </template>
 
-    <div v-if="channelQuery.isLoading.value" class="q-pa-md text-grey-6 text-center">
+    <div
+      v-if="channelQuery.isLoading.value && !deepChannel"
+      class="q-pa-md text-grey-6 text-center">
       <q-spinner-dots size="24px" />
     </div>
     <AlbumItem
@@ -59,7 +61,13 @@
         </q-card-section>
 
         <q-card-actions align="right" class="q-pa-md">
-          <q-btn flat label="Cancel" color="accent" v-close-popup data-cy="cancel-edit-channel" />
+          <q-btn
+            flat
+            label="Cancel"
+            color="accent"
+            v-close-popup
+            :disable="savingEdit"
+            data-cy="cancel-edit-channel" />
           <q-btn
             unelevated
             label="Save"
@@ -102,7 +110,7 @@ const channelQuery = channelStore.useChannelQuery(
 
 const deepChannel = computed(() => channelQuery.data.value?.data ?? null)
 const displayChannel = computed(() => deepChannel.value || props.channel)
-const displayAlbums = computed(() => displayChannel.value.albums || [])
+const displayAlbums = computed(() => displayChannel.value?.albums || [])
 
 function onExpand() {
   hasBeenExpanded.value = true
@@ -204,16 +212,21 @@ const handleCoverFileSelected = async fileOrFiles => {
   editCoverPreview.value = previewUrl
 }
 
-const saveEdit = () => {
+const saveEdit = async () => {
   savingEdit.value = true
   try {
-    const payload = {
-      channelPublicId: props.channel.publicId,
-      title: editForm.value.title,
-      coverFile: editCoverFile.value
-    }
-    emit('editChannel', payload)
+    await new Promise((resolve, reject) => {
+      emit('editChannel', {
+        channelPublicId: props.channel.publicId,
+        title: editForm.value.title,
+        coverFile: editCoverFile.value,
+        resolve,
+        reject
+      })
+    })
     editDialog.value = false
+  } catch {
+    // error already shown by parent via notify
   } finally {
     savingEdit.value = false
   }
