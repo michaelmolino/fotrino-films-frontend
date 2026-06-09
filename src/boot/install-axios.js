@@ -20,8 +20,10 @@ const DEFAULT_REQUEST_POLICY = Object.freeze({
 })
 
 const RESOLVED_REQUEST_POLICY_KEY = '__resolvedRequestPolicy'
+const CSRF_RETRY_MARKER_KEY = '__csrfRetryAttempted'
 
 let interceptorsInstalled = false
+let csrfRefreshPromise = null
 
 function resolveRequestPolicy(config) {
   const policy = config?.__policy && typeof config.__policy === 'object' ? config.__policy : null
@@ -57,11 +59,15 @@ export default boot(({ app, router }) => {
     }
   }
 
+  const isMutationMethod = method => {
+    return ['post', 'put', 'delete'].includes(method)
+  }
+
   const attachCsrfToken = req => {
     const method = (req.method || '').toLowerCase()
     const requestPolicy = req?.[RESOLVED_REQUEST_POLICY_KEY]
 
-    if (!['post', 'put', 'delete'].includes(method)) {
+    if (!isMutationMethod(method)) {
       return
     }
 
@@ -81,6 +87,10 @@ export default boot(({ app, router }) => {
   const confirmDeleteRequest = async req => {
     const method = (req.method || '').toLowerCase()
     const requestPolicy = req?.[RESOLVED_REQUEST_POLICY_KEY]
+
+    if (req?.__skipDeleteConfirm === true) {
+      return true
+    }
 
     if (method !== 'delete' || requestPolicy.deleteHandling !== 'global') {
       return true
@@ -147,6 +157,59 @@ export default boot(({ app, router }) => {
     }
   }
 
+  const shouldRetryForExpiredCsrf = ({ error, status, requestPolicy }) => {
+    const method = error?.config?.method
+    const errorCode = getGlobalApiErrorPayload(error)?.error
+
+    if (!isMutationMethod(method)) {
+      return false
+    }
+
+    if (requestPolicy?.csrfHandling !== 'global') {
+      return false
+    }
+
+    if (error?.config?.[CSRF_RETRY_MARKER_KEY] === true) {
+      return false
+    }
+
+    return status === 400 && errorCode === 'csrf_invalid'
+  }
+
+  const refreshProfileForCsrfRetry = async () => {
+    if (!csrfRefreshPromise) {
+      csrfRefreshPromise = useAccountStore()
+        .fetchProfile()
+        .finally(() => {
+          csrfRefreshPromise = null
+        })
+    }
+
+    return await csrfRefreshPromise
+  }
+
+  const retryRequestWithFreshCsrf = async error => {
+    const originalConfig = error?.config
+    if (!originalConfig) {
+      return null
+    }
+
+    const refreshedProfile = await refreshProfileForCsrfRetry()
+    if (!refreshedProfile?.csrfToken) {
+      return null
+    }
+
+    const retryConfig = {
+      ...originalConfig,
+      __skipDeleteConfirm: true,
+      [CSRF_RETRY_MARKER_KEY]: true
+    }
+
+    delete retryConfig[RESOLVED_REQUEST_POLICY_KEY]
+
+    return await api.request(retryConfig)
+  }
+
   const onRequest = async req => {
     const requestPolicy = (req[RESOLVED_REQUEST_POLICY_KEY] = resolveRequestPolicy(req))
 
@@ -175,7 +238,7 @@ export default boot(({ app, router }) => {
     return response
   }
 
-  const onResponseError = error => {
+  const onResponseError = async error => {
     const requestPolicy = error?.config?.[RESOLVED_REQUEST_POLICY_KEY]
     if (requestPolicy?.loadHandling === 'global') {
       hideLoader()
@@ -187,6 +250,13 @@ export default boot(({ app, router }) => {
       error?.code === 'ERR_CANCELED' ||
       error?.name === 'CanceledError'
 
+    if (shouldRetryForExpiredCsrf({ error, status, requestPolicy })) {
+      const retriedResponse = await retryRequestWithFreshCsrf(error)
+      if (retriedResponse) {
+        return retriedResponse
+      }
+    }
+
     if (error?.__apiErrorHandled !== true) {
       handleApiError({
         error,
@@ -196,7 +266,7 @@ export default boot(({ app, router }) => {
       })
     }
 
-    return Promise.reject(error)
+    throw error
   }
 
   api.interceptors.request.use(onRequest)
