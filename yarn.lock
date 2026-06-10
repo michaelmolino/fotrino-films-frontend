@@ -2231,10 +2231,10 @@ doctrine@^2.1.0:
   dependencies:
     esutils "^2.0.2"
 
-dompurify@^3.4.8:
-  version "3.4.8"
-  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.4.8.tgz#6c54f8c207160e7f83fcb7f4fd05a82ac36b1cdc"
-  integrity sha512-yb1cEmaOum7wFvOCSQxyfgVlv5D47Rc30iZWoMpbDIWTnJ6grDDQyu2KFJzB2k7u0pMuJcQ1zphH//fFnw2tjQ==
+dompurify@^3.4.9:
+  version "3.4.9"
+  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.4.9.tgz#b036637b2df8997126b58837bc90f85dbcad6b2f"
+  integrity sha512-4dPSRMRDqHvs0V4YDFCsaIZo4if5u0xM+llyxiM2fwuZFdKArUBAF3VtI2+n8NKg9P870WMdYk0UhqQNoWXbfQ==
   optionalDependencies:
     "@types/trusted-types" "^2.0.7"
 
@@ -4280,9 +4280,9 @@ prettier-linter-helpers@^1.0.1:
     fast-diff "^1.1.2"
 
 prettier@3:
-  version "3.8.3"
-  resolved "https://registry.npmjs.org/prettier/-/prettier-3.8.3.tgz"
-  integrity sha512-7igPTM53cGHMW8xWuVTydi2KO233VFiTNyF5hLJqpilHfmn8C8gPf+PS7dUT64YcXFbiMGZxS9pCSxL/Dxm/Jw==
+  version "3.8.4"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.8.4.tgz#f334f013ac04a96676f24dabc23c1c4ae1bae411"
+  integrity sha512-N2MylSdi48+5N/6S5j+maeHbUSIzzZ5uOcX5Hm4QpV8Dkb1HFjfAKTKX6yNPJQD9AhcT3ifHNB66tWTTJDi11Q==
 
 process-nextick-args@~2.0.0:
   version "2.0.1"
