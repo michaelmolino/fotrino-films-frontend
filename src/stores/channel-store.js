@@ -24,33 +24,17 @@ export const useChannelStore = defineStore('channel', () => {
   })
 
   const unifiedRouteQueryOptions = createApiGetQueryOptionsFactory({
-    key: (
-      resourceType,
-      resourceId,
-      focusedMediaPrivateId = null,
-      withPending = false,
-      withSoftDeleted = false
-    ) => [
+    key: (resourceType, resourceId, withPending = false, withSoftDeleted = false) => [
       'channel',
       'resolve',
       resourceType,
       resourceId,
-      focusedMediaPrivateId || 'root',
       withPending ? 'pending' : 'current',
       withSoftDeleted ? 'with-deleted' : 'without-deleted'
     ],
     staleTime: API_CACHE_MEDIUM_MS,
-    url: (
-      resourceType,
-      resourceId,
-      focusedMediaPrivateId = null,
-      withPending = false,
-      withSoftDeleted = false
-    ) => {
+    url: (resourceType, resourceId, withPending = false, withSoftDeleted = false) => {
       const params = new URLSearchParams()
-      if (resourceType === 'privateAlbumMedia' && focusedMediaPrivateId) {
-        params.set('mediaPrivateId', focusedMediaPrivateId)
-      }
       if (resourceType === 'channel' && withPending) {
         params.set('withPending', 'true')
       }
@@ -71,7 +55,7 @@ export const useChannelStore = defineStore('channel', () => {
   const channelQueryOptions = (
     channelPublicId,
     { withPending = false, withSoftDeleted = false } = {}
-  ) => unifiedRouteQueryOptions('channel', channelPublicId, null, withPending, withSoftDeleted)
+  ) => unifiedRouteQueryOptions('channel', channelPublicId, withPending, withSoftDeleted)
 
   const routeTargetQueryOptions = target => {
     if (!target?.type) return null
@@ -86,11 +70,7 @@ export const useChannelStore = defineStore('channel', () => {
       case 'privateAlbum':
         return unifiedRouteQueryOptions('privateAlbum', target.privateAlbumId)
       case 'privateAlbumMedia':
-        return unifiedRouteQueryOptions(
-          'privateAlbumMedia',
-          target.privateAlbumId,
-          target.privateMediaId
-        )
+        return unifiedRouteQueryOptions('privateAlbum', target.privateAlbumId)
       case 'privateMedia':
         return unifiedRouteQueryOptions('privateMedia', target.privateMediaId)
       default:
