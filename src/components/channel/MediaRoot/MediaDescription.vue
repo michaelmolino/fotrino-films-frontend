@@ -175,12 +175,11 @@ async function submitReport() {
   try {
     const result = await channelStore.reportMedia(reportPayload.value)
     const res = result.data
-    const reported = !!res.reported
-    if (reported) {
-      notifySuccess('Report submitted. Our team will review it.')
-    } else {
+    if (res?.reported === false) {
       const msg = res.message || 'You have already reported this video.'
       notifyInfo(msg)
+    } else {
+      notifySuccess('Report submitted. Our team will review it.')
     }
     reportDialog.value = false
     reason.value = ''

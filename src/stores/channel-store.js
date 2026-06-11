@@ -337,7 +337,7 @@ export const useChannelStore = defineStore('channel', () => {
         exact: true
       })
     }
-    return mutationResult({ ok: true, data: res.data })
+    return mutationResult({ ok: true, data: res.data?.data ?? null })
   }
 
   const useChannelQuery = (channelPublicId, enabled = true, options = {}) => {
