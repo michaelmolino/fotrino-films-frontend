@@ -39,6 +39,7 @@
       :key="album.privateId"
       :album="album"
       :channel="displayChannel"
+      :isMediaAbortPending="isMediaAbortPending"
       data-cy="album-item"
       v-on="albumItemListeners"
       :getMediaLink="getMediaLink" />
@@ -94,6 +95,10 @@ import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 
 const props = defineProps({
   channel: Object,
+  isMediaAbortPending: {
+    type: Function,
+    default: () => false
+  },
   getMediaLink: Function
 })
 

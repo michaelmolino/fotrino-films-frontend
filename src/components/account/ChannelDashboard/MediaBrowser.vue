@@ -6,6 +6,7 @@
         v-for="channel in channels"
         :key="channel.publicId"
         :channel="channel"
+        :isMediaAbortPending="isMediaAbortPending"
         :getMediaLink="getMediaLink"
         data-cy="channel-item"
         v-on="channelItemListeners" />
@@ -15,7 +16,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useChannelStore } from 'src/stores/channel-store.js'
 import { useUploadStore } from 'src/stores/upload-store.js'
 import ChannelItem from './MediaBrowser/ChannelItem.vue'
@@ -28,8 +29,44 @@ const uploadStore = useUploadStore()
 const props = defineProps({
   channels: { type: Array, default: () => [] }
 })
+const abortingMediaIds = ref(new Set())
 
 const showEmptyState = computed(() => props.channels.length === 0)
+
+function collectPendingMediaPrivateIds(channels) {
+  const ids = new Set()
+  for (const channel of channels || []) {
+    for (const album of channel?.albums || []) {
+      for (const media of album?.media || []) {
+        if (media?.pending && media?.privateId) {
+          ids.add(media.privateId)
+        }
+      }
+    }
+  }
+  return ids
+}
+
+watch(
+  () => props.channels,
+  nextChannels => {
+    if (!abortingMediaIds.value.size) {
+      return
+    }
+    const pendingIds = collectPendingMediaPrivateIds(nextChannels)
+    const nextAborting = new Set(
+      [...abortingMediaIds.value].filter(mediaPrivateId => pendingIds.has(mediaPrivateId))
+    )
+    if (nextAborting.size !== abortingMediaIds.value.size) {
+      abortingMediaIds.value = nextAborting
+    }
+  },
+  { deep: true }
+)
+
+function isMediaAbortPending(mediaPrivateId) {
+  return abortingMediaIds.value.has(mediaPrivateId)
+}
 
 const channelItemListeners = {
   deleteChannel: channelPublicId =>
@@ -123,10 +160,20 @@ async function undeleteChannel(channelPublicId) {
 }
 
 async function abortPendingMedia(mediaPrivateId) {
+  if (!mediaPrivateId || abortingMediaIds.value.has(mediaPrivateId)) {
+    return
+  }
+
+  abortingMediaIds.value = new Set(abortingMediaIds.value).add(mediaPrivateId)
+
   try {
     await uploadStore.abortUpload(mediaPrivateId)
     notifySuccess('Pending upload aborted.')
   } catch (error) {
+    const nextAborting = new Set(abortingMediaIds.value)
+    nextAborting.delete(mediaPrivateId)
+    abortingMediaIds.value = nextAborting
+
     if (error?.__userCancelled || error?.code === 'ERR_CANCELED') {
       return
     }

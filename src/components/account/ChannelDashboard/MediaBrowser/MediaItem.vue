@@ -5,6 +5,7 @@
       :image="media.previewAsset"
       :pending="media.pending"
       :abortable="media.pending"
+      :abortInProgress="abortInProgress"
       :deleted="media.deleted"
       undeletable
       editable
@@ -97,6 +98,10 @@ const props = defineProps({
   media: Object,
   album: Object,
   channel: Object,
+  abortInProgress: {
+    type: Boolean,
+    default: false
+  },
   getMediaLink: Function
 })
 

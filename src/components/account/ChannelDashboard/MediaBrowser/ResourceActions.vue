@@ -78,6 +78,19 @@
             <q-tooltip>Abort Pending Upload</q-tooltip>
           </q-btn>
           <q-btn
+            v-else-if="showAbortInProgressAction"
+            flat
+            dense
+            size="sm"
+            icon="hourglass_top"
+            color="grey-6"
+            class="q-ml-xs"
+            disable
+            data-cy="abort-pending-media-in-progress"
+            :aria-label="'Abort pending upload in progress for ' + title">
+            <q-tooltip>Aborting pending upload...</q-tooltip>
+          </q-btn>
+          <q-btn
             v-if="showEditAction"
             flat
             dense
@@ -132,6 +145,10 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  abortInProgress: {
+    type: Boolean,
+    default: false
+  },
   undeletable: {
     type: Boolean,
     default: false
@@ -170,7 +187,12 @@ const showDeletedDisabledAction = computed(
   () => !props.pending && props.deleted && !props.undeletable
 )
 const showPendingAction = computed(() => !!props.pending)
-const showAbortAction = computed(() => !!props.pending && !!props.abortable)
+const showAbortAction = computed(
+  () => !!props.pending && !!props.abortable && !props.abortInProgress
+)
+const showAbortInProgressAction = computed(
+  () => !!props.pending && !!props.abortable && !!props.abortInProgress
+)
 const showEditAction = computed(() => !!props.editable && !props.pending && !props.deleted)
 const showDeleteAction = computed(() => !props.pending && !props.deleted)
 </script>
