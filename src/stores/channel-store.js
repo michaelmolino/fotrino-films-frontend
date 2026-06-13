@@ -119,13 +119,13 @@ export const useChannelStore = defineStore('channel', () => {
     }))
   }
 
-  const resolveHistoryChannels = async ({ items = [], current = null } = {}) => {
+  const resolveHistory = async ({ items = [], current = null } = {}) => {
     if ((!Array.isArray(items) || items.length === 0) && !current) {
       return { items: [], deletedItems: [] }
     }
 
     const { data } = await api.post(
-      '/channels/history',
+      '/history',
       { items, current },
       {
         __policy: {
@@ -300,7 +300,7 @@ export const useChannelStore = defineStore('channel', () => {
     const res = await runMutation({
       request: () =>
         api.post(
-          `/channels/media/private/${privateId}/report`,
+          `/media-reports/media/private/${privateId}`,
           {
             reason: reason?.trim() || null
           },
@@ -330,7 +330,7 @@ export const useChannelStore = defineStore('channel', () => {
   return {
     useChannelsQuery,
     useChannelQuery,
-    resolveHistoryChannels,
+    resolveHistory,
     fetchChannel,
     deleteResource,
     undeleteResource,
