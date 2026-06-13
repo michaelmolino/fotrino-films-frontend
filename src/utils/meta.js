@@ -73,57 +73,60 @@ function getPrivateAlbumMeta(channel) {
   }
 }
 
-// Main meta generator
-export function getMetaData(route, channel) {
-  let meta = { title: null, description: '', image: null, type: 'website' }
-
-  // Route type detection
-  if (route?.params.channelPublicId) {
-    meta = getChannelMeta(channel)
-  }
-  if (route?.params.albumPublicId) {
-    meta = getAlbumMeta(channel, route.params.albumPublicId)
-  }
-  if (route?.params.mediaPublicId) {
-    meta = getMediaMeta(channel, route.params.mediaPublicId)
-  }
-  if (route?.params.privateAlbumId && !route?.params.privateMediaId) {
-    meta = getPrivateAlbumMeta(channel)
-  }
-  if (route?.params.privateAlbumId && route?.params.privateMediaId) {
-    meta = getPrivateMediaMeta(route, channel)
-  }
-  if (route?.params.privateMediaId && !route?.params.privateAlbumId) {
-    meta = getPrivateMediaMeta(route, channel)
+function resolveRouteMeta(route, channel) {
+  const params = route?.params
+  if (!params) {
+    return { title: null, description: '', image: null, type: 'website' }
   }
 
-  // Branding
-  let title = meta.title
-  let description = meta.description
-  let image = meta.image
-  let type = meta.type
-  if (title) {
-    title += ' | Fotrino Films'
-  } else {
-    title = 'Fotrino Films'
-    description = title
+  if (params.privateMediaId) {
+    return getPrivateMediaMeta(route, channel)
+  }
+  if (params.privateAlbumId) {
+    return getPrivateAlbumMeta(channel)
+  }
+  if (params.mediaPublicId) {
+    return getMediaMeta(channel, params.mediaPublicId)
+  }
+  if (params.albumPublicId) {
+    return getAlbumMeta(channel, params.albumPublicId)
+  }
+  if (params.channelPublicId) {
+    return getChannelMeta(channel)
   }
 
-  // Open Graph URL
-  const routePath = route ? route.fullPath.split('?')[0] : '/'
-  const ogUrl = `${SITE_BASE_URL}${routePath}`
+  return { title: null, description: '', image: null, type: 'website' }
+}
 
+function applyBranding(meta) {
+  if (meta.title) {
+    return {
+      title: `${meta.title} | Fotrino Films`,
+      description: meta.description,
+      image: meta.image,
+      type: meta.type
+    }
+  }
+
+  return {
+    title: 'Fotrino Films',
+    description: 'Fotrino Films',
+    image: meta.image,
+    type: meta.type
+  }
+}
+
+function buildMetaData({ title, description, image, type, ogUrl }) {
   const preloadPosterLink =
     type === 'video' && typeof image === 'string' && image.length > 0
       ? {
-          rel: 'preload',
-          as: 'image',
-          href: image,
-          fetchpriority: 'high'
-        }
+        rel: 'preload',
+        as: 'image',
+        href: image,
+        fetchpriority: 'high'
+      }
       : null
 
-  // Compose meta tags
   const metaData = {
     title,
     meta: {
@@ -159,4 +162,16 @@ export function getMetaData(route, channel) {
   }
 
   return metaData
+}
+
+// Main meta generator
+export function getMetaData(route, channel) {
+  const resolvedMeta = resolveRouteMeta(route, channel)
+  const { title, description, image, type } = applyBranding(resolvedMeta)
+
+  // Open Graph URL
+  const routePath = route ? route.fullPath.split('?')[0] : '/'
+  const ogUrl = `${SITE_BASE_URL}${routePath}`
+
+  return buildMetaData({ title, description, image, type, ogUrl })
 }
