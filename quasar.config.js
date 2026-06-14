@@ -4,6 +4,7 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from '@quasar/app-vite/wrappers'
+import { loadEnv } from 'vite'
 import { visualizer } from 'rollup-plugin-visualizer'
 import viteCompression from 'vite-plugin-compression'
 import istanbul from 'vite-plugin-istanbul'
@@ -40,28 +41,41 @@ const apiProxyPrefixes = [
   '/uppy'
 ]
 
-export default defineConfig(() => ({
-  supportTS: false,
-  boot: ['install-colada', 'install-axios', 'bootstrap-profile', 'image-asset-support'],
-  css: [],
-  extras: ['material-icons'],
+const requireEnv = (env, name, { required = true } = {}) => {
+  const value = env[name]
+  if (required && (!value || !String(value).trim())) {
+    throw new Error(`Missing required environment variable: ${name}`)
+  }
+  return value
+}
 
-  build: {
-    vueRouterMode: 'history',
-    publicPath: '/',
-    env: {
-      API:
-        process.env.NODE_ENV === 'production'
-          ? 'https://api.fotrino.com'
-          : 'https://fotrino.example.com:8080',
-      SITE_BASE_URL:
-        process.env.NODE_ENV === 'production'
-          ? 'https://films.fotrino.com'
-          : 'https://fotrino.example.com:8080',
-      SAMPLE_CHANNEL_CANONICAL_PATH: process.env.SAMPLE_CHANNEL_CANONICAL_PATH
-    },
-    sourcemap: process.env.NODE_ENV !== 'production',
-    extendViteConf(viteConf) {
+export default defineConfig(ctx => {
+  const envMode = ctx.dev ? 'development' : 'production'
+  const env = {
+    ...loadEnv(envMode, __dirname, ''),
+    ...process.env
+  }
+  const isProduction = envMode === 'production'
+  const apiBaseUrl = requireEnv(env, 'API')
+  const siteBaseUrl = requireEnv(env, 'SITE_BASE_URL')
+  const devProxyTarget = requireEnv(env, 'DEV_PROXY_TARGET', { required: !isProduction })
+
+  return {
+    supportTS: false,
+    boot: ['install-colada', 'install-axios', 'bootstrap-profile', 'image-asset-support'],
+    css: [],
+    extras: ['material-icons'],
+
+    build: {
+      vueRouterMode: 'history',
+      publicPath: '/',
+      env: {
+        API: apiBaseUrl,
+        SITE_BASE_URL: siteBaseUrl,
+        SAMPLE_CHANNEL_CANONICAL_PATH: env.SAMPLE_CHANNEL_CANONICAL_PATH
+      },
+      sourcemap: !isProduction,
+      extendViteConf(viteConf) {
       viteConf.resolve = viteConf.resolve || {}
       viteConf.resolve.alias = viteConf.resolve.alias || {}
       viteConf.resolve.alias = {
@@ -81,7 +95,7 @@ export default defineConfig(() => ({
         viteCompression({ algorithm: 'brotliCompress', ext: '.br' }),
         viteCompression({ algorithm: 'gzip', ext: '.gz' })
       )
-      if (process.env.ANALYZE === 'true') {
+      if (env.ANALYZE === 'true') {
         viteConf.plugins.push(
           visualizer({
             filename: path.resolve(__dirname, 'dist/spa/stats.html'),
@@ -92,7 +106,7 @@ export default defineConfig(() => ({
           })
         )
       }
-      if (process.env.COVERAGE === 'true') {
+      if (env.COVERAGE === 'true') {
         viteConf.plugins.push(
           istanbul({
             include: ['src/**/*.js', 'src/**/*.vue'],
@@ -102,36 +116,39 @@ export default defineConfig(() => ({
           })
         )
       }
-    }
-  },
+      }
+    },
 
-  devServer: {
-    https: true,
-    host: 'fotrino.example.com',
-    port: 8080,
-    open: process.env.COVERAGE !== 'true',
-    proxy: Object.fromEntries(
-      apiProxyPrefixes.map(prefix => [
-        prefix,
-        {
-          target: 'https://fotrino.example.com:65443/',
-          changeOrigin: true,
-          secure: false,
-          configure: configureForwardedHeaders
-        }
-      ])
-    )
-  },
+    devServer: isProduction
+      ? undefined
+      : {
+          https: true,
+          host: 'fotrino.example.com',
+          port: 8080,
+          open: env.COVERAGE !== 'true',
+          proxy: Object.fromEntries(
+            apiProxyPrefixes.map(prefix => [
+              prefix,
+              {
+                target: devProxyTarget,
+                changeOrigin: true,
+                secure: false,
+                configure: configureForwardedHeaders
+              }
+            ])
+          )
+        },
 
-  framework: {
-    iconSet: 'material-icons',
-    lang: 'en-US',
-    config: { dark: 'auto' },
-    importStrategy: 'auto',
-    plugins: ['Dialog', 'Loading', 'LocalStorage', 'Meta', 'Notify']
-  },
+    framework: {
+      iconSet: 'material-icons',
+      lang: 'en-US',
+      config: { dark: 'auto' },
+      importStrategy: 'auto',
+      plugins: ['Dialog', 'Loading', 'LocalStorage', 'Meta', 'Notify']
+    },
 
-  animations: ['zoomInDown'],
+    animations: ['zoomInDown'],
 
-  ssr: { pwa: false }
-}))
+    ssr: { pwa: false }
+  }
+})

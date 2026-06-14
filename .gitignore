@@ -28,6 +28,9 @@ coverage/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.env*
+!.env.development.example
+!.env.production.example
 
 # Editor directories and files
 .idea
