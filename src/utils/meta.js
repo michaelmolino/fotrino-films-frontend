@@ -120,11 +120,11 @@ function buildMetaData({ title, description, image, type, ogUrl }) {
   const preloadPosterLink =
     type === 'video' && typeof image === 'string' && image.length > 0
       ? {
-        rel: 'preload',
-        as: 'image',
-        href: image,
-        fetchpriority: 'high'
-      }
+          rel: 'preload',
+          as: 'image',
+          href: image,
+          fetchpriority: 'high'
+        }
       : null
 
   const metaData = {

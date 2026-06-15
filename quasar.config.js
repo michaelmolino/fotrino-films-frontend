@@ -76,46 +76,46 @@ export default defineConfig(ctx => {
       },
       sourcemap: !isProduction,
       extendViteConf(viteConf) {
-      viteConf.resolve = viteConf.resolve || {}
-      viteConf.resolve.alias = viteConf.resolve.alias || {}
-      viteConf.resolve.alias = {
-        ...viteConf.resolve.alias,
-        '@layouts': path.resolve(__dirname, 'src/layouts'),
-        '@components': path.resolve(__dirname, 'src/components'),
-        '@composables': path.resolve(__dirname, 'src/composables'),
-        '@utils': path.resolve(__dirname, 'src/utils'),
-        '@clients': path.resolve(__dirname, 'src/clients'),
-        '@assets': path.resolve(__dirname, 'src/assets'),
-        '@css': path.resolve(__dirname, 'src/css'),
-        '@deps': path.resolve(__dirname, 'node_modules')
-      }
-      viteConf.optimizeDeps = viteConf.optimizeDeps || {}
-      viteConf.plugins = viteConf.plugins || []
-      viteConf.plugins.push(
-        viteCompression({ algorithm: 'brotliCompress', ext: '.br' }),
-        viteCompression({ algorithm: 'gzip', ext: '.gz' })
-      )
-      if (env.ANALYZE === 'true') {
+        viteConf.resolve = viteConf.resolve || {}
+        viteConf.resolve.alias = viteConf.resolve.alias || {}
+        viteConf.resolve.alias = {
+          ...viteConf.resolve.alias,
+          '@layouts': path.resolve(__dirname, 'src/layouts'),
+          '@components': path.resolve(__dirname, 'src/components'),
+          '@composables': path.resolve(__dirname, 'src/composables'),
+          '@utils': path.resolve(__dirname, 'src/utils'),
+          '@clients': path.resolve(__dirname, 'src/clients'),
+          '@assets': path.resolve(__dirname, 'src/assets'),
+          '@css': path.resolve(__dirname, 'src/css'),
+          '@deps': path.resolve(__dirname, 'node_modules')
+        }
+        viteConf.optimizeDeps = viteConf.optimizeDeps || {}
+        viteConf.plugins = viteConf.plugins || []
         viteConf.plugins.push(
-          visualizer({
-            filename: path.resolve(__dirname, 'dist/spa/stats.html'),
-            template: 'treemap',
-            gzipSize: true,
-            brotliSize: true,
-            open: false
-          })
+          viteCompression({ algorithm: 'brotliCompress', ext: '.br' }),
+          viteCompression({ algorithm: 'gzip', ext: '.gz' })
         )
-      }
-      if (env.COVERAGE === 'true') {
-        viteConf.plugins.push(
-          istanbul({
-            include: ['src/**/*.js', 'src/**/*.vue'],
-            extension: ['.js', '.vue'],
-            cypress: true,
-            requireEnv: false
-          })
-        )
-      }
+        if (env.ANALYZE === 'true') {
+          viteConf.plugins.push(
+            visualizer({
+              filename: path.resolve(__dirname, 'dist/spa/stats.html'),
+              template: 'treemap',
+              gzipSize: true,
+              brotliSize: true,
+              open: false
+            })
+          )
+        }
+        if (env.COVERAGE === 'true') {
+          viteConf.plugins.push(
+            istanbul({
+              include: ['src/**/*.js', 'src/**/*.vue'],
+              extension: ['.js', '.vue'],
+              cypress: true,
+              requireEnv: false
+            })
+          )
+        }
       }
     },
 

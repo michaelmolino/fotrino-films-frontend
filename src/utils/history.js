@@ -197,7 +197,7 @@ export async function resolveHistoryFromBackend(
   }
 
   try {
-      const response = await channelStore.resolveHistory({
+    const response = await channelStore.resolveHistory({
       items: entries,
       current: hasCurrentEntry ? currentEntry : null
     })
