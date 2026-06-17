@@ -20,7 +20,6 @@ updates:
 
     labels:
       - 'dependencies'
-      - 'auto-merge'
 
     ignore:
       - dependency-name: '*'
