@@ -112,7 +112,6 @@ function parseResourceDate(value) {
   }
 
   const [year, month, day] = value
-    .replaceAll('/', '-')
     .split('-')
     .map(part => Number.parseInt(part, 10))
   if (!year || !month || !day) {

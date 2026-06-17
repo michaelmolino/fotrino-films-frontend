@@ -25,6 +25,7 @@ The following components are maintained in private repositories.
 - Backend: Python API built with Flask, using Postgres and Redis for persistence and caching.
 - Worker: Asynchronous job processing handled via Procrastinate, with ffmpeg used for media processing.
 - Tests: End-to-end test suite written in Cypress, covering key user flows and system behaviour.
+- Infra: Terraform files for infrastructure dependencies, publish scripts, and production environment variables.
 
 ## OpenAPI Docs
 

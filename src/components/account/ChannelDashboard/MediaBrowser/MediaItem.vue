@@ -177,7 +177,7 @@ function onUpdateTitle(value) {
 function onUpdateResourceDate(value) {
   editForm.value = {
     ...editForm.value,
-    resourceDate: value ? value.replaceAll('/', '-') : value
+    resourceDate: value
   }
 }
 

@@ -522,7 +522,7 @@ function onComposerMediaResourceDateUpdate(value) {
     ...payload,
     album: {
       ...payload.album,
-      media: { ...payload.album.media, resourceDate: value ? value.replaceAll('/', '-') : value }
+      media: { ...payload.album.media, resourceDate: value }
     }
   })
 }
