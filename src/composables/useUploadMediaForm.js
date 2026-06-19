@@ -54,6 +54,17 @@ function createInitialAlbumPayload(projectMode = 'unselected') {
   }
 }
 
+function createInitialAlbumSelectionPayload(projectMode = 'unselected') {
+  return {
+    projectMode,
+    privateId: null,
+    posterType: 'default',
+    posterColor: '#000000',
+    title: 'My Videos',
+    subtitle: null
+  }
+}
+
 function buildPreviewAsset(url) {
   if (typeof url !== 'string' || !url) {
     return []
@@ -323,7 +334,7 @@ export function useUploadMediaForm() {
   function resetAlbumSelection(projectMode = 'unselected') {
     albumsLoadToken.value += 1
     albums.value = []
-    Object.assign(payload.album, createInitialAlbumPayload(projectMode))
+    Object.assign(payload.album, createInitialAlbumSelectionPayload(projectMode))
     posterFile.value = null
   }
 
