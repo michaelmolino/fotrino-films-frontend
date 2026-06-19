@@ -75,7 +75,7 @@
         <q-item>
           <q-item-section avatar top class="summary-resource-avatar summary-avatar-top">
             <q-avatar
-              v-if="isAlbumSummaryReady"
+              v-if="isAlbumSummaryReady && albumCompletionSource"
               size="26px"
               class="summary-step-avatar"
               :class="albumSummaryAvatarClass"
@@ -136,7 +136,7 @@ const props = defineProps({
   channelCompletionSource: { type: String, default: null },
   isAlbumSummaryReady: { type: Boolean, required: true },
   albumSummaryPosterSrc: { type: String, default: null },
-  albumSummaryPosterColor: { type: String, required: true },
+  albumSummaryPosterColor: { type: String, default: null },
   albumSummaryLabel: { type: String, required: true },
   albumSummarySubtitle: { type: String, default: '' },
   albumCompletionSource: { type: String, default: null },
@@ -158,7 +158,7 @@ const albumSummaryAvatarClass = computed(() => ({
   'summary-step-swatch': !props.albumSummaryPosterSrc
 }))
 const albumSummaryAvatarStyle = computed(() => {
-  if (props.albumSummaryPosterSrc) {
+  if (props.albumSummaryPosterSrc || !props.albumSummaryPosterColor) {
     return undefined
   }
   return { backgroundColor: props.albumSummaryPosterColor }

@@ -342,8 +342,12 @@ const albumSummaryPosterSrc = computed(() => {
 })
 
 const albumSummaryPosterColor = computed(() => {
+  if (payload.album.projectMode === 'unselected') {
+    return null
+  }
+
   if (!isAlbumSummaryReady.value) {
-    return '#000000'
+    return null
   }
 
   if (payload.album.projectMode === 'create') {
@@ -439,6 +443,10 @@ const isAlbumAutoDefault = computed(() => {
 })
 
 const albumCompletionSource = computed(() => {
+  if (payload.album.projectMode === 'unselected') {
+    return null
+  }
+
   if (!isAlbumSummaryReady.value) {
     return null
   }
@@ -465,9 +473,6 @@ const channelEditorCoverSrc = computed(() => {
   return resolveImagePrimaryUrl(profile.value?.avatarAsset) || null
 })
 
-const albumEditorPosterSrc = computed(() => {
-  return resolveImagePrimaryUrl(album.value?.posterAsset) || null
-})
 const albumEditorPosterColor = computed(() => payload.album.posterColor || '#000000')
 const albumEditorPreview = computed(() => {
   const currentAlbum = album.value || {}
@@ -476,7 +481,8 @@ const albumEditorPreview = computed(() => {
   return {
     title: payload.album.title || currentAlbum.title || 'My Videos',
     subtitle: payload.album.subtitle || currentAlbum.subtitle || '',
-    poster: albumEditorPosterSrc.value,
+    posterAsset: currentAlbum.posterAsset || null,
+    posterType: payload.album.posterType,
     posterColor: albumEditorPosterColor.value,
     media: isNew ? [{}] : baseMedia
   }

@@ -35,6 +35,25 @@ function createUploadIdempotencyKey() {
   return createRandomId('upload')
 }
 
+function createInitialAlbumPayload(projectMode = 'unselected') {
+  return {
+    projectMode,
+    privateId: null,
+    posterType: 'default',
+    posterColor: '#000000',
+    title: 'My Videos',
+    subtitle: null,
+    media: {
+      filename: null,
+      title: null,
+      description: null,
+      main: false,
+      previewType: 'frame',
+      resourceDate: new Date().toISOString().split('T')[0]
+    }
+  }
+}
+
 function buildPreviewAsset(url) {
   if (typeof url !== 'string' || !url) {
     return []
@@ -50,22 +69,7 @@ function createInitialPayload() {
     idempotencyKey: createUploadIdempotencyKey(),
     coverType: 'profile',
     title: 'My Channel',
-    album: {
-      projectMode: 'unselected',
-      privateId: null,
-      posterType: 'default',
-      posterColor: '#000000',
-      title: 'My Videos',
-      subtitle: null,
-      media: {
-        filename: null,
-        title: null,
-        description: null,
-        main: false,
-        previewType: 'frame',
-        resourceDate: new Date().toISOString().split('T')[0]
-      }
-    }
+    album: createInitialAlbumPayload()
   }
 }
 
@@ -254,15 +258,15 @@ export function useUploadMediaForm() {
       return albumsById.value[payload.album.privateId.value]
     }
 
-    const poster =
+    const posterAsset =
       payload.album.projectMode === 'create' && payload.album.posterType === 'new'
-        ? posterThumb.value
+        ? [{ type: 'jpeg', key: posterThumb.value }]
         : null
 
     return {
       title: payload.album.title,
       subtitle: payload.album.subtitle,
-      poster,
+      posterAsset,
       posterColor: payload.album.posterColor,
       media: []
     }
@@ -319,8 +323,8 @@ export function useUploadMediaForm() {
   function resetAlbumSelection(projectMode = 'unselected') {
     albumsLoadToken.value += 1
     albums.value = []
-    payload.album.projectMode = projectMode
-    payload.album.privateId = null
+    Object.assign(payload.album, createInitialAlbumPayload(projectMode))
+    posterFile.value = null
   }
 
   function resetAlbumsAndQueueValidation(projectMode = 'unselected') {

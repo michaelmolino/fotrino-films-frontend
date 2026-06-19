@@ -11,8 +11,11 @@
     <q-badge class="text-white bg-accent q-pa-md z-top" floating>
       <span class="text-bold">{{ album.media.length }}</span>
     </q-badge>
+    <div v-if="showPosterSkeleton" class="poster-skeleton">
+      <q-skeleton type="rect" class="fit" animation="none" />
+    </div>
     <q-img
-      v-if="posterUrl"
+      v-else-if="posterUrl"
       :src="posterUrl"
       :ratio="2 / 3"
       fit="cover"
@@ -35,7 +38,7 @@
       </template>
     </q-img>
     <div
-      v-if="!posterUrl"
+      v-else
       class="poster-fallback"
       :style="{ backgroundColor: album.posterColor || '#000000' }">
       <!-- Centered overlay in the main body for color fallback -->
@@ -59,6 +62,12 @@ const props = defineProps({
 })
 
 const posterUrl = computed(() => resolveImagePrimaryUrl(props.album?.posterAsset))
+const hasPosterAsset = computed(
+  () => Array.isArray(props.album?.posterAsset) && props.album.posterAsset.some(asset => !!asset?.key)
+)
+const showPosterSkeleton = computed(
+  () => props.album?.posterType === 'new' && !posterUrl.value && !hasPosterAsset.value
+)
 
 function hexToRgb(hex) {
   let h = (hex || '').trim()
@@ -93,6 +102,14 @@ const contrastTextStyle = computed(() => ({ color: contrastTextColor.value }))
   width: 100%;
   aspect-ratio: 2 / 3; /* match q-img ratio for consistency */
 }
+
+.poster-skeleton {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
 .poster-center-overlay {
   pointer-events: none; /* allow click-through to the button */
 }
