@@ -23,7 +23,7 @@
     "browser-image-compression": "^2.0.2",
     "browser-video-thumbnail-generator": "^2.0.4",
     "dayjs": "^1.11.21",
-    "dompurify": "^3.4.10",
+    "dompurify": "^3.4.11",
     "exifr": "^7.1.3",
     "hls.js": "^1.6.16",
     "i18n-iso-countries": "^7.14.0",
@@ -54,7 +54,7 @@
     "sass": "^1.101.0",
     "terser": "^5.48.0",
     "vite": "^8.0.16",
-    "vite-plugin-checker": "^0.14.3",
+    "vite-plugin-checker": "^0.14.4",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-istanbul": "^8.0.0",
     "vue-eslint-parser": "^10.4.1"
