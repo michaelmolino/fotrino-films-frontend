@@ -18,7 +18,7 @@
     "@uppy/aws-s3": "^5.1.0",
     "@uppy/core": "^5.0.0",
     "@vueuse/core": "^14.3.0",
-    "axios": "^1.18.0",
+    "axios": "^1.18.1",
     "axios-retry": "^4.5.0",
     "browser-image-compression": "^2.0.2",
     "browser-video-thumbnail-generator": "^2.0.4",
