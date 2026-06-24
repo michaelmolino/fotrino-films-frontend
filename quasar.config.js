@@ -56,8 +56,8 @@ export default defineConfig(ctx => {
     ...process.env
   }
   const isProduction = envMode === 'production'
-  const apiBaseUrl = requireEnv(env, 'API')
-  const siteBaseUrl = requireEnv(env, 'SITE_BASE_URL')
+  const apiBaseUrl = requireEnv(env, 'FOTRINO_API_URL')
+  const siteBaseUrl = requireEnv(env, 'FOTRINO_BASE_URL')
   const devProxyTarget = requireEnv(env, 'DEV_PROXY_TARGET', { required: !isProduction })
 
   return {
@@ -70,8 +70,8 @@ export default defineConfig(ctx => {
       vueRouterMode: 'history',
       publicPath: '/',
       env: {
-        API: apiBaseUrl,
-        SITE_BASE_URL: siteBaseUrl,
+        FOTRINO_API_URL: apiBaseUrl,
+        FOTRINO_BASE_URL: siteBaseUrl,
         SAMPLE_CHANNEL_CANONICAL_PATH: env.SAMPLE_CHANNEL_CANONICAL_PATH
       },
       sourcemap: !isProduction,

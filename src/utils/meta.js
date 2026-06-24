@@ -1,7 +1,7 @@
 import { formatTitleWithSubtitle, sanitizeText } from '@utils/text.js'
 import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 
-const SITE_BASE_URL = process.env.SITE_BASE_URL
+const FOTRINO_BASE_URL = process.env.FOTRINO_BASE_URL
 
 function findAlbum(channel, albumPublicId) {
   if (!channel || !albumPublicId) {
@@ -171,7 +171,7 @@ export function getMetaData(route, channel) {
 
   // Open Graph URL
   const routePath = route ? route.fullPath.split('?')[0] : '/'
-  const ogUrl = `${SITE_BASE_URL}${routePath}`
+  const ogUrl = `${FOTRINO_BASE_URL}${routePath}`
 
   return buildMetaData({ title, description, image, type, ogUrl })
 }

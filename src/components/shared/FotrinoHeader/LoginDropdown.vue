@@ -81,7 +81,7 @@ const providerMap = {
 
 function getProviderLoginHref(providerKey) {
   const returnTo = route.fullPath
-  return `${process.env.API}/account/login/${providerKey}?redirect_to=${encodeURIComponent(returnTo)}`
+  return `${process.env.FOTRINO_API_URL}/account/login/${providerKey}?redirect_to=${encodeURIComponent(returnTo)}`
 }
 
 const oauthProviders = computed(() => {

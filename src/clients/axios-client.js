@@ -30,7 +30,7 @@ const retryDelay = (retryCount, error) => {
 }
 
 const api = axios.create({
-  baseURL: process.env.API,
+  baseURL: process.env.FOTRINO_API_URL,
   withCredentials: true
 })
 

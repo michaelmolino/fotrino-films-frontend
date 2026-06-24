@@ -63,7 +63,8 @@ const props = defineProps({
 
 const posterUrl = computed(() => resolveImagePrimaryUrl(props.album?.posterAsset))
 const hasPosterAsset = computed(
-  () => Array.isArray(props.album?.posterAsset) && props.album.posterAsset.some(asset => !!asset?.key)
+  () =>
+    Array.isArray(props.album?.posterAsset) && props.album.posterAsset.some(asset => !!asset?.key)
 )
 const showPosterSkeleton = computed(
   () => props.album?.posterType === 'new' && !posterUrl.value && !hasPosterAsset.value

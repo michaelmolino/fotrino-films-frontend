@@ -112,9 +112,7 @@ function parseResourceDate(value) {
   }
 
   const separator = value.includes('-') ? '-' : '/'
-  const [year, month, day] = value
-    .split(separator)
-    .map(part => Number.parseInt(part, 10))
+  const [year, month, day] = value.split(separator).map(part => Number.parseInt(part, 10))
   if (!year || !month || !day) {
     return new Date('invalid')
   }
