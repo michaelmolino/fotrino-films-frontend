@@ -236,7 +236,6 @@ async function submitReport() {
   min-width: 0;
   line-height: 1.25;
   overflow-wrap: anywhere;
-  word-break: break-word;
 }
 
 .description-text-wrap {

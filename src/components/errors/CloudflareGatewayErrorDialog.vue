@@ -173,6 +173,6 @@ const prettyPayload = computed(() => JSON.stringify(props.payload, null, 2))
   font-size: 12px;
   line-height: 1.45;
   white-space: pre-wrap;
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 </style>

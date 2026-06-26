@@ -101,6 +101,6 @@ async function runCleanup() {
 <style scoped>
 .maintenance-result-pre {
   white-space: pre-wrap;
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 </style>
