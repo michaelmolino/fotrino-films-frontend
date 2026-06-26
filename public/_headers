@@ -1,0 +1,8 @@
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: same-origin
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Permissions-Policy: geolocation=(), microphone=(), camera=()
+
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; manifest-src 'self'; worker-src 'self' blob:; img-src 'self' data: blob: https://*.fotrino.com https://9eba60c99ea7f3ceabc2289744ed1052.r2.cloudflarestorage.com; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'nonce-cpV/TeR/KtzDx/tdBdscuQ==' https://challenges.cloudflare.com; connect-src 'self' https://api.fotrino.com https://*.fotrino.com https://9eba60c99ea7f3ceabc2289744ed1052.r2.cloudflarestorage.com blob:; frame-src 'self' https://challenges.cloudflare.com; media-src 'self' https://media-private.fotrino.com blob:;
