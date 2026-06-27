@@ -1,4 +1,6 @@
 /*
+  Access-Control-Allow-Origin: https://films.fotrino.com
+
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: same-origin
