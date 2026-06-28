@@ -25,8 +25,18 @@ export function useUploadFlow({ uploadStore, getDraftRequest, stepper }) {
       throw new Error('No files to upload')
     }
 
+    // Abort any pending upload left over from a previous failed attempt so the
+    // new draft creation does not hit a conflict on the existing pending record.
+    if (activeMediaRef.value != null) {
+      await uploadStore.abortUpload(activeMediaRef.value).catch(err => {
+        console.warn('Failed to abort stale pending upload on retry:', err)
+      })
+      activeMediaRef.value = null
+    }
+
     abortController.value = new AbortController()
     isUploading.value = true
+    let succeeded = false
 
     try {
       const draftResult = await uploadStore.postUploadDraft(getDraftRequest())
@@ -54,6 +64,7 @@ export function useUploadFlow({ uploadStore, getDraftRequest, stepper }) {
       await uploadStore.confirmUpload(mediaPrivateId)
 
       statusText.value = 'Upload complete!'
+      succeeded = true
       stepper.value?.next()
     } catch (err) {
       if (abortController.value.signal.aborted && err.message === 'Upload cancelled') {
@@ -68,7 +79,11 @@ export function useUploadFlow({ uploadStore, getDraftRequest, stepper }) {
       cleanup()
       isUploading.value = false
       abortController.value = null
-      activeMediaRef.value = null
+      // Preserve activeMediaRef on failure so the next factoryUpload call can
+      // abort the stale pending record before creating a fresh draft.
+      if (succeeded) {
+        activeMediaRef.value = null
+      }
     }
   }
 
