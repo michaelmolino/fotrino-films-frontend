@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /c/
+Disallow: /a/
+Disallow: /m/
+Disallow: /private/
