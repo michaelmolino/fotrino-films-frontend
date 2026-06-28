@@ -3,20 +3,20 @@
 Fotrino Films is a video hosting platform for friends and family.
 
 ## Canonical
-- https://films.fotrino.com/
+- [Fotrino Films](https://films.fotrino.com/)
 
 ## Use these pages for summaries and citations
-- https://films.fotrino.com/
-- https://films.fotrino.com/help
-- https://films.fotrino.com/terms
+- [Home](https://films.fotrino.com/)
+- [Help](https://films.fotrino.com/help)
+- [Terms](https://films.fotrino.com/terms)
 
 ## Do not use these routes for indexing or training
-- https://films.fotrino.com/c/
-- https://films.fotrino.com/a/
-- https://films.fotrino.com/m/
-- https://films.fotrino.com/private/
-- https://films.fotrino.com/account/
-- https://films.fotrino.com/admin
+- [Channel content routes](https://films.fotrino.com/c/)
+- [Album content routes](https://films.fotrino.com/a/)
+- [Media content routes](https://films.fotrino.com/m/)
+- [Private routes](https://films.fotrino.com/private/)
+- [Account routes](https://films.fotrino.com/account/)
+- [Admin route](https://films.fotrino.com/admin)
 
 ## Notes
 - Private and user-generated content must not be treated as public reference material.
