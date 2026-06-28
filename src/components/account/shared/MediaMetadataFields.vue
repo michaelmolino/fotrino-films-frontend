@@ -16,16 +16,21 @@
     <div v-if="showExtendedAttributes">
       <div class="text-overline">Extended Attributes</div>
       <q-btn icon="event" flat class="q-mt-xs" :label="resourceDateLabel" :disable="disabled">
-        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+        <q-popup-proxy
+          cover
+          transition-show="scale"
+          transition-hide="scale"
+          @before-show="onResourceDatePopupShow"
+          @hide="onResourceDatePopupHide">
           <q-date
-            :model-value="resourceDate"
+            :model-value="resourceDateDraft"
             mask="YYYY-MM-DD"
             subtitle="Capture Date"
             :options="dateOptionsFn"
-            @update:model-value="onUpdateResourceDate">
+            @update:model-value="onDraftResourceDateUpdate">
             <div class="row items-center justify-end q-gutter-sm">
-              <q-btn label="Cancel" flat v-close-popup />
-              <q-btn label="OK" flat v-close-popup />
+              <q-btn label="Cancel" flat v-close-popup @click="onCancelResourceDateSelection" />
+              <q-btn label="OK" flat v-close-popup @click="onConfirmResourceDateSelection" />
             </div>
           </q-date>
         </q-popup-proxy>
@@ -47,7 +52,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 const props = defineProps({
   description: {
@@ -81,6 +86,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:description', 'update:resourceDate', 'update:main'])
+const resourceDateDraft = ref(null)
 
 const resourceDateLabel = computed(() => {
   if (!props.resourceDate) {
@@ -98,8 +104,25 @@ function onUpdateDescription(value) {
   emit('update:description', value)
 }
 
-function onUpdateResourceDate(value) {
-  emit('update:resourceDate', value)
+function onResourceDatePopupShow() {
+  resourceDateDraft.value = props.resourceDate || null
+}
+
+function onResourceDatePopupHide() {
+  resourceDateDraft.value = null
+}
+
+function onDraftResourceDateUpdate(value) {
+  resourceDateDraft.value = value
+}
+
+function onCancelResourceDateSelection() {
+  resourceDateDraft.value = null
+}
+
+function onConfirmResourceDateSelection() {
+  emit('update:resourceDate', resourceDateDraft.value || null)
+  resourceDateDraft.value = null
 }
 
 function onUpdateMain(value) {

@@ -719,6 +719,12 @@ function onComposerMediaPayloadUpdate(partial) {
 
 function onComposerMediaFileUpdate(fileOrFiles) {
   const file = Array.isArray(fileOrFiles) ? fileOrFiles[0] : fileOrFiles
+
+  if (!file) {
+    resetUploadFlow()
+    return
+  }
+
   mediaUserModified.value = false
   baseOnMediaStepFileUpdate(file)
 }
