@@ -1,10 +1,7 @@
 import { nextTick, onBeforeUnmount, ref, watch, computed, toRef } from 'vue'
 import { useQuery } from '@pinia/colada'
-import { useEventListener } from '@vueuse/core'
 import { api } from 'src/clients/axios-client.js'
 import { setupVideoPlayback } from '@utils/video-playback'
-
-const MEDIA_SESSION_REFRESH_HEADROOM_MS = 60_000
 
 function createPlyrPlaybackController({ mediaEl }) {
   const player = ref(null)
@@ -107,7 +104,6 @@ function createPlyrPlaybackController({ mediaEl }) {
 export function usePlyrMediaLifecycle(props, mediaEl, options = {}) {
   const media = toRef(props, 'media')
   let lifecycleRunId = 0
-  const mediaSessionRefreshTimer = ref(null)
   const { destroyPlayers, setupPlayerForMedia, refreshPlaybackSource } =
     createPlyrPlaybackController({ mediaEl })
   const { onPlaybackReady = null } = options
@@ -130,42 +126,13 @@ export function usePlyrMediaLifecycle(props, mediaEl, options = {}) {
     }
   })
 
-  const clearMediaSessionRefreshTimer = () => {
-    if (mediaSessionRefreshTimer.value !== null) {
-      clearTimeout(mediaSessionRefreshTimer.value)
-      mediaSessionRefreshTimer.value = null
-    }
-  }
-
-  const scheduleMediaSessionRefresh = session => {
-    clearMediaSessionRefreshTimer()
-
-    if (!session?.expiresAt) {
-      return
-    }
-
-    const delay = Math.max(
-      1000,
-      session.expiresAt * 1000 - Date.now() - MEDIA_SESSION_REFRESH_HEADROOM_MS
-    )
-    mediaSessionRefreshTimer.value = setTimeout(() => {
-      if (media.value.privateId) {
-        void syncPlaybackLifecycle({ rebuild: false })
-      }
-    }, delay)
-  }
-
-  watch(
-    () => mediaSessionQuery.data.value,
-    session => scheduleMediaSessionRefresh(session),
-    { immediate: true }
-  )
-
   async function resolvePlaybackUrl(mediaSnapshot) {
     if (!mediaSnapshot.privateId) {
       throw new Error('Media is missing privateId; cannot create playback session.')
     }
 
+    // Token auto-refresh is intentionally disabled for now.
+    // If the session expires, users must reload to obtain a new playback URL.
     await mediaSessionQuery.refresh()
     const session = mediaSessionQuery.data.value
     if (!session?.playbackUrl) {
@@ -178,7 +145,6 @@ export function usePlyrMediaLifecycle(props, mediaEl, options = {}) {
   async function syncPlaybackLifecycle({ rebuild = false } = {}) {
     const mediaSnapshot = { ...media.value }
     const runId = ++lifecycleRunId
-    clearMediaSessionRefreshTimer()
 
     const sourceUrl = await resolvePlaybackUrl(mediaSnapshot)
 
@@ -220,19 +186,6 @@ export function usePlyrMediaLifecycle(props, mediaEl, options = {}) {
     onPlaybackReady?.()
   }
 
-  useEventListener(document, 'visibilitychange', () => {
-    if (document.visibilityState !== 'visible' || !media.value.privateId) {
-      return
-    }
-
-    const session = mediaSessionQuery.data.value
-    const expiresAtMs = session?.expiresAt ? session.expiresAt * 1000 : 0
-    const isStale = !expiresAtMs || expiresAtMs - Date.now() <= MEDIA_SESSION_REFRESH_HEADROOM_MS
-    if (isStale) {
-      void syncPlaybackLifecycle({ rebuild: false })
-    }
-  })
-
   const playbackLifecycleKey = computed(
     () => `${media.value.privateId}|${media.value.type}|${media.value.orientation}`
   )
@@ -247,7 +200,6 @@ export function usePlyrMediaLifecycle(props, mediaEl, options = {}) {
 
   onBeforeUnmount(() => {
     lifecycleRunId += 1
-    clearMediaSessionRefreshTimer()
     destroyPlayers()
   })
 
