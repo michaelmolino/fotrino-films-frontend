@@ -70,14 +70,14 @@
             <q-tooltip>Requeue</q-tooltip>
           </q-btn>
           <q-btn
-            v-else-if="props.row.status === 'doing'"
+            v-else-if="props.row.status === 'doing' || props.row.status === 'stalled'"
             dense
             size="sm"
             flat
             color="warning"
             icon="restart_alt"
             @click="runAction(props.row)">
-            <q-tooltip>Requeue Running Job</q-tooltip>
+            <q-tooltip>Requeue Running/Stalled Job</q-tooltip>
           </q-btn>
           <span v-else class="text-grey-6">-</span>
         </q-td>
@@ -95,7 +95,7 @@ import { notifyError, notifySuccess } from 'src/utils/notify.js'
 
 const adminStore = useAdminStore()
 const JOB_FILTER_KEY = 'admin.jobs.filterMode'
-const JOB_FILTER_VALUES = new Set(['all', 'todo', 'doing', 'failed'])
+const JOB_FILTER_VALUES = new Set(['all', 'todo', 'doing', 'stalled', 'failed'])
 
 function getInitialJobFilterMode() {
   if (globalThis.window === undefined) {
@@ -115,6 +115,7 @@ const tablePagination = { rowsPerPage: 0 }
 const FILTER_STATUSES = [
   { value: 'todo', label: 'Pending' },
   { value: 'doing', label: 'Running' },
+  { value: 'stalled', label: 'Stalled' },
   { value: 'failed', label: 'Failed' }
 ]
 
@@ -122,6 +123,7 @@ const statusCounts = computed(() => {
   const counts = {
     todo: 0,
     doing: 0,
+    stalled: 0,
     failed: 0
   }
   for (const job of jobs.value) {
@@ -181,6 +183,7 @@ function statusColor(status) {
   if (status === 'failed') return 'negative'
   if (status === 'todo') return 'primary'
   if (status === 'doing') return 'warning'
+  if (status === 'stalled') return 'negative'
   return 'grey-6'
 }
 

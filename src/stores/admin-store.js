@@ -113,7 +113,7 @@ export const useAdminStore = defineStore('admin', () => {
       invalidateQueriesSafely(queryCache, { key: ['admin', 'jobs'] })
       return mutationResult({ ok: true, data: 'replayed' })
     }
-    if (job.status === 'doing') {
+    if (job.status === 'doing' || job.status === 'stalled') {
       await runMutation({
         request: () => api.post(`/admin/jobs/doing/${job.id}/requeue`)
       })
