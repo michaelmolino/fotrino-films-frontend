@@ -92,9 +92,25 @@ function buildStoredHistoryFromResolvedItems(items) {
   }))
 }
 
+function resolveChannelHistoryDetails(channel) {
+  if (!channel) {
+    return { title: undefined, cover: undefined, canonicalPath: undefined }
+  }
+
+  return {
+    title: channel.title,
+    cover: resolveImagePrimaryUrl(channel.coverAsset),
+    canonicalPath: channel.canonicalPath
+  }
+}
+
 export function syncHistoryFromRouteContext({ context, channel }) {
   if (!context.isPrivate && channel) {
-    addToHistory({ type: 'channel', resourceId: channel.publicId, details: channel })
+    addToHistory({
+      type: 'channel',
+      resourceId: channel.publicId,
+      details: resolveChannelHistoryDetails(channel)
+    })
   }
 
   if (context.type === 'privateMedia' && context.privateMediaId && channel) {
@@ -144,11 +160,12 @@ export function buildCurrentHistoryEntryFromContext(context) {
 }
 
 export function resolveHistoryTargetPath(entry) {
-  return (
-    entry.canonicalPath.privateAlbumPath ||
-    entry.canonicalPath.privatePath ||
-    entry.canonicalPath.publicPath
-  )
+  const canonicalPath = entry?.canonicalPath
+  if (!canonicalPath || typeof canonicalPath !== 'object') {
+    return null
+  }
+
+  return canonicalPath.privateAlbumPath || canonicalPath.privatePath || canonicalPath.publicPath
 }
 
 export function addToHistory({ type, resourceId, details = {} }) {

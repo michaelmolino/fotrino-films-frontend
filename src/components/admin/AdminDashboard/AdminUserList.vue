@@ -87,47 +87,6 @@
           {{ props.row.lastLogin ? daysSince(props.row.lastLogin, true) : 'Never logged in' }}
         </q-td>
       </template>
-      <template #body-cell-channels="props">
-        <q-td :props="props">
-          <q-expansion-item
-            dense
-            expand-separator
-            :label="getChannelsLabel(props.row)"
-            :disable="props.row.channels.length === 0">
-            <div class="q-py-sm">
-              <div
-                v-for="channel in props.row.channels"
-                :key="channel.publicId"
-                class="channel-row q-px-sm q-py-xs">
-                <div class="row items-center no-wrap">
-                  <q-avatar size="28px" class="q-mr-sm">
-                    <img
-                      :src="resolveChannelCover(channel)"
-                      :alt="`${channel.title} cover`"
-                      loading="lazy"
-                      decoding="async" />
-                  </q-avatar>
-                  <div class="col">
-                    <div>{{ channel.title }}</div>
-                    <div class="text-caption text-grey-6">
-                      Created: {{ daysSince(channel.created, true) }}
-                    </div>
-                  </div>
-                  <q-btn
-                    :to="channel.canonicalPath.publicPath"
-                    icon="link"
-                    flat
-                    dense
-                    size="sm"
-                    color="primary"
-                    :title="`Visit ${channel.title}`"
-                    :aria-label="`Visit ${channel.title}`" />
-                </div>
-              </div>
-            </div>
-          </q-expansion-item>
-        </q-td>
-      </template>
       <template #body-cell-actions="props">
         <q-td :props="props">
           <q-btn
@@ -209,7 +168,7 @@ const filteredUsers = computed(() => {
 const userColumns = [
   { name: 'user', label: 'User', field: 'name', align: 'left' },
   { name: 'lastLogin', label: 'Last Login', field: 'lastLogin', align: 'left' },
-  { name: 'channels', label: 'Channels', field: 'channels', align: 'left' },
+  { name: 'mediaCount', label: 'Media', field: 'mediaCount', align: 'left' },
   { name: 'actions', label: 'Actions', field: 'actions', align: 'center' }
 ]
 const providerIcons = {
@@ -224,17 +183,8 @@ const providerIconClass = computed(() =>
   $q.dark.isActive ? 'oauth-icon--white q-ml-xs' : 'q-ml-xs'
 )
 
-function getChannelsLabel(user) {
-  const count = user.channels.length
-  return count > 0 ? `Show Channels (${count})` : 'No Channels'
-}
-
 function resolveUserAvatar(user) {
   return resolveImagePrimaryUrl(user.avatarAsset)
-}
-
-function resolveChannelCover(channel) {
-  return resolveImagePrimaryUrl(channel.coverAsset)
 }
 
 watch(filterMode, value => {
@@ -313,9 +263,6 @@ watch(
 .avatar-wrap {
   padding-right: 4px;
   min-width: 52px;
-}
-.channel-row + .channel-row {
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
 :deep(.q-table tbody td) {
   padding-top: 10px;
