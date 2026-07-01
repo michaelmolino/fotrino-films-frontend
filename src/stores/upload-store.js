@@ -52,7 +52,7 @@ export const useUploadStore = defineStore('upload', () => {
 
   const requestUploadInstruction = async url => {
     const res = await api.post(url)
-    return mutationResult({ ok: true, data: res.data })
+    return mutationResult({ ok: true, data: res?.data?.data ?? null })
   }
 
   const postUploadDraft = async draftRequest => {
@@ -69,7 +69,11 @@ export const useUploadStore = defineStore('upload', () => {
       }
     })
 
-    const draftData = response.data
+    const draftData = response?.data?.data
+
+    if (!draftData || typeof draftData !== 'object') {
+      throw new Error('Upload draft response is missing data payload')
+    }
 
     setUpload(draftData.instructions)
     return mutationResult({ ok: true, data: draftData })
@@ -89,7 +93,7 @@ export const useUploadStore = defineStore('upload', () => {
         })
     })
 
-    return mutationResult({ ok: true, data: response?.data || { canSubmit: false, blockers: [] } })
+    return mutationResult({ ok: true, data: response?.data?.data ?? null })
   }
 
   const confirmUpload = async mediaPrivateId => {
