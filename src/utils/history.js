@@ -11,6 +11,7 @@ function isValidHistoryEntry(entry) {
   return (
     entry &&
     typeof entry === 'object' &&
+    Object.keys(entry).length === 2 &&
     HISTORY_TYPES.has(entry.type) &&
     typeof entry.resourceId === 'string' &&
     entry.resourceId.length > 0
@@ -206,6 +207,7 @@ export async function resolveHistoryFromBackend(
   }
   const entries = [...history.value]
   const hasCurrentEntry = Boolean(currentEntry?.type && currentEntry?.resourceId)
+  const shouldIncludeCurrentEntry = hasCurrentEntry && entries.length === 0
 
   if (entries.length === 0 && !hasCurrentEntry) {
     historyChannels.value = []
@@ -216,7 +218,7 @@ export async function resolveHistoryFromBackend(
   try {
     const response = await channelStore.resolveHistory({
       items: entries,
-      current: hasCurrentEntry ? currentEntry : null
+      current: shouldIncludeCurrentEntry ? currentEntry : null
     })
     const items = response.items
     const deletedItems = response.deletedItems
