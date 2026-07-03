@@ -16,6 +16,8 @@ The demo runs on a small deployment for evaluation purposes. It is not represent
 [![SSL Labs SSL Server Test](https://img.shields.io/badge/SSL%20LABS-A%2B-brightgreen?style=for-the-badge)](https://www.ssllabs.com/ssltest/analyze.html?d=films.fotrino.com)
 [![Mozilla HTTP Observatory Grade](https://img.shields.io/mozilla-observatory/grade/films.fotrino.com?publish&style=for-the-badge)](https://observatory.mozilla.org/analyze/films.fotrino.com)
 
+[![Status Monitor](https://img.shields.io/badge/Visit-Status%20Monitor-F2FDFF?style=for-the-badge)](https://stats.uptimerobot.com/7YZWdybJAr)
+
 ## Architecture & Development
 
 ![Architecture Diagram](./docs/fotrino-architecture.png)
