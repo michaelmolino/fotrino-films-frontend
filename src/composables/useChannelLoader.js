@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useQueryCache } from '@pinia/colada'
 import { useChannelStore } from 'src/stores/channel-store.js'
 import { useRoute, useRouter } from 'vue-router'
@@ -96,6 +96,42 @@ export function useChannelLoader({ manageMeta = false } = {}) {
     return albumPublicId ? findAlbumByPublicId(albumPublicId) : null
   }
 
+  const findPrivateMediaById = privateMediaId => {
+    if (!privateMediaId) return null
+    return (
+      (channel.value?.album?.media || []).find(media => media?.privateId === privateMediaId) || null
+    )
+  }
+
+  const resolveContextCanonicalPath = context => {
+    if (!context || !channel.value) return null
+
+    if (context.type === 'channel') {
+      if (!channel.value.publicId || !channel.value.slug) return null
+      return {
+        publicPath: `/c/${channel.value.publicId}/${channel.value.slug}`
+      }
+    }
+
+    if (context.type === 'album') {
+      return findAlbumByPublicId(context.albumPublicId)?.canonicalPath || null
+    }
+
+    if (context.type === 'media') {
+      return findMediaByPublicId(context.mediaPublicId)?.canonicalPath || null
+    }
+
+    if (context.type === 'privateAlbum') {
+      return channel.value.album?.canonicalPath || null
+    }
+
+    if (context.type === 'privateAlbumMedia' || context.type === 'privateMedia') {
+      return findPrivateMediaById(context.privateMediaId)?.canonicalPath || null
+    }
+
+    return null
+  }
+
   const runRouteQuery = async options => {
     const entry = queryCache.ensure(options)
     const state = await queryCache.refresh(entry, options)
@@ -136,15 +172,26 @@ export function useChannelLoader({ manageMeta = false } = {}) {
   }
 
   const syncCanonicalSlugs = ({ route, context }) => {
+    const contextCanonicalPath = resolveContextCanonicalPath(context)
     const canonicalPath = resolveCanonicalPathForRoute({
       context,
-      canonicalPath: channel.value?.canonicalPath
+      canonicalPath: contextCanonicalPath
     })
 
     if (canonicalPath && canonicalPath !== route.path) {
       router.replace({ path: canonicalPath, query: route.query })
     }
   }
+
+  watch(
+    [channel, routeContext],
+    ([currentChannel, context]) => {
+      if (!currentChannel) return
+
+      currentChannel.canonicalPath = resolveContextCanonicalPath(context)
+    },
+    { immediate: true }
+  )
 
   /**
    * Load channel data from route params and update store/router/metadata

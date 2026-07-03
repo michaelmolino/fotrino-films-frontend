@@ -1,5 +1,5 @@
 <template>
-  <div v-if="primaryAction" ref="containerRef" class="share-actions-floating">
+  <div v-if="primaryAction && isCanonicalPathFresh" ref="containerRef" class="share-actions-floating">
     <q-btn
       icon="share"
       :round="true"
@@ -78,10 +78,14 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { copyToClipboard } from 'quasar'
 import { notifyInfo } from 'src/utils/notify.js'
+import {
+  isCanonicalPathCompatibleWithRouteTarget,
+  toChannelRouteTargetFromContext
+} from '@utils/channel-route.js'
 
 const props = defineProps({
   channel: { type: Object, required: true },
@@ -96,6 +100,40 @@ const containerRef = ref(null)
 const route = useRoute()
 
 const routeType = computed(() => props.routeContext.type)
+
+const activeCanonicalPath = computed(() => {
+  if (routeType.value === 'channel') {
+    return props.channel?.canonicalPath?.publicPath || null
+  }
+
+  if (routeType.value === 'album') {
+    return props.album?.canonicalPath?.publicPath || null
+  }
+
+  if (routeType.value === 'privateAlbum') {
+    return props.album?.canonicalPath?.privatePath || null
+  }
+
+  if (routeType.value === 'media') {
+    return props.media?.canonicalPath?.publicPath || null
+  }
+
+  if (routeType.value === 'privateAlbumMedia') {
+    return props.media?.canonicalPath?.privateAlbumPath || null
+  }
+
+  if (routeType.value === 'privateMedia') {
+    return props.media?.canonicalPath?.privatePath || null
+  }
+
+  return null
+})
+
+const isCanonicalPathFresh = computed(() => {
+  const target = toChannelRouteTargetFromContext(props.routeContext)
+  const canonicalPath = activeCanonicalPath.value
+  return isCanonicalPathCompatibleWithRouteTarget(canonicalPath, target)
+})
 
 const shareActionTemplates = {
   channel: {
@@ -143,7 +181,7 @@ const shareActionTemplates = {
 }
 
 const channelMenuActions = computed(() => {
-  return [{ ...shareActionTemplates.channel, path: route.path }]
+  return [{ ...shareActionTemplates.channel, path: props.channel.canonicalPath.publicPath }]
 })
 
 const albumMenuActions = computed(() => {
@@ -259,8 +297,21 @@ onBeforeUnmount(() => {
   document.removeEventListener('keydown', handleEscape)
 })
 
+watch(
+  () => route.path,
+  () => {
+    closeMenu()
+  }
+)
+
 function copyLink(path) {
-  copyToClipboard(`${globalThis.location.origin}${path}`).then(() => {
+  const absolutePath = `${globalThis.location.origin}${path}`
+  const clipboard = globalThis.navigator?.clipboard
+  const copyPromise = clipboard?.writeText
+    ? clipboard.writeText(absolutePath)
+    : copyToClipboard(absolutePath)
+
+  copyPromise.then(() => {
     notifyInfo('Link copied to clipboard.', {
       color: 'accent',
       icon: 'content_paste',
