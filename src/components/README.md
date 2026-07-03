@@ -1,6 +1,7 @@
 # Components Readability Patterns
 
-This folder uses a view-model-first component pattern to keep templates easy to scan and scripts easy to test.
+Route-driven root components in this folder use a view-model-first pattern to keep templates easy to scan and scripts easy to test.
+Smaller pages and leaf components may use simpler `contentState`-style branching without the full split.
 
 The main goal is to make component intent obvious:
 
@@ -59,7 +60,7 @@ For route-driven roots, keep responsibilities explicit:
 - `useChannelLoader`: load channel-level data and finder helpers.
 - `use*RouteEntities`: resolve route targets (album/media) from `routeContext` and loaded data.
 - `use*RootViewModel`: compute render-ready state and card arrays.
-- `use*RouteOrchestrator`: enforce redirects/not-found behavior and navigation flow.
+- `use*RouteOrchestrator`: enforce redirects/not-found behavior and navigation flow. The filename may be shared even when the exported orchestrator name is specific to the root.
 
 This split keeps rendering concerns independent from navigation policy.
 
@@ -102,7 +103,7 @@ export function useExampleRootViewModel({ loading, entity, routeContext, items }
       context: routeContext.value,
       canonicalPath: item.canonicalPath
     })
-  })
+  }
 
   const itemCards = computed(() => {
     return items.value.map((item, index) => ({
@@ -167,4 +168,4 @@ These patterns are already used in channel roots and related composables:
 - `useAlbumRouteEntities` and `useMediaRouteEntities`
 - `useChannelRootRouteOrchestrator`, `useAlbumRootRouteOrchestrator`, `useMediaRootRouteOrchestrator`
 
-Use those files as canonical examples when adding or refactoring components in this folder.
+Use those files as canonical examples when adding or refactoring route-driven components in this folder.
