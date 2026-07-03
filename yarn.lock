@@ -4372,10 +4372,10 @@ qs@6.15.3, qs@~6.14.0:
     es-define-property "^1.0.1"
     side-channel "^1.1.1"
 
-quasar@2.20.3:
-  version "2.20.3"
-  resolved "https://registry.yarnpkg.com/quasar/-/quasar-2.20.3.tgz#efaa7f6bed05cd8997fb5e3afd5c0a00cf14c3dc"
-  integrity sha512-lOM/W9P4vech4y/LZO6U60mcEbkPSfHOoyiG6TMh3/Ftuj7d5ipB4i3AhNgScCMzuuiBqFfvSZiph3TUce5fwQ==
+quasar@2.21.0:
+  version "2.21.0"
+  resolved "https://registry.yarnpkg.com/quasar/-/quasar-2.21.0.tgz#178dc59b899843e6c923155b574fa8d7af24a692"
+  integrity sha512-101qA4iBlEF3538xxOA8ekgeell5g9dcj2R5MMaG4wCbhLO52iDmETipCEXPiKtg1H3YWkgBU67QG9Q6GAkY6A==
 
 range-parser@~1.2.1:
   version "1.2.1"
