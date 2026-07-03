@@ -104,9 +104,12 @@ export const useUploadStore = defineStore('upload', () => {
     return mutationResult({ ok: true })
   }
 
-  const abortUpload = async mediaPrivateId => {
+  const abortUpload = async (mediaPrivateId, { skipDeleteConfirm = false } = {}) => {
     const response = await runMutation({
-      request: () => api.delete(`/uploads/media/${mediaPrivateId}/abort`),
+      request: () =>
+        api.delete(`/uploads/media/${mediaPrivateId}/abort`, {
+          __skipDeleteConfirm: skipDeleteConfirm
+        }),
       onError: error => {
         if (error?.__userCancelled) {
           return CANCELLED

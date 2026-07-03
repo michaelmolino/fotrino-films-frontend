@@ -424,6 +424,11 @@ export function useUploadMediaForm() {
       return
     }
 
+    if (!mediaFile.value) {
+      validation.value = { canSubmit: false, blockers: ['media.required'] }
+      return
+    }
+
     if (validationInFlightPromise) {
       await validationInFlightPromise
       return
@@ -735,6 +740,10 @@ export function useUploadMediaForm() {
   watch(
     () => payload.publicId?.value,
     async newPublicId => {
+      if (!mediaFile.value) {
+        return
+      }
+
       if (!syncAlbumSelectionForChannelMode(payload.channelMode, newPublicId)) {
         return
       }
@@ -752,6 +761,10 @@ export function useUploadMediaForm() {
 
   watch(channels, channelList => {
     if (!channelsHydrated.value) {
+      return
+    }
+
+    if (!mediaFile.value) {
       return
     }
 
@@ -787,6 +800,8 @@ export function useUploadMediaForm() {
       if (payload.album.media.previewType === 'frame') {
         setPreviewThumbRandom(null)
       }
+
+      setDefaultChannelSelection(channels.value || [])
     } else {
       payload.album.media.filename = null
       disposeFrameSession()
@@ -821,16 +836,28 @@ export function useUploadMediaForm() {
       channelsHydrated.value = true
     }
 
-    const list = channels.value || []
-    setDefaultChannelSelection(list)
+    if (mediaFile.value) {
+      const list = channels.value || []
+      const previousChannelMode = payload.channelMode
+      const previousPublicId = payload.publicId?.value ?? null
+      setDefaultChannelSelection(list)
+      const nextPublicId = payload.publicId?.value ?? null
+      const channelSelectionChanged =
+        payload.channelMode !== previousChannelMode || nextPublicId !== previousPublicId
 
-    if (payload.channelMode === 'existing' && payload.publicId?.value) {
-      const requestToken = ++albumsLoadToken.value
-      await loadAlbumsForChannelPublicId(payload.publicId.value, requestToken)
-      setDefaultProjectSelection(albums.value || [])
+      if (!channelSelectionChanged && payload.channelMode === 'existing' && payload.publicId?.value) {
+        const requestToken = ++albumsLoadToken.value
+        await loadAlbumsForChannelPublicId(payload.publicId.value, requestToken)
+        setDefaultProjectSelection(albums.value || [])
+      }
+
+      if (!channelSelectionChanged) {
+        await refreshValidation()
+      }
+    } else {
+      validation.value = { canSubmit: false, blockers: ['media.required'] }
     }
 
-    await refreshValidation()
     globalThis.addEventListener('beforeunload', beforeUnloadHandler)
   })
 
