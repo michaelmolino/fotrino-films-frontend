@@ -93,6 +93,14 @@ function buildStoredHistoryFromResolvedItems(items) {
   }))
 }
 
+function buildHistoryEntryKey(type, resourceId) {
+  return `${type}:${resourceId}`
+}
+
+function buildHistoryEntryKeySet(entries) {
+  return new Set(entries.map(item => buildHistoryEntryKey(item.type, item.resourceId)))
+}
+
 function resolveChannelHistoryDetails(channel) {
   if (!channel) {
     return { title: undefined, cover: undefined, canonicalPath: undefined }
@@ -106,42 +114,50 @@ function resolveChannelHistoryDetails(channel) {
 }
 
 export function syncHistoryFromRouteContext({ context, channel }) {
+  let hasChanged = false
+
   if (!context.isPrivate && channel) {
-    addToHistory({
-      type: 'channel',
-      resourceId: channel.publicId,
-      details: resolveChannelHistoryDetails(channel)
-    })
+    hasChanged =
+      addToHistory({
+        type: 'channel',
+        resourceId: channel.publicId,
+        details: resolveChannelHistoryDetails(channel)
+      }) || hasChanged
   }
 
   if (context.type === 'privateMedia' && context.privateMediaId && channel) {
     const media = channel.album.media.find(item => item.privateId === context.privateMediaId)
 
-    addToHistory({
-      type: 'privateMedia',
-      resourceId: context.privateMediaId,
-      details: {
-        title: media.title || channel.title,
-        cover:
-          resolveImagePrimaryUrl(media.previewAsset) || resolveImagePrimaryUrl(channel.coverAsset),
-        canonicalPath: media.canonicalPath
-      }
-    })
+    hasChanged =
+      addToHistory({
+        type: 'privateMedia',
+        resourceId: context.privateMediaId,
+        details: {
+          title: media.title || channel.title,
+          cover:
+            resolveImagePrimaryUrl(media.previewAsset) ||
+            resolveImagePrimaryUrl(channel.coverAsset),
+          canonicalPath: media.canonicalPath
+        }
+      }) || hasChanged
   }
 
   if (context.privateAlbumId && channel.album) {
     const album = channel.album
-    addToHistory({
-      type: 'privateAlbum',
-      resourceId: context.privateAlbumId,
-      details: {
-        title: album.title || channel.title,
-        cover:
-          resolveImagePrimaryUrl(album.posterAsset) || resolveImagePrimaryUrl(channel.coverAsset),
-        canonicalPath: album.canonicalPath
-      }
-    })
+    hasChanged =
+      addToHistory({
+        type: 'privateAlbum',
+        resourceId: context.privateAlbumId,
+        details: {
+          title: album.title || channel.title,
+          cover:
+            resolveImagePrimaryUrl(album.posterAsset) || resolveImagePrimaryUrl(channel.coverAsset),
+          canonicalPath: album.canonicalPath
+        }
+      }) || hasChanged
   }
+
+  return hasChanged
 }
 
 export function buildCurrentHistoryEntryFromContext(context) {
@@ -171,8 +187,12 @@ export function resolveHistoryTargetPath(entry) {
 
 export function addToHistory({ type, resourceId, details = {} }) {
   const entry = { type, resourceId }
-  if (history.value.some(item => `${item.type}:${item.resourceId}` === `${type}:${resourceId}`))
-    return
+  const entryKey = buildHistoryEntryKey(type, resourceId)
+  const historyKeys = buildHistoryEntryKeySet(history.value)
+
+  if (historyKeys.has(entryKey)) {
+    return false
+  }
 
   const updated = [...history.value, entry]
   commitHistory(updated)
@@ -190,6 +210,8 @@ export function addToHistory({ type, resourceId, details = {} }) {
       }
     ]
   }
+
+  return true
 }
 
 export function removeHistory(resourceId, type = null) {
