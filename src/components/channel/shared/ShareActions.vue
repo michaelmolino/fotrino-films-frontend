@@ -314,10 +314,7 @@ watch(
 
 function copyLink(path) {
   const absolutePath = `${globalThis.location.origin}${path}`
-  const clipboard = globalThis.navigator?.clipboard
-  const copyPromise = clipboard?.writeText
-    ? clipboard.writeText(absolutePath)
-    : copyToClipboard(absolutePath)
+  const copyPromise = copyToClipboard(absolutePath)
 
   copyPromise.then(() => {
     dismissShareNotification = notifyInfo('Link copied to clipboard.', {
