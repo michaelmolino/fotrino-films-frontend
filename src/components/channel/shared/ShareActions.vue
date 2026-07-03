@@ -1,5 +1,8 @@
 <template>
-  <div v-if="primaryAction && isCanonicalPathFresh" ref="containerRef" class="share-actions-floating">
+  <div
+    v-if="primaryAction && isCanonicalPathFresh"
+    ref="containerRef"
+    class="share-actions-floating">
     <q-btn
       icon="share"
       :round="true"

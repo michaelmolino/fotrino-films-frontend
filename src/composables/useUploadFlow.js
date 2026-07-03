@@ -28,9 +28,11 @@ export function useUploadFlow({ uploadStore, getDraftRequest, stepper }) {
     // Abort any pending upload left over from a previous failed attempt so the
     // new draft creation does not hit a conflict on the existing pending record.
     if (activeMediaRef.value != null) {
-      await uploadStore.abortUpload(activeMediaRef.value, { skipDeleteConfirm: true }).catch(err => {
-        console.warn('Failed to abort stale pending upload on retry:', err)
-      })
+      await uploadStore
+        .abortUpload(activeMediaRef.value, { skipDeleteConfirm: true })
+        .catch(err => {
+          console.warn('Failed to abort stale pending upload on retry:', err)
+        })
       activeMediaRef.value = null
     }
 

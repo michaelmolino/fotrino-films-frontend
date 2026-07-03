@@ -845,7 +845,11 @@ export function useUploadMediaForm() {
       const channelSelectionChanged =
         payload.channelMode !== previousChannelMode || nextPublicId !== previousPublicId
 
-      if (!channelSelectionChanged && payload.channelMode === 'existing' && payload.publicId?.value) {
+      if (
+        !channelSelectionChanged &&
+        payload.channelMode === 'existing' &&
+        payload.publicId?.value
+      ) {
         const requestToken = ++albumsLoadToken.value
         await loadAlbumsForChannelPublicId(payload.publicId.value, requestToken)
         setDefaultProjectSelection(albums.value || [])

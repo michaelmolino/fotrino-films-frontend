@@ -34,7 +34,9 @@ The demo runs on a small deployment for evaluation purposes. It is not represent
   - API - A [Flask](https://flask.palletsprojects.com/en/stable/) (Python) application.
 
     [![OpenAPI Docs](https://img.shields.io/badge/Visit-OpenAPI%20Docs-CAA8F5?style=for-the-badge)](https://openapi.fotrino.com/)
+
   - Async Worker - Runs asynchronous media workflows (transcoding, HLS packaging, image conversion, and deletion) with [Procrastinate](https://procrastinate.readthedocs.io/en/stable/index.html) and [ffmpeg](https://ffmpeg.org/). Jobs are persisted in Postgres rather than an external queue, a deliberate architectural choice for reliability and operational simplicity.
+
 - Cypress Tests - End-to-end tests covering key user journeys.
 - Infrastructure
   - Prerenderer - Serves prerendered pages with metadata for bots that do not execute JavaScript (mostly so link previews work).
