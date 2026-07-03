@@ -39,7 +39,7 @@ The demo runs on a small deployment for evaluation purposes. It is not represent
 - Infrastructure
   - Prerenderer - Serves prerendered pages with metadata for bots that do not execute JavaScript (mostly so link previews work).
   - Session Validator - Ensures users have a valid media session before serving assets from a private bucket.
-  - Terraform - All infrastructure, except the secrets manager, is deployed via Terraform.
+  - Terraform - All infrastructure is deployed via Terraform.
   - Environment Variables (no secrets) - Required production environment variables.
 
 ## AI Usage
