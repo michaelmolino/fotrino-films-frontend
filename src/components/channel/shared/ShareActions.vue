@@ -98,6 +98,7 @@ const showAdvanced = ref(false)
 const menuOpen = ref(false)
 const containerRef = ref(null)
 const route = useRoute()
+let dismissShareNotification = null
 
 const routeType = computed(() => props.routeContext.type)
 
@@ -268,6 +269,10 @@ function toggleMenu() {
 }
 
 function onAction(path) {
+  if (dismissShareNotification) {
+    dismissShareNotification()
+    dismissShareNotification = null
+  }
   copyLink(path)
   closeMenu()
 }
@@ -312,7 +317,7 @@ function copyLink(path) {
     : copyToClipboard(absolutePath)
 
   copyPromise.then(() => {
-    notifyInfo('Link copied to clipboard.', {
+    dismissShareNotification = notifyInfo('Link copied to clipboard.', {
       color: 'accent',
       icon: 'content_paste',
       timeout: 1000
