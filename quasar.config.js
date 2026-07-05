@@ -122,22 +122,22 @@ export default defineConfig(ctx => {
     devServer: isProduction
       ? undefined
       : {
-        https: true,
-        host: 'fotrino.example.com',
-        port: 8080,
-        open: env.COVERAGE !== 'true',
-        proxy: Object.fromEntries(
-          apiProxyPrefixes.map(prefix => [
-            prefix,
-            {
-              target: devProxyTarget,
-              changeOrigin: true,
-              secure: false,
-              configure: configureForwardedHeaders
-            }
-          ])
-        )
-      },
+          https: true,
+          host: 'fotrino.example.com',
+          port: 8080,
+          open: env.COVERAGE !== 'true',
+          proxy: Object.fromEntries(
+            apiProxyPrefixes.map(prefix => [
+              prefix,
+              {
+                target: devProxyTarget,
+                changeOrigin: true,
+                secure: false,
+                configure: configureForwardedHeaders
+              }
+            ])
+          )
+        },
 
     framework: {
       iconSet: 'material-icons',
