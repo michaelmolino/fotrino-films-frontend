@@ -9,7 +9,6 @@ This project is under active development and should be considered pre-production
 ## Demo
 
 [![Live Demo](https://img.shields.io/badge/Visit-Live%20Demo-1f7a8c?style=for-the-badge)](https://films.fotrino.com/)
-
 ![Uptime Robot ratio (30 days)](https://img.shields.io/uptimerobot/ratio/m790680436-a2d6dce12fb55d496ecc9bd2?style=for-the-badge&label=Status%20Monitor&link=https%3A%2F%2Fstats.uptimerobot.com%2F7YZWdybJAr)
 
 The demo runs on a small deployment for evaluation purposes. It is not representative of production scale or performance characteristics. The service may be intermittently unavailable due to maintenance, resets, or resource constraints.

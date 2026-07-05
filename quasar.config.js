@@ -58,7 +58,7 @@ export default defineConfig(ctx => {
   const isProduction = envMode === 'production'
   const apiBaseUrl = requireEnv(env, 'FOTRINO_API_URL')
   const siteBaseUrl = requireEnv(env, 'FOTRINO_BASE_URL')
-  const devProxyTarget = requireEnv(env, 'DEV_PROXY_TARGET', { required: !isProduction })
+  const devProxyTarget = requireEnv(env, 'DEV_API_PROXY_TARGET', { required: !isProduction })
 
   return {
     supportTS: false,
@@ -122,22 +122,22 @@ export default defineConfig(ctx => {
     devServer: isProduction
       ? undefined
       : {
-          https: true,
-          host: 'fotrino.example.com',
-          port: 8080,
-          open: env.COVERAGE !== 'true',
-          proxy: Object.fromEntries(
-            apiProxyPrefixes.map(prefix => [
-              prefix,
-              {
-                target: devProxyTarget,
-                changeOrigin: true,
-                secure: false,
-                configure: configureForwardedHeaders
-              }
-            ])
-          )
-        },
+        https: true,
+        host: 'fotrino.example.com',
+        port: 8080,
+        open: env.COVERAGE !== 'true',
+        proxy: Object.fromEntries(
+          apiProxyPrefixes.map(prefix => [
+            prefix,
+            {
+              target: devProxyTarget,
+              changeOrigin: true,
+              secure: false,
+              configure: configureForwardedHeaders
+            }
+          ])
+        )
+      },
 
     framework: {
       iconSet: 'material-icons',
