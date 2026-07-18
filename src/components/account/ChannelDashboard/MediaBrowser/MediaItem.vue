@@ -150,15 +150,11 @@ function setLocalPreviewImage(url) {
   editPreviewImage.value = url || resolveImagePrimaryUrl(props.media?.previewAsset) || null
 }
 
-function toResourceDate(raw) {
-  return raw ? raw.slice(0, 10) : null
-}
-
 function openEditDialog() {
   editForm.value = {
     title: props.media?.title ?? '',
     description: props.media?.descriptionUnsafe ?? null,
-    resourceDate: toResourceDate(props.media?.resourceDate),
+    resourceDate: props.media?.resourceDate ?? null,
     main: !!props.media?.main
   }
   resetPreviewFile()
