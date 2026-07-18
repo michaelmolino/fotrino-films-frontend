@@ -190,8 +190,8 @@
           @show="onItemSelect('filesize')">
           <q-card>
             <q-card-section>
-              The maximum file size for uploads is {{ UPLOAD_MEDIA_FILE_SIZE_LABEL }}.
-              If you have a legitimate need for larger uploads, contact support first.
+              The maximum file size for uploads is {{ UPLOAD_MEDIA_FILE_SIZE_LABEL }}. If you have a
+              legitimate need for larger uploads, contact support first.
             </q-card-section>
           </q-card>
         </q-expansion-item>
