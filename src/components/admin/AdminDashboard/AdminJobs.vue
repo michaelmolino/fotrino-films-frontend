@@ -47,6 +47,11 @@
           </q-expansion-item>
         </q-td>
       </template>
+      <template #body-cell-lastError="props">
+        <q-td :props="props">
+          <span style="white-space: pre-wrap">{{ props.row.lastError || '-' }}</span>
+        </q-td>
+      </template>
       <template #body-cell-actions="props">
         <q-td :props="props">
           <q-btn
@@ -171,7 +176,7 @@ const jobColumns = [
   { name: 'attempts', label: 'Attempts', field: 'attempts', align: 'right' },
   { name: 'payload', label: 'Payload', field: 'payload', align: 'left' },
   {
-    name: 'last_error',
+    name: 'lastError',
     label: 'Last Error',
     field: 'lastError',
     align: 'left'
