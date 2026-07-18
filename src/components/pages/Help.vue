@@ -190,10 +190,8 @@
           @show="onItemSelect('filesize')">
           <q-card>
             <q-card-section>
-              Large uploads are supported, but please keep them to reasonable sizes, such as under
-              20GB. Extremely large uploads may trigger manual review and could put your content or
-              account at risk if they appear abusive. If you have a legitimate need for larger
-              uploads, contact support first.
+              The maximum file size for uploads is {{ UPLOAD_MEDIA_FILE_SIZE_LABEL }}.
+              If you have a legitimate need for larger uploads, contact support first.
             </q-card-section>
           </q-card>
         </q-expansion-item>
@@ -207,6 +205,7 @@
 import facebookIcon from '@assets/icons/facebook.svg'
 import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { UPLOAD_MEDIA_FILE_SIZE_LABEL } from 'src/utils/upload-limits.js'
 
 defineOptions({ name: 'Help-Page' })
 const route = useRoute()

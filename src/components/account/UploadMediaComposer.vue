@@ -31,6 +31,7 @@
                 outlined
                 :model-value="mediaFile"
                 accept="video/*"
+                :max-file-size="UPLOAD_MEDIA_FILE_SIZE_BYTES"
                 color="accent"
                 data-cy="upload-media-file"
                 @update:model-value="onComposerMediaFileUpdate"
@@ -45,6 +46,9 @@
                     class="cursor-pointer" />
                 </template>
               </q-file>
+              <div class="text-caption text-grey-7 q-mt-sm">
+                Uploads are limited to {{ UPLOAD_MEDIA_FILE_SIZE_LABEL }}.
+              </div>
             </q-card-section>
           </q-card>
 
@@ -196,6 +200,10 @@ import { useUploadMediaForm } from '@composables/useUploadMediaForm.js'
 import { daysSince } from '@utils/date.js'
 import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 import { sanitizeHtml, sanitizeText } from '@utils/text.js'
+import {
+  UPLOAD_MEDIA_FILE_SIZE_BYTES,
+  UPLOAD_MEDIA_FILE_SIZE_LABEL
+} from 'src/utils/upload-limits.js'
 import { notifyWarning } from 'src/utils/notify.js'
 
 const $q = useQuasar()
@@ -783,6 +791,13 @@ watch(isMediaReady, ready => {
 function onMediaFileRejected(rejectedEntries) {
   const first = rejectedEntries?.[0]
   const failedProp = first?.failedPropValidation || first?.failedProp
+
+  if (failedProp === 'max-file-size') {
+    notifyWarning(
+      `Selected file is too large. The maximum upload size is ${UPLOAD_MEDIA_FILE_SIZE_LABEL}.`
+    )
+    return
+  }
 
   if (failedProp === 'accept') {
     notifyWarning('Unsupported file type. Please choose a video file.')

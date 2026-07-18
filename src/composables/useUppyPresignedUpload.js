@@ -1,6 +1,7 @@
 import { markRaw, ref, shallowRef } from 'vue'
 import { createPresignedUppyClient } from '@clients/uppy-upload-client.js'
 import { useAccountStore } from 'src/stores/account-store'
+import { UPLOAD_MEDIA_FILE_SIZE_BYTES } from 'src/utils/upload-limits.js'
 
 // Manage presigned uploads and expose reactive upload state.
 export function useUppyPresignedUpload() {
@@ -39,6 +40,7 @@ export function useUppyPresignedUpload() {
     const createdClient = createPresignedUppyClient({
       id: 'presigned-uploader',
       instructions,
+      maxFileSize: UPLOAD_MEDIA_FILE_SIZE_BYTES,
       uploadEndpoint: '/uppy',
       headers: accountStore?.profile?.csrfToken
         ? { 'X-CSRFToken': accountStore.profile.csrfToken }

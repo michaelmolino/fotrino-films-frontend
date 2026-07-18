@@ -1,0 +1,2 @@
+export const UPLOAD_MEDIA_FILE_SIZE_BYTES = 8 * 1024 * 1024 * 1024
+export const UPLOAD_MEDIA_FILE_SIZE_LABEL = '8 GB'
