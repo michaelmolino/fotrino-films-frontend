@@ -84,7 +84,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { copyToClipboard } from 'quasar'
-import { notifyInfo } from 'src/utils/notify.js'
+import { notifyInfo } from '@/utils/notify.js'
 import {
   isCanonicalPathCompatibleWithRouteTarget,
   toChannelRouteTargetFromContext

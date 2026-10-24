@@ -205,7 +205,7 @@
 import facebookIcon from '@assets/icons/facebook.svg'
 import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { UPLOAD_MEDIA_FILE_SIZE_LABEL } from 'src/utils/upload-limits.js'
+import { UPLOAD_MEDIA_FILE_SIZE_LABEL } from '@/utils/upload-limits.js'
 
 defineOptions({ name: 'Help-Page' })
 const route = useRoute()

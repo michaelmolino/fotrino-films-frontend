@@ -31,7 +31,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { useAccountStore } from 'src/stores/account-store.js'
+import { useAccountStore } from '@/stores/account-store.js'
 import { useQuasar } from 'quasar'
 import googleIcon from '@assets/icons/google.svg'
 import microsoftIcon from '@assets/icons/microsoft.svg'
@@ -81,7 +81,7 @@ const providerMap = {
 
 function getProviderLoginHref(providerKey) {
   const returnTo = route.fullPath
-  return `${process.env.FOTRINO_API_URL}/account/login/${providerKey}?redirect_to=${encodeURIComponent(returnTo)}`
+  return `${import.meta.env.FOTRINO_API_URL}/account/login/${providerKey}?redirect_to=${encodeURIComponent(returnTo)}`
 }
 
 const oauthProviders = computed(() => {

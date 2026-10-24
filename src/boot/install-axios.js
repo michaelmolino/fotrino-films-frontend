@@ -1,14 +1,14 @@
 import { boot } from 'quasar/wrappers'
 import { Dialog, Loading } from 'quasar'
-import { useAccountStore } from 'src/stores/account-store'
-import { api } from 'src/clients/axios-client.js'
-import { confirmDestructiveAction, notifyError } from 'src/utils/notify.js'
+import { useAccountStore } from '@/stores/account-store'
+import { api } from '@/clients/axios-client.js'
+import { confirmDestructiveAction, notifyError } from '@/utils/notify.js'
 import {
   getCloudflareGatewayErrorPayload,
   getComponentApiErrorPayload,
   getGlobalApiErrorPayload,
   getGlobalApiErrorMessage
-} from 'src/utils/api-error-service.js'
+} from '@/utils/api-error-service.js'
 import CloudflareGatewayErrorDialog from '@components/errors/CloudflareGatewayErrorDialog.vue'
 
 const DEFAULT_REQUEST_POLICY = Object.freeze({

@@ -38,7 +38,7 @@
 import { computed, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
 import { useRoute } from 'vue-router'
-import { useChannelStore } from 'src/stores/channel-store.js'
+import { useChannelStore } from '@/stores/channel-store.js'
 import {
   resolveHistoryTargetPath,
   buildCurrentHistoryEntryFromContext,
@@ -47,7 +47,7 @@ import {
   resolveHistoryFromBackend
 } from '@utils/history.js'
 import { resolveChannelRouteContext } from '@utils/channel-route.js'
-import { notifyWarning } from 'src/utils/notify.js'
+import { notifyWarning } from '@/utils/notify.js'
 
 const channelStore = useChannelStore()
 const $q = useQuasar()

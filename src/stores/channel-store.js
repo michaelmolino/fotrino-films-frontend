@@ -1,14 +1,14 @@
 import { toValue } from 'vue'
 import { defineStore } from 'pinia'
 import { useQuery, useQueryCache } from '@pinia/colada'
-import { API_CACHE_MEDIUM_MS } from 'src/stores/utils/cache-timeouts.js'
-import { mutationResult, runMutation } from 'src/stores/utils/store-mutations.js'
+import { API_CACHE_MEDIUM_MS } from '@/stores/utils/cache-timeouts.js'
+import { mutationResult, runMutation } from '@/stores/utils/store-mutations.js'
 import {
   createApiGetQueryOptionsFactory,
   invalidateQueriesSafely,
   toArray
-} from 'src/stores/utils/query-helpers.js'
-import { api } from 'src/clients/axios-client.js'
+} from '@/stores/utils/query-helpers.js'
+import { api } from '@/clients/axios-client.js'
 
 export const useChannelStore = defineStore('channel', () => {
   const queryCache = useQueryCache()

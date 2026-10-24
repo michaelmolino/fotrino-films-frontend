@@ -1,6 +1,6 @@
 import { computed, ref, watch } from 'vue'
 import { useQueryCache } from '@pinia/colada'
-import { useChannelStore } from 'src/stores/channel-store.js'
+import { useChannelStore } from '@/stores/channel-store.js'
 import { useRoute, useRouter } from 'vue-router'
 import { useMeta } from 'quasar'
 import { getMetaData } from '@utils/meta.js'

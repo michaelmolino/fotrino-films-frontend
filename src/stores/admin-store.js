@@ -1,14 +1,14 @@
 import { defineStore } from 'pinia'
 import { useQuery, useQueryCache } from '@pinia/colada'
-import { mutationResult, runMutation } from 'src/stores/utils/store-mutations.js'
+import { mutationResult, runMutation } from '@/stores/utils/store-mutations.js'
 import { computed } from 'vue'
 import {
   createApiGetQueryOptionsFactory,
   invalidateQueriesSafely,
   toArray
-} from 'src/stores/utils/query-helpers.js'
-import { api } from 'src/clients/axios-client.js'
-import { getGlobalApiErrorPayload } from 'src/utils/api-error-service.js'
+} from '@/stores/utils/query-helpers.js'
+import { api } from '@/clients/axios-client.js'
+import { getGlobalApiErrorPayload } from '@/utils/api-error-service.js'
 
 export const useAdminStore = defineStore('admin', () => {
   const queryCache = useQueryCache()

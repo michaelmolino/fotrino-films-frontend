@@ -3,7 +3,7 @@
  */
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { defineConfig } from '@quasar/app-vite/wrappers'
+import { defineConfig } from '@quasar/app-vite'
 import { loadEnv } from 'vite'
 import { visualizer } from 'rollup-plugin-visualizer'
 import viteCompression from 'vite-plugin-compression'
@@ -69,10 +69,12 @@ export default defineConfig(ctx => {
     build: {
       vueRouterMode: 'history',
       publicPath: '/',
-      env: {
+      defineEnv: {
         FOTRINO_API_URL: apiBaseUrl,
         FOTRINO_BASE_URL: siteBaseUrl,
-        SAMPLE_CHANNEL_CANONICAL_PATH: env.SAMPLE_CHANNEL_CANONICAL_PATH
+        ...(env.SAMPLE_CHANNEL_CANONICAL_PATH
+          ? { SAMPLE_CHANNEL_CANONICAL_PATH: env.SAMPLE_CHANNEL_CANONICAL_PATH }
+          : {})
       },
       sourcemap: !isProduction,
       extendViteConf(viteConf) {

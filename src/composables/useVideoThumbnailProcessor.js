@@ -1,5 +1,5 @@
 import { VideoThumbnailGenerator } from 'browser-video-thumbnail-generator'
-import { randomUnitInterval } from 'src/utils/random.js'
+import { randomUnitInterval } from '@/utils/random.js'
 
 const RANDOM_POSITION_PRECISION = 2
 // For large files, seeking to a random position deep in the file can take

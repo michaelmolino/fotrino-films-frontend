@@ -11,8 +11,8 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useAccountStore } from 'src/stores/account-store.js'
-import { useChannelStore } from 'src/stores/channel-store.js'
+import { useAccountStore } from '@/stores/account-store.js'
+import { useChannelStore } from '@/stores/channel-store.js'
 import ProfileCard from '@components/account/ChannelDashboard/ProfileCard.vue'
 import MediaBrowser from '@components/account/ChannelDashboard/MediaBrowser.vue'
 import NothingText from '@components/shared/NothingText.vue'

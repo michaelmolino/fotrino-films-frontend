@@ -1,7 +1,7 @@
 import { formatTitleWithSubtitle, sanitizeText } from '@utils/text.js'
 import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 
-const FOTRINO_BASE_URL = process.env.FOTRINO_BASE_URL
+const FOTRINO_BASE_URL = import.meta.env.FOTRINO_BASE_URL
 
 function findAlbum(channel, albumPublicId) {
   if (!channel || !albumPublicId) {

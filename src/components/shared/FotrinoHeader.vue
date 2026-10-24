@@ -14,7 +14,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useAccountStore } from 'src/stores/account-store.js'
+import { useAccountStore } from '@/stores/account-store.js'
 
 import LogoBranding from './FotrinoHeader/LogoBranding.vue'
 import HistoryDropdown from './FotrinoHeader/HistoryDropdown.vue'

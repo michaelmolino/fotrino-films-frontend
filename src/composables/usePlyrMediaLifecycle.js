@@ -1,6 +1,6 @@
 import { nextTick, onBeforeUnmount, ref, watch, computed, toRef } from 'vue'
 import { useQuery } from '@pinia/colada'
-import { api } from 'src/clients/axios-client.js'
+import { api } from '@/clients/axios-client.js'
 import { setupVideoPlayback } from '@utils/video-playback'
 
 function createPlyrPlaybackController({ mediaEl }) {

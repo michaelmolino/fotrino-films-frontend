@@ -1,13 +1,13 @@
 import { computed, toValue } from 'vue'
 import { defineStore } from 'pinia'
 import { useQuery, useQueryCache } from '@pinia/colada'
-import { API_CACHE_LONG_MS, API_CACHE_SHORT_MS } from 'src/stores/utils/cache-timeouts.js'
+import { API_CACHE_LONG_MS, API_CACHE_SHORT_MS } from '@/stores/utils/cache-timeouts.js'
 import {
   createApiGetQueryOptionsFactory,
   invalidateQueriesSafely
-} from 'src/stores/utils/query-helpers.js'
-import { api } from 'src/clients/axios-client.js'
-import { mutationResult, runMutation } from 'src/stores/utils/store-mutations.js'
+} from '@/stores/utils/query-helpers.js'
+import { api } from '@/clients/axios-client.js'
+import { mutationResult, runMutation } from '@/stores/utils/store-mutations.js'
 
 export const useAccountStore = defineStore('account', () => {
   const queryCache = useQueryCache()

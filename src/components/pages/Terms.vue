@@ -191,7 +191,7 @@
 defineOptions({ name: 'Terms-Page' })
 
 import { computed } from 'vue'
-import { useAccountStore } from 'src/stores/account-store.js'
+import { useAccountStore } from '@/stores/account-store.js'
 
 const accountStore = useAccountStore()
 const providersQuery = accountStore.useProvidersQuery()

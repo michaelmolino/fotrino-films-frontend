@@ -62,7 +62,7 @@ const primaryTitleTransitionClass = computed(() =>
 const secondaryTitleTransitionClass = computed(() =>
   prefersReducedMotion.value ? '' : 'animated zoomInDown slower delay-1s'
 )
-const sampleChannelPath = process.env.SAMPLE_CHANNEL_CANONICAL_PATH
+const sampleChannelPath = import.meta.env.SAMPLE_CHANNEL_CANONICAL_PATH
 const textToneClass = computed(() => ($q.dark.isActive ? 'text-white' : 'text-primary'))
 const content = {
   titlePrimaryLeft: 'Fotrino ',

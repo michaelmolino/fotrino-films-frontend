@@ -93,10 +93,10 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { useAdminStore } from 'src/stores/admin-store.js'
+import { useAdminStore } from '@/stores/admin-store.js'
 import { daysSince } from '@utils/date.js'
-import { getComponentApiErrorMessage } from 'src/utils/api-error-service.js'
-import { notifyError, notifySuccess } from 'src/utils/notify.js'
+import { getComponentApiErrorMessage } from '@/utils/api-error-service.js'
+import { notifyError, notifySuccess } from '@/utils/notify.js'
 
 const adminStore = useAdminStore()
 const JOB_FILTER_KEY = 'admin.jobs.filterMode'

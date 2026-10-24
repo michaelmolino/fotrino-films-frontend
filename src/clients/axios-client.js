@@ -1,6 +1,6 @@
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
-import { parseRetryAfterSeconds } from 'src/utils/api-error-service.js'
+import { parseRetryAfterSeconds } from '@/utils/api-error-service.js'
 
 const RETRYABLE_STATUS_CODES = new Set([408, 429, 500, 502, 503, 504])
 
@@ -30,7 +30,7 @@ const retryDelay = (retryCount, error) => {
 }
 
 const api = axios.create({
-  baseURL: process.env.FOTRINO_API_URL,
+  baseURL: import.meta.env.FOTRINO_API_URL,
   withCredentials: true
 })
 

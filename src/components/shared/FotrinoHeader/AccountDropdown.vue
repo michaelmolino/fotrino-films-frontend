@@ -27,7 +27,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useAccountStore } from 'src/stores/account-store.js'
+import { useAccountStore } from '@/stores/account-store.js'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { resolveImagePrimaryUrl } from '@utils/image-asset.js'

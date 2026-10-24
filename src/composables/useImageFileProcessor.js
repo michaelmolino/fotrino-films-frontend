@@ -2,7 +2,7 @@ import { ref } from 'vue'
 import { useObjectUrl } from '@vueuse/core'
 import imageCompression from 'browser-image-compression'
 import imageCompressionLibUrl from 'browser-image-compression/dist/browser-image-compression.js?url'
-import { notifyError } from 'src/utils/notify.js'
+import { notifyError } from '@/utils/notify.js'
 
 async function compressImageFile(file) {
   if (!file) return file

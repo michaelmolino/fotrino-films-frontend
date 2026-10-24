@@ -15,8 +15,8 @@
   "dependencies": {
     "@pinia/colada": "^1.4.8",
     "@quasar/extras": "^2.1.0",
-    "@uppy/aws-s3": "^6.3.0",
-    "@uppy/core": "^6.3.0",
+    "@uppy/aws-s3": "^5.1.0",
+    "@uppy/core": "^5.2.0",
     "@vueuse/core": "^15.0.0",
     "axios": "^1.20.0",
     "axios-retry": "^4.5.0",
@@ -50,6 +50,7 @@
     "globals": "^17.13.0",
     "postcss": "^8.5.31",
     "prettier": "3",
+    "rollup-plugin-visualizer": "^7.1.1",
     "sass": "^1.106.1",
     "terser": "^5.51.2",
     "vite": "^8.3.4",

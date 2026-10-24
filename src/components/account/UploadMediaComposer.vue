@@ -203,8 +203,8 @@ import { sanitizeHtml, sanitizeText } from '@utils/text.js'
 import {
   UPLOAD_MEDIA_FILE_SIZE_BYTES,
   UPLOAD_MEDIA_FILE_SIZE_LABEL
-} from 'src/utils/upload-limits.js'
-import { notifyWarning } from 'src/utils/notify.js'
+} from '@/utils/upload-limits.js'
+import { notifyWarning } from '@/utils/notify.js'
 
 const $q = useQuasar()
 const activeSection = ref(null)

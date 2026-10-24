@@ -17,12 +17,12 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { useChannelStore } from 'src/stores/channel-store.js'
-import { useUploadStore } from 'src/stores/upload-store.js'
+import { useChannelStore } from '@/stores/channel-store.js'
+import { useUploadStore } from '@/stores/upload-store.js'
 import ChannelItem from './MediaBrowser/ChannelItem.vue'
-import { getComponentApiErrorMessage } from 'src/utils/api-error-service.js'
-import { useUppyPresignedUpload } from 'src/composables/useUppyPresignedUpload.js'
-import { notifyError, notifySuccess } from 'src/utils/notify.js'
+import { getComponentApiErrorMessage } from '@/utils/api-error-service.js'
+import { useUppyPresignedUpload } from '@/composables/useUppyPresignedUpload.js'
+import { notifyError, notifySuccess } from '@/utils/notify.js'
 
 const channelStore = useChannelStore()
 const uploadStore = useUploadStore()

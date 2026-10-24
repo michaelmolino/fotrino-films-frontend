@@ -1,4 +1,4 @@
-import { api } from 'src/clients/axios-client.js'
+import { api } from '@/clients/axios-client.js'
 
 const identity = value => value
 

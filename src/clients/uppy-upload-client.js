@@ -40,8 +40,8 @@ export function createPresignedUppyClient({
 }) {
   const instructionByType = buildInstructionMap(instructions)
   const apiBase =
-    typeof process.env.FOTRINO_API_URL === 'string'
-      ? process.env.FOTRINO_API_URL.trim().replace(/\/$/, '')
+    typeof import.meta.env.FOTRINO_API_URL === 'string'
+      ? import.meta.env.FOTRINO_API_URL.trim().replace(/\/$/, '')
       : ''
   const companionBase = apiBase ? `${apiBase}/uppy` : '/uppy'
 

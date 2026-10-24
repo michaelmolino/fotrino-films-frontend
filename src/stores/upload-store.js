@@ -1,9 +1,9 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { api } from 'src/clients/axios-client.js'
+import { api } from '@/clients/axios-client.js'
 import { useQueryCache } from '@pinia/colada'
-import { invalidateQueriesSafely } from 'src/stores/utils/query-helpers.js'
-import { mutationResult, runMutation } from 'src/stores/utils/store-mutations.js'
+import { invalidateQueriesSafely } from '@/stores/utils/query-helpers.js'
+import { mutationResult, runMutation } from '@/stores/utils/store-mutations.js'
 
 export const useUploadStore = defineStore('upload', () => {
   const upload = ref(null)

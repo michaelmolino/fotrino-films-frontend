@@ -90,7 +90,7 @@ import AlbumItem from './AlbumItem.vue'
 import EditableChannelFields from '@components/account/shared/EditableChannelFields.vue'
 import { daysSince } from '@utils/date.js'
 import { useImageSelectionProcessing } from '@composables/useImageFileProcessor.js'
-import { useChannelStore } from 'src/stores/channel-store.js'
+import { useChannelStore } from '@/stores/channel-store.js'
 import { resolveImagePrimaryUrl } from '@utils/image-asset.js'
 
 const props = defineProps({

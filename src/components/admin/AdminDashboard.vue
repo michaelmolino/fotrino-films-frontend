@@ -14,7 +14,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useAccountStore } from 'src/stores/account-store.js'
+import { useAccountStore } from '@/stores/account-store.js'
 import AdminUserList from './AdminDashboard/AdminUserList.vue'
 import AdminJobs from './AdminDashboard/AdminJobs.vue'
 import AdminMaintenance from './AdminDashboard/AdminMaintenance.vue'

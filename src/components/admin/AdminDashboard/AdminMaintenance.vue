@@ -64,9 +64,9 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useAdminStore } from 'src/stores/admin-store.js'
-import { getComponentApiErrorMessage } from 'src/utils/api-error-service.js'
-import { notifyError, notifySuccess } from 'src/utils/notify.js'
+import { useAdminStore } from '@/stores/admin-store.js'
+import { getComponentApiErrorMessage } from '@/utils/api-error-service.js'
+import { notifyError, notifySuccess } from '@/utils/notify.js'
 
 const adminStore = useAdminStore()
 const olderThanHours = ref(24)

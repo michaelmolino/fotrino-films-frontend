@@ -27,7 +27,7 @@ const { loadChannel, routeContext } = useChannelLoader({ manageMeta: true })
 const showTerms = ref(false)
 
 onMounted(() => {
-  if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.QUASAR_DEV) {
     console.warn('WARNING: This is a development server and should not be exposed to the internet.')
   }
 })

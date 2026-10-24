@@ -1,16 +1,16 @@
 import { ref, reactive, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { onBeforeRouteLeave, useRoute } from 'vue-router'
-import { useAccountStore } from 'src/stores/account-store.js'
-import { useChannelStore } from 'src/stores/channel-store.js'
-import { useUploadStore } from 'src/stores/upload-store.js'
-import { getComponentApiErrorMessage } from 'src/utils/api-error-service.js'
+import { useAccountStore } from '@/stores/account-store.js'
+import { useChannelStore } from '@/stores/channel-store.js'
+import { useUploadStore } from '@/stores/upload-store.js'
+import { getComponentApiErrorMessage } from '@/utils/api-error-service.js'
 import { useImageFileProcessor } from '@composables/useImageFileProcessor.js'
 import { useVideoThumbnailProcessor } from '@composables/useVideoThumbnailProcessor.js'
 import { useUploadFlow } from '@composables/useUploadFlow.js'
 import { extractExifDate } from '@composables/useMediaMetadata.js'
-import { createRandomId } from 'src/utils/random.js'
+import { createRandomId } from '@/utils/random.js'
 import { useDebounceFn } from '@vueuse/core'
-import { notifyError, notifyWarning } from 'src/utils/notify.js'
+import { notifyError, notifyWarning } from '@/utils/notify.js'
 
 const IMAGE_RESOURCE_TYPES = new Set(['cover', 'poster', 'preview'])
 const VALIDATION_DEBOUNCE_MS = 300
